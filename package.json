@@ -21,7 +21,8 @@
     "lint:fix": "biome check . --write",
     "format": "biome format . --write",
     "typecheck": "tsc --noEmit",
-    "test": "vitest --env-file=.env"
+    "test": "vitest",
+    "test:ci": "vitest run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1153.0",
@@ -34,7 +35,6 @@
     "@fastify/swagger": "^9.9.2",
     "@prisma/adapter-pg": "7",
     "@prisma/client": "7",
-    "arctic": "^3.7.0",
     "fastify": "^5.12.5",
     "fastify-type-provider-zod": "^7.0.0",
     "jose": "^6.2.13",
@@ -50,6 +50,7 @@
     "tsup": "^8.5.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "vite": "^8.3.4",
     "vitest": "^5.0.3"
   }
 }

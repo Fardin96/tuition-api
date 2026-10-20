@@ -7,7 +7,7 @@ Backend for the Tuition Media / Masters Hub app.
 - **Runtime:** Node.js 22, TypeScript, ESM
 - **Framework:** Fastify 5 with Zod type provider
 - **ORM / DB:** Prisma 7 + PostgreSQL 13+ (uses `@prisma/adapter-pg`)
-- **Auth:** Google OAuth via `arctic`, JWT access tokens, SHA-256 hashed refresh tokens
+- **Auth:** Google ID-token verification (frontend-driven OAuth), JWT access tokens, SHA-256 hashed refresh tokens
 - **Files:** Cloudflare R2 (S3-compatible object storage)
 - **Notifications:** n8n webhook → WhatsApp
 - **Hosting:** DigitalOcean App Platform, region `blr` (Bangalore) — see `.do/app.yaml`
@@ -63,14 +63,15 @@ curl http://localhost:3000/api/v1/health
 | `yarn db:studio` | Open Prisma Studio |
 | `yarn lint` / `yarn lint:fix` | Biome |
 | `yarn typecheck` | TypeScript |
-| `yarn test` | Vitest |
+| `yarn test` | Vitest (watch) |
+| `yarn test:ci` | Vitest (single run) |
 
 ## Deploy to DigitalOcean App Platform
 
 1. The App Platform app already includes a PostgreSQL database component — `DATABASE_URL` is injected automatically as `${db.DATABASE_URL}` in `.do/app.yaml`.
 2. Create a Cloudflare R2 bucket and API token for file uploads.
-3. Set up Google OAuth credentials and whitelist the production redirect URI.
-4. Fill in `.do/app.yaml` (GitHub repo name, R2 credentials, Google secrets, token secrets).
+3. Set up a Google OAuth client and add the production `GOOGLE_CLIENT_ID` to `.do/app.yaml`.
+4. Fill in `.do/app.yaml` (GitHub repo name, R2 credentials, Google client ID, token secrets).
 5. Install `doctl` and run:
    ```bash
    doctl apps create --spec .do/app.yaml
@@ -80,6 +81,22 @@ curl http://localhost:3000/api/v1/health
    doctl apps create-deployment <app-id> --spec .do/app.yaml --job migrate
    # or run `yarn db:seed` locally against the managed DB
    ```
+
+## Testing
+
+Tests use **Vitest** and hit a real PostgreSQL database.
+
+1. Create a test DB (separate from `tuition_dev`):
+   ```bash
+   createdb tuition_test
+   ```
+2. Add `TEST_DATABASE_URL` to `.env` (or use the same `DATABASE_URL` for both).
+3. Run tests:
+   ```bash
+   yarn test:ci
+   ```
+
+CI runs on every push/PR via `.github/workflows/ci.yml` using a Postgres service container.
 
 ## Required environment variables
 
@@ -91,7 +108,7 @@ See `.env.example` for the full list. Required for the app to start:
 
 Required once you build auth/files/notifications:
 
-- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_ID` (backend verifies the ID token from the frontend)
 - `R2_ENDPOINT`, `R2_REGION`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_URL_PREFIX`
 - `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`
 - `SUPER_ADMIN_EMAIL_1`, `SUPER_ADMIN_EMAIL_2`
