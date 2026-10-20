@@ -1,0 +1,879 @@
+// Masters Hub / Tuition Media: schema v5 (resolved against the ERD)
+// Prisma 7. The datasource URL lives in prisma.config.ts, not here.
+//
+// Rules Prisma cannot express (CHECKs, triggers, partial unique indexes) live in
+// constraints.sql and ship as part of the init migration. Every rule is listed
+// in the diagram under its table.
+//
+// v5 changes:
+//  - Application no longer declares composite FKs with a nullable column (Prisma
+//    rejects a relation whose scalar fields mix required and optional). The
+//    "requirement belongs to this student / package belongs to this tutor" rule is
+//    now a trigger in constraints.sql. Simple single-column relations remain.
+//  - Every optional relation has an explicit onDelete: Restrict. Prisma's default
+//    for an optional relation is SetNull, which would silently rewrite history
+//    (and would fire the append-only triggers).
+//  - Redundant @@unique([accountId, role]) removed from profile tables (accountId
+//    is already unique / PK).
+//  - Added FK-side indexes on platform_fee.application_id and
+//    notification_log.recipient_account_id.
+//
+// Roles: STUDENT, TUTOR, ADMIN. "Student" covers parent and learner (one role).
+// Admin has two levels: ADMIN and SUPER_ADMIN (allowlisted emails only).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────── enums ─────────────────────────
+
+enum Role {
+  STUDENT
+  TUTOR
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum AdminRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum AdminStatus {
+  PENDING
+  ACTIVE
+  REMOVED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum GenderPref {
+  ANY
+  MALE
+  FEMALE
+}
+
+enum VerificationStatus {
+  NOT_SUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ListingStatus {
+  DRAFT
+  OPEN
+  FILLED
+  CLOSED
+  EXPIRED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApplicationStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  REJECTED
+  WITHDRAWN
+  CANCELLED
+  EXPIRED
+}
+
+enum InitiatedBy {
+  TUTOR
+  STUDENT
+}
+
+enum ReviewDirection {
+  STUDENT_TO_TUTOR
+  TUTOR_TO_STUDENT
+}
+
+enum ReviewStatus {
+  VISIBLE
+  HIDDEN
+}
+
+enum FeeType {
+  PLACEMENT
+  RECURRING
+  OTHER
+}
+
+// Set by a trigger from the payment rows (except WAIVED / VOID, which an admin sets).
+// OVERDUE is not stored: (status in DUE, PARTIAL) and due_date < today.
+enum FeeStatus {
+  DUE
+  PARTIAL
+  PAID
+  WAIVED
+  VOID
+}
+
+enum PaymentMethod {
+  BKASH
+  NAGAD
+  ROCKET
+  BANK
+  CASH
+  OTHER
+}
+
+enum PaymentKind {
+  PAYMENT
+  REVERSAL
+}
+
+enum FilePurpose {
+  STUDENT_ID
+  TUTOR_ID
+  CREDENTIAL
+  TUTOR_VIDEO
+  BLOG_COVER
+}
+
+enum FileStatus {
+  PENDING_UPLOAD
+  UPLOADED
+  DELETED
+}
+
+enum ReportCategory {
+  ABUSE
+  FAKE_PROFILE
+  SPAM
+  NO_SHOW
+  OFF_PLATFORM_CONTACT
+  INAPPROPRIATE_CONTENT
+  OTHER
+}
+
+enum DisputeType {
+  NO_SHOW
+  QUALITY
+  PAYMENT
+  SCHEDULE
+  OTHER
+}
+
+enum CaseStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum NotificationChannel {
+  WHATSAPP
+  EMAIL
+}
+
+enum NotificationEvent {
+  APPLICATION_RECEIVED
+  APPLICATION_CONFIRMED
+  TUTOR_VERIFICATION_DECIDED
+  PAYMENT_REMINDER
+}
+
+enum NotificationStatus {
+  PENDING
+  SENDING
+  SENT
+  DELIVERED
+  FAILED
+  DEAD
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ───────────────────────── accounts & admin ─────────────────────────
+// Login = short-lived access token + a refresh token kept in `session` (hash
+// only). OTP state lives with the OTP provider. Consent is two columns on
+// account, not a log table.
+// One account = one role = at most one profile: each profile row carries a
+// fixed `role` and a composite FK (account_id, role) -> account (id, role).
+
+model Account {
+  id                String        @id @default(uuid(7)) @db.Uuid
+  role              Role
+  googleSub         String        @unique @map("google_sub")
+  email             String        @unique // lowercased
+  status            AccountStatus @default(ACTIVE) // BLOCKED is set by trigger from account_block
+  consentVersion    String?       @map("consent_version")
+  consentAcceptedAt DateTime?     @map("consent_accepted_at") @db.Timestamptz(3)
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastLoginAt       DateTime?     @map("last_login_at") @db.Timestamptz(3)
+  deletedAt         DateTime?     @map("deleted_at") @db.Timestamptz(3)
+
+  student         Student?
+  tutor           Tutor?
+  adminUser       AdminUser?
+  sessions        Session[]
+  files           FileAsset[]
+  notifications   NotificationLog[]
+  auditEntries    AuditLog[]
+  blocks          AccountBlock[]
+  reportsMade     Report[]          @relation("ReportReporter")
+  reportsAgainst  Report[]          @relation("ReportTarget")
+  disputesRaised  Dispute[]         @relation("DisputeRaisedBy")
+  disputesAgainst Dispute[]         @relation("DisputeAgainst")
+
+  @@unique([id, role]) // target of the profile composite FKs
+  @@map("account")
+}
+
+// One row per signed-in device. The refresh token is opaque and random; only its
+// SHA-256 hash is stored, never the token itself.
+model Session {
+  id               String    @id @default(uuid(7)) @db.Uuid
+  accountId        String    @map("account_id") @db.Uuid
+  refreshTokenHash String    @unique @map("refresh_token_hash")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUsedAt       DateTime  @default(now()) @map("last_used_at") @db.Timestamptz(3)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(3) // refresh-token expiry
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(3)
+  ip               String?
+  userAgent        String?   @map("user_agent")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, revokedAt])
+  @@index([expiresAt]) // cleanup job
+  @@map("session")
+}
+
+// ADMIN: can moderate. SUPER_ADMIN: everything an admin can do, plus approve or
+// remove admins and block accounts. Only two people can be SUPER_ADMIN
+// (super_admin_email, two slots). New admins start PENDING until a super admin
+// approves them.
+model AdminUser {
+  accountId    String      @id @map("account_id") @db.Uuid
+  role         Role        @default(ADMIN)
+  name         String
+  adminRole    AdminRole   @default(ADMIN) @map("admin_role")
+  status       AdminStatus @default(PENDING)
+  approvedById String?     @map("approved_by") @db.Uuid
+  approvedAt   DateTime?   @map("approved_at") @db.Timestamptz(3)
+  removedById  String?     @map("removed_by") @db.Uuid
+  removedAt    DateTime?   @map("removed_at") @db.Timestamptz(3)
+  mfaEnabled   Boolean     @default(false) @map("mfa_enabled")
+  mfaSecretEnc String?     @map("mfa_secret_enc") // encrypted at app level
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  account    Account     @relation(fields: [accountId, role], references: [id, role])
+  approvedBy AdminUser?  @relation("AdminApproval", fields: [approvedById], references: [accountId], onDelete: Restrict)
+  approvals  AdminUser[] @relation("AdminApproval")
+  removedBy  AdminUser?  @relation("AdminRemoval", fields: [removedById], references: [accountId], onDelete: Restrict)
+  removals   AdminUser[] @relation("AdminRemoval")
+
+  reviewedVerifications TutorVerification[]
+  recordedPayments      FeePayment[]
+  blogPosts             BlogPost[]
+  contentEdits          SiteContent[]
+  blocksMade            AccountBlock[]      @relation("BlockedBy")
+  unblocksMade          AccountBlock[]      @relation("UnblockedBy")
+  handledReports        Report[]
+  handledDisputes       Dispute[]
+
+  @@unique([accountId, role])
+  @@map("admin_user")
+}
+
+// The only emails allowed to hold SUPER_ADMIN. Two slots, seeded once.
+model SuperAdminEmail {
+  slot  Int    @id // 1 or 2
+  email String @unique
+
+  @@map("super_admin_email")
+}
+
+// A block is a super-admin action. History is kept; at most one block is active
+// per account. A trigger keeps account.status in step.
+model AccountBlock {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  accountId     String    @map("account_id") @db.Uuid
+  blockedById   String    @map("blocked_by") @db.Uuid
+  reason        String
+  blockedAt     DateTime  @default(now()) @map("blocked_at") @db.Timestamptz(3)
+  unblockedAt   DateTime? @map("unblocked_at") @db.Timestamptz(3)
+  unblockedById String?   @map("unblocked_by") @db.Uuid
+
+  account     Account    @relation(fields: [accountId], references: [id])
+  blockedBy   AdminUser  @relation("BlockedBy", fields: [blockedById], references: [accountId])
+  unblockedBy AdminUser? @relation("UnblockedBy", fields: [unblockedById], references: [accountId], onDelete: Restrict)
+
+  @@index([accountId, blockedAt(sort: Desc)])
+  @@map("account_block")
+}
+
+// ───────────────────────── lookups ─────────────────────────
+
+// Seeded once: division > district > area.
+model Area {
+  id       Int    @id @default(autoincrement())
+  division String
+  district String
+  name     String
+
+  students     Student[]
+  tutorAreas   TutorArea[]
+  requirements TuitionRequirement[]
+  packages     TuitionPackage[]
+
+  @@unique([district, name])
+  @@map("area")
+}
+
+// Broad level, e.g. SSC / HSC / Admission. Admin-managed.
+model Category {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  slug      String  @unique
+  sortOrder Int     @default(0) @map("sort_order")
+  isActive  Boolean @default(true) @map("is_active")
+
+  requirements TuitionRequirement[]
+  packages     TuitionPackage[]
+
+  @@map("category")
+}
+
+// The clean subject list (Math, English, Physics...). Admin-managed.
+model Subject {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  slug      String  @unique
+  sortOrder Int     @default(0) @map("sort_order")
+  isActive  Boolean @default(true) @map("is_active")
+
+  tutorSubjects TutorSubject[]
+  requirements  TuitionRequirement[]
+  packages      TuitionPackage[]
+
+  @@map("subject")
+}
+
+// Every uploaded object. Other tables reference file_asset, never a raw URL.
+model FileAsset {
+  id             String      @id @default(uuid(7)) @db.Uuid
+  ownerAccountId String      @map("owner_account_id") @db.Uuid
+  purpose        FilePurpose
+  storageKey     String      @unique @map("storage_key")
+  contentType    String      @map("content_type")
+  sizeBytes      Int         @map("size_bytes")
+  status         FileStatus  @default(PENDING_UPLOAD)
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  uploadedAt     DateTime?   @map("uploaded_at") @db.Timestamptz(3)
+  deletedAt      DateTime?   @map("deleted_at") @db.Timestamptz(3)
+
+  owner                Account             @relation(fields: [ownerAccountId], references: [id])
+  studentVerifications Student[]           @relation("StudentVerificationFile")
+  tutorVerifications   TutorVerification[]
+  credentials          TutorCredential[]
+  videos               TutorVideo[]
+  blogCovers           BlogPost[]
+
+  @@index([ownerAccountId])
+  @@index([status, createdAt])
+  @@map("file_asset")
+}
+
+// ───────────────────────── profiles ─────────────────────────
+
+model Student {
+  id                 String             @id @default(uuid(7)) @db.Uuid
+  accountId          String             @unique @map("account_id") @db.Uuid
+  role               Role               @default(STUDENT)
+  name               String
+  areaId             Int                @map("area_id")
+  address            String
+  emergencyContact   String             @map("emergency_contact")
+  whatsappNumber     String             @unique @map("whatsapp_number") // E.164 text, never numeric
+  whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
+  studentIdNumber    String             @map("student_id_number")
+  verificationFileId String?            @map("verification_file_id") @db.Uuid
+  verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
+  // Rating tutors give this student. Written only by the review trigger.
+  ratingAvg          Decimal            @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  ratingCount        Int                @default(0) @map("rating_count")
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  account          Account              @relation(fields: [accountId, role], references: [id, role])
+  area             Area                 @relation(fields: [areaId], references: [id])
+  verificationFile FileAsset?           @relation("StudentVerificationFile", fields: [verificationFileId], references: [id], onDelete: Restrict)
+  requirements     TuitionRequirement[]
+  applications     Application[]
+  reviewsGiven     Review[]             @relation("ReviewStudent")
+
+  @@unique([accountId, role])
+  @@index([areaId])
+  @@index([verificationStatus])
+  @@map("student")
+}
+
+model Tutor {
+  id                 String             @id @default(uuid(7)) @db.Uuid
+  accountId          String             @unique @map("account_id") @db.Uuid
+  role               Role               @default(TUTOR)
+  name               String
+  address            String
+  emergencyContact   String             @map("emergency_contact")
+  whatsappNumber     String             @unique @map("whatsapp_number")
+  whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
+  studentIdNumber    String             @map("student_id_number")
+  gender             Gender
+  parentsInfo        String?            @map("parents_info")
+  // Denormalised current state, kept in step by trigger from tutor_verification (latest row).
+  verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
+  // Set by the service: verified, active account. The directory filters on this.
+  // A trigger clears it when verification stops being APPROVED or the account is not ACTIVE.
+  isListed           Boolean            @default(false) @map("is_listed")
+  // Rating students give this tutor. Written only by the review trigger.
+  ratingAvg          Decimal            @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  ratingCount        Int                @default(0) @map("rating_count")
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  account       Account             @relation(fields: [accountId, role], references: [id, role])
+  areas         TutorArea[]
+  subjects      TutorSubject[]
+  verifications TutorVerification[]
+  credentials   TutorCredential[]
+  videos        TutorVideo[]
+  packages      TuitionPackage[]
+  applications  Application[]
+  fees          PlatformFee[]
+  reviews       Review[]            @relation("ReviewTutor")
+
+  @@unique([accountId, role])
+  @@index([isListed, ratingAvg(sort: Desc)])
+  @@index([isListed, gender])
+  @@map("tutor")
+}
+
+// Areas a tutor teaches in (many).
+model TutorArea {
+  tutorId String @map("tutor_id") @db.Uuid
+  areaId  Int    @map("area_id")
+
+  tutor Tutor @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  area  Area  @relation(fields: [areaId], references: [id])
+
+  @@id([tutorId, areaId])
+  @@index([areaId, tutorId])
+  @@map("tutor_area")
+}
+
+// Subjects a tutor teaches (many), from the clean subject list.
+model TutorSubject {
+  tutorId   String @map("tutor_id") @db.Uuid
+  subjectId Int    @map("subject_id")
+
+  tutor   Tutor   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  @@id([tutorId, subjectId])
+  @@index([subjectId, tutorId])
+  @@map("tutor_subject")
+}
+
+// One row per submission. A rejection survives a later approved resubmission.
+model TutorVerification {
+  id           String             @id @default(uuid(7)) @db.Uuid
+  tutorId      String             @map("tutor_id") @db.Uuid
+  fileId       String             @map("file_id") @db.Uuid
+  ocrData      Json?              @map("ocr_data")
+  status       VerificationStatus @default(PENDING)
+  submittedAt  DateTime           @default(now()) @map("submitted_at") @db.Timestamptz(3)
+  reviewedById String?            @map("reviewed_by") @db.Uuid
+  decidedAt    DateTime?          @map("decided_at") @db.Timestamptz(3)
+  note         String?
+
+  tutor      Tutor      @relation(fields: [tutorId], references: [id])
+  file       FileAsset  @relation(fields: [fileId], references: [id])
+  reviewedBy AdminUser? @relation(fields: [reviewedById], references: [accountId], onDelete: Restrict)
+
+  @@index([tutorId, submittedAt(sort: Desc)])
+  @@index([status, submittedAt]) // admin review queue
+  @@map("tutor_verification")
+}
+
+model TutorCredential {
+  id        String @id @default(uuid(7)) @db.Uuid
+  tutorId   String @map("tutor_id") @db.Uuid
+  examLabel String @map("exam_label")
+  result    String
+  fileId    String @map("file_id") @db.Uuid
+
+  tutor Tutor     @relation(fields: [tutorId], references: [id])
+  file  FileAsset @relation(fields: [fileId], references: [id])
+
+  @@index([tutorId])
+  @@map("tutor_credential")
+}
+
+// Needs admin approval before it shows. Curated: top tutors only (20-50 total).
+model TutorVideo {
+  id             String           @id @default(uuid(7)) @db.Uuid
+  tutorId        String           @map("tutor_id") @db.Uuid
+  fileId         String           @unique @map("file_id") @db.Uuid
+  title          String
+  status         ModerationStatus @default(PENDING)
+  moderationNote String?          @map("moderation_note")
+  sortOrder      Int              @default(0) @map("sort_order")
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  tutor Tutor     @relation(fields: [tutorId], references: [id])
+  file  FileAsset @relation(fields: [fileId], references: [id])
+
+  @@index([tutorId])
+  @@index([status, sortOrder])
+  @@map("tutor_video")
+}
+
+// ───────────────────────── listings ─────────────────────────
+
+// A student's search criteria: used as a filter to find tutors, and visible to
+// tutors who may apply. A student can have any number. No admin approval.
+model TuitionRequirement {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  studentId       String        @map("student_id") @db.Uuid
+  categoryId      Int           @map("category_id")
+  areaId          Int           @map("area_id") // where the tuition happens
+  subjectId       Int           @map("subject_id")
+  classLevel      Int           @map("class_level") @db.SmallInt
+  timeOfDay       DateTime      @map("time_of_day") @db.Time(0)
+  daysPerWeek     Int           @map("days_per_week") @db.SmallInt
+  salary          Int // BDT per month
+  studentCount    Int           @default(1) @map("student_count") @db.SmallInt
+  hireByDate      DateTime      @map("hire_by_date") @db.Date
+  tutorGenderPref GenderPref    @default(ANY) @map("tutor_gender_pref")
+  instituteName   String?       @map("institute_name")
+  tuitionType     String        @map("tuition_type") @db.VarChar(30)
+  status          ListingStatus @default(OPEN)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  student      Student       @relation(fields: [studentId], references: [id])
+  category     Category      @relation(fields: [categoryId], references: [id])
+  area         Area          @relation(fields: [areaId], references: [id])
+  subject      Subject       @relation(fields: [subjectId], references: [id])
+  applications Application[]
+
+  @@index([studentId, createdAt(sort: Desc)])
+  @@index([status, categoryId, subjectId, areaId, createdAt(sort: Desc)])
+  @@map("tuition_requirement")
+}
+
+// Created by a tutor. Needs admin approval before students can see it.
+model TuitionPackage {
+  id               String           @id @default(uuid(7)) @db.Uuid
+  tutorId          String           @map("tutor_id") @db.Uuid
+  categoryId       Int              @map("category_id")
+  subjectId        Int              @map("subject_id")
+  areaId           Int?             @map("area_id") // null = online / anywhere
+  classLevel       Int              @map("class_level") @db.SmallInt
+  timeOfDay        DateTime         @map("time_of_day") @db.Time(0)
+  daysPerWeek      Int              @map("days_per_week") @db.SmallInt
+  expectedSalary   Int              @map("expected_salary")
+  studentCount     Int              @default(1) @map("student_count") @db.SmallInt
+  availableFrom    DateTime         @map("available_from") @db.Date
+  status           ListingStatus    @default(OPEN)
+  moderationStatus ModerationStatus @default(PENDING) @map("moderation_status")
+  moderationNote   String?          @map("moderation_note")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  tutor        Tutor         @relation(fields: [tutorId], references: [id])
+  category     Category      @relation(fields: [categoryId], references: [id])
+  subject      Subject       @relation(fields: [subjectId], references: [id])
+  area         Area?         @relation(fields: [areaId], references: [id], onDelete: Restrict) // never turn a package "online" by deleting an area
+  applications Application[]
+
+  @@index([tutorId, createdAt(sort: Desc)])
+  @@index([status, moderationStatus, categoryId, subjectId, areaId, createdAt(sort: Desc)])
+  @@map("tuition_package")
+}
+
+// ───────────────────────── matching ─────────────────────────
+// Two ways in:
+//   A TUTOR applies to a student's requirement. Many tutors can apply to the
+//   same requirement (one row per tutor). The STUDENT who posted it accepts or
+//   rejects each tutor.
+//   A STUDENT takes a tutor's package.
+// No admin approval anywhere on applications, and admins do not accept or
+// reject them. (Admin approval applies to tutor packages and videos.)
+// Duplicates are impossible: one application per (tutor, requirement) and one
+// per (student, package). To retry after a withdrawal, reopen the same row.
+// A CONFIRMED / COMPLETED row is the hiring / tuition history record, and its
+// confirmed_at / ended_at can never be changed (trigger).
+// Ownership ("requirement is this student's, package is this tutor's") is
+// enforced by application_target_guard (trigger), not by a composite FK.
+
+model Application {
+  id            String            @id @default(uuid(7)) @db.Uuid
+  requirementId String?           @map("requirement_id") @db.Uuid
+  packageId     String?           @map("package_id") @db.Uuid
+  tutorId       String            @map("tutor_id") @db.Uuid
+  studentId     String            @map("student_id") @db.Uuid
+  initiatedBy   InitiatedBy       @map("initiated_by")
+  status        ApplicationStatus @default(PENDING)
+  appliedAt     DateTime          @default(now()) @map("applied_at") @db.Timestamptz(3)
+  confirmedAt   DateTime?         @map("confirmed_at") @db.Timestamptz(3)
+  endedAt       DateTime?         @map("ended_at") @db.Timestamptz(3)
+
+  requirement   TuitionRequirement? @relation(fields: [requirementId], references: [id], onDelete: Restrict)
+  package       TuitionPackage?     @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  tutor         Tutor               @relation(fields: [tutorId], references: [id])
+  student       Student             @relation(fields: [studentId], references: [id])
+  fees          PlatformFee[]
+  notifications NotificationLog[]
+  reports       Report[]
+  disputes      Dispute[]
+
+  @@unique([tutorId, requirementId]) // same tutor cannot apply to the same requirement twice
+  @@unique([studentId, packageId]) // same student cannot request the same package twice
+  @@index([tutorId, status, appliedAt(sort: Desc)])
+  @@index([studentId, status, appliedAt(sort: Desc)])
+  @@index([requirementId])
+  @@index([packageId])
+  @@map("application")
+}
+
+// Given between a tutor and a student, in either direction. One per direction
+// per pair, and only once the pair has a CONFIRMED / COMPLETED application.
+// Rating averages on tutor and student are recomputed by trigger on every
+// insert, update or delete here, so they cannot drift from the rows.
+model Review {
+  id        String          @id @default(uuid(7)) @db.Uuid
+  tutorId   String          @map("tutor_id") @db.Uuid
+  studentId String          @map("student_id") @db.Uuid
+  direction ReviewDirection
+  rating    Int             @db.SmallInt
+  comment   String?
+  status    ReviewStatus    @default(VISIBLE)
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  tutor   Tutor   @relation("ReviewTutor", fields: [tutorId], references: [id])
+  student Student @relation("ReviewStudent", fields: [studentId], references: [id])
+
+  @@unique([tutorId, studentId, direction])
+  @@index([tutorId, direction, status])
+  @@index([studentId, direction, status])
+  @@map("review")
+}
+
+// ───────────────────────── trust & safety ─────────────────────────
+
+// A complaint about a user's conduct.
+model Report {
+  id              String         @id @default(uuid(7)) @db.Uuid
+  reporterId      String         @map("reporter_id") @db.Uuid
+  targetAccountId String         @map("target_account_id") @db.Uuid
+  applicationId   String?        @map("application_id") @db.Uuid
+  category        ReportCategory
+  details         String
+  status          CaseStatus     @default(OPEN)
+  handledById     String?        @map("handled_by") @db.Uuid
+  resolutionNote  String?        @map("resolution_note")
+  resolvedAt      DateTime?      @map("resolved_at") @db.Timestamptz(3)
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  reporter    Account      @relation("ReportReporter", fields: [reporterId], references: [id])
+  target      Account      @relation("ReportTarget", fields: [targetAccountId], references: [id])
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  handledBy   AdminUser?   @relation(fields: [handledById], references: [accountId], onDelete: Restrict)
+
+  @@index([status, createdAt])
+  @@index([targetAccountId])
+  @@index([reporterId])
+  @@map("report")
+}
+
+// A problem inside a running match (no-show, quality, payment).
+model Dispute {
+  id             String      @id @default(uuid(7)) @db.Uuid
+  applicationId  String      @map("application_id") @db.Uuid
+  raisedById     String      @map("raised_by") @db.Uuid
+  againstId      String      @map("against") @db.Uuid
+  type           DisputeType
+  details        String
+  status         CaseStatus  @default(OPEN)
+  handledById    String?     @map("handled_by") @db.Uuid
+  resolutionNote String?     @map("resolution_note")
+  resolvedAt     DateTime?   @map("resolved_at") @db.Timestamptz(3)
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  application Application @relation(fields: [applicationId], references: [id])
+  raisedBy    Account     @relation("DisputeRaisedBy", fields: [raisedById], references: [id])
+  against     Account     @relation("DisputeAgainst", fields: [againstId], references: [id])
+  handledBy   AdminUser?  @relation(fields: [handledById], references: [accountId], onDelete: Restrict)
+
+  @@index([status, createdAt])
+  @@index([applicationId])
+  @@map("dispute")
+}
+
+// ───────────────────────── tutor payment tracking (off-app) ─────────────────────────
+// The app does not move money. It records what each tutor owes and what the
+// admin received. amount_paid and status are written by a trigger from the
+// fee_payment rows in the same transaction, so they cannot drift.
+// tutor_id must equal application.tutor_id (platform_fee_guard trigger).
+
+model PlatformFee {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  tutorId       String    @map("tutor_id") @db.Uuid
+  applicationId String    @map("application_id") @db.Uuid
+  feeType       FeeType   @default(PLACEMENT) @map("fee_type")
+  amountDue     Decimal   @map("amount_due") @db.Decimal(12, 2)
+  amountPaid    Decimal   @default(0) @map("amount_paid") @db.Decimal(12, 2)
+  dueDate       DateTime  @map("due_date") @db.Date
+  status        FeeStatus @default(DUE)
+  note          String?
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  tutor       Tutor        @relation(fields: [tutorId], references: [id])
+  application Application  @relation(fields: [applicationId], references: [id])
+  payments    FeePayment[]
+
+  @@index([tutorId, status, dueDate])
+  @@index([status, dueDate]) // overdue report
+  @@index([applicationId])
+  @@map("platform_fee")
+}
+
+// Append-only ledger. A wrong entry or a refund is a REVERSAL row pointing at
+// the original payment, never an edit or delete.
+model FeePayment {
+  id                String        @id @default(uuid(7)) @db.Uuid
+  feeId             String        @map("fee_id") @db.Uuid
+  kind              PaymentKind   @default(PAYMENT)
+  reversesPaymentId String?       @map("reverses_payment_id") @db.Uuid
+  amount            Decimal       @db.Decimal(12, 2) // always positive
+  method            PaymentMethod
+  txnReference      String?       @map("txn_reference") // bKash/Nagad TrxID etc.
+  reason            String? // required for a REVERSAL
+  receivedAt        DateTime      @map("received_at") @db.Timestamptz(3)
+  recordedById      String        @map("recorded_by") @db.Uuid
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  fee             PlatformFee  @relation(fields: [feeId], references: [id])
+  recordedBy      AdminUser    @relation(fields: [recordedById], references: [accountId])
+  reversesPayment FeePayment?  @relation("PaymentReversal", fields: [reversesPaymentId], references: [id], onDelete: Restrict)
+  reversals       FeePayment[] @relation("PaymentReversal")
+
+  @@index([feeId])
+  @@index([reversesPaymentId])
+  @@map("fee_payment")
+}
+
+// ───────────────────────── notifications (outbox) ─────────────────────────
+// Inserted in the same transaction as the business change. A worker claims
+// PENDING / FAILED / expired-SENDING rows (FOR UPDATE SKIP LOCKED), sets
+// status = SENDING and next_attempt_at = now() + lease, then pushes to n8n.
+// A crashed worker's row becomes claimable again when the lease runs out.
+// dedupe_key is the idempotency guard, e.g. "application_confirmed:{appId}:{accountId}".
+
+model NotificationLog {
+  id                String              @id @default(uuid(7)) @db.Uuid
+  eventType         NotificationEvent   @map("event_type")
+  channel           NotificationChannel @default(WHATSAPP)
+  recipientId       String              @map("recipient_account_id") @db.Uuid
+  applicationId     String?             @map("application_id") @db.Uuid
+  dedupeKey         String              @unique @map("dedupe_key")
+  templateName      String              @map("template_name")
+  payload           Json
+  status            NotificationStatus  @default(PENDING)
+  attempts          Int                 @default(0)
+  nextAttemptAt     DateTime            @default(now()) @map("next_attempt_at") @db.Timestamptz(3)
+  sentAt            DateTime?           @map("sent_at") @db.Timestamptz(3)
+  providerMessageId String?             @unique @map("provider_message_id")
+  lastError         String?             @map("last_error")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  recipient   Account      @relation(fields: [recipientId], references: [id])
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+
+  @@index([applicationId])
+  @@index([recipientId])
+  @@map("notification_log")
+}
+
+// ───────────────────────── CMS and audit ─────────────────────────
+
+model BlogPost {
+  id          String     @id @default(uuid(7)) @db.Uuid
+  slug        String     @unique
+  title       String
+  excerpt     String?
+  body        String // markdown
+  coverFileId String?    @map("cover_file_id") @db.Uuid
+  status      PostStatus @default(DRAFT)
+  publishedAt DateTime?  @map("published_at") @db.Timestamptz(3)
+  authorId    String     @map("author_id") @db.Uuid
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  author    AdminUser  @relation(fields: [authorId], references: [accountId])
+  coverFile FileAsset? @relation(fields: [coverFileId], references: [id], onDelete: Restrict)
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@map("blog_post")
+}
+
+// Landing-page blocks (hero, testimonials, FAQ...) as keyed JSON.
+model SiteContent {
+  key         String   @id
+  value       Json
+  updatedById String?  @map("updated_by") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  updatedBy AdminUser? @relation(fields: [updatedById], references: [accountId], onDelete: Restrict)
+
+  @@map("site_content")
+}
+
+// Append-only (trigger in constraints.sql).
+model AuditLog {
+  id             BigInt   @id @default(autoincrement())
+  actorAccountId String?  @map("actor_account_id") @db.Uuid // null = system
+  action         String
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id")
+  before         Json?
+  after          Json?
+  ip             String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  actor Account? @relation(fields: [actorAccountId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId, createdAt(sort: Desc)])
+  @@index([actorAccountId, createdAt(sort: Desc)])
+  @@map("audit_log")
+}

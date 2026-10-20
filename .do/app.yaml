@@ -1,0 +1,102 @@
+# DigitalOcean App Platform spec
+# Replace placeholders marked with <...> before applying.
+# Apply with: doctl apps create --spec .do/app.yaml
+# Or update:  doctl apps update <app-id> --spec .do/app.yaml
+
+name: tuition-api
+region: blr
+
+services:
+  - name: api
+    source_dir: /
+    github:
+      repo: fardin96/tuition-api
+      branch: main
+      deploy_on_push: true
+    build_command: yarn install --frozen-lockfile && yarn build
+    run_command: node dist/server.js
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 3000
+    health_check:
+      http_path: /api/v1/health
+      port: 3000
+      initial_delay_seconds: 10
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: '3000'
+      - key: HOST
+        value: '0.0.0.0'
+      # DB connection string:
+      #   A) Database component inside this App Platform app (your setup):
+      #      value: ${db.DATABASE_URL}
+      #   B) Standalone Managed Database:
+      #      value: postgresql://user:pass@host:port/db?sslmode=require
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+        type: SECRET
+      # Token secrets - generate with: openssl rand -base64 48
+      - key: ACCESS_TOKEN_SECRET
+        value: <access-token-secret>
+        type: SECRET
+      - key: REFRESH_TOKEN_SECRET
+        value: <refresh-token-secret>
+        type: SECRET
+      # Google OAuth (frontend sends ID token; backend only verifies it)
+      - key: GOOGLE_CLIENT_ID
+        value: <google-client-id>
+        type: SECRET
+      # Super-admin allowlist (seeded once via yarn db:seed).
+      # Set real values in the App Platform UI or via doctl before running the seed job.
+      - key: SUPER_ADMIN_EMAIL_1
+        value: <super-admin-email-1>
+        type: SECRET
+      - key: SUPER_ADMIN_EMAIL_2
+        value: <super-admin-email-2>
+        type: SECRET
+      # Cloudflare R2 (S3-compatible) for file uploads
+      # Endpoint format: https://<account-id>.r2.cloudflarestorage.com
+      # Region for R2 is always: auto
+      - key: R2_ENDPOINT
+        value: <r2-endpoint>
+      - key: R2_REGION
+        value: auto
+      - key: R2_BUCKET
+        value: <r2-bucket>
+      - key: R2_ACCESS_KEY_ID
+        value: <r2-access-key-id>
+        type: SECRET
+      - key: R2_SECRET_ACCESS_KEY
+        value: <r2-secret-access-key>
+        type: SECRET
+      - key: R2_PUBLIC_URL_PREFIX
+        value: <r2-public-url-or-empty>
+      # n8n webhook for WhatsApp notifications
+      - key: N8N_WEBHOOK_URL
+        value: <n8n-webhook-url>
+      - key: N8N_WEBHOOK_SECRET
+        value: <n8n-webhook-secret>
+        type: SECRET
+
+jobs:
+  - name: migrate
+    kind: PRE_DEPLOY
+    source_dir: /
+    github:
+      repo: fardin96/tuition-api
+      branch: main
+    build_command: yarn install --frozen-lockfile
+    run_command: npx prisma migrate deploy
+    instance_size_slug: basic-xxs
+    envs:
+      # DB connection string (same options as the service above)
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+        type: SECRET
