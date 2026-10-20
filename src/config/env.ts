@@ -7,6 +7,8 @@ const schema = z.object({
   DATABASE_URL: z.string(),
   TEST_DATABASE_URL: z.string().optional(),
 
+  FRONTEND_URL: z.string().optional(),
+
   GOOGLE_CLIENT_ID: z.string().optional(),
 
   ACCESS_TOKEN_SECRET: z.string().min(32).default("dev-secret-must-change-in-production-123"),

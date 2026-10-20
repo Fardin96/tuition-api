@@ -19,10 +19,16 @@ export async function buildApp() {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
+  const productionOrigins = env.FRONTEND_URL
+    ? env.FRONTEND_URL.split(",").map((url) => url.trim())
+    : ["https://tution-media-mocha.vercel.app"];
+
   await app.register(helmet);
   await app.register(cors, {
-    origin: env.NODE_ENV === "development",
+    origin: env.NODE_ENV === "development" ? true : productionOrigins,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
   await app.register(cookie);
   await app.register(rateLimit, {

@@ -34,6 +34,9 @@ services:
         value: '3000'
       - key: HOST
         value: '0.0.0.0'
+      # Frontend origin(s) for CORS (comma separated for multiple)
+      - key: FRONTEND_URL
+        value: 'https://tution-media-mocha.vercel.app'
       # DB connection string:
       #   A) Database component inside this App Platform app (your setup):
       #      value: ${db.DATABASE_URL}

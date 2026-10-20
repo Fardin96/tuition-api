@@ -8,3 +8,6 @@
 .env.local
 .env.*.local
 client_secret_742336373833-4an0kcr7q12fjdhk3krv7t89midlp22a.apps.googleusercontent.com.json
+
+# planning
+endpoints.md
