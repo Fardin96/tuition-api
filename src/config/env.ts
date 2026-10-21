@@ -5,6 +5,8 @@ const schema = z.object({
   PORT: z.coerce.number().default(3000),
   HOST: z.string().default("0.0.0.0"),
   DATABASE_URL: z.string(),
+  DATABASE_POOL_URL: z.string().optional(),
+  DATABASE_CA_CERT: z.string().optional(),
   TEST_DATABASE_URL: z.string().optional(),
 
   FRONTEND_URL: z.string().optional(),

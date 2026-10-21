@@ -1,7 +1,10 @@
 # DigitalOcean App Platform spec
-# Replace placeholders marked with <...> before applying.
 # Apply with: doctl apps create --spec .do/app.yaml
 # Or update:  doctl apps update <app-id> --spec .do/app.yaml
+#
+# This app uses an EXISTING DigitalOcean managed Postgres cluster and its
+# connection pooler. Set the <...> secrets below via the App Platform UI or
+# doctl before deploying.
 
 name: tuition-api
 region: blr
@@ -13,7 +16,7 @@ services:
       repo: fardin96/tuition-api
       branch: main
       deploy_on_push: true
-    build_command: yarn install --frozen-lockfile && yarn build
+    build_command: yarn install --frozen-lockfile && yarn db:generate
     run_command: node dist/server.js
     environment_slug: node-js
     instance_count: 1
@@ -36,14 +39,17 @@ services:
         value: '0.0.0.0'
       # Frontend origin(s) for CORS (comma separated for multiple)
       - key: FRONTEND_URL
-        value: 'https://tution-media-mocha.vercel.app'
-      # DB connection string:
-      #   A) Database component inside this App Platform app (your setup):
-      #      value: ${db.DATABASE_URL}
-      #   B) Standalone Managed Database:
-      #      value: postgresql://user:pass@host:port/db?sslmode=require
-      - key: DATABASE_URL
-        value: ${db.DATABASE_URL}
+        value: <frontend-url>
+      # Connection pooler URL for the running app (transaction pooling).
+      # Replace with the pooler connection string from your DO dashboard.
+      # Limit the application pool to 5 connections per container; the pooler
+      # multiplexes many app requests over 22 backend connections.
+      - key: DATABASE_POOL_URL
+        value: <paste-pool-url-here>?&pgbouncer=true&connection_limit=5
+        type: SECRET
+      # Contents of the DigitalOcean "Download CA certificate" file.
+      - key: DATABASE_CA_CERT
+        value: <database-ca-cert-pem-content>
         type: SECRET
       # Token secrets - generate with: openssl rand -base64 48
       - key: ACCESS_TOKEN_SECRET
@@ -95,11 +101,16 @@ jobs:
     github:
       repo: fardin96/tuition-api
       branch: main
-    build_command: yarn install --frozen-lockfile
+    build_command: yarn install --frozen-lockfile && yarn db:generate
     run_command: npx prisma migrate deploy
     instance_size_slug: basic-xxs
     envs:
-      # DB connection string (same options as the service above)
+      # Direct DB URL for migrations (never use the pooler for migrate deploy).
+      # Replace with the direct connection string from your DO dashboard (port 25060).
       - key: DATABASE_URL
-        value: ${db.DATABASE_URL}
+        value: <paste-direct-db-url-here>
+        type: SECRET
+      # DigitalOcean managed Postgres CA certificate.
+      - key: DATABASE_CA_CERT
+        value: <database-ca-cert-pem-content>
         type: SECRET
