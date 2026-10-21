@@ -2,6 +2,10 @@
 # Apply with: doctl apps create --spec .do/app.yaml
 # Or update:  doctl apps update <app-id> --spec .do/app.yaml
 #
+# NOTE: App Platform does NOT read this file on git push. Changes here only take
+# effect when applied with doctl/the UI. Applying it replaces dashboard secrets
+# with the <...> placeholders, so re-enter real values afterwards.
+#
 # This app uses an EXISTING DigitalOcean managed Postgres cluster and its
 # connection pooler. Set the <...> secrets below via the App Platform UI or
 # doctl before deploying.
@@ -16,8 +20,11 @@ services:
       repo: fardin96/tuition-api
       branch: main
       deploy_on_push: true
-    build_command: yarn install --frozen-lockfile && yarn db:generate
-    run_command: node dist/server.js
+    build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
+    # Migrations run on startup (no separate job container). Prisma takes an advisory
+    # lock, so this stays safe if you scale to multiple instances later. A failed
+    # migration crashes the new container and DO keeps the previous deploy live.
+    run_command: yarn db:deploy && node dist/server.js
     environment_slug: node-js
     instance_count: 1
     instance_size_slug: basic-xxs
@@ -42,10 +49,16 @@ services:
         value: <frontend-url>
       # Connection pooler URL for the running app (transaction pooling).
       # Replace with the pooler connection string from your DO dashboard.
-      # Limit the application pool to 5 connections per container; the pooler
-      # multiplexes many app requests over 22 backend connections.
+      # connection_limit sets the app's pool size per container (read in src/lib/prisma.ts,
+      # default 5); the DO pooler multiplexes these over its 22 backend connections.
+      # Do NOT add pgbouncer=true; it has no effect with the pg driver adapter.
       - key: DATABASE_POOL_URL
         value: <paste-pool-url-here>?&pgbouncer=true&connection_limit=5
+        type: SECRET
+      # Direct DB URL (port 25060). Used only by `prisma migrate deploy` at startup;
+      # never run migrations through the pooler.
+      - key: DATABASE_URL
+        value: <paste-direct-db-url-here>
         type: SECRET
       # Contents of the DigitalOcean "Download CA certificate" file.
       - key: DATABASE_CA_CERT
@@ -92,25 +105,4 @@ services:
         value: <n8n-webhook-url>
       - key: N8N_WEBHOOK_SECRET
         value: <n8n-webhook-secret>
-        type: SECRET
-
-jobs:
-  - name: migrate
-    kind: PRE_DEPLOY
-    source_dir: /
-    github:
-      repo: fardin96/tuition-api
-      branch: main
-    build_command: yarn install --frozen-lockfile && yarn db:generate
-    run_command: npx prisma migrate deploy
-    instance_size_slug: basic-xxs
-    envs:
-      # Direct DB URL for migrations (never use the pooler for migrate deploy).
-      # Replace with the direct connection string from your DO dashboard (port 25060).
-      - key: DATABASE_URL
-        value: <paste-direct-db-url-here>
-        type: SECRET
-      # DigitalOcean managed Postgres CA certificate.
-      - key: DATABASE_CA_CERT
-        value: <database-ca-cert-pem-content>
         type: SECRET

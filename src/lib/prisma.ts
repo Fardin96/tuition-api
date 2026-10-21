@@ -20,23 +20,21 @@ function buildPgConfig() {
   // Migrations / Prisma CLI commands use DATABASE_URL directly.
   const connectionUrl = env.DATABASE_POOL_URL ?? env.DATABASE_URL;
   const url = new URL(connectionUrl);
-  const isPooler = url.port === "25061" || url.pathname.includes("-pool");
 
+  // node-postgres ignores Prisma-engine URL params; pool size must be passed as `max`.
+  const max = Number(url.searchParams.get("connection_limit")) || 5;
   // sslmode=require is a libpq/psql convention; node-postgres expects explicit SSL options.
-  url.searchParams.delete("sslmode");
+  for (const p of ["sslmode", "pgbouncer", "connection_limit"]) url.searchParams.delete(p);
 
-  const connectionString = url.toString();
   const ca = getCaCert();
 
   return {
-    connectionString,
+    connectionString: url.toString(),
+    max,
     ssl: {
       rejectUnauthorized: Boolean(ca),
       ca,
     },
-    // Transaction poolers cannot handle prepared statements across checkout/checkin.
-    // Setting prepareThreshold: 0 disables prepared statements for the pooler URL.
-    ...(isPooler ? { prepareThreshold: 0 } : {}),
   };
 }
 
