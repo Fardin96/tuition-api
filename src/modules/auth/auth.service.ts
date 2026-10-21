@@ -191,7 +191,7 @@ export async function findAccountByGoogleSub(googleSub: string) {
 
 export async function createOrUpdateAccount(
   payload: GoogleTokenPayload,
-  role: Role,
+  role: Role | undefined,
   consentVersion?: string,
 ): Promise<{ account: AccountModel; isNew: boolean }> {
   const existing = await prisma.account.findUnique({
@@ -207,6 +207,12 @@ export async function createOrUpdateAccount(
       data: { lastLoginAt: new Date() },
     });
     return { account, isNew: false };
+  }
+
+  if (!role) {
+    const err = new Error("No account found for this Google account. Sign up first.");
+    Object.assign(err, { statusCode: 404 });
+    throw err;
   }
 
   const isSuperAdmin = await prisma.superAdminEmail.findUnique({

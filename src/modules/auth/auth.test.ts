@@ -87,6 +87,45 @@ describe("auth routes", () => {
       expect(admin?.status).toBe("PENDING");
     });
 
+    it("signs in an existing account without a role", async () => {
+      const app = await createTestApp();
+      const existing = await createAccount({ role: "TUTOR" });
+      vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+        sub: existing.googleSub,
+        email: existing.email,
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/auth/google",
+        payload: { idToken: "fake-id-token" },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).account.id).toBe(existing.id);
+    });
+
+    it("rejects sign-in for an unknown account and creates nothing", async () => {
+      const app = await createTestApp();
+      vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+        sub: "google-unknown",
+        email: "unknown@example.com",
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/auth/google",
+        payload: { idToken: "fake-id-token" },
+      });
+
+      expect(res.statusCode).toBe(404);
+      expect(JSON.parse(res.body).message).toMatch(/Sign up first/);
+      const account = await prisma.account.findUnique({
+        where: { email: "unknown@example.com" },
+      });
+      expect(account).toBeNull();
+    });
+
     it("rejects missing idToken", async () => {
       const app = await createTestApp();
       const res = await app.inject({

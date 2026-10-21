@@ -5,7 +5,8 @@ export const roleSchema = z.enum(["STUDENT", "TUTOR", "ADMIN"] as const);
 
 export const googleAuthSchema = z.object({
   idToken: z.string().min(1),
-  role: roleSchema,
+  // Sign-up sends a role; sign-in omits it, so an unknown Google account is rejected, not created.
+  role: roleSchema.optional(),
   consentVersion: z.string().optional(),
 });
 

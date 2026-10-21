@@ -58,15 +58,11 @@ export async function authRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { idToken, role, consentVersion } = request.body as {
         idToken: string;
-        role: string;
+        role?: "STUDENT" | "TUTOR" | "ADMIN";
         consentVersion?: string;
       };
       const googlePayload = await verifyGoogleIdToken(idToken);
-      const { account } = await createOrUpdateAccount(
-        googlePayload,
-        role as "STUDENT" | "TUTOR" | "ADMIN",
-        consentVersion,
-      );
+      const { account } = await createOrUpdateAccount(googlePayload, role, consentVersion);
 
       const tokens = await buildTokenResponse(account);
       await createSession(account.id, tokens.refreshToken, {
