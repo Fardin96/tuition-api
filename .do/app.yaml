@@ -24,7 +24,7 @@ services:
     # Migrations run on startup (no separate job container). Prisma takes an advisory
     # lock, so this stays safe if you scale to multiple instances later. A failed
     # migration crashes the new container and DO keeps the previous deploy live.
-    run_command: yarn db:deploy && node dist/server.js
+    run_command: node dist/server.js
     environment_slug: node-js
     instance_count: 1
     instance_size_slug: basic-xxs

@@ -7,6 +7,8 @@ import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod
 import { env } from "./config/env.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
+import { studentRoutes } from "./modules/student/student.routes.js";
+import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
 import { healthRoutes } from "./plugins/health.js";
 
 export async function buildApp() {
@@ -52,6 +54,9 @@ export async function buildApp() {
   await app.register(healthRoutes, { prefix: "/api/v1/health" });
   await app.register(authRoutes, { prefix: "/api/v1/auth" });
   await app.register(meRoutes, { prefix: "/api/v1/me" });
+  await app.register(studentRoutes, { prefix: "/api/v1/students" });
+  await app.register(tutorRoutes, { prefix: "/api/v1/tutors" });
+  await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
 
   app.setErrorHandler((error, _request, reply) => {
     const err = error as Error & { statusCode?: number };

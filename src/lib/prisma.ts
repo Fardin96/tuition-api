@@ -23,6 +23,7 @@ function buildPgConfig() {
 
   // node-postgres ignores Prisma-engine URL params; pool size must be passed as `max`.
   const max = Number(url.searchParams.get("connection_limit")) || 5;
+  const sslMode = url.searchParams.get("sslmode");
   // sslmode=require is a libpq/psql convention; node-postgres expects explicit SSL options.
   for (const p of ["sslmode", "pgbouncer", "connection_limit"]) url.searchParams.delete(p);
 
@@ -31,10 +32,14 @@ function buildPgConfig() {
   return {
     connectionString: url.toString(),
     max,
-    ssl: {
-      rejectUnauthorized: Boolean(ca),
-      ca,
-    },
+    ...(sslMode !== "disable"
+      ? {
+          ssl: {
+            rejectUnauthorized: Boolean(ca),
+            ca,
+          },
+        }
+      : {}),
   };
 }
 
