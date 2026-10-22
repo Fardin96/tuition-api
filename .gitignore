@@ -15,3 +15,6 @@ ca-certificate.crt
 # planning
 endpoints.md
 GATES.md
+
+# local-db
+/prisma/migrations/
