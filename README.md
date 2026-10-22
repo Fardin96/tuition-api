@@ -119,7 +119,17 @@ Tests use **Vitest** and hit a real PostgreSQL database.
    yarn test:ci
    ```
 
-CI runs on every push/PR via `.github/workflows/ci.yml` using a Postgres service container.
+### Pre-push hook
+
+Husky is configured to run `lint`, `typecheck`, `test:ci`, and `build` before every push. The hook requires `TEST_DATABASE_URL` to be exported in your shell (or set by `.env` + a tool like `direnv`).
+
+Skip the hook if needed:
+
+```bash
+git push --no-verify
+```
+
+CI runs on every push/PR via `.github/workflows/ci.yml` using a PostGIS-enabled Postgres service container.
 
 ## Required environment variables
 

@@ -10,7 +10,7 @@ export type SaveLocationInput = {
 
 export async function upsertTutorLocation(tutorId: string, input: SaveLocationInput) {
   await prisma.$executeRaw`
-    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress)
+    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
     VALUES (
       gen_random_uuid(),
       ${tutorId},
@@ -19,7 +19,8 @@ export async function upsertTutorLocation(tutorId: string, input: SaveLocationIn
       ${input.districtCode},
       ST_SetSRID(ST_MakePoint(${input.longitude}, ${input.latitude}), 4326)::geography,
       NOW(),
-      false
+      false,
+      NOW()
     )
     ON CONFLICT (tutor_id) DO UPDATE SET
       place_id = EXCLUDED.place_id,
@@ -34,7 +35,7 @@ export async function upsertTutorLocation(tutorId: string, input: SaveLocationIn
 
 export async function upsertStudentLocation(studentId: string, input: SaveLocationInput) {
   await prisma.$executeRaw`
-    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress)
+    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
     VALUES (
       gen_random_uuid(),
       ${studentId},
@@ -43,7 +44,8 @@ export async function upsertStudentLocation(studentId: string, input: SaveLocati
       ${input.districtCode},
       ST_SetSRID(ST_MakePoint(${input.longitude}, ${input.latitude}), 4326)::geography,
       NOW(),
-      false
+      false,
+      NOW()
     )
     ON CONFLICT (student_id) DO UPDATE SET
       place_id = EXCLUDED.place_id,

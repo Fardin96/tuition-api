@@ -16,5 +16,5 @@ ca-certificate.crt
 endpoints.md
 GATES.md
 
-# local-db
-/prisma/migrations/
+# husky generated files
+/.husky/_

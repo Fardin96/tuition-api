@@ -220,7 +220,7 @@ export async function setTutorLocation(
   const needsReaddress = data.needsReaddress ?? false;
 
   await prisma.$executeRaw`
-    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress)
+    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
     VALUES (
       gen_random_uuid(),
       ${tutorId},
@@ -229,7 +229,8 @@ export async function setTutorLocation(
       ${district},
       ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
       ${fetchedAt},
-      ${needsReaddress}
+      ${needsReaddress},
+      NOW()
     );
   `;
 }
@@ -252,7 +253,7 @@ export async function setStudentLocation(
   const needsReaddress = data.needsReaddress ?? false;
 
   await prisma.$executeRaw`
-    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress)
+    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
     VALUES (
       gen_random_uuid(),
       ${studentId},
@@ -261,7 +262,8 @@ export async function setStudentLocation(
       ${district},
       ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
       ${fetchedAt},
-      ${needsReaddress}
+      ${needsReaddress},
+      NOW()
     );
   `;
 }
