@@ -428,6 +428,7 @@ model Student {
   requirements     TuitionRequirement[]
   applications     Application[]
   reviewsGiven     Review[]             @relation("ReviewStudent")
+  location         StudentLocation?
 
   @@unique([accountId, role])
   @@index([areaId])
@@ -468,11 +469,48 @@ model Tutor {
   applications  Application[]
   fees          PlatformFee[]
   reviews       Review[]            @relation("ReviewTutor")
+  location      TutorLocation?
 
   @@unique([accountId, role])
   @@index([isListed, ratingAvg(sort: Desc)])
   @@index([isListed, gender])
   @@map("tutor")
+}
+
+model TutorLocation {
+  id             String                                @id @default(uuid(7)) @db.Uuid
+  tutorId        String                                @unique @map("tutor_id") @db.Uuid
+  placeId        String                                @map("place_id")
+  addressText    String                                @map("address_text")
+  districtCode   String                                @map("district_code")
+  geog           Unsupported("GEOGRAPHY(POINT,4326)")?
+  geogFetchedAt  DateTime?                             @map("geog_fetched_at") @db.Timestamptz(3)
+  needsReaddress Boolean                               @default(false) @map("needs_readdress")
+  createdAt      DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime                              @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  tutor Tutor @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
+  @@index([districtCode])
+  @@map("tutor_location")
+}
+
+model StudentLocation {
+  id             String                                @id @default(uuid(7)) @db.Uuid
+  studentId      String                                @unique @map("student_id") @db.Uuid
+  placeId        String                                @map("place_id")
+  addressText    String                                @map("address_text")
+  districtCode   String                                @map("district_code")
+  geog           Unsupported("GEOGRAPHY(POINT,4326)")?
+  geogFetchedAt  DateTime?                             @map("geog_fetched_at") @db.Timestamptz(3)
+  needsReaddress Boolean                               @default(false) @map("needs_readdress")
+  createdAt      DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime                              @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([districtCode])
+  @@map("student_location")
 }
 
 // Areas a tutor teaches in (many).

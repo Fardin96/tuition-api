@@ -202,6 +202,70 @@ export async function createApplication(data: {
   });
 }
 
+export async function setTutorLocation(
+  tutorId: string,
+  data: {
+    districtCode?: string;
+    lat?: number;
+    lng?: number;
+    needsReaddress?: boolean;
+    fetchedAt?: Date;
+  } = {},
+) {
+  const placeId = `place-${tutorId}`;
+  const district = data.districtCode ?? "dhaka";
+  const lng = data.lng ?? 90.4125;
+  const lat = data.lat ?? 23.8103;
+  const fetchedAt = data.fetchedAt ?? new Date();
+  const needsReaddress = data.needsReaddress ?? false;
+
+  await prisma.$executeRaw`
+    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress)
+    VALUES (
+      gen_random_uuid(),
+      ${tutorId},
+      ${placeId},
+      'Tutor Address',
+      ${district},
+      ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
+      ${fetchedAt},
+      ${needsReaddress}
+    );
+  `;
+}
+
+export async function setStudentLocation(
+  studentId: string,
+  data: {
+    districtCode?: string;
+    lat?: number;
+    lng?: number;
+    needsReaddress?: boolean;
+    fetchedAt?: Date;
+  } = {},
+) {
+  const placeId = `place-${studentId}`;
+  const district = data.districtCode ?? "dhaka";
+  const lng = data.lng ?? 90.4125;
+  const lat = data.lat ?? 23.8103;
+  const fetchedAt = data.fetchedAt ?? new Date();
+  const needsReaddress = data.needsReaddress ?? false;
+
+  await prisma.$executeRaw`
+    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress)
+    VALUES (
+      gen_random_uuid(),
+      ${studentId},
+      ${placeId},
+      'Student Address',
+      ${district},
+      ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
+      ${fetchedAt},
+      ${needsReaddress}
+    );
+  `;
+}
+
 export async function createFileAsset(
   ownerAccountId: string,
   purpose: "STUDENT_ID" | "TUTOR_ID" | "CREDENTIAL" | "TUTOR_VIDEO",

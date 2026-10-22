@@ -106,3 +106,30 @@ services:
       - key: N8N_WEBHOOK_SECRET
         value: <n8n-webhook-secret>
         type: SECRET
+
+jobs:
+  # Soft warning at 21 days, hard expiry at 28 days. Runs weekly; that is
+  # frequent enough for a 7-day expiry tolerance.
+  - name: weekly-location-expiry
+    source_dir: /
+    github:
+      repo: fardin96/tuition-api
+      branch: main
+      deploy_on_push: true
+    build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
+    run_command: node dist/cron/weekly-location-expiry.js
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    schedule: "0 3 * * 0"
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: <paste-direct-db-url-here>
+        type: SECRET
+      - key: DATABASE_POOL_URL
+        value: <paste-pool-url-here>?&pgbouncer=true&connection_limit=5
+        type: SECRET
+      - key: DATABASE_CA_CERT
+        value: <database-ca-cert-pem-content>
+        type: SECRET

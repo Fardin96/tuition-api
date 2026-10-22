@@ -62,6 +62,8 @@ export const ModelName = {
   FileAsset: 'FileAsset',
   Student: 'Student',
   Tutor: 'Tutor',
+  TutorLocation: 'TutorLocation',
+  StudentLocation: 'StudentLocation',
   TutorArea: 'TutorArea',
   TutorSubject: 'TutorSubject',
   TutorVerification: 'TutorVerification',
@@ -258,6 +260,36 @@ export const TutorScalarFieldEnum = {
 } as const
 
 export type TutorScalarFieldEnum = (typeof TutorScalarFieldEnum)[keyof typeof TutorScalarFieldEnum]
+
+
+export const TutorLocationScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  placeId: 'placeId',
+  addressText: 'addressText',
+  districtCode: 'districtCode',
+  geogFetchedAt: 'geogFetchedAt',
+  needsReaddress: 'needsReaddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutorLocationScalarFieldEnum = (typeof TutorLocationScalarFieldEnum)[keyof typeof TutorLocationScalarFieldEnum]
+
+
+export const StudentLocationScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  placeId: 'placeId',
+  addressText: 'addressText',
+  districtCode: 'districtCode',
+  geogFetchedAt: 'geogFetchedAt',
+  needsReaddress: 'needsReaddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StudentLocationScalarFieldEnum = (typeof StudentLocationScalarFieldEnum)[keyof typeof StudentLocationScalarFieldEnum]
 
 
 export const TutorAreaScalarFieldEnum = {

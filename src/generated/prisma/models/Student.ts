@@ -318,6 +318,7 @@ export type StudentWhereInput = {
   requirements?: Prisma.TuitionRequirementListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
+  location?: Prisma.XOR<Prisma.StudentLocationNullableScalarRelationFilter, Prisma.StudentLocationWhereInput> | null
 }
 
 export type StudentOrderByWithRelationInput = {
@@ -343,6 +344,7 @@ export type StudentOrderByWithRelationInput = {
   requirements?: Prisma.TuitionRequirementOrderByRelationAggregateInput
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
   reviewsGiven?: Prisma.ReviewOrderByRelationAggregateInput
+  location?: Prisma.StudentLocationOrderByWithRelationInput
 }
 
 export type StudentWhereUniqueInput = Prisma.AtLeast<{
@@ -372,6 +374,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   requirements?: Prisma.TuitionRequirementListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
+  location?: Prisma.XOR<Prisma.StudentLocationNullableScalarRelationFilter, Prisma.StudentLocationWhereInput> | null
 }, "id" | "accountId" | "whatsappNumber" | "accountId_role">
 
 export type StudentOrderByWithAggregationInput = {
@@ -439,6 +442,7 @@ export type StudentCreateInput = {
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateInput = {
@@ -461,6 +465,7 @@ export type StudentUncheckedCreateInput = {
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUpdateInput = {
@@ -482,6 +487,7 @@ export type StudentUpdateInput = {
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateInput = {
@@ -504,6 +510,7 @@ export type StudentUncheckedUpdateInput = {
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateManyInput = {
@@ -781,6 +788,20 @@ export type DecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type StudentCreateNestedOneWithoutLocationInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutLocationInput, Prisma.StudentUncheckedCreateWithoutLocationInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutLocationInput
+  connect?: Prisma.StudentWhereUniqueInput
+}
+
+export type StudentUpdateOneRequiredWithoutLocationNestedInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutLocationInput, Prisma.StudentUncheckedCreateWithoutLocationInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutLocationInput
+  upsert?: Prisma.StudentUpsertWithoutLocationInput
+  connect?: Prisma.StudentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutLocationInput, Prisma.StudentUpdateWithoutLocationInput>, Prisma.StudentUncheckedUpdateWithoutLocationInput>
+}
+
 export type StudentCreateNestedOneWithoutRequirementsInput = {
   create?: Prisma.XOR<Prisma.StudentCreateWithoutRequirementsInput, Prisma.StudentUncheckedCreateWithoutRequirementsInput>
   connectOrCreate?: Prisma.StudentCreateOrConnectWithoutRequirementsInput
@@ -841,6 +862,7 @@ export type StudentCreateWithoutAccountInput = {
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutAccountInput = {
@@ -861,6 +883,7 @@ export type StudentUncheckedCreateWithoutAccountInput = {
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutAccountInput = {
@@ -897,6 +920,7 @@ export type StudentUpdateWithoutAccountInput = {
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutAccountInput = {
@@ -917,6 +941,7 @@ export type StudentUncheckedUpdateWithoutAccountInput = {
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutAreaInput = {
@@ -937,6 +962,7 @@ export type StudentCreateWithoutAreaInput = {
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutAreaInput = {
@@ -958,6 +984,7 @@ export type StudentUncheckedCreateWithoutAreaInput = {
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutAreaInput = {
@@ -1026,6 +1053,7 @@ export type StudentCreateWithoutVerificationFileInput = {
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutVerificationFileInput = {
@@ -1047,6 +1075,7 @@ export type StudentUncheckedCreateWithoutVerificationFileInput = {
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutVerificationFileInput = {
@@ -1075,6 +1104,108 @@ export type StudentUpdateManyWithWhereWithoutVerificationFileInput = {
   data: Prisma.XOR<Prisma.StudentUpdateManyMutationInput, Prisma.StudentUncheckedUpdateManyWithoutVerificationFileInput>
 }
 
+export type StudentCreateWithoutLocationInput = {
+  id?: string
+  name: string
+  address: string
+  emergencyContact: string
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  studentIdNumber: string
+  verificationStatus?: $Enums.VerificationStatus
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutStudentInput
+  area: Prisma.AreaCreateNestedOneWithoutStudentsInput
+  verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+}
+
+export type StudentUncheckedCreateWithoutLocationInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  areaId: number
+  address: string
+  emergencyContact: string
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  studentIdNumber: string
+  verificationFileId?: string | null
+  verificationStatus?: $Enums.VerificationStatus
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type StudentCreateOrConnectWithoutLocationInput = {
+  where: Prisma.StudentWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudentCreateWithoutLocationInput, Prisma.StudentUncheckedCreateWithoutLocationInput>
+}
+
+export type StudentUpsertWithoutLocationInput = {
+  update: Prisma.XOR<Prisma.StudentUpdateWithoutLocationInput, Prisma.StudentUncheckedUpdateWithoutLocationInput>
+  create: Prisma.XOR<Prisma.StudentCreateWithoutLocationInput, Prisma.StudentUncheckedCreateWithoutLocationInput>
+  where?: Prisma.StudentWhereInput
+}
+
+export type StudentUpdateToOneWithWhereWithoutLocationInput = {
+  where?: Prisma.StudentWhereInput
+  data: Prisma.XOR<Prisma.StudentUpdateWithoutLocationInput, Prisma.StudentUncheckedUpdateWithoutLocationInput>
+}
+
+export type StudentUpdateWithoutLocationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
+  area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
+  verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentUncheckedUpdateWithoutLocationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  areaId?: Prisma.IntFieldUpdateOperationsInput | number
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+}
+
 export type StudentCreateWithoutRequirementsInput = {
   id?: string
   name: string
@@ -1093,6 +1224,7 @@ export type StudentCreateWithoutRequirementsInput = {
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutRequirementsInput = {
@@ -1114,6 +1246,7 @@ export type StudentUncheckedCreateWithoutRequirementsInput = {
   updatedAt?: Date | string
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutRequirementsInput = {
@@ -1150,6 +1283,7 @@ export type StudentUpdateWithoutRequirementsInput = {
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutRequirementsInput = {
@@ -1171,6 +1305,7 @@ export type StudentUncheckedUpdateWithoutRequirementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutApplicationsInput = {
@@ -1191,6 +1326,7 @@ export type StudentCreateWithoutApplicationsInput = {
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutApplicationsInput = {
@@ -1212,6 +1348,7 @@ export type StudentUncheckedCreateWithoutApplicationsInput = {
   updatedAt?: Date | string
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutApplicationsInput = {
@@ -1248,6 +1385,7 @@ export type StudentUpdateWithoutApplicationsInput = {
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutApplicationsInput = {
@@ -1269,6 +1407,7 @@ export type StudentUncheckedUpdateWithoutApplicationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutReviewsGivenInput = {
@@ -1289,6 +1428,7 @@ export type StudentCreateWithoutReviewsGivenInput = {
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutReviewsGivenInput = {
@@ -1310,6 +1450,7 @@ export type StudentUncheckedCreateWithoutReviewsGivenInput = {
   updatedAt?: Date | string
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutReviewsGivenInput = {
@@ -1346,6 +1487,7 @@ export type StudentUpdateWithoutReviewsGivenInput = {
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutReviewsGivenInput = {
@@ -1367,6 +1509,7 @@ export type StudentUncheckedUpdateWithoutReviewsGivenInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateManyAreaInput = {
@@ -1405,6 +1548,7 @@ export type StudentUpdateWithoutAreaInput = {
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutAreaInput = {
@@ -1426,6 +1570,7 @@ export type StudentUncheckedUpdateWithoutAreaInput = {
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateManyWithoutAreaInput = {
@@ -1482,6 +1627,7 @@ export type StudentUpdateWithoutVerificationFileInput = {
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutVerificationFileInput = {
@@ -1503,6 +1649,7 @@ export type StudentUncheckedUpdateWithoutVerificationFileInput = {
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateManyWithoutVerificationFileInput = {
@@ -1595,6 +1742,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   requirements?: boolean | Prisma.Student$requirementsArgs<ExtArgs>
   applications?: boolean | Prisma.Student$applicationsArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.Student$reviewsGivenArgs<ExtArgs>
+  location?: boolean | Prisma.Student$locationArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
 
@@ -1669,6 +1817,7 @@ export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   requirements?: boolean | Prisma.Student$requirementsArgs<ExtArgs>
   applications?: boolean | Prisma.Student$applicationsArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.Student$reviewsGivenArgs<ExtArgs>
+  location?: boolean | Prisma.Student$locationArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StudentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1691,6 +1840,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     requirements: Prisma.$TuitionRequirementPayload<ExtArgs>[]
     applications: Prisma.$ApplicationPayload<ExtArgs>[]
     reviewsGiven: Prisma.$ReviewPayload<ExtArgs>[]
+    location: Prisma.$StudentLocationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2109,6 +2259,7 @@ export interface Prisma__StudentClient<T, Null = never, ExtArgs extends runtime.
   requirements<T extends Prisma.Student$requirementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$requirementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TuitionRequirementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   applications<T extends Prisma.Student$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsGiven<T extends Prisma.Student$reviewsGivenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$reviewsGivenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  location<T extends Prisma.Student$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$locationArgs<ExtArgs>>): Prisma.Prisma__StudentLocationClient<runtime.Types.Result.GetResult<Prisma.$StudentLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2643,6 +2794,25 @@ export type Student$reviewsGivenArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ReviewScalarFieldEnum | Prisma.ReviewScalarFieldEnum[]
+}
+
+/**
+ * Student.location
+ */
+export type Student$locationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StudentLocation
+   */
+  select?: Prisma.StudentLocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StudentLocation
+   */
+  omit?: Prisma.StudentLocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StudentLocationInclude<ExtArgs> | null
+  where?: Prisma.StudentLocationWhereInput
 }
 
 /**

@@ -1,34 +1,54 @@
 import { prisma } from "../../lib/prisma.js";
+import {
+  getTutorNeedsReaddress,
+  type SaveLocationInput,
+  upsertTutorLocation,
+} from "../location/location.service.js";
 
 function toNumber(value: unknown) {
   return Number(value);
 }
 
-function serializeTutor(tutor: {
-  id: string;
-  accountId: string;
-  name: string;
-  address: string;
-  emergencyContact: string;
-  whatsappNumber: string;
-  studentIdNumber: string;
-  gender: string;
-  parentsInfo: string | null;
-  whatsappVerifiedAt: Date | null;
-  verificationStatus: string;
-  isListed: boolean;
-  ratingAvg: unknown;
-  ratingCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}) {
+function serializeTutor(
+  tutor: {
+    id: string;
+    accountId: string;
+    name: string;
+    address: string;
+    emergencyContact: string;
+    whatsappNumber: string;
+    studentIdNumber: string;
+    gender: string;
+    parentsInfo: string | null;
+    whatsappVerifiedAt: Date | null;
+    verificationStatus: string;
+    isListed: boolean;
+    ratingAvg: unknown;
+    ratingCount: number;
+    createdAt: Date;
+    updatedAt: Date;
+  },
+  needsReaddress?: boolean,
+) {
   return {
     ...tutor,
     ratingAvg: toNumber(tutor.ratingAvg),
     whatsappVerifiedAt: tutor.whatsappVerifiedAt?.toISOString() ?? null,
+    needsReaddress,
     createdAt: tutor.createdAt.toISOString(),
     updatedAt: tutor.updatedAt.toISOString(),
   };
+}
+
+function locationFieldsPresent<
+  T extends { placeId?: string; latitude?: number; longitude?: number; districtCode?: string },
+>(data: T): data is T & SaveLocationInput {
+  return (
+    data.placeId !== undefined &&
+    data.latitude !== undefined &&
+    data.longitude !== undefined &&
+    data.districtCode !== undefined
+  );
 }
 
 export async function createTutorProfile(
@@ -41,6 +61,10 @@ export async function createTutorProfile(
     studentIdNumber: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     parentsInfo?: string;
+    placeId?: string;
+    latitude?: number;
+    longitude?: number;
+    districtCode?: string;
   },
 ) {
   const existing = await prisma.tutor.findUnique({ where: { accountId } });
@@ -50,8 +74,30 @@ export async function createTutorProfile(
     throw err;
   }
 
-  const tutor = await prisma.tutor.create({ data: { accountId, ...data } });
-  return serializeTutor(tutor);
+  const locationInput = locationFieldsPresent(data)
+    ? {
+        placeId: data.placeId,
+        addressText: data.address,
+        districtCode: data.districtCode,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      }
+    : null;
+
+  const {
+    placeId: _placeId,
+    latitude: _latitude,
+    longitude: _longitude,
+    districtCode: _districtCode,
+    ...profileData
+  } = data;
+  const tutor = await prisma.tutor.create({ data: { accountId, ...profileData } });
+
+  if (locationInput) {
+    await upsertTutorLocation(tutor.id, locationInput);
+  }
+
+  return serializeTutor(tutor, await getTutorNeedsReaddress(tutor.id));
 }
 
 export async function updateTutorProfile(
@@ -64,13 +110,42 @@ export async function updateTutorProfile(
     studentIdNumber: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     parentsInfo?: string;
+    placeId?: string;
+    latitude?: number;
+    longitude?: number;
+    districtCode?: string;
   }>,
 ) {
   const existing = await prisma.tutor.findUnique({ where: { accountId } });
   if (!existing) return null;
 
-  const tutor = await prisma.tutor.update({ where: { accountId }, data });
-  return serializeTutor(tutor);
+  const locationInput = locationFieldsPresent(data)
+    ? {
+        placeId: data.placeId,
+        addressText: data.address ?? existing.address,
+        districtCode: data.districtCode,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      }
+    : null;
+
+  const {
+    placeId: _placeId,
+    latitude: _latitude,
+    longitude: _longitude,
+    districtCode: _districtCode,
+    ...profileData
+  } = data;
+  const tutor = await prisma.tutor.update({
+    where: { accountId },
+    data: profileData,
+  });
+
+  if (locationInput) {
+    await upsertTutorLocation(tutor.id, locationInput);
+  }
+
+  return serializeTutor(tutor, await getTutorNeedsReaddress(tutor.id));
 }
 
 export async function replaceTutorAreas(accountId: string, areaIds: number[]) {
@@ -159,7 +234,7 @@ export async function getPublicTutorProfile(tutorId: string) {
   });
   if (!tutor) return null;
   return {
-    ...serializeTutor(tutor),
+    ...serializeTutor(tutor, await getTutorNeedsReaddress(tutor.id)),
     areas: tutor.areas.map((a) => a.area),
     subjects: tutor.subjects.map((s) => s.subject),
     credentials: tutor.credentials,

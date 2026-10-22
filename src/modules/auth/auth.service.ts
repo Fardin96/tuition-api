@@ -281,8 +281,8 @@ export async function getMe(accountId: string) {
   return prisma.account.findUnique({
     where: { id: accountId },
     include: {
-      student: true,
-      tutor: true,
+      student: { include: { location: { select: { needsReaddress: true } } } },
+      tutor: { include: { location: { select: { needsReaddress: true } } } },
       adminUser: true,
     },
   });

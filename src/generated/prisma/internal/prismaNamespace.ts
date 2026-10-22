@@ -408,6 +408,8 @@ export const ModelName = {
   FileAsset: 'FileAsset',
   Student: 'Student',
   Tutor: 'Tutor',
+  TutorLocation: 'TutorLocation',
+  StudentLocation: 'StudentLocation',
   TutorArea: 'TutorArea',
   TutorSubject: 'TutorSubject',
   TutorVerification: 'TutorVerification',
@@ -440,7 +442,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "category" | "subject" | "fileAsset" | "student" | "tutor" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tuitionRequirement" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "category" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tuitionRequirement" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1255,6 +1257,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TutorCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TutorCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutorLocation: {
+      payload: Prisma.$TutorLocationPayload<ExtArgs>
+      fields: Prisma.TutorLocationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutorLocationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutorLocationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>
+        }
+        findFirst: {
+          args: Prisma.TutorLocationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutorLocationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>
+        }
+        findMany: {
+          args: Prisma.TutorLocationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>[]
+        }
+        create: {
+          args: Prisma.TutorLocationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>
+        }
+        createMany: {
+          args: Prisma.TutorLocationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutorLocationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>[]
+        }
+        delete: {
+          args: Prisma.TutorLocationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>
+        }
+        update: {
+          args: Prisma.TutorLocationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutorLocationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutorLocationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutorLocationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutorLocationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorLocationPayload>
+        }
+        aggregate: {
+          args: Prisma.TutorLocationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutorLocation>
+        }
+        groupBy: {
+          args: Prisma.TutorLocationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorLocationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutorLocationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorLocationCountAggregateOutputType> | number
+        }
+      }
+    }
+    StudentLocation: {
+      payload: Prisma.$StudentLocationPayload<ExtArgs>
+      fields: Prisma.StudentLocationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StudentLocationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StudentLocationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>
+        }
+        findFirst: {
+          args: Prisma.StudentLocationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StudentLocationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>
+        }
+        findMany: {
+          args: Prisma.StudentLocationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>[]
+        }
+        create: {
+          args: Prisma.StudentLocationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>
+        }
+        createMany: {
+          args: Prisma.StudentLocationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StudentLocationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>[]
+        }
+        delete: {
+          args: Prisma.StudentLocationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>
+        }
+        update: {
+          args: Prisma.StudentLocationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>
+        }
+        deleteMany: {
+          args: Prisma.StudentLocationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StudentLocationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StudentLocationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>[]
+        }
+        upsert: {
+          args: Prisma.StudentLocationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentLocationPayload>
+        }
+        aggregate: {
+          args: Prisma.StudentLocationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStudentLocation>
+        }
+        groupBy: {
+          args: Prisma.StudentLocationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StudentLocationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StudentLocationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StudentLocationCountAggregateOutputType> | number
         }
       }
     }
@@ -2718,6 +2868,36 @@ export const TutorScalarFieldEnum = {
 export type TutorScalarFieldEnum = (typeof TutorScalarFieldEnum)[keyof typeof TutorScalarFieldEnum]
 
 
+export const TutorLocationScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  placeId: 'placeId',
+  addressText: 'addressText',
+  districtCode: 'districtCode',
+  geogFetchedAt: 'geogFetchedAt',
+  needsReaddress: 'needsReaddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutorLocationScalarFieldEnum = (typeof TutorLocationScalarFieldEnum)[keyof typeof TutorLocationScalarFieldEnum]
+
+
+export const StudentLocationScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  placeId: 'placeId',
+  addressText: 'addressText',
+  districtCode: 'districtCode',
+  geogFetchedAt: 'geogFetchedAt',
+  needsReaddress: 'needsReaddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StudentLocationScalarFieldEnum = (typeof StudentLocationScalarFieldEnum)[keyof typeof StudentLocationScalarFieldEnum]
+
+
 export const TutorAreaScalarFieldEnum = {
   tutorId: 'tutorId',
   areaId: 'areaId'
@@ -3665,6 +3845,8 @@ export type GlobalOmitConfig = {
   fileAsset?: Prisma.FileAssetOmit
   student?: Prisma.StudentOmit
   tutor?: Prisma.TutorOmit
+  tutorLocation?: Prisma.TutorLocationOmit
+  studentLocation?: Prisma.StudentLocationOmit
   tutorArea?: Prisma.TutorAreaOmit
   tutorSubject?: Prisma.TutorSubjectOmit
   tutorVerification?: Prisma.TutorVerificationOmit

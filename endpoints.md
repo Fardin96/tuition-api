@@ -40,17 +40,17 @@ Notes: `GET /me` returns the account plus its profile (student, tutor or admin),
 ## 4. Student (5)
 | # | Method | Path | Who | Purpose |
 |---|---|---|---|---|
-| 23 | POST | /students/me | S | Create profile |
-| 24 | PATCH | /students/me | S | Update profile |
+| 23 | POST | /students/me | S | Create profile. Optional location fields (`placeId`, `latitude`, `longitude`, `districtCode`) are saved into `student_location` alongside the profile |
+| 24 | PATCH | /students/me | S | Update profile. Optional location fields update `student_location` |
 | 25 | POST | /students/me/verification | S | Submit ID file for verification |
 | 26 | GET | /students/:id | T (with an application), A | Limited student profile + rating |
 | 27 | GET | /students/:id/reviews | T, A | Reviews given to a student |
 
-## 5. Tutor (16)
+## 5. Tutor (17)
 | # | Method | Path | Who | Purpose |
 |---|---|---|---|---|
-| 28 | POST | /tutors/me | T | Create profile |
-| 29 | PATCH | /tutors/me | T | Update profile |
+| 28 | POST | /tutors/me | T | Create profile. Optional location fields (`placeId`, `latitude`, `longitude`, `districtCode`) are saved into `tutor_location` alongside the profile; response includes `needsReaddress` |
+| 29 | PATCH | /tutors/me | T | Update profile. Optional location fields update `tutor_location`; response includes `needsReaddress` |
 | 30 | PUT | /tutors/me/areas | T | Replace tutor_area set |
 | 31 | PUT | /tutors/me/subjects | T | Replace tutor_subject set |
 | 32 | POST | /tutors/me/verifications | T | Submit verification (one PENDING at a time) |
@@ -65,6 +65,7 @@ Notes: `GET /me` returns the account plus its profile (student, tutor or admin),
 | 41 | POST | /tutors/me/videos | T | Add video (PENDING) |
 | 42 | DELETE | /tutors/me/videos/:id | T | Remove video |
 | 43 | GET | /videos | P | Approved videos |
+| 44 | GET | /tutors/nearby | S | Geo search for tutors. Query: `radiusMeters` (100–50000, default 5000). Returns tutors within the same `district_code` ordered by distance |
 
 ## 6. Requirements (6)
 | # | Method | Path | Who | Purpose |
@@ -179,5 +180,14 @@ Notes: `GET /me` returns the account plus its profile (student, tutor or admin),
 | 119 | POST | /webhooks/whatsapp-status | n8n (signed) | Delivery receipts: update status / provider_message_id |
 | 120 | GET | /health | P | Liveness |
 
-## Total: 120 endpoints
-Auth 11, Files 4, Lookups 7, Student 5, Tutor 16, Requirements 6, Packages 6, Applications 12, Reviews 2, Reports/Disputes 4, Fees (tutor) 2, Public content 3, Admin 40, System 2.
+## Total: 121 endpoints
+Auth 11, Files 4, Lookups 7, Student 5, Tutor 17, Requirements 6, Packages 6, Applications 12, Reviews 2, Reports/Disputes 4, Fees (tutor) 2, Public content 3, Admin 40, System 2.
+
+## 15. Location background job
+
+One weekly cron, `weekly-location-expiry`, runs every Sunday at 03:00 UTC:
+
+- Marks locations older than **21 days** with `needs_readdress = true` (soft warning shown in the tutor dashboard via `GET /api/v1/me`).
+- Nulls `geog` and sets `needs_readdress = true` for locations older than **28 days** (hard expiry; hidden from `/tutors/nearby`).
+
+No external API call is made. The user refreshes their location from the frontend when they see the warning, which re-saves the coordinates and resets the timers.

@@ -7,6 +7,10 @@ export const studentProfileSchema = z.object({
   emergencyContact: z.string().min(1).max(50),
   whatsappNumber: z.string().min(1).max(20),
   studentIdNumber: z.string().min(1).max(100),
+  placeId: z.string().min(1).max(255).optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  districtCode: z.string().min(1).max(100).optional(),
 });
 
 export type StudentProfileInput = z.infer<typeof studentProfileSchema>;

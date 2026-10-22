@@ -40,6 +40,8 @@ beforeEach(async () => {
       tutor_verification,
       tutor_subject,
       tutor_area,
+      tutor_location,
+      student_location,
       tutor,
       student,
       file_asset,

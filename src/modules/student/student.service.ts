@@ -1,7 +1,33 @@
 import { prisma } from "../../lib/prisma.js";
+import { type SaveLocationInput, upsertStudentLocation } from "../location/location.service.js";
 
 function toNumber(value: unknown) {
   return Number(value);
+}
+
+function locationFieldsPresent<
+  T extends { placeId?: string; latitude?: number; longitude?: number; districtCode?: string },
+>(data: T): data is T & SaveLocationInput {
+  return (
+    data.placeId !== undefined &&
+    data.latitude !== undefined &&
+    data.longitude !== undefined &&
+    data.districtCode !== undefined
+  );
+}
+
+function compileLocationInput<T extends { address?: string | null }>(
+  profileAddress: string,
+  data: T & Partial<SaveLocationInput>,
+): SaveLocationInput | null {
+  if (!locationFieldsPresent(data)) return null;
+  return {
+    placeId: data.placeId,
+    addressText: data.address ?? profileAddress,
+    districtCode: data.districtCode,
+    latitude: data.latitude,
+    longitude: data.longitude,
+  };
 }
 
 function serializeStudent(student: {
@@ -38,6 +64,10 @@ export async function createStudentProfile(
     emergencyContact: string;
     whatsappNumber: string;
     studentIdNumber: string;
+    placeId?: string;
+    latitude?: number;
+    longitude?: number;
+    districtCode?: string;
   },
 ) {
   const existing = await prisma.student.findUnique({ where: { accountId } });
@@ -47,9 +77,22 @@ export async function createStudentProfile(
     throw err;
   }
 
+  const {
+    placeId: _placeId,
+    latitude: _latitude,
+    longitude: _longitude,
+    districtCode: _districtCode,
+    ...profileData
+  } = data;
   const student = await prisma.student.create({
-    data: { accountId, ...data },
+    data: { accountId, ...profileData },
   });
+
+  const locationInput = compileLocationInput(student.address, data);
+  if (locationInput) {
+    await upsertStudentLocation(student.id, locationInput);
+  }
+
   return serializeStudent(student);
 }
 
@@ -62,15 +105,32 @@ export async function updateStudentProfile(
     emergencyContact: string;
     whatsappNumber: string;
     studentIdNumber: string;
+    placeId?: string;
+    latitude?: number;
+    longitude?: number;
+    districtCode?: string;
   }>,
 ) {
   const existing = await prisma.student.findUnique({ where: { accountId } });
   if (!existing) return null;
 
+  const {
+    placeId: _placeId,
+    latitude: _latitude,
+    longitude: _longitude,
+    districtCode: _districtCode,
+    ...profileData
+  } = data;
   const student = await prisma.student.update({
     where: { accountId },
-    data,
+    data: profileData,
   });
+
+  const locationInput = compileLocationInput(student.address, data);
+  if (locationInput) {
+    await upsertStudentLocation(student.id, locationInput);
+  }
+
   return serializeStudent(student);
 }
 

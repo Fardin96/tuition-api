@@ -326,6 +326,7 @@ export type TutorWhereInput = {
   applications?: Prisma.ApplicationListRelationFilter
   fees?: Prisma.PlatformFeeListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
+  location?: Prisma.XOR<Prisma.TutorLocationNullableScalarRelationFilter, Prisma.TutorLocationWhereInput> | null
 }
 
 export type TutorOrderByWithRelationInput = {
@@ -356,6 +357,7 @@ export type TutorOrderByWithRelationInput = {
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
   fees?: Prisma.PlatformFeeOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
+  location?: Prisma.TutorLocationOrderByWithRelationInput
 }
 
 export type TutorWhereUniqueInput = Prisma.AtLeast<{
@@ -390,6 +392,7 @@ export type TutorWhereUniqueInput = Prisma.AtLeast<{
   applications?: Prisma.ApplicationListRelationFilter
   fees?: Prisma.PlatformFeeListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
+  location?: Prisma.XOR<Prisma.TutorLocationNullableScalarRelationFilter, Prisma.TutorLocationWhereInput> | null
 }, "id" | "accountId" | "whatsappNumber" | "accountId_role">
 
 export type TutorOrderByWithAggregationInput = {
@@ -466,6 +469,7 @@ export type TutorCreateInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateInput = {
@@ -495,6 +499,7 @@ export type TutorUncheckedCreateInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUpdateInput = {
@@ -523,6 +528,7 @@ export type TutorUpdateInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateInput = {
@@ -552,6 +558,7 @@ export type TutorUncheckedUpdateInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateManyInput = {
@@ -733,6 +740,20 @@ export type EnumGenderFieldUpdateOperationsInput = {
   set?: $Enums.Gender
 }
 
+export type TutorCreateNestedOneWithoutLocationInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutLocationInput, Prisma.TutorUncheckedCreateWithoutLocationInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutLocationInput
+  connect?: Prisma.TutorWhereUniqueInput
+}
+
+export type TutorUpdateOneRequiredWithoutLocationNestedInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutLocationInput, Prisma.TutorUncheckedCreateWithoutLocationInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutLocationInput
+  upsert?: Prisma.TutorUpsertWithoutLocationInput
+  connect?: Prisma.TutorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TutorUpdateToOneWithWhereWithoutLocationInput, Prisma.TutorUpdateWithoutLocationInput>, Prisma.TutorUncheckedUpdateWithoutLocationInput>
+}
+
 export type TutorCreateNestedOneWithoutAreasInput = {
   create?: Prisma.XOR<Prisma.TutorCreateWithoutAreasInput, Prisma.TutorUncheckedCreateWithoutAreasInput>
   connectOrCreate?: Prisma.TutorCreateOrConnectWithoutAreasInput
@@ -884,6 +905,7 @@ export type TutorCreateWithoutAccountInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutAccountInput = {
@@ -911,6 +933,7 @@ export type TutorUncheckedCreateWithoutAccountInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutAccountInput = {
@@ -954,10 +977,142 @@ export type TutorUpdateWithoutAccountInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  areas?: Prisma.TutorAreaUncheckedUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+}
+
+export type TutorCreateWithoutLocationInput = {
+  id?: string
+  name: string
+  address: string
+  emergencyContact: string
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  studentIdNumber: string
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutTutorInput
+  areas?: Prisma.TutorAreaCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+}
+
+export type TutorUncheckedCreateWithoutLocationInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  address: string
+  emergencyContact: string
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  studentIdNumber: string
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  areas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+}
+
+export type TutorCreateOrConnectWithoutLocationInput = {
+  where: Prisma.TutorWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutorCreateWithoutLocationInput, Prisma.TutorUncheckedCreateWithoutLocationInput>
+}
+
+export type TutorUpsertWithoutLocationInput = {
+  update: Prisma.XOR<Prisma.TutorUpdateWithoutLocationInput, Prisma.TutorUncheckedUpdateWithoutLocationInput>
+  create: Prisma.XOR<Prisma.TutorCreateWithoutLocationInput, Prisma.TutorUncheckedCreateWithoutLocationInput>
+  where?: Prisma.TutorWhereInput
+}
+
+export type TutorUpdateToOneWithWhereWithoutLocationInput = {
+  where?: Prisma.TutorWhereInput
+  data: Prisma.XOR<Prisma.TutorUpdateWithoutLocationInput, Prisma.TutorUncheckedUpdateWithoutLocationInput>
+}
+
+export type TutorUpdateWithoutLocationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutTutorNestedInput
+  areas?: Prisma.TutorAreaUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorUncheckedUpdateWithoutLocationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1008,6 +1163,7 @@ export type TutorCreateWithoutAreasInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutAreasInput = {
@@ -1036,6 +1192,7 @@ export type TutorUncheckedCreateWithoutAreasInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutAreasInput = {
@@ -1079,6 +1236,7 @@ export type TutorUpdateWithoutAreasInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutAreasInput = {
@@ -1107,6 +1265,7 @@ export type TutorUncheckedUpdateWithoutAreasInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutSubjectsInput = {
@@ -1134,6 +1293,7 @@ export type TutorCreateWithoutSubjectsInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutSubjectsInput = {
@@ -1162,6 +1322,7 @@ export type TutorUncheckedCreateWithoutSubjectsInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutSubjectsInput = {
@@ -1205,6 +1366,7 @@ export type TutorUpdateWithoutSubjectsInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutSubjectsInput = {
@@ -1233,6 +1395,7 @@ export type TutorUncheckedUpdateWithoutSubjectsInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutVerificationsInput = {
@@ -1260,6 +1423,7 @@ export type TutorCreateWithoutVerificationsInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutVerificationsInput = {
@@ -1288,6 +1452,7 @@ export type TutorUncheckedCreateWithoutVerificationsInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutVerificationsInput = {
@@ -1331,6 +1496,7 @@ export type TutorUpdateWithoutVerificationsInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutVerificationsInput = {
@@ -1359,6 +1525,7 @@ export type TutorUncheckedUpdateWithoutVerificationsInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutCredentialsInput = {
@@ -1386,6 +1553,7 @@ export type TutorCreateWithoutCredentialsInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutCredentialsInput = {
@@ -1414,6 +1582,7 @@ export type TutorUncheckedCreateWithoutCredentialsInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutCredentialsInput = {
@@ -1457,6 +1626,7 @@ export type TutorUpdateWithoutCredentialsInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutCredentialsInput = {
@@ -1485,6 +1655,7 @@ export type TutorUncheckedUpdateWithoutCredentialsInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutVideosInput = {
@@ -1512,6 +1683,7 @@ export type TutorCreateWithoutVideosInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutVideosInput = {
@@ -1540,6 +1712,7 @@ export type TutorUncheckedCreateWithoutVideosInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutVideosInput = {
@@ -1583,6 +1756,7 @@ export type TutorUpdateWithoutVideosInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutVideosInput = {
@@ -1611,6 +1785,7 @@ export type TutorUncheckedUpdateWithoutVideosInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutPackagesInput = {
@@ -1638,6 +1813,7 @@ export type TutorCreateWithoutPackagesInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutPackagesInput = {
@@ -1666,6 +1842,7 @@ export type TutorUncheckedCreateWithoutPackagesInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutPackagesInput = {
@@ -1709,6 +1886,7 @@ export type TutorUpdateWithoutPackagesInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutPackagesInput = {
@@ -1737,6 +1915,7 @@ export type TutorUncheckedUpdateWithoutPackagesInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutApplicationsInput = {
@@ -1764,6 +1943,7 @@ export type TutorCreateWithoutApplicationsInput = {
   packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutApplicationsInput = {
@@ -1792,6 +1972,7 @@ export type TutorUncheckedCreateWithoutApplicationsInput = {
   packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutApplicationsInput = {
@@ -1835,6 +2016,7 @@ export type TutorUpdateWithoutApplicationsInput = {
   packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutApplicationsInput = {
@@ -1863,6 +2045,7 @@ export type TutorUncheckedUpdateWithoutApplicationsInput = {
   packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutReviewsInput = {
@@ -1890,6 +2073,7 @@ export type TutorCreateWithoutReviewsInput = {
   packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutReviewsInput = {
@@ -1918,6 +2102,7 @@ export type TutorUncheckedCreateWithoutReviewsInput = {
   packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutReviewsInput = {
@@ -1961,6 +2146,7 @@ export type TutorUpdateWithoutReviewsInput = {
   packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutReviewsInput = {
@@ -1989,6 +2175,7 @@ export type TutorUncheckedUpdateWithoutReviewsInput = {
   packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutFeesInput = {
@@ -2016,6 +2203,7 @@ export type TutorCreateWithoutFeesInput = {
   packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutFeesInput = {
@@ -2044,6 +2232,7 @@ export type TutorUncheckedCreateWithoutFeesInput = {
   packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutFeesInput = {
@@ -2087,6 +2276,7 @@ export type TutorUpdateWithoutFeesInput = {
   packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutFeesInput = {
@@ -2115,6 +2305,7 @@ export type TutorUncheckedUpdateWithoutFeesInput = {
   packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
 }
 
 
@@ -2248,6 +2439,7 @@ export type TutorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   applications?: boolean | Prisma.Tutor$applicationsArgs<ExtArgs>
   fees?: boolean | Prisma.Tutor$feesArgs<ExtArgs>
   reviews?: boolean | Prisma.Tutor$reviewsArgs<ExtArgs>
+  location?: boolean | Prisma.Tutor$locationArgs<ExtArgs>
   _count?: boolean | Prisma.TutorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tutor"]>
 
@@ -2325,6 +2517,7 @@ export type TutorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   applications?: boolean | Prisma.Tutor$applicationsArgs<ExtArgs>
   fees?: boolean | Prisma.Tutor$feesArgs<ExtArgs>
   reviews?: boolean | Prisma.Tutor$reviewsArgs<ExtArgs>
+  location?: boolean | Prisma.Tutor$locationArgs<ExtArgs>
   _count?: boolean | Prisma.TutorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TutorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2347,6 +2540,7 @@ export type $TutorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     applications: Prisma.$ApplicationPayload<ExtArgs>[]
     fees: Prisma.$PlatformFeePayload<ExtArgs>[]
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
+    location: Prisma.$TutorLocationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2770,6 +2964,7 @@ export interface Prisma__TutorClient<T, Null = never, ExtArgs extends runtime.Ty
   applications<T extends Prisma.Tutor$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   fees<T extends Prisma.Tutor$feesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$feesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformFeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.Tutor$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  location<T extends Prisma.Tutor$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$locationArgs<ExtArgs>>): Prisma.Prisma__TutorLocationClient<runtime.Types.Result.GetResult<Prisma.$TutorLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3430,6 +3625,25 @@ export type Tutor$reviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ReviewScalarFieldEnum | Prisma.ReviewScalarFieldEnum[]
+}
+
+/**
+ * Tutor.location
+ */
+export type Tutor$locationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TutorLocation
+   */
+  select?: Prisma.TutorLocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TutorLocation
+   */
+  omit?: Prisma.TutorLocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TutorLocationInclude<ExtArgs> | null
+  where?: Prisma.TutorLocationWhereInput
 }
 
 /**

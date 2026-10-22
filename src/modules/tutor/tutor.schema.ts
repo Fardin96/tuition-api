@@ -9,6 +9,10 @@ export const tutorProfileSchema = z.object({
   studentIdNumber: z.string().min(1).max(100),
   gender: z.nativeEnum(Gender),
   parentsInfo: z.string().max(1000).optional(),
+  placeId: z.string().min(1).max(255).optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  districtCode: z.string().min(1).max(100).optional(),
 });
 
 export type TutorProfileInput = z.infer<typeof tutorProfileSchema>;
@@ -16,6 +20,10 @@ export type TutorProfileInput = z.infer<typeof tutorProfileSchema>;
 export const updateTutorProfileSchema = tutorProfileSchema.partial();
 
 export type UpdateTutorProfileInput = z.infer<typeof updateTutorProfileSchema>;
+
+export const tutorNearbyQuerySchema = z.object({
+  radiusMeters: z.coerce.number().int().min(100).max(50000).default(5000),
+});
 
 export const tutorAreasSchema = z.object({
   areaIds: z.array(z.coerce.number().int().positive()).max(50),
@@ -58,6 +66,9 @@ export const tutorResponseSchema = z.object({
   isListed: z.boolean(),
   ratingAvg: z.number(),
   ratingCount: z.number(),
+  needsReaddress: z.boolean().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
+
+export type TutorNearbyQuery = z.infer<typeof tutorNearbyQuerySchema>;

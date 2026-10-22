@@ -170,11 +170,24 @@ export async function authRoutes(app: FastifyInstance) {
   );
 }
 
+function transformMe(me: Awaited<ReturnType<typeof getMe>>) {
+  if (!me) return me;
+  return {
+    ...me,
+    tutor: me.tutor
+      ? { ...me.tutor, needsReaddress: me.tutor.location?.needsReaddress ?? false }
+      : undefined,
+    student: me.student
+      ? { ...me.student, needsReaddress: me.student.location?.needsReaddress ?? false }
+      : undefined,
+  };
+}
+
 export async function meRoutes(app: FastifyInstance) {
   app.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
     const account = requireAuth(request);
     const me = await getMe(account.accountId);
-    return reply.send({ account: me });
+    return reply.send({ account: transformMe(me) });
   });
 
   app.delete("/", async (request: FastifyRequest, reply: FastifyReply) => {

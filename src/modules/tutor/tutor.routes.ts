@@ -1,14 +1,17 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { requireRole } from "../../plugins/auth.js";
+import { findNearbyTutors } from "../location/location.service.js";
 import {
   type TutorAreasInput,
   type TutorIdParam,
+  type TutorNearbyQuery,
   type TutorProfileInput,
   type TutorSearchQuery,
   type TutorSubjectsInput,
   tutorAreasSchema,
   tutorIdParamSchema,
+  tutorNearbyQuerySchema,
   tutorProfileSchema,
   tutorResponseSchema,
   tutorSearchQuerySchema,
@@ -157,6 +160,35 @@ export async function tutorRoutes(app: FastifyInstance) {
           decidedAt: v.decidedAt?.toISOString() ?? null,
         })),
       });
+    },
+  );
+
+  app.get(
+    "/nearby",
+    {
+      schema: {
+        querystring: tutorNearbyQuerySchema,
+        response: {
+          200: z.object({
+            tutors: z.array(
+              z.object({
+                id: z.string(),
+                name: z.string(),
+                gender: z.string(),
+                ratingAvg: z.number(),
+                ratingCount: z.number(),
+                distanceMeters: z.number(),
+              }),
+            ),
+          }),
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "STUDENT");
+      const query = request.query as TutorNearbyQuery;
+      const tutors = await findNearbyTutors(account.accountId, query.radiusMeters);
+      return reply.send({ tutors });
     },
   );
 

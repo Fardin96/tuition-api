@@ -73,6 +73,16 @@ export type Student = Prisma.StudentModel
  */
 export type Tutor = Prisma.TutorModel
 /**
+ * Model TutorLocation
+ * 
+ */
+export type TutorLocation = Prisma.TutorLocationModel
+/**
+ * Model StudentLocation
+ * 
+ */
+export type StudentLocation = Prisma.StudentLocationModel
+/**
  * Model TutorArea
  * 
  */

@@ -26,14 +26,16 @@ yarn install
 # To start it later:
 #   brew services start postgresql@17
 #
-# Default dev DB (already created):
-#   DATABASE_URL="postgresql://user:password@localhost:5432/tuition_dev"
+# Default dev DB (already created). Add ?sslmode=disable for local Postgres
+# when the app is not configured to use TLS:
+#   DATABASE_URL="postgresql://user:password@localhost:5432/tuition_dev?sslmode=disable"
 
 # 4. Env
 cp .env.example .env
 # Edit .env and fill in real secrets (Google OAuth, R2, n8n, tokens, super-admin emails).
 
-# 5. DB schema + constraints
+# 5. DB schema + constraints (postgis must be installed first)
+psql "$DATABASE_URL" -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 yarn db:generate
 yarn db:migrate
 
@@ -65,33 +67,54 @@ curl http://localhost:3000/api/v1/health
 | `yarn typecheck` | TypeScript |
 | `yarn test` | Vitest (watch) |
 | `yarn test:ci` | Vitest (single run) |
+| `yarn cron:weekly-location-expiry` | Run the weekly location-expiry cron manually |
 
 ## Deploy to DigitalOcean App Platform
 
-1. The App Platform app already includes a PostgreSQL database component — `DATABASE_URL` is injected automatically as `${db.DATABASE_URL}` in `.do/app.yaml`.
-2. Create a Cloudflare R2 bucket and API token for file uploads.
-3. Set up a Google OAuth client and add the production `GOOGLE_CLIENT_ID` to `.do/app.yaml`.
-4. Fill in `.do/app.yaml` (GitHub repo name, R2 credentials, Google client ID, token secrets).
-5. Install `doctl` and run:
+1. The App Platform app uses an **existing** DigitalOcean managed Postgres cluster — set `DATABASE_URL` and `DATABASE_POOL_URL` in the UI or `.do/app.yaml`.
+2. Enable the `postgis` extension on the managed database before first deploy:
+   ```bash
+   psql "$DATABASE_URL" -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+   ```
+3. Create a Cloudflare R2 bucket and API token for file uploads.
+4. Set up a Google OAuth client and add the production `GOOGLE_CLIENT_ID` to `.do/app.yaml`.
+5. Fill in `.do/app.yaml` placeholders (GitHub repo, R2 credentials, token secrets, DB URLs).
+6. Install `doctl` and run:
    ```bash
    doctl apps create --spec .do/app.yaml
    ```
-6. Run the seed job once after first deploy to insert the super-admin allowlist:
+7. Run migrations once after first deploy:
    ```bash
    doctl apps create-deployment <app-id> --spec .do/app.yaml --job migrate
-   # or run `yarn db:seed` locally against the managed DB
+   # or run `yarn db:deploy` locally against the managed DB
    ```
+
+### Weekly location-expiry cron
+
+A single DO App Platform job runs every Sunday at 03:00 UTC:
+
+- Soft warning at **21 days**: sets `needs_readdress = true` on `tutor_location` / `student_location`.
+- Hard expiry at **28 days**: nulls `geog` and keeps `needs_readdress = true`, hiding the tutor/student from geo search.
+
+No external API call is required. The job is declared as `weekly-location-expiry` in `.do/app.yaml`.
 
 ## Testing
 
 Tests use **Vitest** and hit a real PostgreSQL database.
 
-1. Create a test DB (separate from `tuition_dev`):
+1. Ensure Postgres has the `postgis` extension:
+   ```bash
+   psql -d template1 -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+   ```
+2. Create a test DB (separate from `tuition_dev`):
    ```bash
    createdb tuition_test
    ```
-2. Add `TEST_DATABASE_URL` to `.env` (or use the same `DATABASE_URL` for both).
-3. Run tests:
+3. Add `TEST_DATABASE_URL` to `.env` with `sslmode=disable` for local:
+   ```bash
+   TEST_DATABASE_URL="postgresql://user:password@localhost:5432/tuition_test?sslmode=disable"
+   ```
+4. Run tests:
    ```bash
    yarn test:ci
    ```
