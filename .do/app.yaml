@@ -144,7 +144,8 @@ jobs:
     run_command: node dist/cron/weekly-location-expiry.js
     environment_slug: node-js
     instance_size_slug: basic-xxs
-    schedule: "0 3 * * 0"
+    schedule:
+      cron: "0 3 * * 0"
     envs:
       - key: NODE_ENV
         value: production
