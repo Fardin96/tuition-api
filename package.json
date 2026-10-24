@@ -12,7 +12,7 @@
     "start": "node dist/server.js",
     "db:migrate:create": "prisma migrate dev --create-only",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
+    "db:deploy": "prisma db execute --file prisma/recover-failed-migrations.sql && prisma migrate deploy",
     "db:generate": "prisma generate",
     "db:seed": "tsx --env-file-if-exists=.env src/seed/index.ts",
     "db:reset": "prisma migrate reset",
