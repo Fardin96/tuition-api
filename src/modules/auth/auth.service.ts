@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { env } from "../../config/env.js";
+import type { Prisma } from "../../generated/prisma/client.js";
 import type { Role } from "../../generated/prisma/enums.js";
 import type { AccountModel } from "../../generated/prisma/models/Account.js";
 import { prisma } from "../../lib/prisma.js";
@@ -274,6 +275,124 @@ export async function softDeleteAccount(accountId: string) {
   return prisma.account.update({
     where: { id: accountId },
     data: { deletedAt: new Date(), status: "DELETED" },
+  });
+}
+
+export async function hardDeleteAccount(accountId: string) {
+  await prisma.$transaction(async (tx) => {
+    const [student, tutor, admin] = await Promise.all([
+      tx.student.findUnique({ where: { accountId }, select: { id: true } }),
+      tx.tutor.findUnique({ where: { accountId }, select: { id: true } }),
+      tx.adminUser.findUnique({ where: { accountId }, select: { accountId: true } }),
+    ]);
+
+    const studentId = student?.id;
+    const tutorId = tutor?.id;
+
+    // Sessions and direct account-owned notifications.
+    await tx.session.deleteMany({ where: { accountId } });
+    await tx.notificationLog.deleteMany({ where: { recipientId: accountId } });
+
+    // Account blocks, reports and disputes where this account is involved.
+    await tx.accountBlock.deleteMany({
+      where: {
+        OR: [{ accountId }, { blockedById: accountId }, { unblockedById: accountId }],
+      },
+    });
+    await tx.report.deleteMany({
+      where: {
+        OR: [{ reporterId: accountId }, { targetAccountId: accountId }, { handledById: accountId }],
+      },
+    });
+    await tx.dispute.deleteMany({
+      where: {
+        OR: [{ raisedById: accountId }, { againstId: accountId }, { handledById: accountId }],
+      },
+    });
+
+    if (admin) {
+      // Clear admin references that would otherwise block admin_user deletion.
+      await tx.tutorVerification.updateMany({
+        where: { reviewedById: accountId },
+        data: { reviewedById: null },
+      });
+      await tx.report.updateMany({
+        where: { handledById: accountId },
+        data: { handledById: null },
+      });
+      await tx.dispute.updateMany({
+        where: { handledById: accountId },
+        data: { handledById: null },
+      });
+      await tx.siteContent.updateMany({
+        where: { updatedById: accountId },
+        data: { updatedById: null },
+      });
+      await tx.blogPost.deleteMany({ where: { authorId: accountId } });
+    }
+
+    const applicationWhere: Prisma.ApplicationWhereInput = {};
+    if (tutorId) applicationWhere.tutorId = tutorId;
+    if (studentId) applicationWhere.studentId = studentId;
+
+    const hasProfile = Boolean(tutorId || studentId);
+    const appIds = hasProfile
+      ? (await tx.application.findMany({ where: applicationWhere, select: { id: true } })).map(
+          (a) => a.id,
+        )
+      : [];
+
+    if (appIds.length > 0) {
+      await tx.dispute.deleteMany({ where: { applicationId: { in: appIds } } });
+      await tx.report.deleteMany({ where: { applicationId: { in: appIds } } });
+      await tx.notificationLog.deleteMany({ where: { applicationId: { in: appIds } } });
+    }
+
+    // Platform fees and payments are append-only; if any exist the delete will
+    // surface a foreign-key error and the caller can handle it.
+    if (tutorId || appIds.length > 0) {
+      const platformFeeWhere: Prisma.PlatformFeeWhereInput = {};
+      if (tutorId) platformFeeWhere.tutorId = tutorId;
+      if (appIds.length > 0) platformFeeWhere.applicationId = { in: appIds };
+      await tx.platformFee.deleteMany({ where: platformFeeWhere });
+    }
+
+    const reviewWhere: Prisma.ReviewWhereInput = {};
+    if (tutorId) reviewWhere.tutorId = tutorId;
+    if (studentId) reviewWhere.studentId = studentId;
+
+    if (hasProfile) {
+      await tx.review.deleteMany({ where: reviewWhere });
+      await tx.application.deleteMany({ where: applicationWhere });
+    }
+
+    if (studentId) {
+      await tx.tuitionRequirement.deleteMany({ where: { studentId } });
+      await tx.student.updateMany({
+        where: { id: studentId },
+        data: { verificationFileId: null, verificationStatus: "NOT_SUBMITTED" },
+      });
+      await tx.student.deleteMany({ where: { accountId } });
+    }
+
+    if (tutorId) {
+      await tx.tuitionPackage.deleteMany({ where: { tutorId } });
+      await tx.tutorVideo.deleteMany({ where: { tutorId } });
+      await tx.tutorCredential.deleteMany({ where: { tutorId } });
+      await tx.tutorVerification.deleteMany({ where: { tutorId } });
+      await tx.tutorArea.deleteMany({ where: { tutorId } });
+      await tx.tutorSubject.deleteMany({ where: { tutorId } });
+      await tx.tutor.deleteMany({ where: { accountId } });
+    }
+
+    if (admin) {
+      await tx.adminUser.deleteMany({ where: { accountId } });
+    }
+
+    // File assets must go after every row that references them.
+    await tx.fileAsset.deleteMany({ where: { ownerAccountId: accountId } });
+
+    await tx.account.delete({ where: { id: accountId } });
   });
 }
 

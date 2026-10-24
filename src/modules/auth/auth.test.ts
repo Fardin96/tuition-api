@@ -2,9 +2,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "../../lib/prisma.js";
 import {
   createAccount,
+  createApplication,
+  createArea,
+  createCategory,
+  createFileAsset,
+  createRequirement,
   createSession,
+  createStudentProfile,
+  createSubject,
   createTestApp,
+  createTutorProfile,
   getAuthHeaders,
+  setStudentLocation,
+  setTutorLocation,
 } from "../../tests/helpers.js";
 import * as authService from "./auth.service.js";
 
@@ -355,6 +365,147 @@ describe("me routes", () => {
       });
       expect(sessions).toBe(0);
     });
+  });
+});
+
+describe("DELETE /api/v1/me/hard-delete", () => {
+  it("permanently deletes the account and all related data, then allows Google re-sign-up", async () => {
+    const app = await createTestApp();
+
+    const area = await createArea();
+    const category = await createCategory();
+    const subject = await createSubject();
+
+    const studentAccount = await createAccount({
+      role: "STUDENT",
+      email: "hard-delete-student@example.com",
+      googleSub: "google-hard-delete-student",
+    });
+    const studentProfile = await createStudentProfile(studentAccount.id, area.id);
+    await setStudentLocation(studentProfile.id);
+
+    const verificationFile = await createFileAsset(studentAccount.id, "STUDENT_ID");
+    await prisma.student.update({
+      where: { id: studentProfile.id },
+      data: { verificationFileId: verificationFile.id, verificationStatus: "PENDING" },
+    });
+
+    await createSession(studentAccount.id);
+
+    await prisma.notificationLog.create({
+      data: {
+        eventType: "APPLICATION_RECEIVED",
+        channel: "WHATSAPP",
+        recipientId: studentAccount.id,
+        dedupeKey: `test-${studentAccount.id}`,
+        templateName: "application_received",
+        payload: {},
+      },
+    });
+
+    const tutorAccount = await createAccount({
+      role: "TUTOR",
+      email: "hard-delete-tutor@example.com",
+      googleSub: "google-hard-delete-tutor",
+    });
+    const tutorProfile = await createTutorProfile(tutorAccount.id);
+    await setTutorLocation(tutorProfile.id);
+
+    const requirement = await createRequirement({
+      studentId: studentProfile.id,
+      categoryId: category.id,
+      areaId: area.id,
+      subjectId: subject.id,
+    });
+
+    const application = await createApplication({
+      requirementId: requirement.id,
+      tutorId: tutorProfile.id,
+      studentId: studentProfile.id,
+      initiatedBy: "TUTOR",
+      status: "COMPLETED",
+    });
+
+    await prisma.review.create({
+      data: {
+        tutorId: tutorProfile.id,
+        studentId: studentProfile.id,
+        direction: "STUDENT_TO_TUTOR",
+        rating: 5,
+        comment: "Great tutor",
+      },
+    });
+
+    await prisma.report.create({
+      data: {
+        reporterId: studentAccount.id,
+        targetAccountId: tutorAccount.id,
+        applicationId: application.id,
+        category: "SPAM",
+        details: "Spam",
+      },
+    });
+
+    const headers = await getAuthHeaders(studentAccount);
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers,
+    });
+
+    expect(res.statusCode).toBe(204);
+
+    expect(await prisma.account.findUnique({ where: { id: studentAccount.id } })).toBeNull();
+    expect(await prisma.student.findUnique({ where: { accountId: studentAccount.id } })).toBeNull();
+    expect(await prisma.studentLocation.count({ where: { studentId: studentProfile.id } })).toBe(0);
+    expect(await prisma.tuitionRequirement.count({ where: { studentId: studentProfile.id } })).toBe(
+      0,
+    );
+    expect(
+      await prisma.application.count({
+        where: { OR: [{ studentId: studentProfile.id }, { tutorId: tutorProfile.id }] },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.review.count({
+        where: { OR: [{ studentId: studentProfile.id }, { tutorId: tutorProfile.id }] },
+      }),
+    ).toBe(0);
+    expect(await prisma.report.count({ where: { reporterId: studentAccount.id } })).toBe(0);
+    expect(await prisma.session.count({ where: { accountId: studentAccount.id } })).toBe(0);
+    expect(await prisma.notificationLog.count({ where: { recipientId: studentAccount.id } })).toBe(
+      0,
+    );
+    expect(await prisma.fileAsset.count({ where: { ownerAccountId: studentAccount.id } })).toBe(0);
+
+    // Tutor account and profile are untouched.
+    expect(await prisma.account.findUnique({ where: { id: tutorAccount.id } })).not.toBeNull();
+    expect(await prisma.tutor.findUnique({ where: { accountId: tutorAccount.id } })).not.toBeNull();
+
+    // The same Google account can sign up again.
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: studentAccount.googleSub,
+      email: studentAccount.email,
+      email_verified: true,
+      name: "Recreated Student",
+    });
+
+    const signupRes = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-token", role: "STUDENT" },
+    });
+
+    expect(signupRes.statusCode).toBe(200);
+    const body = JSON.parse(signupRes.body);
+    expect(body.account.id).not.toBe(studentAccount.id);
+    expect(body.account.email).toBe(studentAccount.email);
+  });
+
+  it("requires authentication", async () => {
+    const app = await createTestApp();
+    const res = await app.inject({ method: "DELETE", url: "/api/v1/me/hard-delete" });
+    expect(res.statusCode).toBe(401);
   });
 });
 

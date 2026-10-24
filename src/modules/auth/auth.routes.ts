@@ -7,6 +7,7 @@ import {
   createSession,
   generateRefreshToken,
   getMe,
+  hardDeleteAccount,
   listSessions,
   recordConsent,
   revokeAllSessions,
@@ -193,6 +194,12 @@ export async function meRoutes(app: FastifyInstance) {
   app.delete("/", async (request: FastifyRequest, reply: FastifyReply) => {
     const account = requireAuth(request);
     await softDeleteAccount(account.accountId);
+    return reply.status(204).send();
+  });
+
+  app.delete("/hard-delete", async (request: FastifyRequest, reply: FastifyReply) => {
+    const account = requireAuth(request);
+    await hardDeleteAccount(account.accountId);
     return reply.status(204).send();
   });
 }
