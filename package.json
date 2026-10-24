@@ -24,7 +24,7 @@
     "test": "vitest",
     "test:ci": "vitest run",
     "cron:weekly-location-expiry": "tsx --env-file-if-exists=.env src/cron/weekly-location-expiry.ts",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1153.0",
@@ -43,6 +43,7 @@
     "jose": "^6.2.13",
     "pg": "^8.23.1",
     "prisma": "7",
+    "tsup": "^8.5.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
@@ -50,7 +51,6 @@
     "@types/node": "^26.6.5",
     "@types/pg": "^8.23.1",
     "husky": "^9.1.7",
-    "tsup": "^8.5.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",

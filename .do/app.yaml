@@ -20,7 +20,7 @@ services:
       repo: fardin96/tuition-api
       branch: main
       deploy_on_push: true
-    build_command: yarn install --frozen-lockfile --production=false && yarn db:generate && yarn build
+    build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
     run_command: node dist/server.js
     environment_slug: node-js
     instance_count: 1
@@ -116,7 +116,7 @@ jobs:
       repo: fardin96/tuition-api
       branch: main
       deploy_on_push: true
-    build_command: yarn install --frozen-lockfile --production=false && yarn db:generate
+    build_command: yarn install --frozen-lockfile && yarn db:generate
     run_command: bash scripts/migrate.sh
     environment_slug: node-js
     instance_size_slug: basic-xxs
@@ -141,7 +141,7 @@ jobs:
       repo: fardin96/tuition-api
       branch: main
       deploy_on_push: true
-    build_command: yarn install --frozen-lockfile --production=false && yarn db:generate && yarn build
+    build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
     run_command: node dist/cron/weekly-location-expiry.js
     environment_slug: node-js
     instance_size_slug: basic-xxs
