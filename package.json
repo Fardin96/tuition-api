@@ -43,7 +43,6 @@
     "jose": "^6.2.13",
     "pg": "^8.23.1",
     "prisma": "7",
-    "tsup": "^8.5.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
