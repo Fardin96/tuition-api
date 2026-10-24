@@ -1,9 +1,10 @@
--- Runs before `prisma migrate deploy` (see `db:deploy` in package.json).
+-- Runs before `prisma migrate deploy` (see `scripts/migrate.sh` and `.do/app.yaml`).
 -- Recovers from any failed `*_location_postgis` migration attempt in production:
 -- the original migration folder no longer exists (replaced by 20261022876543_location_postgis),
 -- but its failed row in _prisma_migrations blocks every deploy with P3009.
 -- No-op on fresh databases and once the row is resolved.
--- shortcut: scoped to location_postgis migrations, delete this file and its db:deploy step once production has deployed successfully.
+-- shortcut: scoped to location_postgis migrations, delete this file and its step in
+-- scripts/migrate.sh once production has deployed successfully.
 DO $$
 BEGIN
   IF to_regclass('public._prisma_migrations') IS NULL THEN

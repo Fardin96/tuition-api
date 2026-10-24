@@ -21,9 +21,6 @@ services:
       branch: main
       deploy_on_push: true
     build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
-    # Migrations run on startup (no separate job container). Prisma takes an advisory
-    # lock, so this stays safe if you scale to multiple instances later. A failed
-    # migration crashes the new container and DO keeps the previous deploy live.
     run_command: node dist/server.js
     environment_slug: node-js
     instance_count: 1
@@ -55,7 +52,7 @@ services:
       - key: DATABASE_POOL_URL
         value: <paste-pool-url-here>?&pgbouncer=true&connection_limit=5
         type: SECRET
-      # Direct DB URL (port 25060). Used only by `prisma migrate deploy` at startup;
+      # Direct DB URL (port 25060). Used only by the `migrate` PRE_DEPLOY job;
       # never run migrations through the pooler.
       - key: DATABASE_URL
         value: <paste-direct-db-url-here>
@@ -108,6 +105,33 @@ services:
         type: SECRET
 
 jobs:
+  # Database migrations run as a PRE_DEPLOY job so a failed migration fails the
+  # deploy without crashing the running service. This also keeps migration logs
+  # separate from the app runtime and lets `scripts/migrate.sh` recover from
+  # transient migration failures before `prisma migrate deploy` runs.
+  - name: migrate
+    kind: PRE_DEPLOY
+    source_dir: /
+    github:
+      repo: fardin96/tuition-api
+      branch: main
+      deploy_on_push: true
+    build_command: yarn install --frozen-lockfile && yarn db:generate
+    run_command: bash scripts/migrate.sh
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    envs:
+      - key: NODE_ENV
+        value: production
+      # Direct DB URL (port 25060). Never run migrations through the pooler.
+      - key: DATABASE_URL
+        value: <paste-direct-db-url-here>
+        type: SECRET
+      # Contents of the DigitalOcean "Download CA certificate" file.
+      - key: DATABASE_CA_CERT
+        value: <database-ca-cert-pem-content>
+        type: SECRET
+
   # Soft warning at 21 days, hard expiry at 28 days. Runs weekly; that is
   # frequent enough for a 7-day expiry tolerance.
   - name: weekly-location-expiry

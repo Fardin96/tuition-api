@@ -59,7 +59,8 @@ curl http://localhost:3000/api/v1/health
 | `yarn start` | Run production bundle (env vars injected by host) |
 | `yarn db:migrate:create` | Create a new empty migration |
 | `yarn db:migrate` | Apply migrations in dev |
-| `yarn db:deploy` | Apply migrations in production |
+| `bash scripts/migrate.sh` | Apply migrations in production (run automatically by the pre-deploy job) |
+| `npx prisma migrate deploy` | Apply migrations locally/manually |
 | `yarn db:generate` | Regenerate Prisma client |
 | `yarn db:seed` | Run seed script |
 | `yarn db:studio` | Open Prisma Studio |
@@ -83,10 +84,11 @@ curl http://localhost:3000/api/v1/health
    ```bash
    doctl apps create --spec .do/app.yaml
    ```
-7. Run migrations once after first deploy:
+7. Migrations run automatically before each deploy via the `migrate` pre-deploy job declared in `.do/app.yaml`. To run them manually:
    ```bash
-   doctl apps create-deployment <app-id> --spec .do/app.yaml --job migrate
-   # or run `yarn db:deploy` locally against the managed DB
+   bash scripts/migrate.sh
+   # or, against the managed DB from your local machine:
+   DATABASE_URL="<direct-db-url>" npx prisma migrate deploy
    ```
 
 ### Weekly location-expiry cron
