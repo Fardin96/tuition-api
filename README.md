@@ -110,9 +110,11 @@ Tests use **Vitest** and hit a real PostgreSQL database.
    ```bash
    createdb tuition_test
    ```
-3. Add `TEST_DATABASE_URL` to `.env` with `sslmode=disable` for local:
+3. Add a test database URL to `.env` with `sslmode=disable`. Either `DATABASE_URL` or `TEST_DATABASE_URL` works; tests use `TEST_DATABASE_URL` when set, otherwise `DATABASE_URL`:
    ```bash
-   TEST_DATABASE_URL="postgresql://user:password@localhost:5432/tuition_test?sslmode=disable"
+   DATABASE_URL="postgresql://user:password@localhost:5432/tuition_test?sslmode=disable"
+   # optional override:
+   # TEST_DATABASE_URL="postgresql://user:password@localhost:5432/tuition_test?sslmode=disable"
    ```
 4. Run tests:
    ```bash
@@ -121,7 +123,7 @@ Tests use **Vitest** and hit a real PostgreSQL database.
 
 ### Pre-push hook
 
-Husky is configured to run `lint`, `typecheck`, `test:ci`, and `build` before every push. The hook requires `TEST_DATABASE_URL` to be exported in your shell (or set by `.env` + a tool like `direnv`).
+Husky is configured to run `lint`, `typecheck`, `test:ci`, and `build` before every push. The hook automatically loads `.env` if it exists, so setting `DATABASE_URL` or `TEST_DATABASE_URL` there is enough.
 
 Skip the hook if needed:
 

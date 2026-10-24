@@ -3,9 +3,15 @@ set -e
 
 echo "Running pre-push checks..."
 
-if [ -z "$TEST_DATABASE_URL" ]; then
+# Load .env if it exists so DATABASE_URL/TEST_DATABASE_URL are available.
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | grep -v '^$' | xargs)
+fi
+
+if [ -z "$DATABASE_URL" ] && [ -z "$TEST_DATABASE_URL" ]; then
   echo ""
-  echo "TEST_DATABASE_URL is not set. Set it before pushing, or skip the hook with:"
+  echo "Neither DATABASE_URL nor TEST_DATABASE_URL is set. Add one to .env,"
+  echo "export it in your shell, or skip the hook with:"
   echo "  git push --no-verify"
   echo ""
   exit 1
