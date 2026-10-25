@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch --env-file=.env src/server.ts",
-    "build": "tsup src/server.ts src/cron/weekly-location-expiry.ts --format esm --out-dir dist --clean",
+    "build": "npx tsup src/server.ts src/cron/weekly-location-expiry.ts --format esm --out-dir dist --clean",
     "start": "node dist/server.js",
     "db:migrate:create": "prisma migrate dev --create-only",
     "db:migrate": "prisma migrate dev",
@@ -51,6 +51,7 @@
     "@types/pg": "^8.23.1",
     "husky": "^9.1.7",
     "tsx": "^4.23.15",
+    "tsup": "^8.5.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
     "vitest": "^5.0.3"
