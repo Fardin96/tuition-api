@@ -378,6 +378,11 @@ export type SubjectScalarRelationFilter = {
   isNot?: Prisma.SubjectWhereInput
 }
 
+export type SubjectNullableScalarRelationFilter = {
+  is?: Prisma.SubjectWhereInput | null
+  isNot?: Prisma.SubjectWhereInput | null
+}
+
 export type SubjectCreateNestedOneWithoutTutorSubjectsInput = {
   create?: Prisma.XOR<Prisma.SubjectCreateWithoutTutorSubjectsInput, Prisma.SubjectUncheckedCreateWithoutTutorSubjectsInput>
   connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutTutorSubjectsInput
@@ -398,10 +403,12 @@ export type SubjectCreateNestedOneWithoutRequirementsInput = {
   connect?: Prisma.SubjectWhereUniqueInput
 }
 
-export type SubjectUpdateOneRequiredWithoutRequirementsNestedInput = {
+export type SubjectUpdateOneWithoutRequirementsNestedInput = {
   create?: Prisma.XOR<Prisma.SubjectCreateWithoutRequirementsInput, Prisma.SubjectUncheckedCreateWithoutRequirementsInput>
   connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutRequirementsInput
   upsert?: Prisma.SubjectUpsertWithoutRequirementsInput
+  disconnect?: Prisma.SubjectWhereInput | boolean
+  delete?: Prisma.SubjectWhereInput | boolean
   connect?: Prisma.SubjectWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutRequirementsInput, Prisma.SubjectUpdateWithoutRequirementsInput>, Prisma.SubjectUncheckedUpdateWithoutRequirementsInput>
 }

@@ -600,26 +600,26 @@ model TutorVideo {
 model TuitionRequirement {
   id              String        @id @default(uuid(7)) @db.Uuid
   studentId       String        @map("student_id") @db.Uuid
-  categoryId      Int           @map("category_id")
-  areaId          Int           @map("area_id") // where the tuition happens
-  subjectId       Int           @map("subject_id")
-  classLevel      Int           @map("class_level") @db.SmallInt
-  timeOfDay       DateTime      @map("time_of_day") @db.Time(0)
-  daysPerWeek     Int           @map("days_per_week") @db.SmallInt
-  salary          Int // BDT per month
-  studentCount    Int           @default(1) @map("student_count") @db.SmallInt
-  hireByDate      DateTime      @map("hire_by_date") @db.Date
+  categoryId      Int?          @map("category_id")
+  areaId          Int?          @map("area_id") // where the tuition happens
+  subjectId       Int?          @map("subject_id")
+  classLevel      Int?          @map("class_level") @db.SmallInt
+  timeOfDay       DateTime?     @map("time_of_day") @db.Time(0)
+  daysPerWeek     Int?          @map("days_per_week") @db.SmallInt
+  salary          Int? // BDT per month
+  studentCount    Int?          @default(1) @map("student_count") @db.SmallInt
+  hireByDate      DateTime?     @map("hire_by_date") @db.Date
   tutorGenderPref GenderPref    @default(ANY) @map("tutor_gender_pref")
   instituteName   String?       @map("institute_name")
-  tuitionType     String        @map("tuition_type") @db.VarChar(30)
+  tuitionType     String?       @map("tuition_type") @db.VarChar(30)
   status          ListingStatus @default(OPEN)
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   student      Student       @relation(fields: [studentId], references: [id])
-  category     Category      @relation(fields: [categoryId], references: [id])
-  area         Area          @relation(fields: [areaId], references: [id])
-  subject      Subject       @relation(fields: [subjectId], references: [id])
+  category     Category?     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  area         Area?         @relation(fields: [areaId], references: [id], onDelete: Restrict)
+  subject      Subject?      @relation(fields: [subjectId], references: [id], onDelete: Restrict)
   applications Application[]
 
   @@index([studentId, createdAt(sort: Desc)])
