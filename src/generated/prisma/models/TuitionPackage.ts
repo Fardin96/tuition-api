@@ -825,14 +825,6 @@ export type TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput = {
   deleteMany?: Prisma.TuitionPackageScalarWhereInput | Prisma.TuitionPackageScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type TuitionPackageCreateNestedOneWithoutApplicationsInput = {
   create?: Prisma.XOR<Prisma.TuitionPackageCreateWithoutApplicationsInput, Prisma.TuitionPackageUncheckedCreateWithoutApplicationsInput>
   connectOrCreate?: Prisma.TuitionPackageCreateOrConnectWithoutApplicationsInput

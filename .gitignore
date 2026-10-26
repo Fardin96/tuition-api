@@ -18,3 +18,7 @@ GATES.md
 
 # husky generated files
 /.husky/_
+
+# ai-stuff
+skills-lock.json
+.agents/

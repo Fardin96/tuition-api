@@ -402,10 +402,12 @@ export type AreaCreateNestedOneWithoutRequirementsInput = {
   connect?: Prisma.AreaWhereUniqueInput
 }
 
-export type AreaUpdateOneRequiredWithoutRequirementsNestedInput = {
+export type AreaUpdateOneWithoutRequirementsNestedInput = {
   create?: Prisma.XOR<Prisma.AreaCreateWithoutRequirementsInput, Prisma.AreaUncheckedCreateWithoutRequirementsInput>
   connectOrCreate?: Prisma.AreaCreateOrConnectWithoutRequirementsInput
   upsert?: Prisma.AreaUpsertWithoutRequirementsInput
+  disconnect?: Prisma.AreaWhereInput | boolean
+  delete?: Prisma.AreaWhereInput | boolean
   connect?: Prisma.AreaWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.AreaUpdateToOneWithWhereWithoutRequirementsInput, Prisma.AreaUpdateWithoutRequirementsInput>, Prisma.AreaUncheckedUpdateWithoutRequirementsInput>
 }

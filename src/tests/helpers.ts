@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { Role } from "../generated/prisma/enums.js";
+import type { GenderPref, ListingStatus, Role } from "../generated/prisma/enums.js";
 import { prisma } from "../lib/prisma.js";
 import { generateRefreshToken, hashToken, signAccessToken } from "../modules/auth/auth.service.js";
 import { buildApp } from "../server.js";
@@ -92,8 +92,11 @@ export async function createRequirement(data: {
   timeOfDay?: Date;
   daysPerWeek?: number;
   salary?: number;
+  studentCount?: number;
   hireByDate?: Date;
+  tutorGenderPref?: GenderPref;
   tuitionType?: string;
+  status?: ListingStatus;
 }) {
   return prisma.tuitionRequirement.create({
     data: {
@@ -102,7 +105,7 @@ export async function createRequirement(data: {
       daysPerWeek: 3,
       salary: 5000,
       hireByDate: new Date("2024-12-31"),
-      tuitionType: "HOME",
+      tuitionType: "Home Tutoring Solo",
       ...data,
     },
   });
