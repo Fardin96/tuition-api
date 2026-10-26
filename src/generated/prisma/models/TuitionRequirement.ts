@@ -29,7 +29,6 @@ export type AggregateTuitionRequirement = {
 export type TuitionRequirementAvgAggregateOutputType = {
   categoryId: number | null
   areaId: number | null
-  subjectId: number | null
   classLevel: number | null
   daysPerWeek: number | null
   salary: number | null
@@ -39,7 +38,6 @@ export type TuitionRequirementAvgAggregateOutputType = {
 export type TuitionRequirementSumAggregateOutputType = {
   categoryId: number | null
   areaId: number | null
-  subjectId: number | null
   classLevel: number | null
   daysPerWeek: number | null
   salary: number | null
@@ -51,7 +49,6 @@ export type TuitionRequirementMinAggregateOutputType = {
   studentId: string | null
   categoryId: number | null
   areaId: number | null
-  subjectId: number | null
   classLevel: number | null
   timeOfDay: Date | null
   daysPerWeek: number | null
@@ -71,7 +68,6 @@ export type TuitionRequirementMaxAggregateOutputType = {
   studentId: string | null
   categoryId: number | null
   areaId: number | null
-  subjectId: number | null
   classLevel: number | null
   timeOfDay: Date | null
   daysPerWeek: number | null
@@ -91,7 +87,6 @@ export type TuitionRequirementCountAggregateOutputType = {
   studentId: number
   categoryId: number
   areaId: number
-  subjectId: number
   classLevel: number
   timeOfDay: number
   daysPerWeek: number
@@ -111,7 +106,6 @@ export type TuitionRequirementCountAggregateOutputType = {
 export type TuitionRequirementAvgAggregateInputType = {
   categoryId?: true
   areaId?: true
-  subjectId?: true
   classLevel?: true
   daysPerWeek?: true
   salary?: true
@@ -121,7 +115,6 @@ export type TuitionRequirementAvgAggregateInputType = {
 export type TuitionRequirementSumAggregateInputType = {
   categoryId?: true
   areaId?: true
-  subjectId?: true
   classLevel?: true
   daysPerWeek?: true
   salary?: true
@@ -133,7 +126,6 @@ export type TuitionRequirementMinAggregateInputType = {
   studentId?: true
   categoryId?: true
   areaId?: true
-  subjectId?: true
   classLevel?: true
   timeOfDay?: true
   daysPerWeek?: true
@@ -153,7 +145,6 @@ export type TuitionRequirementMaxAggregateInputType = {
   studentId?: true
   categoryId?: true
   areaId?: true
-  subjectId?: true
   classLevel?: true
   timeOfDay?: true
   daysPerWeek?: true
@@ -173,7 +164,6 @@ export type TuitionRequirementCountAggregateInputType = {
   studentId?: true
   categoryId?: true
   areaId?: true
-  subjectId?: true
   classLevel?: true
   timeOfDay?: true
   daysPerWeek?: true
@@ -280,7 +270,6 @@ export type TuitionRequirementGroupByOutputType = {
   studentId: string
   categoryId: number | null
   areaId: number | null
-  subjectId: number | null
   classLevel: number | null
   timeOfDay: Date | null
   daysPerWeek: number | null
@@ -323,7 +312,6 @@ export type TuitionRequirementWhereInput = {
   studentId?: Prisma.UuidFilter<"TuitionRequirement"> | string
   categoryId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   areaId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
-  subjectId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   classLevel?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
@@ -339,7 +327,7 @@ export type TuitionRequirementWhereInput = {
   student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
   category?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
   area?: Prisma.XOR<Prisma.AreaNullableScalarRelationFilter, Prisma.AreaWhereInput> | null
-  subject?: Prisma.XOR<Prisma.SubjectNullableScalarRelationFilter, Prisma.SubjectWhereInput> | null
+  subjects?: Prisma.RequirementSubjectListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
 }
 
@@ -348,7 +336,6 @@ export type TuitionRequirementOrderByWithRelationInput = {
   studentId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   areaId?: Prisma.SortOrderInput | Prisma.SortOrder
-  subjectId?: Prisma.SortOrderInput | Prisma.SortOrder
   classLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOfDay?: Prisma.SortOrderInput | Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -364,7 +351,7 @@ export type TuitionRequirementOrderByWithRelationInput = {
   student?: Prisma.StudentOrderByWithRelationInput
   category?: Prisma.CategoryOrderByWithRelationInput
   area?: Prisma.AreaOrderByWithRelationInput
-  subject?: Prisma.SubjectOrderByWithRelationInput
+  subjects?: Prisma.RequirementSubjectOrderByRelationAggregateInput
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
 }
 
@@ -376,7 +363,6 @@ export type TuitionRequirementWhereUniqueInput = Prisma.AtLeast<{
   studentId?: Prisma.UuidFilter<"TuitionRequirement"> | string
   categoryId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   areaId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
-  subjectId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   classLevel?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
@@ -392,7 +378,7 @@ export type TuitionRequirementWhereUniqueInput = Prisma.AtLeast<{
   student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
   category?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
   area?: Prisma.XOR<Prisma.AreaNullableScalarRelationFilter, Prisma.AreaWhereInput> | null
-  subject?: Prisma.XOR<Prisma.SubjectNullableScalarRelationFilter, Prisma.SubjectWhereInput> | null
+  subjects?: Prisma.RequirementSubjectListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
 }, "id">
 
@@ -401,7 +387,6 @@ export type TuitionRequirementOrderByWithAggregationInput = {
   studentId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   areaId?: Prisma.SortOrderInput | Prisma.SortOrder
-  subjectId?: Prisma.SortOrderInput | Prisma.SortOrder
   classLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOfDay?: Prisma.SortOrderInput | Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -429,7 +414,6 @@ export type TuitionRequirementScalarWhereWithAggregatesInput = {
   studentId?: Prisma.UuidWithAggregatesFilter<"TuitionRequirement"> | string
   categoryId?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
   areaId?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
-  subjectId?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
   classLevel?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableWithAggregatesFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
@@ -461,7 +445,7 @@ export type TuitionRequirementCreateInput = {
   student: Prisma.StudentCreateNestedOneWithoutRequirementsInput
   category?: Prisma.CategoryCreateNestedOneWithoutRequirementsInput
   area?: Prisma.AreaCreateNestedOneWithoutRequirementsInput
-  subject?: Prisma.SubjectCreateNestedOneWithoutRequirementsInput
+  subjects?: Prisma.RequirementSubjectCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutRequirementInput
 }
 
@@ -470,7 +454,6 @@ export type TuitionRequirementUncheckedCreateInput = {
   studentId: string
   categoryId?: number | null
   areaId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -483,6 +466,7 @@ export type TuitionRequirementUncheckedCreateInput = {
   status?: $Enums.ListingStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutRequirementInput
 }
 
@@ -503,7 +487,7 @@ export type TuitionRequirementUpdateInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutRequirementsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutRequirementsNestedInput
   area?: Prisma.AreaUpdateOneWithoutRequirementsNestedInput
-  subject?: Prisma.SubjectUpdateOneWithoutRequirementsNestedInput
+  subjects?: Prisma.RequirementSubjectUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutRequirementNestedInput
 }
 
@@ -512,7 +496,6 @@ export type TuitionRequirementUncheckedUpdateInput = {
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -525,6 +508,7 @@ export type TuitionRequirementUncheckedUpdateInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
@@ -533,7 +517,6 @@ export type TuitionRequirementCreateManyInput = {
   studentId: string
   categoryId?: number | null
   areaId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -569,7 +552,6 @@ export type TuitionRequirementUncheckedUpdateManyInput = {
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -599,7 +581,6 @@ export type TuitionRequirementCountOrderByAggregateInput = {
   studentId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
-  subjectId?: Prisma.SortOrder
   classLevel?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
@@ -617,7 +598,6 @@ export type TuitionRequirementCountOrderByAggregateInput = {
 export type TuitionRequirementAvgOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
-  subjectId?: Prisma.SortOrder
   classLevel?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   salary?: Prisma.SortOrder
@@ -629,7 +609,6 @@ export type TuitionRequirementMaxOrderByAggregateInput = {
   studentId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
-  subjectId?: Prisma.SortOrder
   classLevel?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
@@ -649,7 +628,6 @@ export type TuitionRequirementMinOrderByAggregateInput = {
   studentId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
-  subjectId?: Prisma.SortOrder
   classLevel?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
@@ -667,11 +645,15 @@ export type TuitionRequirementMinOrderByAggregateInput = {
 export type TuitionRequirementSumOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
-  subjectId?: Prisma.SortOrder
   classLevel?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
+}
+
+export type TuitionRequirementScalarRelationFilter = {
+  is?: Prisma.TuitionRequirementWhereInput
+  isNot?: Prisma.TuitionRequirementWhereInput
 }
 
 export type TuitionRequirementNullableScalarRelationFilter = {
@@ -763,48 +745,6 @@ export type TuitionRequirementUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.TuitionRequirementScalarWhereInput | Prisma.TuitionRequirementScalarWhereInput[]
 }
 
-export type TuitionRequirementCreateNestedManyWithoutSubjectInput = {
-  create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput> | Prisma.TuitionRequirementCreateWithoutSubjectInput[] | Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput | Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput[]
-  createMany?: Prisma.TuitionRequirementCreateManySubjectInputEnvelope
-  connect?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-}
-
-export type TuitionRequirementUncheckedCreateNestedManyWithoutSubjectInput = {
-  create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput> | Prisma.TuitionRequirementCreateWithoutSubjectInput[] | Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput | Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput[]
-  createMany?: Prisma.TuitionRequirementCreateManySubjectInputEnvelope
-  connect?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-}
-
-export type TuitionRequirementUpdateManyWithoutSubjectNestedInput = {
-  create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput> | Prisma.TuitionRequirementCreateWithoutSubjectInput[] | Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput | Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput[]
-  upsert?: Prisma.TuitionRequirementUpsertWithWhereUniqueWithoutSubjectInput | Prisma.TuitionRequirementUpsertWithWhereUniqueWithoutSubjectInput[]
-  createMany?: Prisma.TuitionRequirementCreateManySubjectInputEnvelope
-  set?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  disconnect?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  delete?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  connect?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  update?: Prisma.TuitionRequirementUpdateWithWhereUniqueWithoutSubjectInput | Prisma.TuitionRequirementUpdateWithWhereUniqueWithoutSubjectInput[]
-  updateMany?: Prisma.TuitionRequirementUpdateManyWithWhereWithoutSubjectInput | Prisma.TuitionRequirementUpdateManyWithWhereWithoutSubjectInput[]
-  deleteMany?: Prisma.TuitionRequirementScalarWhereInput | Prisma.TuitionRequirementScalarWhereInput[]
-}
-
-export type TuitionRequirementUncheckedUpdateManyWithoutSubjectNestedInput = {
-  create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput> | Prisma.TuitionRequirementCreateWithoutSubjectInput[] | Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput | Prisma.TuitionRequirementCreateOrConnectWithoutSubjectInput[]
-  upsert?: Prisma.TuitionRequirementUpsertWithWhereUniqueWithoutSubjectInput | Prisma.TuitionRequirementUpsertWithWhereUniqueWithoutSubjectInput[]
-  createMany?: Prisma.TuitionRequirementCreateManySubjectInputEnvelope
-  set?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  disconnect?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  delete?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  connect?: Prisma.TuitionRequirementWhereUniqueInput | Prisma.TuitionRequirementWhereUniqueInput[]
-  update?: Prisma.TuitionRequirementUpdateWithWhereUniqueWithoutSubjectInput | Prisma.TuitionRequirementUpdateWithWhereUniqueWithoutSubjectInput[]
-  updateMany?: Prisma.TuitionRequirementUpdateManyWithWhereWithoutSubjectInput | Prisma.TuitionRequirementUpdateManyWithWhereWithoutSubjectInput[]
-  deleteMany?: Prisma.TuitionRequirementScalarWhereInput | Prisma.TuitionRequirementScalarWhereInput[]
-}
-
 export type TuitionRequirementCreateNestedManyWithoutStudentInput = {
   create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutStudentInput, Prisma.TuitionRequirementUncheckedCreateWithoutStudentInput> | Prisma.TuitionRequirementCreateWithoutStudentInput[] | Prisma.TuitionRequirementUncheckedCreateWithoutStudentInput[]
   connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutStudentInput | Prisma.TuitionRequirementCreateOrConnectWithoutStudentInput[]
@@ -863,6 +803,20 @@ export type EnumListingStatusFieldUpdateOperationsInput = {
   set?: $Enums.ListingStatus
 }
 
+export type TuitionRequirementCreateNestedOneWithoutSubjectsInput = {
+  create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectsInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectsInput>
+  connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutSubjectsInput
+  connect?: Prisma.TuitionRequirementWhereUniqueInput
+}
+
+export type TuitionRequirementUpdateOneRequiredWithoutSubjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectsInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectsInput>
+  connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutSubjectsInput
+  upsert?: Prisma.TuitionRequirementUpsertWithoutSubjectsInput
+  connect?: Prisma.TuitionRequirementWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TuitionRequirementUpdateToOneWithWhereWithoutSubjectsInput, Prisma.TuitionRequirementUpdateWithoutSubjectsInput>, Prisma.TuitionRequirementUncheckedUpdateWithoutSubjectsInput>
+}
+
 export type TuitionRequirementCreateNestedOneWithoutApplicationsInput = {
   create?: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutApplicationsInput, Prisma.TuitionRequirementUncheckedCreateWithoutApplicationsInput>
   connectOrCreate?: Prisma.TuitionRequirementCreateOrConnectWithoutApplicationsInput
@@ -895,7 +849,7 @@ export type TuitionRequirementCreateWithoutAreaInput = {
   updatedAt?: Date | string
   student: Prisma.StudentCreateNestedOneWithoutRequirementsInput
   category?: Prisma.CategoryCreateNestedOneWithoutRequirementsInput
-  subject?: Prisma.SubjectCreateNestedOneWithoutRequirementsInput
+  subjects?: Prisma.RequirementSubjectCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutRequirementInput
 }
 
@@ -903,7 +857,6 @@ export type TuitionRequirementUncheckedCreateWithoutAreaInput = {
   id?: string
   studentId: string
   categoryId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -916,6 +869,7 @@ export type TuitionRequirementUncheckedCreateWithoutAreaInput = {
   status?: $Enums.ListingStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutRequirementInput
 }
 
@@ -953,7 +907,6 @@ export type TuitionRequirementScalarWhereInput = {
   studentId?: Prisma.UuidFilter<"TuitionRequirement"> | string
   categoryId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   areaId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
-  subjectId?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   classLevel?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
@@ -984,7 +937,7 @@ export type TuitionRequirementCreateWithoutCategoryInput = {
   updatedAt?: Date | string
   student: Prisma.StudentCreateNestedOneWithoutRequirementsInput
   area?: Prisma.AreaCreateNestedOneWithoutRequirementsInput
-  subject?: Prisma.SubjectCreateNestedOneWithoutRequirementsInput
+  subjects?: Prisma.RequirementSubjectCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutRequirementInput
 }
 
@@ -992,7 +945,6 @@ export type TuitionRequirementUncheckedCreateWithoutCategoryInput = {
   id?: string
   studentId: string
   areaId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -1005,6 +957,7 @@ export type TuitionRequirementUncheckedCreateWithoutCategoryInput = {
   status?: $Enums.ListingStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutRequirementInput
 }
 
@@ -1034,72 +987,6 @@ export type TuitionRequirementUpdateManyWithWhereWithoutCategoryInput = {
   data: Prisma.XOR<Prisma.TuitionRequirementUpdateManyMutationInput, Prisma.TuitionRequirementUncheckedUpdateManyWithoutCategoryInput>
 }
 
-export type TuitionRequirementCreateWithoutSubjectInput = {
-  id?: string
-  classLevel?: number | null
-  timeOfDay?: Date | string | null
-  daysPerWeek?: number | null
-  salary?: number | null
-  studentCount?: number | null
-  hireByDate?: Date | string | null
-  tutorGenderPref?: $Enums.GenderPref
-  instituteName?: string | null
-  tuitionType?: string | null
-  status?: $Enums.ListingStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  student: Prisma.StudentCreateNestedOneWithoutRequirementsInput
-  category?: Prisma.CategoryCreateNestedOneWithoutRequirementsInput
-  area?: Prisma.AreaCreateNestedOneWithoutRequirementsInput
-  applications?: Prisma.ApplicationCreateNestedManyWithoutRequirementInput
-}
-
-export type TuitionRequirementUncheckedCreateWithoutSubjectInput = {
-  id?: string
-  studentId: string
-  categoryId?: number | null
-  areaId?: number | null
-  classLevel?: number | null
-  timeOfDay?: Date | string | null
-  daysPerWeek?: number | null
-  salary?: number | null
-  studentCount?: number | null
-  hireByDate?: Date | string | null
-  tutorGenderPref?: $Enums.GenderPref
-  instituteName?: string | null
-  tuitionType?: string | null
-  status?: $Enums.ListingStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutRequirementInput
-}
-
-export type TuitionRequirementCreateOrConnectWithoutSubjectInput = {
-  where: Prisma.TuitionRequirementWhereUniqueInput
-  create: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput>
-}
-
-export type TuitionRequirementCreateManySubjectInputEnvelope = {
-  data: Prisma.TuitionRequirementCreateManySubjectInput | Prisma.TuitionRequirementCreateManySubjectInput[]
-  skipDuplicates?: boolean
-}
-
-export type TuitionRequirementUpsertWithWhereUniqueWithoutSubjectInput = {
-  where: Prisma.TuitionRequirementWhereUniqueInput
-  update: Prisma.XOR<Prisma.TuitionRequirementUpdateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedUpdateWithoutSubjectInput>
-  create: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectInput>
-}
-
-export type TuitionRequirementUpdateWithWhereUniqueWithoutSubjectInput = {
-  where: Prisma.TuitionRequirementWhereUniqueInput
-  data: Prisma.XOR<Prisma.TuitionRequirementUpdateWithoutSubjectInput, Prisma.TuitionRequirementUncheckedUpdateWithoutSubjectInput>
-}
-
-export type TuitionRequirementUpdateManyWithWhereWithoutSubjectInput = {
-  where: Prisma.TuitionRequirementScalarWhereInput
-  data: Prisma.XOR<Prisma.TuitionRequirementUpdateManyMutationInput, Prisma.TuitionRequirementUncheckedUpdateManyWithoutSubjectInput>
-}
-
 export type TuitionRequirementCreateWithoutStudentInput = {
   id?: string
   classLevel?: number | null
@@ -1116,7 +1003,7 @@ export type TuitionRequirementCreateWithoutStudentInput = {
   updatedAt?: Date | string
   category?: Prisma.CategoryCreateNestedOneWithoutRequirementsInput
   area?: Prisma.AreaCreateNestedOneWithoutRequirementsInput
-  subject?: Prisma.SubjectCreateNestedOneWithoutRequirementsInput
+  subjects?: Prisma.RequirementSubjectCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutRequirementInput
 }
 
@@ -1124,7 +1011,6 @@ export type TuitionRequirementUncheckedCreateWithoutStudentInput = {
   id?: string
   categoryId?: number | null
   areaId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -1137,6 +1023,7 @@ export type TuitionRequirementUncheckedCreateWithoutStudentInput = {
   status?: $Enums.ListingStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutRequirementInput
 }
 
@@ -1166,6 +1053,102 @@ export type TuitionRequirementUpdateManyWithWhereWithoutStudentInput = {
   data: Prisma.XOR<Prisma.TuitionRequirementUpdateManyMutationInput, Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentInput>
 }
 
+export type TuitionRequirementCreateWithoutSubjectsInput = {
+  id?: string
+  classLevel?: number | null
+  timeOfDay?: Date | string | null
+  daysPerWeek?: number | null
+  salary?: number | null
+  studentCount?: number | null
+  hireByDate?: Date | string | null
+  tutorGenderPref?: $Enums.GenderPref
+  instituteName?: string | null
+  tuitionType?: string | null
+  status?: $Enums.ListingStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  student: Prisma.StudentCreateNestedOneWithoutRequirementsInput
+  category?: Prisma.CategoryCreateNestedOneWithoutRequirementsInput
+  area?: Prisma.AreaCreateNestedOneWithoutRequirementsInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutRequirementInput
+}
+
+export type TuitionRequirementUncheckedCreateWithoutSubjectsInput = {
+  id?: string
+  studentId: string
+  categoryId?: number | null
+  areaId?: number | null
+  classLevel?: number | null
+  timeOfDay?: Date | string | null
+  daysPerWeek?: number | null
+  salary?: number | null
+  studentCount?: number | null
+  hireByDate?: Date | string | null
+  tutorGenderPref?: $Enums.GenderPref
+  instituteName?: string | null
+  tuitionType?: string | null
+  status?: $Enums.ListingStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutRequirementInput
+}
+
+export type TuitionRequirementCreateOrConnectWithoutSubjectsInput = {
+  where: Prisma.TuitionRequirementWhereUniqueInput
+  create: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectsInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectsInput>
+}
+
+export type TuitionRequirementUpsertWithoutSubjectsInput = {
+  update: Prisma.XOR<Prisma.TuitionRequirementUpdateWithoutSubjectsInput, Prisma.TuitionRequirementUncheckedUpdateWithoutSubjectsInput>
+  create: Prisma.XOR<Prisma.TuitionRequirementCreateWithoutSubjectsInput, Prisma.TuitionRequirementUncheckedCreateWithoutSubjectsInput>
+  where?: Prisma.TuitionRequirementWhereInput
+}
+
+export type TuitionRequirementUpdateToOneWithWhereWithoutSubjectsInput = {
+  where?: Prisma.TuitionRequirementWhereInput
+  data: Prisma.XOR<Prisma.TuitionRequirementUpdateWithoutSubjectsInput, Prisma.TuitionRequirementUncheckedUpdateWithoutSubjectsInput>
+}
+
+export type TuitionRequirementUpdateWithoutSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tutorGenderPref?: Prisma.EnumGenderPrefFieldUpdateOperationsInput | $Enums.GenderPref
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tuitionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  student?: Prisma.StudentUpdateOneRequiredWithoutRequirementsNestedInput
+  category?: Prisma.CategoryUpdateOneWithoutRequirementsNestedInput
+  area?: Prisma.AreaUpdateOneWithoutRequirementsNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutRequirementNestedInput
+}
+
+export type TuitionRequirementUncheckedUpdateWithoutSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tutorGenderPref?: Prisma.EnumGenderPrefFieldUpdateOperationsInput | $Enums.GenderPref
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tuitionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutRequirementNestedInput
+}
+
 export type TuitionRequirementCreateWithoutApplicationsInput = {
   id?: string
   classLevel?: number | null
@@ -1183,7 +1166,7 @@ export type TuitionRequirementCreateWithoutApplicationsInput = {
   student: Prisma.StudentCreateNestedOneWithoutRequirementsInput
   category?: Prisma.CategoryCreateNestedOneWithoutRequirementsInput
   area?: Prisma.AreaCreateNestedOneWithoutRequirementsInput
-  subject?: Prisma.SubjectCreateNestedOneWithoutRequirementsInput
+  subjects?: Prisma.RequirementSubjectCreateNestedManyWithoutRequirementInput
 }
 
 export type TuitionRequirementUncheckedCreateWithoutApplicationsInput = {
@@ -1191,7 +1174,6 @@ export type TuitionRequirementUncheckedCreateWithoutApplicationsInput = {
   studentId: string
   categoryId?: number | null
   areaId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -1204,6 +1186,7 @@ export type TuitionRequirementUncheckedCreateWithoutApplicationsInput = {
   status?: $Enums.ListingStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
 }
 
 export type TuitionRequirementCreateOrConnectWithoutApplicationsInput = {
@@ -1239,7 +1222,7 @@ export type TuitionRequirementUpdateWithoutApplicationsInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutRequirementsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutRequirementsNestedInput
   area?: Prisma.AreaUpdateOneWithoutRequirementsNestedInput
-  subject?: Prisma.SubjectUpdateOneWithoutRequirementsNestedInput
+  subjects?: Prisma.RequirementSubjectUpdateManyWithoutRequirementNestedInput
 }
 
 export type TuitionRequirementUncheckedUpdateWithoutApplicationsInput = {
@@ -1247,7 +1230,6 @@ export type TuitionRequirementUncheckedUpdateWithoutApplicationsInput = {
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1260,13 +1242,13 @@ export type TuitionRequirementUncheckedUpdateWithoutApplicationsInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
 export type TuitionRequirementCreateManyAreaInput = {
   id?: string
   studentId: string
   categoryId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -1297,7 +1279,7 @@ export type TuitionRequirementUpdateWithoutAreaInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.StudentUpdateOneRequiredWithoutRequirementsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutRequirementsNestedInput
-  subject?: Prisma.SubjectUpdateOneWithoutRequirementsNestedInput
+  subjects?: Prisma.RequirementSubjectUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutRequirementNestedInput
 }
 
@@ -1305,7 +1287,6 @@ export type TuitionRequirementUncheckedUpdateWithoutAreaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1318,6 +1299,7 @@ export type TuitionRequirementUncheckedUpdateWithoutAreaInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
@@ -1325,7 +1307,6 @@ export type TuitionRequirementUncheckedUpdateManyWithoutAreaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1344,7 +1325,6 @@ export type TuitionRequirementCreateManyCategoryInput = {
   id?: string
   studentId: string
   areaId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -1375,7 +1355,7 @@ export type TuitionRequirementUpdateWithoutCategoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.StudentUpdateOneRequiredWithoutRequirementsNestedInput
   area?: Prisma.AreaUpdateOneWithoutRequirementsNestedInput
-  subject?: Prisma.SubjectUpdateOneWithoutRequirementsNestedInput
+  subjects?: Prisma.RequirementSubjectUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutRequirementNestedInput
 }
 
@@ -1383,7 +1363,6 @@ export type TuitionRequirementUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1396,91 +1375,13 @@ export type TuitionRequirementUncheckedUpdateWithoutCategoryInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
 export type TuitionRequirementUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  tutorGenderPref?: Prisma.EnumGenderPrefFieldUpdateOperationsInput | $Enums.GenderPref
-  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  tuitionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type TuitionRequirementCreateManySubjectInput = {
-  id?: string
-  studentId: string
-  categoryId?: number | null
-  areaId?: number | null
-  classLevel?: number | null
-  timeOfDay?: Date | string | null
-  daysPerWeek?: number | null
-  salary?: number | null
-  studentCount?: number | null
-  hireByDate?: Date | string | null
-  tutorGenderPref?: $Enums.GenderPref
-  instituteName?: string | null
-  tuitionType?: string | null
-  status?: $Enums.ListingStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type TuitionRequirementUpdateWithoutSubjectInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  tutorGenderPref?: Prisma.EnumGenderPrefFieldUpdateOperationsInput | $Enums.GenderPref
-  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  tuitionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  student?: Prisma.StudentUpdateOneRequiredWithoutRequirementsNestedInput
-  category?: Prisma.CategoryUpdateOneWithoutRequirementsNestedInput
-  area?: Prisma.AreaUpdateOneWithoutRequirementsNestedInput
-  applications?: Prisma.ApplicationUpdateManyWithoutRequirementNestedInput
-}
-
-export type TuitionRequirementUncheckedUpdateWithoutSubjectInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  tutorGenderPref?: Prisma.EnumGenderPrefFieldUpdateOperationsInput | $Enums.GenderPref
-  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  tuitionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutRequirementNestedInput
-}
-
-export type TuitionRequirementUncheckedUpdateManyWithoutSubjectInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1500,7 +1401,6 @@ export type TuitionRequirementCreateManyStudentInput = {
   id?: string
   categoryId?: number | null
   areaId?: number | null
-  subjectId?: number | null
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
@@ -1531,7 +1431,7 @@ export type TuitionRequirementUpdateWithoutStudentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneWithoutRequirementsNestedInput
   area?: Prisma.AreaUpdateOneWithoutRequirementsNestedInput
-  subject?: Prisma.SubjectUpdateOneWithoutRequirementsNestedInput
+  subjects?: Prisma.RequirementSubjectUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutRequirementNestedInput
 }
 
@@ -1539,7 +1439,6 @@ export type TuitionRequirementUncheckedUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1552,6 +1451,7 @@ export type TuitionRequirementUncheckedUpdateWithoutStudentInput = {
   status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
@@ -1559,7 +1459,6 @@ export type TuitionRequirementUncheckedUpdateManyWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  subjectId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1580,10 +1479,12 @@ export type TuitionRequirementUncheckedUpdateManyWithoutStudentInput = {
  */
 
 export type TuitionRequirementCountOutputType = {
+  subjects: number
   applications: number
 }
 
 export type TuitionRequirementCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  subjects?: boolean | TuitionRequirementCountOutputTypeCountSubjectsArgs
   applications?: boolean | TuitionRequirementCountOutputTypeCountApplicationsArgs
 }
 
@@ -1600,6 +1501,13 @@ export type TuitionRequirementCountOutputTypeDefaultArgs<ExtArgs extends runtime
 /**
  * TuitionRequirementCountOutputType without action
  */
+export type TuitionRequirementCountOutputTypeCountSubjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RequirementSubjectWhereInput
+}
+
+/**
+ * TuitionRequirementCountOutputType without action
+ */
 export type TuitionRequirementCountOutputTypeCountApplicationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ApplicationWhereInput
 }
@@ -1610,7 +1518,6 @@ export type TuitionRequirementSelect<ExtArgs extends runtime.Types.Extensions.In
   studentId?: boolean
   categoryId?: boolean
   areaId?: boolean
-  subjectId?: boolean
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
@@ -1626,7 +1533,7 @@ export type TuitionRequirementSelect<ExtArgs extends runtime.Types.Extensions.In
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   category?: boolean | Prisma.TuitionRequirement$categoryArgs<ExtArgs>
   area?: boolean | Prisma.TuitionRequirement$areaArgs<ExtArgs>
-  subject?: boolean | Prisma.TuitionRequirement$subjectArgs<ExtArgs>
+  subjects?: boolean | Prisma.TuitionRequirement$subjectsArgs<ExtArgs>
   applications?: boolean | Prisma.TuitionRequirement$applicationsArgs<ExtArgs>
   _count?: boolean | Prisma.TuitionRequirementCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tuitionRequirement"]>
@@ -1636,7 +1543,6 @@ export type TuitionRequirementSelectCreateManyAndReturn<ExtArgs extends runtime.
   studentId?: boolean
   categoryId?: boolean
   areaId?: boolean
-  subjectId?: boolean
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
@@ -1652,7 +1558,6 @@ export type TuitionRequirementSelectCreateManyAndReturn<ExtArgs extends runtime.
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   category?: boolean | Prisma.TuitionRequirement$categoryArgs<ExtArgs>
   area?: boolean | Prisma.TuitionRequirement$areaArgs<ExtArgs>
-  subject?: boolean | Prisma.TuitionRequirement$subjectArgs<ExtArgs>
 }, ExtArgs["result"]["tuitionRequirement"]>
 
 export type TuitionRequirementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1660,7 +1565,6 @@ export type TuitionRequirementSelectUpdateManyAndReturn<ExtArgs extends runtime.
   studentId?: boolean
   categoryId?: boolean
   areaId?: boolean
-  subjectId?: boolean
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
@@ -1676,7 +1580,6 @@ export type TuitionRequirementSelectUpdateManyAndReturn<ExtArgs extends runtime.
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   category?: boolean | Prisma.TuitionRequirement$categoryArgs<ExtArgs>
   area?: boolean | Prisma.TuitionRequirement$areaArgs<ExtArgs>
-  subject?: boolean | Prisma.TuitionRequirement$subjectArgs<ExtArgs>
 }, ExtArgs["result"]["tuitionRequirement"]>
 
 export type TuitionRequirementSelectScalar = {
@@ -1684,7 +1587,6 @@ export type TuitionRequirementSelectScalar = {
   studentId?: boolean
   categoryId?: boolean
   areaId?: boolean
-  subjectId?: boolean
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
@@ -1699,12 +1601,12 @@ export type TuitionRequirementSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TuitionRequirementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "categoryId" | "areaId" | "subjectId" | "classLevel" | "timeOfDay" | "daysPerWeek" | "salary" | "studentCount" | "hireByDate" | "tutorGenderPref" | "instituteName" | "tuitionType" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["tuitionRequirement"]>
+export type TuitionRequirementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "categoryId" | "areaId" | "classLevel" | "timeOfDay" | "daysPerWeek" | "salary" | "studentCount" | "hireByDate" | "tutorGenderPref" | "instituteName" | "tuitionType" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["tuitionRequirement"]>
 export type TuitionRequirementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   category?: boolean | Prisma.TuitionRequirement$categoryArgs<ExtArgs>
   area?: boolean | Prisma.TuitionRequirement$areaArgs<ExtArgs>
-  subject?: boolean | Prisma.TuitionRequirement$subjectArgs<ExtArgs>
+  subjects?: boolean | Prisma.TuitionRequirement$subjectsArgs<ExtArgs>
   applications?: boolean | Prisma.TuitionRequirement$applicationsArgs<ExtArgs>
   _count?: boolean | Prisma.TuitionRequirementCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1712,13 +1614,11 @@ export type TuitionRequirementIncludeCreateManyAndReturn<ExtArgs extends runtime
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   category?: boolean | Prisma.TuitionRequirement$categoryArgs<ExtArgs>
   area?: boolean | Prisma.TuitionRequirement$areaArgs<ExtArgs>
-  subject?: boolean | Prisma.TuitionRequirement$subjectArgs<ExtArgs>
 }
 export type TuitionRequirementIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   category?: boolean | Prisma.TuitionRequirement$categoryArgs<ExtArgs>
   area?: boolean | Prisma.TuitionRequirement$areaArgs<ExtArgs>
-  subject?: boolean | Prisma.TuitionRequirement$subjectArgs<ExtArgs>
 }
 
 export type $TuitionRequirementPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1727,7 +1627,7 @@ export type $TuitionRequirementPayload<ExtArgs extends runtime.Types.Extensions.
     student: Prisma.$StudentPayload<ExtArgs>
     category: Prisma.$CategoryPayload<ExtArgs> | null
     area: Prisma.$AreaPayload<ExtArgs> | null
-    subject: Prisma.$SubjectPayload<ExtArgs> | null
+    subjects: Prisma.$RequirementSubjectPayload<ExtArgs>[]
     applications: Prisma.$ApplicationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1735,7 +1635,6 @@ export type $TuitionRequirementPayload<ExtArgs extends runtime.Types.Extensions.
     studentId: string
     categoryId: number | null
     areaId: number | null
-    subjectId: number | null
     classLevel: number | null
     timeOfDay: Date | null
     daysPerWeek: number | null
@@ -2145,7 +2044,7 @@ export interface Prisma__TuitionRequirementClient<T, Null = never, ExtArgs exten
   student<T extends Prisma.StudentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudentDefaultArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   category<T extends Prisma.TuitionRequirement$categoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TuitionRequirement$categoryArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   area<T extends Prisma.TuitionRequirement$areaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TuitionRequirement$areaArgs<ExtArgs>>): Prisma.Prisma__AreaClient<runtime.Types.Result.GetResult<Prisma.$AreaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  subject<T extends Prisma.TuitionRequirement$subjectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TuitionRequirement$subjectArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  subjects<T extends Prisma.TuitionRequirement$subjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TuitionRequirement$subjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RequirementSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   applications<T extends Prisma.TuitionRequirement$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TuitionRequirement$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2180,7 +2079,6 @@ export interface TuitionRequirementFieldRefs {
   readonly studentId: Prisma.FieldRef<"TuitionRequirement", 'String'>
   readonly categoryId: Prisma.FieldRef<"TuitionRequirement", 'Int'>
   readonly areaId: Prisma.FieldRef<"TuitionRequirement", 'Int'>
-  readonly subjectId: Prisma.FieldRef<"TuitionRequirement", 'Int'>
   readonly classLevel: Prisma.FieldRef<"TuitionRequirement", 'Int'>
   readonly timeOfDay: Prisma.FieldRef<"TuitionRequirement", 'DateTime'>
   readonly daysPerWeek: Prisma.FieldRef<"TuitionRequirement", 'Int'>
@@ -2632,22 +2530,27 @@ export type TuitionRequirement$areaArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
- * TuitionRequirement.subject
+ * TuitionRequirement.subjects
  */
-export type TuitionRequirement$subjectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type TuitionRequirement$subjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Subject
+   * Select specific fields to fetch from the RequirementSubject
    */
-  select?: Prisma.SubjectSelect<ExtArgs> | null
+  select?: Prisma.RequirementSubjectSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Subject
+   * Omit specific fields from the RequirementSubject
    */
-  omit?: Prisma.SubjectOmit<ExtArgs> | null
+  omit?: Prisma.RequirementSubjectOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.SubjectInclude<ExtArgs> | null
-  where?: Prisma.SubjectWhereInput
+  include?: Prisma.RequirementSubjectInclude<ExtArgs> | null
+  where?: Prisma.RequirementSubjectWhereInput
+  orderBy?: Prisma.RequirementSubjectOrderByWithRelationInput | Prisma.RequirementSubjectOrderByWithRelationInput[]
+  cursor?: Prisma.RequirementSubjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RequirementSubjectScalarFieldEnum | Prisma.RequirementSubjectScalarFieldEnum[]
 }
 
 /**

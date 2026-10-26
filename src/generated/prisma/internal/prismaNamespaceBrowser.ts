@@ -70,6 +70,7 @@ export const ModelName = {
   TutorCredential: 'TutorCredential',
   TutorVideo: 'TutorVideo',
   TuitionRequirement: 'TuitionRequirement',
+  RequirementSubject: 'RequirementSubject',
   TuitionPackage: 'TuitionPackage',
   Application: 'Application',
   Review: 'Review',
@@ -353,7 +354,6 @@ export const TuitionRequirementScalarFieldEnum = {
   studentId: 'studentId',
   categoryId: 'categoryId',
   areaId: 'areaId',
-  subjectId: 'subjectId',
   classLevel: 'classLevel',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
@@ -369,6 +369,14 @@ export const TuitionRequirementScalarFieldEnum = {
 } as const
 
 export type TuitionRequirementScalarFieldEnum = (typeof TuitionRequirementScalarFieldEnum)[keyof typeof TuitionRequirementScalarFieldEnum]
+
+
+export const RequirementSubjectScalarFieldEnum = {
+  requirementId: 'requirementId',
+  subjectId: 'subjectId'
+} as const
+
+export type RequirementSubjectScalarFieldEnum = (typeof RequirementSubjectScalarFieldEnum)[keyof typeof RequirementSubjectScalarFieldEnum]
 
 
 export const TuitionPackageScalarFieldEnum = {

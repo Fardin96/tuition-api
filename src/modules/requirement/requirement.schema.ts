@@ -42,7 +42,7 @@ export const timeOfDaySchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/);
 const baseRequirementSchema = z.object({
   categoryId: z.coerce.number().int().positive(),
   areaId: z.coerce.number().int().positive(),
-  subjectId: z.coerce.number().int().positive(),
+  subjectIds: z.array(z.coerce.number().int().positive()).min(1),
   classLevel: classLevelSchema,
   timeOfDay: timeOfDaySchema,
   daysPerWeek: z.coerce.number().int().min(1).max(7),
@@ -80,7 +80,7 @@ export const requirementResponseSchema = z.object({
   studentId: z.string(),
   categoryId: z.number().nullable(),
   areaId: z.number().nullable(),
-  subjectId: z.number().nullable(),
+  subjectIds: z.array(z.number()),
   classLevel: z.number().nullable(),
   timeOfDay: z.string().nullable(),
   daysPerWeek: z.number().nullable(),

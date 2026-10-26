@@ -363,15 +363,14 @@ model Category {
 
 // The clean subject list (Math, English, Physics...). Admin-managed.
 model Subject {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  slug      String  @unique
-  sortOrder Int     @default(0) @map("sort_order")
-  isActive  Boolean @default(true) @map("is_active")
-
-  tutorSubjects TutorSubject[]
-  requirements  TuitionRequirement[]
-  packages      TuitionPackage[]
+  id                  Int                  @id @default(autoincrement())
+  name                String               @unique
+  slug                String               @unique
+  sortOrder           Int                  @default(0) @map("sort_order")
+  isActive            Boolean              @default(true) @map("is_active")
+  tutorSubjects       TutorSubject[]
+  requirementSubjects RequirementSubject[]
+  packages            TuitionPackage[]
 
   @@map("subject")
 }
@@ -602,7 +601,6 @@ model TuitionRequirement {
   studentId       String        @map("student_id") @db.Uuid
   categoryId      Int?          @map("category_id")
   areaId          Int?          @map("area_id") // where the tuition happens
-  subjectId       Int?          @map("subject_id")
   classLevel      Int?          @map("class_level") @db.SmallInt
   timeOfDay       DateTime?     @map("time_of_day") @db.Time(0)
   daysPerWeek     Int?          @map("days_per_week") @db.SmallInt
@@ -616,15 +614,28 @@ model TuitionRequirement {
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  student      Student       @relation(fields: [studentId], references: [id])
-  category     Category?     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  area         Area?         @relation(fields: [areaId], references: [id], onDelete: Restrict)
-  subject      Subject?      @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  student      Student              @relation(fields: [studentId], references: [id])
+  category     Category?            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  area         Area?                @relation(fields: [areaId], references: [id], onDelete: Restrict)
+  subjects     RequirementSubject[]
   applications Application[]
 
   @@index([studentId, createdAt(sort: Desc)])
-  @@index([status, categoryId, subjectId, areaId, createdAt(sort: Desc)])
+  @@index([status, categoryId, areaId, createdAt(sort: Desc)])
   @@map("tuition_requirement")
+}
+
+// Join table for TuitionRequirement <-> Subject (many-to-many)
+model RequirementSubject {
+  requirementId String @map("requirement_id") @db.Uuid
+  subjectId     Int    @map("subject_id")
+
+  requirement   TuitionRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  subject       Subject            @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  @@id([requirementId, subjectId])
+  @@index([subjectId, requirementId])
+  @@map("requirement_subject")
 }
 
 // Created by a tutor. Needs admin approval before students can see it.

@@ -27,7 +27,7 @@ describe("requirement module", () => {
       payload: {
         categoryId: category.id,
         areaId: area.id,
-        subjectId: subject.id,
+        subjectIds: [subject.id],
         classLevel: 10,
         timeOfDay: "10:00",
         daysPerWeek: 3,
@@ -43,7 +43,7 @@ describe("requirement module", () => {
     expect(body.studentId).toBe(studentProfile.id);
     expect(body.categoryId).toBe(category.id);
     expect(body.areaId).toBe(area.id);
-    expect(body.subjectId).toBe(subject.id);
+    expect(body.subjectIds).toEqual([subject.id]);
     expect(body.classLevel).toBe(10);
     expect(body.timeOfDay).toBe("10:00");
     expect(body.daysPerWeek).toBe(3);
@@ -71,7 +71,7 @@ describe("requirement module", () => {
       payload: {
         categoryId: category.id,
         areaId: area.id,
-        subjectId: subject.id,
+        subjectIds: [subject.id],
         classLevel: 10,
         timeOfDay: "10:00",
         daysPerWeek: 3,
@@ -411,7 +411,7 @@ describe("requirement module", () => {
       payload: {
         categoryId: category.id,
         areaId: area.id,
-        subjectId: subject.id,
+        subjectIds: [subject.id],
         classLevel: 10,
         timeOfDay: "10:00",
         daysPerWeek: 3,
@@ -440,7 +440,7 @@ describe("requirement module", () => {
       payload: {
         categoryId: 999999,
         areaId: area.id,
-        subjectId: subject.id,
+        subjectIds: [subject.id],
         classLevel: 10,
         timeOfDay: "10:00",
         daysPerWeek: 3,
@@ -499,7 +499,7 @@ describe("requirement module", () => {
       payload: {
         categoryId: category.id,
         areaId: area.id,
-        subjectId: subject.id,
+        subjectIds: [subject.id],
         classLevel: 10,
         timeOfDay: "10:00",
         daysPerWeek: 3,
@@ -528,7 +528,7 @@ describe("requirement module", () => {
       payload: {
         categoryId: category.id,
         areaId: area.id,
-        subjectId: subject.id,
+        subjectIds: [subject.id],
         classLevel: 18,
         timeOfDay: "10:00",
         daysPerWeek: 3,
@@ -566,7 +566,7 @@ describe("requirement module", () => {
     expect(body.tuitionType).toBe("Online");
     expect(body.categoryId).toBeNull();
     expect(body.areaId).toBeNull();
-    expect(body.subjectId).toBeNull();
+    expect(body.subjectIds).toEqual([]);
     expect(body.classLevel).toBeNull();
     expect(body.timeOfDay).toBeNull();
     expect(body.hireByDate).toBeNull();
@@ -690,7 +690,7 @@ describe("requirement module", () => {
       headers: authHeaders,
       payload: {
         areaId: area.id,
-        subjectId: subject.id,
+        subjectIds: [subject.id],
         classLevel: 8,
         timeOfDay: "16:00",
         daysPerWeek: 4,

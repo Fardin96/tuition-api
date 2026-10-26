@@ -85,9 +85,10 @@ export async function createCategory(overrides: { name?: string } = {}) {
 
 export async function createRequirement(data: {
   studentId: string;
-  categoryId: number;
-  areaId: number;
-  subjectId: number;
+  categoryId?: number;
+  areaId?: number;
+  subjectId?: number;
+  subjectIds?: number[];
   classLevel?: number;
   timeOfDay?: Date;
   daysPerWeek?: number;
@@ -98,6 +99,8 @@ export async function createRequirement(data: {
   tuitionType?: string;
   status?: ListingStatus;
 }) {
+  const { subjectId, subjectIds, ...rest } = data;
+  const sIds = subjectIds ?? (subjectId ? [subjectId] : []);
   return prisma.tuitionRequirement.create({
     data: {
       classLevel: 10,
@@ -106,8 +109,14 @@ export async function createRequirement(data: {
       salary: 5000,
       hireByDate: new Date("2024-12-31"),
       tuitionType: "Home Tutoring Solo",
-      ...data,
+      ...rest,
+      subjects: sIds.length > 0 ? {
+        createMany: {
+          data: sIds.map(id => ({ subjectId: id })),
+        },
+      } : undefined,
     },
+    include: { subjects: true },
   });
 }
 
