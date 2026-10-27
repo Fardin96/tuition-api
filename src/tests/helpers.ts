@@ -110,11 +110,14 @@ export async function createRequirement(data: {
       hireByDate: new Date("2024-12-31"),
       tuitionType: "Home Tutoring Solo",
       ...rest,
-      subjects: sIds.length > 0 ? {
-        createMany: {
-          data: sIds.map(id => ({ subjectId: id })),
-        },
-      } : undefined,
+      subjects:
+        sIds.length > 0
+          ? {
+              createMany: {
+                data: sIds.map((id) => ({ subjectId: id })),
+              },
+            }
+          : undefined,
     },
     include: { subjects: true },
   });

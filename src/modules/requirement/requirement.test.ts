@@ -10,6 +10,8 @@ import {
   getAuthHeaders,
 } from "../../tests/helpers.js";
 
+const sorted = (ids: number[]) => [...ids].sort((a, b) => a - b);
+
 describe("requirement module", () => {
   it("should create a requirement with defaults", async () => {
     const app = await createTestApp();
@@ -706,5 +708,226 @@ describe("requirement module", () => {
     expect(body.salary).toBe(6000);
     expect(body.classLevel).toBe(8);
     expect(body.tuitionType).toBe("Online");
+  });
+
+  it("should save multiple subjects on a draft and return them on GET", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    const first = await createSubject();
+    const second = await createSubject();
+    await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const createRes = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers: authHeaders,
+      payload: {
+        status: "DRAFT",
+        categoryId: category.id,
+        subjectIds: [second.id, first.id],
+      },
+    });
+    expect(createRes.statusCode).toBe(201);
+    expect(sorted(createRes.json().subjectIds)).toEqual(sorted([first.id, second.id]));
+
+    const getRes = await app.inject({
+      method: "GET",
+      url: `/api/v1/requirements/${createRes.json().id}`,
+      headers: authHeaders,
+    });
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.json().subjectIds).toEqual(sorted([first.id, second.id]));
+  });
+
+  it("should replace subjects on a draft when it is edited", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    const first = await createSubject();
+    const second = await createSubject();
+    const studentProfile = await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const requirement = await createRequirement({
+      studentId: studentProfile.id,
+      categoryId: category.id,
+      areaId: area.id,
+      subjectIds: [first.id],
+      status: "DRAFT",
+    });
+
+    const addRes = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+      payload: { subjectIds: [first.id, second.id] },
+    });
+    expect(addRes.statusCode).toBe(200);
+    expect(sorted(addRes.json().subjectIds)).toEqual(sorted([first.id, second.id]));
+
+    const removeRes = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+      payload: { subjectIds: [second.id] },
+    });
+    expect(removeRes.statusCode).toBe(200);
+
+    const getRes = await app.inject({
+      method: "GET",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+    });
+    expect(getRes.json().subjectIds).toEqual([second.id]);
+  });
+
+  it("should keep existing subjects when a draft is edited without subjectIds", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    const first = await createSubject();
+    const second = await createSubject();
+    const studentProfile = await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const requirement = await createRequirement({
+      studentId: studentProfile.id,
+      categoryId: category.id,
+      areaId: area.id,
+      subjectIds: [first.id, second.id],
+      status: "DRAFT",
+    });
+
+    const patchRes = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+      payload: { salary: 9000 },
+    });
+    expect(patchRes.statusCode).toBe(200);
+    expect(patchRes.json().salary).toBe(9000);
+    expect(sorted(patchRes.json().subjectIds)).toEqual(sorted([first.id, second.id]));
+  });
+
+  it("should allow creating a draft with no subjects", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers: authHeaders,
+      payload: { status: "DRAFT", categoryId: category.id, subjectIds: [] },
+    });
+
+    expect(response.statusCode).toBe(201);
+    expect(response.json().subjectIds).toEqual([]);
+  });
+
+  it("should clear all subjects from a draft", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    const subject = await createSubject();
+    const studentProfile = await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const requirement = await createRequirement({
+      studentId: studentProfile.id,
+      categoryId: category.id,
+      areaId: area.id,
+      subjectIds: [subject.id],
+      status: "DRAFT",
+    });
+
+    const patchRes = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+      payload: { subjectIds: [] },
+    });
+    expect(patchRes.statusCode).toBe(200);
+    expect(patchRes.json().subjectIds).toEqual([]);
+
+    const getRes = await app.inject({
+      method: "GET",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+    });
+    expect(getRes.json().subjectIds).toEqual([]);
+  });
+
+  it("should reject publishing a requirement that has no subjects", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    const subject = await createSubject();
+    const studentProfile = await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const requirement = await createRequirement({
+      studentId: studentProfile.id,
+      categoryId: category.id,
+      areaId: area.id,
+      subjectIds: [subject.id],
+      status: "DRAFT",
+    });
+
+    const patchRes = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+      payload: { subjectIds: [], status: "OPEN" },
+    });
+    expect(patchRes.statusCode).toBe(400);
+    expect(patchRes.json().message).toBe(
+      "Cannot publish incomplete requirement: all fields are required to open",
+    );
+
+    const getRes = await app.inject({
+      method: "GET",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+    });
+    expect(getRes.json().subjectIds).toEqual([subject.id]);
+  });
+
+  it("should reject creating an OPEN requirement with no subjects", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers: authHeaders,
+      payload: {
+        categoryId: category.id,
+        areaId: area.id,
+        subjectIds: [],
+        classLevel: 10,
+        timeOfDay: "10:00",
+        daysPerWeek: 3,
+        salary: 5000,
+        hireByDate: "2024-12-31",
+        tuitionType: "Home Tutoring Solo",
+      },
+    });
+
+    expect(response.statusCode).toBe(400);
   });
 });

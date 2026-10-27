@@ -2,6 +2,8 @@ import type { TuitionRequirement } from "../../generated/prisma/client.js";
 import { prisma } from "../../lib/prisma.js";
 import type { CreateRequirementInput, UpdateRequirementInput } from "./requirement.schema.js";
 
+const withSubjects = { subjects: { orderBy: { subjectId: "asc" } } } as const;
+
 function serializeRequirement(
   requirement: TuitionRequirement & { subjects?: { subjectId: number }[] },
 ) {
@@ -66,15 +68,16 @@ export async function createRequirement(accountId: string, data: CreateRequireme
         studentId,
         timeOfDay: timeOfDayDate,
         hireByDate,
-        subjects: subjectIds
-          ? {
-              createMany: {
-                data: subjectIds.map((id) => ({ subjectId: id })),
-              },
-            }
-          : undefined,
+        subjects:
+          subjectIds && subjectIds.length > 0
+            ? {
+                createMany: {
+                  data: subjectIds.map((id) => ({ subjectId: id })),
+                },
+              }
+            : undefined,
       },
-      include: { subjects: true },
+      include: withSubjects,
     });
     return serializeRequirement(created);
   } catch (error) {
@@ -91,7 +94,7 @@ export async function getRequirementById(id: string, accountId: string) {
       id,
       studentId,
     },
-    include: { subjects: true },
+    include: withSubjects,
   });
 
   return requirement ? serializeRequirement(requirement) : null;
@@ -105,7 +108,7 @@ export async function getRequirementsForStudent(accountId: string) {
     where: {
       studentId,
     },
-    include: { subjects: true },
+    include: withSubjects,
     orderBy: {
       createdAt: "desc",
     },
@@ -124,7 +127,7 @@ export async function updateRequirement(
 
   const existing = await prisma.tuitionRequirement.findFirst({
     where: { id, studentId },
-    include: { subjects: true },
+    include: withSubjects,
   });
   if (!existing) return null;
 
@@ -136,7 +139,10 @@ export async function updateRequirement(
 
   const targetStatus = data.status ?? existing.status;
   if (targetStatus === "OPEN") {
-    const candidateSubjects = data.subjectIds !== undefined ? data.subjectIds : (existing.subjects?.map(s => s.subjectId) || []);
+    const candidateSubjects =
+      data.subjectIds !== undefined
+        ? data.subjectIds
+        : existing.subjects?.map((s) => s.subjectId) || [];
     const candidate = {
       categoryId: data.categoryId ?? existing.categoryId,
       areaId: data.areaId ?? existing.areaId,
@@ -190,7 +196,7 @@ export async function updateRequirement(
           timeOfDay: data.timeOfDay ? new Date(`1970-01-01T${data.timeOfDay}:00Z`) : undefined,
           hireByDate: data.hireByDate ? new Date(data.hireByDate) : undefined,
         },
-        include: { subjects: true },
+        include: withSubjects,
       });
     });
 
@@ -221,7 +227,7 @@ export async function closeRequirement(id: string, accountId: string) {
 
   const requirement = await prisma.tuitionRequirement.findUnique({
     where: { id },
-    include: { subjects: true },
+    include: withSubjects,
   });
 
   return requirement ? serializeRequirement(requirement) : null;
