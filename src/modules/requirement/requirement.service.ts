@@ -2,9 +2,15 @@ import type { TuitionRequirement } from "../../generated/prisma/client.js";
 import { prisma } from "../../lib/prisma.js";
 import type { CreateRequirementInput, UpdateRequirementInput } from "./requirement.schema.js";
 
-function serializeRequirement(requirement: TuitionRequirement) {
+const withSubjects = { subjects: { orderBy: { subjectId: "asc" } } } as const;
+
+function serializeRequirement(
+  requirement: TuitionRequirement & { subjects?: { subjectId: number }[] },
+) {
+  const { subjects, ...rest } = requirement;
   return {
-    ...requirement,
+    ...rest,
+    subjectIds: subjects ? subjects.map((s) => s.subjectId) : [],
     timeOfDay: requirement.timeOfDay ? requirement.timeOfDay.toISOString().slice(11, 16) : null,
     hireByDate: requirement.hireByDate ? requirement.hireByDate.toISOString().slice(0, 10) : null,
     createdAt: requirement.createdAt.toISOString(),
@@ -50,17 +56,28 @@ export async function createRequirement(accountId: string, data: CreateRequireme
     throw err;
   }
 
+  const { subjectIds, ...requirementData } = data;
+
   const timeOfDayDate = data.timeOfDay ? new Date(`1970-01-01T${data.timeOfDay}:00Z`) : null;
   const hireByDate = data.hireByDate ? new Date(data.hireByDate) : null;
 
   try {
     const created = await prisma.tuitionRequirement.create({
       data: {
-        ...data,
+        ...requirementData,
         studentId,
         timeOfDay: timeOfDayDate,
         hireByDate,
+        subjects:
+          subjectIds && subjectIds.length > 0
+            ? {
+                createMany: {
+                  data: subjectIds.map((id) => ({ subjectId: id })),
+                },
+              }
+            : undefined,
       },
+      include: withSubjects,
     });
     return serializeRequirement(created);
   } catch (error) {
@@ -77,6 +94,7 @@ export async function getRequirementById(id: string, accountId: string) {
       id,
       studentId,
     },
+    include: withSubjects,
   });
 
   return requirement ? serializeRequirement(requirement) : null;
@@ -90,6 +108,7 @@ export async function getRequirementsForStudent(accountId: string) {
     where: {
       studentId,
     },
+    include: withSubjects,
     orderBy: {
       createdAt: "desc",
     },
@@ -108,6 +127,7 @@ export async function updateRequirement(
 
   const existing = await prisma.tuitionRequirement.findFirst({
     where: { id, studentId },
+    include: withSubjects,
   });
   if (!existing) return null;
 
@@ -119,10 +139,13 @@ export async function updateRequirement(
 
   const targetStatus = data.status ?? existing.status;
   if (targetStatus === "OPEN") {
+    const candidateSubjects =
+      data.subjectIds !== undefined
+        ? data.subjectIds
+        : existing.subjects?.map((s) => s.subjectId) || [];
     const candidate = {
       categoryId: data.categoryId ?? existing.categoryId,
       areaId: data.areaId ?? existing.areaId,
-      subjectId: data.subjectId ?? existing.subjectId,
       classLevel: data.classLevel ?? existing.classLevel,
       timeOfDay: data.timeOfDay !== undefined ? data.timeOfDay : existing.timeOfDay,
       daysPerWeek: data.daysPerWeek ?? existing.daysPerWeek,
@@ -134,7 +157,7 @@ export async function updateRequirement(
     if (
       candidate.categoryId == null ||
       candidate.areaId == null ||
-      candidate.subjectId == null ||
+      candidateSubjects.length === 0 ||
       candidate.classLevel == null ||
       candidate.timeOfDay == null ||
       candidate.daysPerWeek == null ||
@@ -150,14 +173,31 @@ export async function updateRequirement(
     }
   }
 
+  const { subjectIds, ...requirementData } = data;
+
   try {
-    const updated = await prisma.tuitionRequirement.update({
-      where: { id },
-      data: {
-        ...data,
-        timeOfDay: data.timeOfDay ? new Date(`1970-01-01T${data.timeOfDay}:00Z`) : undefined,
-        hireByDate: data.hireByDate ? new Date(data.hireByDate) : undefined,
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      if (subjectIds !== undefined) {
+        await tx.requirementSubject.deleteMany({
+          where: { requirementId: id },
+        });
+
+        if (subjectIds.length > 0) {
+          await tx.requirementSubject.createMany({
+            data: subjectIds.map((sid) => ({ requirementId: id, subjectId: sid })),
+          });
+        }
+      }
+
+      return tx.tuitionRequirement.update({
+        where: { id },
+        data: {
+          ...requirementData,
+          timeOfDay: data.timeOfDay ? new Date(`1970-01-01T${data.timeOfDay}:00Z`) : undefined,
+          hireByDate: data.hireByDate ? new Date(data.hireByDate) : undefined,
+        },
+        include: withSubjects,
+      });
     });
 
     return serializeRequirement(updated);
@@ -187,6 +227,7 @@ export async function closeRequirement(id: string, accountId: string) {
 
   const requirement = await prisma.tuitionRequirement.findUnique({
     where: { id },
+    include: withSubjects,
   });
 
   return requirement ? serializeRequirement(requirement) : null;

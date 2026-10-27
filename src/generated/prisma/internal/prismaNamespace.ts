@@ -416,6 +416,7 @@ export const ModelName = {
   TutorCredential: 'TutorCredential',
   TutorVideo: 'TutorVideo',
   TuitionRequirement: 'TuitionRequirement',
+  RequirementSubject: 'RequirementSubject',
   TuitionPackage: 'TuitionPackage',
   Application: 'Application',
   Review: 'Review',
@@ -442,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "category" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tuitionRequirement" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "category" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1852,6 +1853,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RequirementSubject: {
+      payload: Prisma.$RequirementSubjectPayload<ExtArgs>
+      fields: Prisma.RequirementSubjectFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RequirementSubjectFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RequirementSubjectFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>
+        }
+        findFirst: {
+          args: Prisma.RequirementSubjectFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RequirementSubjectFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>
+        }
+        findMany: {
+          args: Prisma.RequirementSubjectFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>[]
+        }
+        create: {
+          args: Prisma.RequirementSubjectCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>
+        }
+        createMany: {
+          args: Prisma.RequirementSubjectCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RequirementSubjectCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>[]
+        }
+        delete: {
+          args: Prisma.RequirementSubjectDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>
+        }
+        update: {
+          args: Prisma.RequirementSubjectUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>
+        }
+        deleteMany: {
+          args: Prisma.RequirementSubjectDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RequirementSubjectUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RequirementSubjectUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>[]
+        }
+        upsert: {
+          args: Prisma.RequirementSubjectUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequirementSubjectPayload>
+        }
+        aggregate: {
+          args: Prisma.RequirementSubjectAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRequirementSubject>
+        }
+        groupBy: {
+          args: Prisma.RequirementSubjectGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RequirementSubjectGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RequirementSubjectCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RequirementSubjectCountAggregateOutputType> | number
+        }
+      }
+    }
     TuitionPackage: {
       payload: Prisma.$TuitionPackagePayload<ExtArgs>
       fields: Prisma.TuitionPackageFieldRefs
@@ -2959,7 +3034,6 @@ export const TuitionRequirementScalarFieldEnum = {
   studentId: 'studentId',
   categoryId: 'categoryId',
   areaId: 'areaId',
-  subjectId: 'subjectId',
   classLevel: 'classLevel',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
@@ -2975,6 +3049,14 @@ export const TuitionRequirementScalarFieldEnum = {
 } as const
 
 export type TuitionRequirementScalarFieldEnum = (typeof TuitionRequirementScalarFieldEnum)[keyof typeof TuitionRequirementScalarFieldEnum]
+
+
+export const RequirementSubjectScalarFieldEnum = {
+  requirementId: 'requirementId',
+  subjectId: 'subjectId'
+} as const
+
+export type RequirementSubjectScalarFieldEnum = (typeof RequirementSubjectScalarFieldEnum)[keyof typeof RequirementSubjectScalarFieldEnum]
 
 
 export const TuitionPackageScalarFieldEnum = {
@@ -3853,6 +3935,7 @@ export type GlobalOmitConfig = {
   tutorCredential?: Prisma.TutorCredentialOmit
   tutorVideo?: Prisma.TutorVideoOmit
   tuitionRequirement?: Prisma.TuitionRequirementOmit
+  requirementSubject?: Prisma.RequirementSubjectOmit
   tuitionPackage?: Prisma.TuitionPackageOmit
   application?: Prisma.ApplicationOmit
   review?: Prisma.ReviewOmit

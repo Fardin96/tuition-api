@@ -113,6 +113,11 @@ export type TutorVideo = Prisma.TutorVideoModel
  */
 export type TuitionRequirement = Prisma.TuitionRequirementModel
 /**
+ * Model RequirementSubject
+ * 
+ */
+export type RequirementSubject = Prisma.RequirementSubjectModel
+/**
  * Model TuitionPackage
  * 
  */

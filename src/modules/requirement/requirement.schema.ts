@@ -38,11 +38,14 @@ export const classLevelSchema = z.coerce.number().int().min(1).max(17);
 // HH:MM -> stored as a time; we convert to a Date during persistence.
 export const timeOfDaySchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/);
 
+// Drafts and edits may clear every subject; OPEN creation requires at least one.
+const subjectIdsSchema = z.array(z.coerce.number().int().positive());
+
 // Base schema without defaults
 const baseRequirementSchema = z.object({
   categoryId: z.coerce.number().int().positive(),
   areaId: z.coerce.number().int().positive(),
-  subjectId: z.coerce.number().int().positive(),
+  subjectIds: subjectIdsSchema,
   classLevel: classLevelSchema,
   timeOfDay: timeOfDaySchema,
   daysPerWeek: z.coerce.number().int().min(1).max(7),
@@ -55,6 +58,7 @@ const baseRequirementSchema = z.object({
 });
 
 const openRequirementSchema = baseRequirementSchema.extend({
+  subjectIds: subjectIdsSchema.min(1),
   studentCount: z.coerce.number().int().min(1).default(1),
   tutorGenderPref: tutorGenderPrefSchema.default("ANY"),
   status: z.literal("OPEN").default("OPEN"),
@@ -80,7 +84,7 @@ export const requirementResponseSchema = z.object({
   studentId: z.string(),
   categoryId: z.number().nullable(),
   areaId: z.number().nullable(),
-  subjectId: z.number().nullable(),
+  subjectIds: z.array(z.number()),
   classLevel: z.number().nullable(),
   timeOfDay: z.string().nullable(),
   daysPerWeek: z.number().nullable(),
