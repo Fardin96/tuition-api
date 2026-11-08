@@ -1,16 +1,20 @@
--- constraints.sql  (schema v5)
+-- constraints.sql  (schema v6, FINAL-STATE reference)
 -- Rules schema.prisma cannot express: CHECKs, triggers, partial indexes, append-only tables.
--- Workflow:
---   1. npx prisma migrate dev --create-only --name init   (generates table DDL)
---   2. Paste this file at the END of the generated migration.sql
---   3. npx prisma migrate dev                             (applies it)
+-- Fresh clone: migration 20261020122427_init contains sections 1-12 verbatim.
+-- Deployed databases receive the [v6] changes through migrations
+-- 20261107000300_v6_constraints and 20261107000400_v6_validate (their SQL is derived from the [v6] blocks here).
 -- On every later `migrate dev`, READ the generated SQL before accepting it.
 -- Prisma does not model CHECKs, triggers or partial unique indexes and may
--- propose dropping the partial indexes. Never accept a DROP INDEX for the
--- indexes named below.
--- Needs PostgreSQL 13+ (plpgsql only).
+-- propose dropping them. NEVER accept a Prisma-generated DROP INDEX for these:
+--   notification_due_idx, tutor_name_trgm, tutor_verification_one_pending,
+--   platform_fee_one_placement_per_application, account_block_one_active,
+--   report_one_open_per_pair, dispute_one_open_per_raiser, tutor_requirement_one_default,
+--   zlr_one_pending_per_tutor, tutor_zone_center_gix, fee_payment_gateway_ref_uniq,
+--   tutor_location_geog_gist_idx, student_location_geog_gist_idx,
+--   tutor_location_searchable_idx, student_location_searchable_idx
+-- Needs PostgreSQL 13+ and PostGIS (created by migration 20261022876543_location_postgis).
 --
--- v5 changes are marked [v5].
+-- v5 changes are marked [v5], v6 changes are marked [v6].
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
@@ -30,10 +34,16 @@ ALTER TABLE account ADD CONSTRAINT account_deleted_matches
   CHECK ((status = 'DELETED') = (deleted_at IS NOT NULL));
 
 -- ═════════ 2. WhatsApp numbers: E.164 text, e.g. +8801712345678 ═══════
+-- [v6] tombstone format `deleted:<accountId>:<original>` (soft delete frees the real number).
 ALTER TABLE student ADD CONSTRAINT student_whatsapp_e164
-  CHECK (whatsapp_number ~ '^\+[1-9][0-9]{7,14}$');
+  CHECK (whatsapp_number ~ '^\+[1-9][0-9]{7,14}$' OR whatsapp_number LIKE 'deleted:%');
 ALTER TABLE tutor ADD CONSTRAINT tutor_whatsapp_e164
-  CHECK (whatsapp_number ~ '^\+[1-9][0-9]{7,14}$');
+  CHECK (whatsapp_number ~ '^\+[1-9][0-9]{7,14}$' OR whatsapp_number LIKE 'deleted:%');
+-- [v6] same E.164 rule for the phone number (tombstones allowed, NULL allowed).
+ALTER TABLE student ADD CONSTRAINT student_phone_e164
+  CHECK (phone_number ~ '^\+[1-9][0-9]{7,14}$' OR phone_number LIKE 'deleted:%');
+ALTER TABLE tutor ADD CONSTRAINT tutor_phone_e164
+  CHECK (phone_number ~ '^\+[1-9][0-9]{7,14}$' OR phone_number LIKE 'deleted:%');
 
 -- ═════════ 3. Value ranges and state shapes ════════════════════════════
 ALTER TABLE tuition_requirement
@@ -64,9 +74,7 @@ ALTER TABLE student ADD CONSTRAINT student_verification_has_file
 ALTER TABLE blog_post ADD CONSTRAINT blog_published_has_date
   CHECK (status <> 'PUBLISHED' OR published_at IS NOT NULL);
 
--- A tutor is listed in the directory only once verified.
-ALTER TABLE tutor ADD CONSTRAINT tutor_listed_requires_verified
-  CHECK (NOT is_listed OR verification_status = 'APPROVED');
+-- [v6] tutor_listed_requires_verified removed: verification is optional unless platform_setting require_tutor_verification is true; recompute_is_listed() is the single writer of is_listed.
 
 -- ═════════ 4. Ratings can never disagree with the review rows ══════════
 -- (a) shape: no average without reviews, no reviews without an average
@@ -214,18 +222,15 @@ ALTER TABLE tutor_verification
     status <> 'REJECTED' OR (note IS NOT NULL AND length(btrim(note)) > 0));
 
 -- [v5] tutor.verification_status is the latest submission's status, always.
--- If it stops being APPROVED the tutor is delisted in the same statement.
--- (Note: a new PENDING resubmission after an approval delists the tutor until
--- it is decided. Change the ORDER BY / filter here if you want to stay listed.)
+-- [v6] Listing is decided only by recompute_is_listed() (section 20).
 CREATE OR REPLACE FUNCTION tutor_verification_sync() RETURNS trigger AS $$
 DECLARE latest "VerificationStatus";
 BEGIN
   SELECT status INTO latest FROM tutor_verification
     WHERE tutor_id = NEW.tutor_id ORDER BY submitted_at DESC, id DESC LIMIT 1;
-  UPDATE tutor SET
-    verification_status = latest,
-    is_listed = is_listed AND latest = 'APPROVED'
-  WHERE id = NEW.tutor_id;
+  -- [v6] body replaced: verification_status only, then re-evaluate listing
+  UPDATE tutor SET verification_status = latest WHERE id = NEW.tutor_id;
+  PERFORM recompute_is_listed(NEW.tutor_id);
   RETURN NULL;
 END $$ LANGUAGE plpgsql;
 CREATE TRIGGER tutor_verification_sync_trg AFTER INSERT OR UPDATE OF status ON tutor_verification
@@ -295,7 +300,7 @@ BEGIN
       RAISE EXCEPTION 'payment exceeds the amount still due (%)', f.amount_due - f.amount_paid;
     END IF;
     IF NEW.txn_reference IS NOT NULL AND EXISTS (
-      -- the same bKash/Nagad transaction id cannot be recorded twice, unless that payment was fully reversed
+      -- [v6] the same SSLCommerz/gateway transaction id cannot be recorded twice, unless that payment was fully reversed
       SELECT 1 FROM fee_payment p
       WHERE p.kind = 'PAYMENT' AND p.method = NEW.method AND p.txn_reference = NEW.txn_reference
         AND p.amount > COALESCE((SELECT sum(r.amount) FROM fee_payment r WHERE r.reverses_payment_id = p.id), 0)
@@ -426,14 +431,16 @@ END $$ LANGUAGE plpgsql;
 CREATE TRIGGER account_status_guard_trg BEFORE UPDATE OF status ON account
   FOR EACH ROW EXECUTE FUNCTION account_status_guard();
 
--- [v5] a blocked or deleted account's tutor profile leaves the directory.
+-- [v6] a status change re-evaluates listing (blocked/deleted leave the directory; unblock re-lists).
 CREATE OR REPLACE FUNCTION account_unlist() RETURNS trigger AS $$
 BEGIN
-  UPDATE tutor SET is_listed = false WHERE account_id = NEW.id AND is_listed;
+  PERFORM recompute_is_listed(t.id) FROM tutor t WHERE t.account_id = NEW.id;
   RETURN NULL;
 END $$ LANGUAGE plpgsql;
+-- [v6] trigger redefined: fires on every status change, not only away from ACTIVE
+DROP TRIGGER IF EXISTS account_unlist_trg ON account;
 CREATE TRIGGER account_unlist_trg AFTER UPDATE OF status ON account
-  FOR EACH ROW WHEN (NEW.status <> 'ACTIVE' AND NEW.status IS DISTINCT FROM OLD.status)
+  FOR EACH ROW WHEN (NEW.status IS DISTINCT FROM OLD.status)
   EXECUTE FUNCTION account_unlist();
 
 -- ═════════ 10. Reports and disputes ════════════════════════════════════
@@ -488,5 +495,199 @@ END $$ LANGUAGE plpgsql;
 CREATE TRIGGER audit_log_append_only   BEFORE UPDATE OR DELETE ON audit_log   FOR EACH ROW EXECUTE FUNCTION forbid_mutation();
 CREATE TRIGGER fee_payment_append_only BEFORE UPDATE OR DELETE ON fee_payment FOR EACH ROW EXECUTE FUNCTION forbid_mutation();
 
--- ═════════ 13. Seed (run once, from your seed script, not the migration) ═
+-- ═════════ 13. Payments: SSLCommerz and cash only (C1, C2) ═══════════════
+-- [v6] NOT VALID on existing tables; validated by migration 20261107000400_v6_validate.
+ALTER TABLE fee_payment
+  ADD CONSTRAINT fee_payment_method_allowed CHECK (method IN ('SSLCOMMERZ', 'CASH')) NOT VALID;
+
+-- [v6] replaces the earlier gateway reference index
+DROP INDEX IF EXISTS fee_payment_gateway_ref_uniq;
+CREATE UNIQUE INDEX fee_payment_gateway_ref_uniq
+  ON fee_payment (txn_reference) WHERE method = 'SSLCOMMERZ' AND kind = 'PAYMENT';
+
+-- ═════════ 14. Tutor requirement ═══════════════════════════════════════════
+-- [v6] class_level_max is capped at 20, matching requirement_class_level_range.
+ALTER TABLE tutor_requirement
+  ADD CONSTRAINT tr_class_range CHECK (class_level_min >= 1 AND class_level_max <= 20 AND class_level_max >= class_level_min),
+  ADD CONSTRAINT tr_time_window CHECK (time_to > time_from),
+  ADD CONSTRAINT tr_days_valid  CHECK (available_days BETWEEN 1 AND 127),
+  ADD CONSTRAINT tr_salary_pos  CHECK (min_salary IS NULL OR min_salary > 0),
+  ADD CONSTRAINT tr_students    CHECK (max_students >= 1),
+  ADD CONSTRAINT tr_default_active CHECK (NOT is_default OR is_active);
+
+-- [v6] at most one default requirement per tutor
+CREATE UNIQUE INDEX tutor_requirement_one_default ON tutor_requirement (tutor_id) WHERE is_default;
+
+-- [v6] cannot archive a requirement that OPEN packages still use
+CREATE OR REPLACE FUNCTION tr_block_archive() RETURNS trigger AS $$
+BEGIN
+  IF OLD.is_active AND NOT NEW.is_active AND EXISTS (
+    SELECT 1 FROM tuition_package p WHERE p.requirement_id = OLD.id AND p.status = 'OPEN'
+  ) THEN
+    RAISE EXCEPTION 'requirement is mapped to open packages' USING ERRCODE = 'restrict_violation';
+  END IF;
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+CREATE TRIGGER tr_block_archive_trg BEFORE UPDATE OF is_active ON tutor_requirement
+  FOR EACH ROW EXECUTE FUNCTION tr_block_archive();
+
+-- [v6] a package may only map to an ACTIVE requirement of the SAME tutor
+CREATE OR REPLACE FUNCTION package_requirement_same_tutor() RETURNS trigger AS $$
+BEGIN
+  IF NEW.requirement_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM tutor_requirement r
+    WHERE r.id = NEW.requirement_id AND r.tutor_id = NEW.tutor_id AND r.is_active
+  ) THEN
+    RAISE EXCEPTION 'package requirement must be an active requirement of the same tutor'
+      USING ERRCODE = 'foreign_key_violation';
+  END IF;
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+CREATE TRIGGER package_requirement_same_tutor_trg
+  BEFORE INSERT OR UPDATE OF requirement_id ON tuition_package
+  FOR EACH ROW EXECUTE FUNCTION package_requirement_same_tutor();
+
+-- ═════════ 15. Teaching zones ═══════════════════════════════════════════════
+-- [v6]
+ALTER TABLE tutor_zone ALTER COLUMN center SET NOT NULL;
+ALTER TABLE tutor_zone
+  ADD CONSTRAINT zone_radius CHECK (radius_m BETWEEN 1000 AND 5000),
+  ADD CONSTRAINT zone_in_bd CHECK (
+    ST_Y(center::geometry) BETWEEN 20.5 AND 26.7 AND ST_X(center::geometry) BETWEEN 88.0 AND 92.7);
+CREATE INDEX tutor_zone_center_gix ON tutor_zone USING gist (center);
+
+-- [v6]
+ALTER TABLE tutor ADD CONSTRAINT tutor_zone_limit CHECK (zone_limit BETWEEN 1 AND 50);
+
+-- [v6] quota enforced in the database; the tutor row lock serialises concurrent inserts
+CREATE OR REPLACE FUNCTION tutor_zone_quota() RETURNS trigger AS $$
+DECLARE v_limit smallint; v_count int;
+BEGIN
+  SELECT zone_limit INTO v_limit FROM tutor WHERE id = NEW.tutor_id FOR UPDATE;
+  SELECT count(*) INTO v_count FROM tutor_zone WHERE tutor_id = NEW.tutor_id;
+  IF v_count >= v_limit THEN
+    RAISE EXCEPTION 'zone limit reached' USING ERRCODE = 'check_violation';
+  END IF;
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+CREATE TRIGGER tutor_zone_quota_trg BEFORE INSERT ON tutor_zone
+  FOR EACH ROW EXECUTE FUNCTION tutor_zone_quota();
+
+-- ═════════ 16. Zone limit requests ══════════════════════════════════════════
+-- [v6]
+ALTER TABLE zone_limit_request
+  ADD CONSTRAINT zlr_limit_range CHECK (requested_limit BETWEEN 6 AND 50),
+  ADD CONSTRAINT zlr_decision_consistent CHECK (
+    (status = 'PENDING'  AND decided_at IS NULL AND decided_by IS NULL)
+    OR (status <> 'PENDING' AND decided_at IS NOT NULL AND decided_by IS NOT NULL));
+CREATE UNIQUE INDEX zlr_one_pending_per_tutor ON zone_limit_request (tutor_id) WHERE status = 'PENDING';
+
+-- ═════════ 17. Weekdays and pins ════════════════════════════════════════════
+-- [v6] weekdays on the student requirement
+ALTER TABLE tuition_requirement
+  ADD CONSTRAINT req_days_valid CHECK (available_days BETWEEN 1 AND 127);
+
+-- [v6] pin sanity on profile locations (inside Bangladesh bounding box)
+ALTER TABLE tutor_location ADD CONSTRAINT tloc_in_bd CHECK (geog IS NULL OR (
+  ST_Y(geog::geometry) BETWEEN 20.5 AND 26.7 AND ST_X(geog::geometry) BETWEEN 88.0 AND 92.7));
+ALTER TABLE student_location ADD CONSTRAINT sloc_in_bd CHECK (geog IS NULL OR (
+  ST_Y(geog::geometry) BETWEEN 20.5 AND 26.7 AND ST_X(geog::geometry) BETWEEN 88.0 AND 92.7));
+
+-- ═════════ 18. Application match log ════════════════════════════════════════
+-- [v6]
+ALTER TABLE application ADD CONSTRAINT app_match_score_range
+  CHECK (match_score IS NULL OR match_score BETWEEN 0 AND 100);
+
+-- ═════════ 19. Platform settings ════════════════════════════════════════════
+-- [v6] a bad value can never break the ::boolean / ::numeric casts in the functions below
+ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
+  CASE key
+    WHEN 'require_tutor_verification' THEN jsonb_typeof(value) = 'boolean'
+    WHEN 'require_phone_verification' THEN jsonb_typeof(value) = 'boolean'
+    WHEN 'commission_percent' THEN
+      CASE WHEN jsonb_typeof(value) = 'number' THEN (value #>> '{}')::numeric BETWEEN 0 AND 100 ELSE false END
+    ELSE false
+  END);
+
+-- [v6] seeds (run in the migration)
+INSERT INTO platform_setting (key, value) VALUES
+  ('require_tutor_verification', 'false'::jsonb),
+  ('require_phone_verification', 'false'::jsonb)   -- flip to true when the OTP feature ships
+ON CONFLICT (key) DO NOTHING;
+
+-- ═════════ 20. Listing + apply-gate functions ═══════════════════════════════
+-- [v6] Listing: verification is optional unless the admin switch is on.
+-- Single writer of is_listed: called by the verification and account triggers.
+CREATE OR REPLACE FUNCTION recompute_is_listed(p_tutor uuid) RETURNS void LANGUAGE sql AS $$
+  UPDATE tutor t SET is_listed = (
+    a.status = 'ACTIVE'
+    AND (NOT COALESCE((SELECT (value #>> '{}')::boolean FROM platform_setting
+                       WHERE key = 'require_tutor_verification'), false)
+         OR t.verification_status = 'APPROVED'))
+  FROM account a WHERE a.id = t.account_id AND t.id = p_tutor;
+$$;
+
+-- [v6] Apply-gate: single source of truth for "what is missing"
+CREATE OR REPLACE FUNCTION tutor_missing_requirements(p_tutor uuid) RETURNS text[]
+LANGUAGE sql STABLE AS $$
+  SELECT array_remove(ARRAY[
+    CASE WHEN btrim(t.name) = ''    THEN 'name' END,
+    CASE WHEN btrim(t.address) = '' THEN 'address' END,
+    CASE WHEN NOT EXISTS (SELECT 1 FROM tutor_location l
+                          WHERE l.tutor_id = t.id AND l.geog IS NOT NULL AND l.district_code <> '')
+         THEN 'location_pin' END,                                    -- also covers "city"
+    CASE WHEN NOT EXISTS (SELECT 1 FROM tutor_area ta WHERE ta.tutor_id = t.id) THEN 'area' END,
+    CASE WHEN t.phone_number IS NULL OR t.phone_number LIKE 'deleted:%' THEN 'phone_number' END,
+    CASE WHEN COALESCE((SELECT (value #>> '{}')::boolean FROM platform_setting
+                        WHERE key = 'require_phone_verification'), false)
+              AND t.phone_verified_at IS NULL THEN 'phone_verification' END,
+    CASE WHEN NOT EXISTS (
+           SELECT 1 FROM tutor_requirement r
+           WHERE r.tutor_id = t.id AND r.is_default AND r.is_active
+             AND EXISTS (SELECT 1 FROM tutor_requirement_subject s WHERE s.requirement_id = r.id)
+             AND (r.teaches_online
+                  OR EXISTS (SELECT 1 FROM tutor_requirement_zone z WHERE z.requirement_id = r.id)))
+         THEN 'default_requirement' END,
+    CASE WHEN COALESCE((SELECT (value #>> '{}')::boolean FROM platform_setting
+                        WHERE key = 'require_tutor_verification'), false)
+              AND t.verification_status <> 'APPROVED' THEN 'verification' END
+  ], NULL)
+  FROM tutor t WHERE t.id = p_tutor;
+$$;
+-- gender is NOT NULL on tutor, so it needs no check. WhatsApp verification is deliberately absent.
+
+-- [v6] renumbered from 13
+-- ═════════ 22. Contact numbers are unique across ALL accounts ═════════════
+-- [v6] a phone or WhatsApp number belongs to one account only, across student and tutor
+-- (the per-table unique indexes alone do not stop student X and tutor Y sharing a number).
+-- Tombstones (deleted:%) are ignored. The same account may use one number for both.
+-- Named *_guard_trg so they run after *_phone_fill_trg (BEFORE triggers fire alphabetically).
+CREATE OR REPLACE FUNCTION contact_number_guard() RETURNS trigger AS $$
+DECLARE
+  n text;
+BEGIN
+  FOR n IN
+    SELECT DISTINCT v FROM (VALUES (NEW.phone_number), (NEW.whatsapp_number)) AS t(v)
+    WHERE v IS NOT NULL AND v NOT LIKE 'deleted:%'
+    ORDER BY v
+  LOOP
+    PERFORM pg_advisory_xact_lock(hashtextextended('contact:' || n, 0));
+    IF EXISTS (
+      SELECT 1 FROM student
+      WHERE account_id <> NEW.account_id AND (phone_number = n OR whatsapp_number = n)
+      UNION ALL
+      SELECT 1 FROM tutor
+      WHERE account_id <> NEW.account_id AND (phone_number = n OR whatsapp_number = n)
+    ) THEN
+      RAISE EXCEPTION 'contact_number_in_use' USING ERRCODE = 'unique_violation', CONSTRAINT = 'contact_number_unique';
+    END IF;
+  END LOOP;
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+CREATE TRIGGER student_phone_guard_trg BEFORE INSERT OR UPDATE OF phone_number, whatsapp_number ON student
+  FOR EACH ROW EXECUTE FUNCTION contact_number_guard();
+CREATE TRIGGER tutor_phone_guard_trg BEFORE INSERT OR UPDATE OF phone_number, whatsapp_number ON tutor
+  FOR EACH ROW EXECUTE FUNCTION contact_number_guard();
+
+-- ═════════ 21. Seed (run once, from your seed script, not the migration) ═
 -- INSERT INTO super_admin_email (slot, email) VALUES (1, 'first@example.com'), (2, 'second@example.com');

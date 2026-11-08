@@ -131,9 +131,12 @@ export async function createStudentProfile(
     address?: string;
     emergencyContact?: string;
     whatsappNumber?: string;
+    phoneNumber?: string;
     studentIdNumber?: string;
   } = {},
 ) {
+  const whatsappNumber =
+    overrides.whatsappNumber ?? `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`;
   return prisma.student.create({
     data: {
       accountId,
@@ -141,9 +144,8 @@ export async function createStudentProfile(
       name: overrides.name ?? "Test Student",
       address: overrides.address ?? "123 Test Lane",
       emergencyContact: overrides.emergencyContact ?? "+8801700000001",
-      whatsappNumber:
-        overrides.whatsappNumber ??
-        `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
+      whatsappNumber,
+      phoneNumber: overrides.phoneNumber ?? whatsappNumber,
       studentIdNumber: overrides.studentIdNumber ?? `STU-${crypto.randomUUID()}`,
     },
   });
@@ -156,21 +158,23 @@ export async function createTutorProfile(
     address?: string;
     emergencyContact?: string;
     whatsappNumber?: string;
+    phoneNumber?: string;
     studentIdNumber?: string;
     gender?: "MALE" | "FEMALE" | "OTHER";
     isListed?: boolean;
     verificationStatus?: "NOT_SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED";
   } = {},
 ) {
+  const whatsappNumber =
+    overrides.whatsappNumber ?? `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`;
   return prisma.tutor.create({
     data: {
       accountId,
       name: overrides.name ?? "Test Tutor",
       address: overrides.address ?? "456 Tutor Road",
       emergencyContact: overrides.emergencyContact ?? "+8801700000002",
-      whatsappNumber:
-        overrides.whatsappNumber ??
-        `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
+      whatsappNumber,
+      phoneNumber: overrides.phoneNumber ?? whatsappNumber,
       studentIdNumber: overrides.studentIdNumber ?? `TUT-${crypto.randomUUID()}`,
       gender: overrides.gender ?? "MALE",
       isListed: overrides.isListed ?? false,
@@ -225,6 +229,7 @@ export async function setTutorLocation(
     lng?: number;
     needsReaddress?: boolean;
     fetchedAt?: Date;
+    geogSource?: "PIN" | "PLACES";
   } = {},
 ) {
   const placeId = `place-${tutorId}`;
@@ -233,9 +238,10 @@ export async function setTutorLocation(
   const lat = data.lat ?? 23.8103;
   const fetchedAt = data.fetchedAt ?? new Date();
   const needsReaddress = data.needsReaddress ?? false;
+  const geogSource = data.geogSource ?? "PLACES";
 
   await prisma.$executeRaw`
-    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
+    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at, geog_source)
     VALUES (
       gen_random_uuid(),
       ${tutorId},
@@ -245,7 +251,8 @@ export async function setTutorLocation(
       ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
       ${fetchedAt},
       ${needsReaddress},
-      NOW()
+      NOW(),
+      ${geogSource}::"GeogSource"
     );
   `;
 }
@@ -258,6 +265,7 @@ export async function setStudentLocation(
     lng?: number;
     needsReaddress?: boolean;
     fetchedAt?: Date;
+    geogSource?: "PIN" | "PLACES";
   } = {},
 ) {
   const placeId = `place-${studentId}`;
@@ -266,9 +274,10 @@ export async function setStudentLocation(
   const lat = data.lat ?? 23.8103;
   const fetchedAt = data.fetchedAt ?? new Date();
   const needsReaddress = data.needsReaddress ?? false;
+  const geogSource = data.geogSource ?? "PLACES";
 
   await prisma.$executeRaw`
-    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
+    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at, geog_source)
     VALUES (
       gen_random_uuid(),
       ${studentId},
@@ -278,7 +287,8 @@ export async function setStudentLocation(
       ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
       ${fetchedAt},
       ${needsReaddress},
-      NOW()
+      NOW(),
+      ${geogSource}::"GeogSource"
     );
   `;
 }

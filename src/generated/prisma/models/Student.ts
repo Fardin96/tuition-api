@@ -48,6 +48,8 @@ export type StudentMinAggregateOutputType = {
   emergencyContact: string | null
   whatsappNumber: string | null
   whatsappVerifiedAt: Date | null
+  phoneNumber: string | null
+  phoneVerifiedAt: Date | null
   studentIdNumber: string | null
   verificationFileId: string | null
   verificationStatus: $Enums.VerificationStatus | null
@@ -67,6 +69,8 @@ export type StudentMaxAggregateOutputType = {
   emergencyContact: string | null
   whatsappNumber: string | null
   whatsappVerifiedAt: Date | null
+  phoneNumber: string | null
+  phoneVerifiedAt: Date | null
   studentIdNumber: string | null
   verificationFileId: string | null
   verificationStatus: $Enums.VerificationStatus | null
@@ -86,6 +90,8 @@ export type StudentCountAggregateOutputType = {
   emergencyContact: number
   whatsappNumber: number
   whatsappVerifiedAt: number
+  phoneNumber: number
+  phoneVerifiedAt: number
   studentIdNumber: number
   verificationFileId: number
   verificationStatus: number
@@ -119,6 +125,8 @@ export type StudentMinAggregateInputType = {
   emergencyContact?: true
   whatsappNumber?: true
   whatsappVerifiedAt?: true
+  phoneNumber?: true
+  phoneVerifiedAt?: true
   studentIdNumber?: true
   verificationFileId?: true
   verificationStatus?: true
@@ -138,6 +146,8 @@ export type StudentMaxAggregateInputType = {
   emergencyContact?: true
   whatsappNumber?: true
   whatsappVerifiedAt?: true
+  phoneNumber?: true
+  phoneVerifiedAt?: true
   studentIdNumber?: true
   verificationFileId?: true
   verificationStatus?: true
@@ -157,6 +167,8 @@ export type StudentCountAggregateInputType = {
   emergencyContact?: true
   whatsappNumber?: true
   whatsappVerifiedAt?: true
+  phoneNumber?: true
+  phoneVerifiedAt?: true
   studentIdNumber?: true
   verificationFileId?: true
   verificationStatus?: true
@@ -263,6 +275,8 @@ export type StudentGroupByOutputType = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt: Date | null
+  phoneNumber: string
+  phoneVerifiedAt: Date | null
   studentIdNumber: string
   verificationFileId: string | null
   verificationStatus: $Enums.VerificationStatus
@@ -305,6 +319,8 @@ export type StudentWhereInput = {
   emergencyContact?: Prisma.StringFilter<"Student"> | string
   whatsappNumber?: Prisma.StringFilter<"Student"> | string
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  phoneNumber?: Prisma.StringFilter<"Student"> | string
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   studentIdNumber?: Prisma.StringFilter<"Student"> | string
   verificationFileId?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Student"> | $Enums.VerificationStatus
@@ -331,6 +347,8 @@ export type StudentOrderByWithRelationInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -351,6 +369,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   accountId?: string
   whatsappNumber?: string
+  phoneNumber?: string
   accountId_role?: Prisma.StudentAccountIdRoleCompoundUniqueInput
   AND?: Prisma.StudentWhereInput | Prisma.StudentWhereInput[]
   OR?: Prisma.StudentWhereInput[]
@@ -361,6 +380,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringFilter<"Student"> | string
   emergencyContact?: Prisma.StringFilter<"Student"> | string
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   studentIdNumber?: Prisma.StringFilter<"Student"> | string
   verificationFileId?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Student"> | $Enums.VerificationStatus
@@ -375,7 +395,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   applications?: Prisma.ApplicationListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
   location?: Prisma.XOR<Prisma.StudentLocationNullableScalarRelationFilter, Prisma.StudentLocationWhereInput> | null
-}, "id" | "accountId" | "whatsappNumber" | "accountId_role">
+}, "id" | "accountId" | "whatsappNumber" | "phoneNumber" | "accountId_role">
 
 export type StudentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -387,6 +407,8 @@ export type StudentOrderByWithAggregationInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -414,6 +436,8 @@ export type StudentScalarWhereWithAggregatesInput = {
   emergencyContact?: Prisma.StringWithAggregatesFilter<"Student"> | string
   whatsappNumber?: Prisma.StringWithAggregatesFilter<"Student"> | string
   whatsappVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
+  phoneNumber?: Prisma.StringWithAggregatesFilter<"Student"> | string
+  phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
   studentIdNumber?: Prisma.StringWithAggregatesFilter<"Student"> | string
   verificationFileId?: Prisma.UuidNullableWithAggregatesFilter<"Student"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusWithAggregatesFilter<"Student"> | $Enums.VerificationStatus
@@ -430,6 +454,8 @@ export type StudentCreateInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -455,6 +481,8 @@ export type StudentUncheckedCreateInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -475,6 +503,8 @@ export type StudentUpdateInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -500,6 +530,8 @@ export type StudentUncheckedUpdateInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -523,6 +555,8 @@ export type StudentCreateManyInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -539,6 +573,8 @@ export type StudentUpdateManyMutationInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -557,6 +593,8 @@ export type StudentUncheckedUpdateManyInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -596,6 +634,8 @@ export type StudentCountOrderByAggregateInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -621,6 +661,8 @@ export type StudentMaxOrderByAggregateInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -640,6 +682,8 @@ export type StudentMinOrderByAggregateInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -851,6 +895,8 @@ export type StudentCreateWithoutAccountInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -873,6 +919,8 @@ export type StudentUncheckedCreateWithoutAccountInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -909,6 +957,8 @@ export type StudentUpdateWithoutAccountInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -931,6 +981,8 @@ export type StudentUncheckedUpdateWithoutAccountInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -951,6 +1003,8 @@ export type StudentCreateWithoutAreaInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -974,6 +1028,8 @@ export type StudentUncheckedCreateWithoutAreaInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1026,6 +1082,8 @@ export type StudentScalarWhereInput = {
   emergencyContact?: Prisma.StringFilter<"Student"> | string
   whatsappNumber?: Prisma.StringFilter<"Student"> | string
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  phoneNumber?: Prisma.StringFilter<"Student"> | string
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   studentIdNumber?: Prisma.StringFilter<"Student"> | string
   verificationFileId?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Student"> | $Enums.VerificationStatus
@@ -1042,6 +1100,8 @@ export type StudentCreateWithoutVerificationFileInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1066,6 +1126,8 @@ export type StudentUncheckedCreateWithoutVerificationFileInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1111,6 +1173,8 @@ export type StudentCreateWithoutLocationInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1135,6 +1199,8 @@ export type StudentUncheckedCreateWithoutLocationInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1170,6 +1236,8 @@ export type StudentUpdateWithoutLocationInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1194,6 +1262,8 @@ export type StudentUncheckedUpdateWithoutLocationInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1213,6 +1283,8 @@ export type StudentCreateWithoutRequirementsInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1237,6 +1309,8 @@ export type StudentUncheckedCreateWithoutRequirementsInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1272,6 +1346,8 @@ export type StudentUpdateWithoutRequirementsInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1296,6 +1372,8 @@ export type StudentUncheckedUpdateWithoutRequirementsInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1315,6 +1393,8 @@ export type StudentCreateWithoutApplicationsInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1339,6 +1419,8 @@ export type StudentUncheckedCreateWithoutApplicationsInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1374,6 +1456,8 @@ export type StudentUpdateWithoutApplicationsInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1398,6 +1482,8 @@ export type StudentUncheckedUpdateWithoutApplicationsInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1417,6 +1503,8 @@ export type StudentCreateWithoutReviewsGivenInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1441,6 +1529,8 @@ export type StudentUncheckedCreateWithoutReviewsGivenInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1476,6 +1566,8 @@ export type StudentUpdateWithoutReviewsGivenInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1500,6 +1592,8 @@ export type StudentUncheckedUpdateWithoutReviewsGivenInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1521,6 +1615,8 @@ export type StudentCreateManyAreaInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1537,6 +1633,8 @@ export type StudentUpdateWithoutAreaInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1560,6 +1658,8 @@ export type StudentUncheckedUpdateWithoutAreaInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1582,6 +1682,8 @@ export type StudentUncheckedUpdateManyWithoutAreaInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1601,6 +1703,8 @@ export type StudentCreateManyVerificationFileInput = {
   emergencyContact: string
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1616,6 +1720,8 @@ export type StudentUpdateWithoutVerificationFileInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1640,6 +1746,8 @@ export type StudentUncheckedUpdateWithoutVerificationFileInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1662,6 +1770,8 @@ export type StudentUncheckedUpdateManyWithoutVerificationFileInput = {
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1729,6 +1839,8 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
@@ -1756,6 +1868,8 @@ export type StudentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
@@ -1778,6 +1892,8 @@ export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
@@ -1800,6 +1916,8 @@ export type StudentSelectScalar = {
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
@@ -1809,7 +1927,7 @@ export type StudentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "areaId" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "studentIdNumber" | "verificationFileId" | "verificationStatus" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
+export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "areaId" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "verificationFileId" | "verificationStatus" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
 export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
@@ -1852,6 +1970,8 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     emergencyContact: string
     whatsappNumber: string
     whatsappVerifiedAt: Date | null
+    phoneNumber: string
+    phoneVerifiedAt: Date | null
     studentIdNumber: string
     verificationFileId: string | null
     verificationStatus: $Enums.VerificationStatus
@@ -2298,6 +2418,8 @@ export interface StudentFieldRefs {
   readonly emergencyContact: Prisma.FieldRef<"Student", 'String'>
   readonly whatsappNumber: Prisma.FieldRef<"Student", 'String'>
   readonly whatsappVerifiedAt: Prisma.FieldRef<"Student", 'DateTime'>
+  readonly phoneNumber: Prisma.FieldRef<"Student", 'String'>
+  readonly phoneVerifiedAt: Prisma.FieldRef<"Student", 'DateTime'>
   readonly studentIdNumber: Prisma.FieldRef<"Student", 'String'>
   readonly verificationFileId: Prisma.FieldRef<"Student", 'String'>
   readonly verificationStatus: Prisma.FieldRef<"Student", 'VerificationStatus'>

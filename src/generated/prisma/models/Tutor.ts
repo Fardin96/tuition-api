@@ -27,11 +27,13 @@ export type AggregateTutor = {
 }
 
 export type TutorAvgAggregateOutputType = {
+  zoneLimit: number | null
   ratingAvg: runtime.Decimal | null
   ratingCount: number | null
 }
 
 export type TutorSumAggregateOutputType = {
+  zoneLimit: number | null
   ratingAvg: runtime.Decimal | null
   ratingCount: number | null
 }
@@ -45,9 +47,12 @@ export type TutorMinAggregateOutputType = {
   emergencyContact: string | null
   whatsappNumber: string | null
   whatsappVerifiedAt: Date | null
+  phoneNumber: string | null
+  phoneVerifiedAt: Date | null
   studentIdNumber: string | null
   gender: $Enums.Gender | null
   parentsInfo: string | null
+  zoneLimit: number | null
   verificationStatus: $Enums.VerificationStatus | null
   isListed: boolean | null
   ratingAvg: runtime.Decimal | null
@@ -65,9 +70,12 @@ export type TutorMaxAggregateOutputType = {
   emergencyContact: string | null
   whatsappNumber: string | null
   whatsappVerifiedAt: Date | null
+  phoneNumber: string | null
+  phoneVerifiedAt: Date | null
   studentIdNumber: string | null
   gender: $Enums.Gender | null
   parentsInfo: string | null
+  zoneLimit: number | null
   verificationStatus: $Enums.VerificationStatus | null
   isListed: boolean | null
   ratingAvg: runtime.Decimal | null
@@ -85,9 +93,12 @@ export type TutorCountAggregateOutputType = {
   emergencyContact: number
   whatsappNumber: number
   whatsappVerifiedAt: number
+  phoneNumber: number
+  phoneVerifiedAt: number
   studentIdNumber: number
   gender: number
   parentsInfo: number
+  zoneLimit: number
   verificationStatus: number
   isListed: number
   ratingAvg: number
@@ -99,11 +110,13 @@ export type TutorCountAggregateOutputType = {
 
 
 export type TutorAvgAggregateInputType = {
+  zoneLimit?: true
   ratingAvg?: true
   ratingCount?: true
 }
 
 export type TutorSumAggregateInputType = {
+  zoneLimit?: true
   ratingAvg?: true
   ratingCount?: true
 }
@@ -117,9 +130,12 @@ export type TutorMinAggregateInputType = {
   emergencyContact?: true
   whatsappNumber?: true
   whatsappVerifiedAt?: true
+  phoneNumber?: true
+  phoneVerifiedAt?: true
   studentIdNumber?: true
   gender?: true
   parentsInfo?: true
+  zoneLimit?: true
   verificationStatus?: true
   isListed?: true
   ratingAvg?: true
@@ -137,9 +153,12 @@ export type TutorMaxAggregateInputType = {
   emergencyContact?: true
   whatsappNumber?: true
   whatsappVerifiedAt?: true
+  phoneNumber?: true
+  phoneVerifiedAt?: true
   studentIdNumber?: true
   gender?: true
   parentsInfo?: true
+  zoneLimit?: true
   verificationStatus?: true
   isListed?: true
   ratingAvg?: true
@@ -157,9 +176,12 @@ export type TutorCountAggregateInputType = {
   emergencyContact?: true
   whatsappNumber?: true
   whatsappVerifiedAt?: true
+  phoneNumber?: true
+  phoneVerifiedAt?: true
   studentIdNumber?: true
   gender?: true
   parentsInfo?: true
+  zoneLimit?: true
   verificationStatus?: true
   isListed?: true
   ratingAvg?: true
@@ -261,12 +283,15 @@ export type TutorGroupByOutputType = {
   role: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact: string | null
   whatsappNumber: string
   whatsappVerifiedAt: Date | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt: Date | null
+  studentIdNumber: string | null
   gender: $Enums.Gender
   parentsInfo: string | null
+  zoneLimit: number
   verificationStatus: $Enums.VerificationStatus
   isListed: boolean
   ratingAvg: runtime.Decimal
@@ -304,12 +329,15 @@ export type TutorWhereInput = {
   role?: Prisma.EnumRoleFilter<"Tutor"> | $Enums.Role
   name?: Prisma.StringFilter<"Tutor"> | string
   address?: Prisma.StringFilter<"Tutor"> | string
-  emergencyContact?: Prisma.StringFilter<"Tutor"> | string
+  emergencyContact?: Prisma.StringNullableFilter<"Tutor"> | string | null
   whatsappNumber?: Prisma.StringFilter<"Tutor"> | string
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Tutor"> | Date | string | null
-  studentIdNumber?: Prisma.StringFilter<"Tutor"> | string
+  phoneNumber?: Prisma.StringFilter<"Tutor"> | string
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Tutor"> | Date | string | null
+  studentIdNumber?: Prisma.StringNullableFilter<"Tutor"> | string | null
   gender?: Prisma.EnumGenderFilter<"Tutor"> | $Enums.Gender
   parentsInfo?: Prisma.StringNullableFilter<"Tutor"> | string | null
+  zoneLimit?: Prisma.IntFilter<"Tutor"> | number
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Tutor"> | $Enums.VerificationStatus
   isListed?: Prisma.BoolFilter<"Tutor"> | boolean
   ratingAvg?: Prisma.DecimalFilter<"Tutor"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -327,6 +355,9 @@ export type TutorWhereInput = {
   fees?: Prisma.PlatformFeeListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
   location?: Prisma.XOR<Prisma.TutorLocationNullableScalarRelationFilter, Prisma.TutorLocationWhereInput> | null
+  requirements?: Prisma.TutorRequirementListRelationFilter
+  zones?: Prisma.TutorZoneListRelationFilter
+  zoneLimitRequests?: Prisma.ZoneLimitRequestListRelationFilter
 }
 
 export type TutorOrderByWithRelationInput = {
@@ -335,12 +366,15 @@ export type TutorOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   name?: Prisma.SortOrder
   address?: Prisma.SortOrder
-  emergencyContact?: Prisma.SortOrder
+  emergencyContact?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  studentIdNumber?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  studentIdNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrderInput | Prisma.SortOrder
+  zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
@@ -358,12 +392,16 @@ export type TutorOrderByWithRelationInput = {
   fees?: Prisma.PlatformFeeOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
   location?: Prisma.TutorLocationOrderByWithRelationInput
+  requirements?: Prisma.TutorRequirementOrderByRelationAggregateInput
+  zones?: Prisma.TutorZoneOrderByRelationAggregateInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestOrderByRelationAggregateInput
 }
 
 export type TutorWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   accountId?: string
   whatsappNumber?: string
+  phoneNumber?: string
   accountId_role?: Prisma.TutorAccountIdRoleCompoundUniqueInput
   AND?: Prisma.TutorWhereInput | Prisma.TutorWhereInput[]
   OR?: Prisma.TutorWhereInput[]
@@ -371,11 +409,13 @@ export type TutorWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumRoleFilter<"Tutor"> | $Enums.Role
   name?: Prisma.StringFilter<"Tutor"> | string
   address?: Prisma.StringFilter<"Tutor"> | string
-  emergencyContact?: Prisma.StringFilter<"Tutor"> | string
+  emergencyContact?: Prisma.StringNullableFilter<"Tutor"> | string | null
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Tutor"> | Date | string | null
-  studentIdNumber?: Prisma.StringFilter<"Tutor"> | string
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Tutor"> | Date | string | null
+  studentIdNumber?: Prisma.StringNullableFilter<"Tutor"> | string | null
   gender?: Prisma.EnumGenderFilter<"Tutor"> | $Enums.Gender
   parentsInfo?: Prisma.StringNullableFilter<"Tutor"> | string | null
+  zoneLimit?: Prisma.IntFilter<"Tutor"> | number
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Tutor"> | $Enums.VerificationStatus
   isListed?: Prisma.BoolFilter<"Tutor"> | boolean
   ratingAvg?: Prisma.DecimalFilter<"Tutor"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -393,7 +433,10 @@ export type TutorWhereUniqueInput = Prisma.AtLeast<{
   fees?: Prisma.PlatformFeeListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
   location?: Prisma.XOR<Prisma.TutorLocationNullableScalarRelationFilter, Prisma.TutorLocationWhereInput> | null
-}, "id" | "accountId" | "whatsappNumber" | "accountId_role">
+  requirements?: Prisma.TutorRequirementListRelationFilter
+  zones?: Prisma.TutorZoneListRelationFilter
+  zoneLimitRequests?: Prisma.ZoneLimitRequestListRelationFilter
+}, "id" | "accountId" | "whatsappNumber" | "phoneNumber" | "accountId_role">
 
 export type TutorOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -401,12 +444,15 @@ export type TutorOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   name?: Prisma.SortOrder
   address?: Prisma.SortOrder
-  emergencyContact?: Prisma.SortOrder
+  emergencyContact?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  studentIdNumber?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  studentIdNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrderInput | Prisma.SortOrder
+  zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
@@ -429,12 +475,15 @@ export type TutorScalarWhereWithAggregatesInput = {
   role?: Prisma.EnumRoleWithAggregatesFilter<"Tutor"> | $Enums.Role
   name?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
   address?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
-  emergencyContact?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
+  emergencyContact?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
   whatsappNumber?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
   whatsappVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tutor"> | Date | string | null
-  studentIdNumber?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
+  phoneNumber?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
+  phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tutor"> | Date | string | null
+  studentIdNumber?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
   gender?: Prisma.EnumGenderWithAggregatesFilter<"Tutor"> | $Enums.Gender
   parentsInfo?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
+  zoneLimit?: Prisma.IntWithAggregatesFilter<"Tutor"> | number
   verificationStatus?: Prisma.EnumVerificationStatusWithAggregatesFilter<"Tutor"> | $Enums.VerificationStatus
   isListed?: Prisma.BoolWithAggregatesFilter<"Tutor"> | boolean
   ratingAvg?: Prisma.DecimalWithAggregatesFilter<"Tutor"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -447,12 +496,15 @@ export type TutorCreateInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -470,6 +522,9 @@ export type TutorCreateInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateInput = {
@@ -478,12 +533,15 @@ export type TutorUncheckedCreateInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -500,18 +558,24 @@ export type TutorUncheckedCreateInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -529,6 +593,9 @@ export type TutorUpdateInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateInput = {
@@ -537,12 +604,15 @@ export type TutorUncheckedUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -559,6 +629,9 @@ export type TutorUncheckedUpdateInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateManyInput = {
@@ -567,12 +640,15 @@ export type TutorCreateManyInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -585,12 +661,15 @@ export type TutorUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -605,12 +684,15 @@ export type TutorUncheckedUpdateManyInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -638,9 +720,12 @@ export type TutorCountOrderByAggregateInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrder
+  zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
@@ -650,6 +735,7 @@ export type TutorCountOrderByAggregateInput = {
 }
 
 export type TutorAvgOrderByAggregateInput = {
+  zoneLimit?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
 }
@@ -663,9 +749,12 @@ export type TutorMaxOrderByAggregateInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrder
+  zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
@@ -683,9 +772,12 @@ export type TutorMinOrderByAggregateInput = {
   emergencyContact?: Prisma.SortOrder
   whatsappNumber?: Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerifiedAt?: Prisma.SortOrder
   studentIdNumber?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrder
+  zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
@@ -695,6 +787,7 @@ export type TutorMinOrderByAggregateInput = {
 }
 
 export type TutorSumOrderByAggregateInput = {
+  zoneLimit?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
 }
@@ -824,6 +917,48 @@ export type TutorUpdateOneRequiredWithoutVideosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TutorUpdateToOneWithWhereWithoutVideosInput, Prisma.TutorUpdateWithoutVideosInput>, Prisma.TutorUncheckedUpdateWithoutVideosInput>
 }
 
+export type TutorCreateNestedOneWithoutRequirementsInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutRequirementsInput, Prisma.TutorUncheckedCreateWithoutRequirementsInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutRequirementsInput
+  connect?: Prisma.TutorWhereUniqueInput
+}
+
+export type TutorUpdateOneRequiredWithoutRequirementsNestedInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutRequirementsInput, Prisma.TutorUncheckedCreateWithoutRequirementsInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutRequirementsInput
+  upsert?: Prisma.TutorUpsertWithoutRequirementsInput
+  connect?: Prisma.TutorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TutorUpdateToOneWithWhereWithoutRequirementsInput, Prisma.TutorUpdateWithoutRequirementsInput>, Prisma.TutorUncheckedUpdateWithoutRequirementsInput>
+}
+
+export type TutorCreateNestedOneWithoutZonesInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutZonesInput, Prisma.TutorUncheckedCreateWithoutZonesInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutZonesInput
+  connect?: Prisma.TutorWhereUniqueInput
+}
+
+export type TutorUpdateOneRequiredWithoutZonesNestedInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutZonesInput, Prisma.TutorUncheckedCreateWithoutZonesInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutZonesInput
+  upsert?: Prisma.TutorUpsertWithoutZonesInput
+  connect?: Prisma.TutorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TutorUpdateToOneWithWhereWithoutZonesInput, Prisma.TutorUpdateWithoutZonesInput>, Prisma.TutorUncheckedUpdateWithoutZonesInput>
+}
+
+export type TutorCreateNestedOneWithoutZoneLimitRequestsInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutZoneLimitRequestsInput, Prisma.TutorUncheckedCreateWithoutZoneLimitRequestsInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutZoneLimitRequestsInput
+  connect?: Prisma.TutorWhereUniqueInput
+}
+
+export type TutorUpdateOneRequiredWithoutZoneLimitRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutZoneLimitRequestsInput, Prisma.TutorUncheckedCreateWithoutZoneLimitRequestsInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutZoneLimitRequestsInput
+  upsert?: Prisma.TutorUpsertWithoutZoneLimitRequestsInput
+  connect?: Prisma.TutorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TutorUpdateToOneWithWhereWithoutZoneLimitRequestsInput, Prisma.TutorUpdateWithoutZoneLimitRequestsInput>, Prisma.TutorUncheckedUpdateWithoutZoneLimitRequestsInput>
+}
+
 export type TutorCreateNestedOneWithoutPackagesInput = {
   create?: Prisma.XOR<Prisma.TutorCreateWithoutPackagesInput, Prisma.TutorUncheckedCreateWithoutPackagesInput>
   connectOrCreate?: Prisma.TutorCreateOrConnectWithoutPackagesInput
@@ -884,12 +1019,15 @@ export type TutorCreateWithoutAccountInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -906,18 +1044,24 @@ export type TutorCreateWithoutAccountInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutAccountInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -934,6 +1078,9 @@ export type TutorUncheckedCreateWithoutAccountInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutAccountInput = {
@@ -956,12 +1103,15 @@ export type TutorUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -978,18 +1128,24 @@ export type TutorUpdateWithoutAccountInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1006,18 +1162,24 @@ export type TutorUncheckedUpdateWithoutAccountInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutLocationInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1034,6 +1196,9 @@ export type TutorCreateWithoutLocationInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutLocationInput = {
@@ -1042,12 +1207,15 @@ export type TutorUncheckedCreateWithoutLocationInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1063,6 +1231,9 @@ export type TutorUncheckedCreateWithoutLocationInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutLocationInput = {
@@ -1085,12 +1256,15 @@ export type TutorUpdateWithoutLocationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1107,6 +1281,9 @@ export type TutorUpdateWithoutLocationInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutLocationInput = {
@@ -1115,12 +1292,15 @@ export type TutorUncheckedUpdateWithoutLocationInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1136,18 +1316,24 @@ export type TutorUncheckedUpdateWithoutLocationInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutAreasInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1164,6 +1350,9 @@ export type TutorCreateWithoutAreasInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutAreasInput = {
@@ -1172,12 +1361,15 @@ export type TutorUncheckedCreateWithoutAreasInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1193,6 +1385,9 @@ export type TutorUncheckedCreateWithoutAreasInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutAreasInput = {
@@ -1215,12 +1410,15 @@ export type TutorUpdateWithoutAreasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1237,6 +1435,9 @@ export type TutorUpdateWithoutAreasInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutAreasInput = {
@@ -1245,12 +1446,15 @@ export type TutorUncheckedUpdateWithoutAreasInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1266,18 +1470,24 @@ export type TutorUncheckedUpdateWithoutAreasInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutSubjectsInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1294,6 +1504,9 @@ export type TutorCreateWithoutSubjectsInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutSubjectsInput = {
@@ -1302,12 +1515,15 @@ export type TutorUncheckedCreateWithoutSubjectsInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1323,6 +1539,9 @@ export type TutorUncheckedCreateWithoutSubjectsInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutSubjectsInput = {
@@ -1345,12 +1564,15 @@ export type TutorUpdateWithoutSubjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1367,6 +1589,9 @@ export type TutorUpdateWithoutSubjectsInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutSubjectsInput = {
@@ -1375,12 +1600,15 @@ export type TutorUncheckedUpdateWithoutSubjectsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1396,18 +1624,24 @@ export type TutorUncheckedUpdateWithoutSubjectsInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutVerificationsInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1424,6 +1658,9 @@ export type TutorCreateWithoutVerificationsInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutVerificationsInput = {
@@ -1432,12 +1669,15 @@ export type TutorUncheckedCreateWithoutVerificationsInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1453,6 +1693,9 @@ export type TutorUncheckedCreateWithoutVerificationsInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutVerificationsInput = {
@@ -1475,12 +1718,15 @@ export type TutorUpdateWithoutVerificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1497,6 +1743,9 @@ export type TutorUpdateWithoutVerificationsInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutVerificationsInput = {
@@ -1505,12 +1754,15 @@ export type TutorUncheckedUpdateWithoutVerificationsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1526,18 +1778,24 @@ export type TutorUncheckedUpdateWithoutVerificationsInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutCredentialsInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1554,6 +1812,9 @@ export type TutorCreateWithoutCredentialsInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutCredentialsInput = {
@@ -1562,12 +1823,15 @@ export type TutorUncheckedCreateWithoutCredentialsInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1583,6 +1847,9 @@ export type TutorUncheckedCreateWithoutCredentialsInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutCredentialsInput = {
@@ -1605,12 +1872,15 @@ export type TutorUpdateWithoutCredentialsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1627,6 +1897,9 @@ export type TutorUpdateWithoutCredentialsInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutCredentialsInput = {
@@ -1635,12 +1908,15 @@ export type TutorUncheckedUpdateWithoutCredentialsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1656,18 +1932,24 @@ export type TutorUncheckedUpdateWithoutCredentialsInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutVideosInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1684,6 +1966,9 @@ export type TutorCreateWithoutVideosInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutVideosInput = {
@@ -1692,12 +1977,15 @@ export type TutorUncheckedCreateWithoutVideosInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1713,6 +2001,9 @@ export type TutorUncheckedCreateWithoutVideosInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutVideosInput = {
@@ -1735,12 +2026,15 @@ export type TutorUpdateWithoutVideosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1757,6 +2051,9 @@ export type TutorUpdateWithoutVideosInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutVideosInput = {
@@ -1765,12 +2062,15 @@ export type TutorUncheckedUpdateWithoutVideosInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1786,18 +2086,486 @@ export type TutorUncheckedUpdateWithoutVideosInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorCreateWithoutRequirementsInput = {
+  id?: string
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutTutorInput
+  areas?: Prisma.TutorAreaCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
+}
+
+export type TutorUncheckedCreateWithoutRequirementsInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  areas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
+}
+
+export type TutorCreateOrConnectWithoutRequirementsInput = {
+  where: Prisma.TutorWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutorCreateWithoutRequirementsInput, Prisma.TutorUncheckedCreateWithoutRequirementsInput>
+}
+
+export type TutorUpsertWithoutRequirementsInput = {
+  update: Prisma.XOR<Prisma.TutorUpdateWithoutRequirementsInput, Prisma.TutorUncheckedUpdateWithoutRequirementsInput>
+  create: Prisma.XOR<Prisma.TutorCreateWithoutRequirementsInput, Prisma.TutorUncheckedCreateWithoutRequirementsInput>
+  where?: Prisma.TutorWhereInput
+}
+
+export type TutorUpdateToOneWithWhereWithoutRequirementsInput = {
+  where?: Prisma.TutorWhereInput
+  data: Prisma.XOR<Prisma.TutorUpdateWithoutRequirementsInput, Prisma.TutorUncheckedUpdateWithoutRequirementsInput>
+}
+
+export type TutorUpdateWithoutRequirementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutTutorNestedInput
+  areas?: Prisma.TutorAreaUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorUncheckedUpdateWithoutRequirementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  areas?: Prisma.TutorAreaUncheckedUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorCreateWithoutZonesInput = {
+  id?: string
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutTutorInput
+  areas?: Prisma.TutorAreaCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
+}
+
+export type TutorUncheckedCreateWithoutZonesInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  areas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
+}
+
+export type TutorCreateOrConnectWithoutZonesInput = {
+  where: Prisma.TutorWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutorCreateWithoutZonesInput, Prisma.TutorUncheckedCreateWithoutZonesInput>
+}
+
+export type TutorUpsertWithoutZonesInput = {
+  update: Prisma.XOR<Prisma.TutorUpdateWithoutZonesInput, Prisma.TutorUncheckedUpdateWithoutZonesInput>
+  create: Prisma.XOR<Prisma.TutorCreateWithoutZonesInput, Prisma.TutorUncheckedCreateWithoutZonesInput>
+  where?: Prisma.TutorWhereInput
+}
+
+export type TutorUpdateToOneWithWhereWithoutZonesInput = {
+  where?: Prisma.TutorWhereInput
+  data: Prisma.XOR<Prisma.TutorUpdateWithoutZonesInput, Prisma.TutorUncheckedUpdateWithoutZonesInput>
+}
+
+export type TutorUpdateWithoutZonesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutTutorNestedInput
+  areas?: Prisma.TutorAreaUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorUncheckedUpdateWithoutZonesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  areas?: Prisma.TutorAreaUncheckedUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorCreateWithoutZoneLimitRequestsInput = {
+  id?: string
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutTutorInput
+  areas?: Prisma.TutorAreaCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+}
+
+export type TutorUncheckedCreateWithoutZoneLimitRequestsInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber: string
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  areas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+}
+
+export type TutorCreateOrConnectWithoutZoneLimitRequestsInput = {
+  where: Prisma.TutorWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutorCreateWithoutZoneLimitRequestsInput, Prisma.TutorUncheckedCreateWithoutZoneLimitRequestsInput>
+}
+
+export type TutorUpsertWithoutZoneLimitRequestsInput = {
+  update: Prisma.XOR<Prisma.TutorUpdateWithoutZoneLimitRequestsInput, Prisma.TutorUncheckedUpdateWithoutZoneLimitRequestsInput>
+  create: Prisma.XOR<Prisma.TutorCreateWithoutZoneLimitRequestsInput, Prisma.TutorUncheckedCreateWithoutZoneLimitRequestsInput>
+  where?: Prisma.TutorWhereInput
+}
+
+export type TutorUpdateToOneWithWhereWithoutZoneLimitRequestsInput = {
+  where?: Prisma.TutorWhereInput
+  data: Prisma.XOR<Prisma.TutorUpdateWithoutZoneLimitRequestsInput, Prisma.TutorUncheckedUpdateWithoutZoneLimitRequestsInput>
+}
+
+export type TutorUpdateWithoutZoneLimitRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutTutorNestedInput
+  areas?: Prisma.TutorAreaUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorUncheckedUpdateWithoutZoneLimitRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  areas?: Prisma.TutorAreaUncheckedUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutPackagesInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1814,6 +2582,9 @@ export type TutorCreateWithoutPackagesInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutPackagesInput = {
@@ -1822,12 +2593,15 @@ export type TutorUncheckedCreateWithoutPackagesInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1843,6 +2617,9 @@ export type TutorUncheckedCreateWithoutPackagesInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutPackagesInput = {
@@ -1865,12 +2642,15 @@ export type TutorUpdateWithoutPackagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1887,6 +2667,9 @@ export type TutorUpdateWithoutPackagesInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutPackagesInput = {
@@ -1895,12 +2678,15 @@ export type TutorUncheckedUpdateWithoutPackagesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1916,18 +2702,24 @@ export type TutorUncheckedUpdateWithoutPackagesInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutApplicationsInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1944,6 +2736,9 @@ export type TutorCreateWithoutApplicationsInput = {
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutApplicationsInput = {
@@ -1952,12 +2747,15 @@ export type TutorUncheckedCreateWithoutApplicationsInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1973,6 +2771,9 @@ export type TutorUncheckedCreateWithoutApplicationsInput = {
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutApplicationsInput = {
@@ -1995,12 +2796,15 @@ export type TutorUpdateWithoutApplicationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2017,6 +2821,9 @@ export type TutorUpdateWithoutApplicationsInput = {
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutApplicationsInput = {
@@ -2025,12 +2832,15 @@ export type TutorUncheckedUpdateWithoutApplicationsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2046,18 +2856,24 @@ export type TutorUncheckedUpdateWithoutApplicationsInput = {
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutReviewsInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2074,6 +2890,9 @@ export type TutorCreateWithoutReviewsInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutReviewsInput = {
@@ -2082,12 +2901,15 @@ export type TutorUncheckedCreateWithoutReviewsInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2103,6 +2925,9 @@ export type TutorUncheckedCreateWithoutReviewsInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutReviewsInput = {
@@ -2125,12 +2950,15 @@ export type TutorUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2147,6 +2975,9 @@ export type TutorUpdateWithoutReviewsInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutReviewsInput = {
@@ -2155,12 +2986,15 @@ export type TutorUncheckedUpdateWithoutReviewsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2176,18 +3010,24 @@ export type TutorUncheckedUpdateWithoutReviewsInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutFeesInput = {
   id?: string
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2204,6 +3044,9 @@ export type TutorCreateWithoutFeesInput = {
   applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutFeesInput = {
@@ -2212,12 +3055,15 @@ export type TutorUncheckedCreateWithoutFeesInput = {
   role?: $Enums.Role
   name: string
   address: string
-  emergencyContact: string
+  emergencyContact?: string | null
   whatsappNumber: string
   whatsappVerifiedAt?: Date | string | null
-  studentIdNumber: string
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2233,6 +3079,9 @@ export type TutorUncheckedCreateWithoutFeesInput = {
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
   location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutFeesInput = {
@@ -2255,12 +3104,15 @@ export type TutorUpdateWithoutFeesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2277,6 +3129,9 @@ export type TutorUpdateWithoutFeesInput = {
   applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutFeesInput = {
@@ -2285,12 +3140,15 @@ export type TutorUncheckedUpdateWithoutFeesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
-  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2306,6 +3164,9 @@ export type TutorUncheckedUpdateWithoutFeesInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 
@@ -2323,6 +3184,9 @@ export type TutorCountOutputType = {
   applications: number
   fees: number
   reviews: number
+  requirements: number
+  zones: number
+  zoneLimitRequests: number
 }
 
 export type TutorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2335,6 +3199,9 @@ export type TutorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   applications?: boolean | TutorCountOutputTypeCountApplicationsArgs
   fees?: boolean | TutorCountOutputTypeCountFeesArgs
   reviews?: boolean | TutorCountOutputTypeCountReviewsArgs
+  requirements?: boolean | TutorCountOutputTypeCountRequirementsArgs
+  zones?: boolean | TutorCountOutputTypeCountZonesArgs
+  zoneLimitRequests?: boolean | TutorCountOutputTypeCountZoneLimitRequestsArgs
 }
 
 /**
@@ -2410,6 +3277,27 @@ export type TutorCountOutputTypeCountReviewsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.ReviewWhereInput
 }
 
+/**
+ * TutorCountOutputType without action
+ */
+export type TutorCountOutputTypeCountRequirementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TutorRequirementWhereInput
+}
+
+/**
+ * TutorCountOutputType without action
+ */
+export type TutorCountOutputTypeCountZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TutorZoneWhereInput
+}
+
+/**
+ * TutorCountOutputType without action
+ */
+export type TutorCountOutputTypeCountZoneLimitRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ZoneLimitRequestWhereInput
+}
+
 
 export type TutorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2420,9 +3308,12 @@ export type TutorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
   ratingAvg?: boolean
@@ -2440,6 +3331,9 @@ export type TutorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   fees?: boolean | Prisma.Tutor$feesArgs<ExtArgs>
   reviews?: boolean | Prisma.Tutor$reviewsArgs<ExtArgs>
   location?: boolean | Prisma.Tutor$locationArgs<ExtArgs>
+  requirements?: boolean | Prisma.Tutor$requirementsArgs<ExtArgs>
+  zones?: boolean | Prisma.Tutor$zonesArgs<ExtArgs>
+  zoneLimitRequests?: boolean | Prisma.Tutor$zoneLimitRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.TutorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tutor"]>
 
@@ -2452,9 +3346,12 @@ export type TutorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
   ratingAvg?: boolean
@@ -2473,9 +3370,12 @@ export type TutorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
   ratingAvg?: boolean
@@ -2494,9 +3394,12 @@ export type TutorSelectScalar = {
   emergencyContact?: boolean
   whatsappNumber?: boolean
   whatsappVerifiedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerifiedAt?: boolean
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
   ratingAvg?: boolean
@@ -2505,7 +3408,7 @@ export type TutorSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TutorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "studentIdNumber" | "gender" | "parentsInfo" | "verificationStatus" | "isListed" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["tutor"]>
+export type TutorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "gender" | "parentsInfo" | "zoneLimit" | "verificationStatus" | "isListed" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["tutor"]>
 export type TutorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   areas?: boolean | Prisma.Tutor$areasArgs<ExtArgs>
@@ -2518,6 +3421,9 @@ export type TutorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   fees?: boolean | Prisma.Tutor$feesArgs<ExtArgs>
   reviews?: boolean | Prisma.Tutor$reviewsArgs<ExtArgs>
   location?: boolean | Prisma.Tutor$locationArgs<ExtArgs>
+  requirements?: boolean | Prisma.Tutor$requirementsArgs<ExtArgs>
+  zones?: boolean | Prisma.Tutor$zonesArgs<ExtArgs>
+  zoneLimitRequests?: boolean | Prisma.Tutor$zoneLimitRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.TutorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TutorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2541,6 +3447,9 @@ export type $TutorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     fees: Prisma.$PlatformFeePayload<ExtArgs>[]
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
     location: Prisma.$TutorLocationPayload<ExtArgs> | null
+    requirements: Prisma.$TutorRequirementPayload<ExtArgs>[]
+    zones: Prisma.$TutorZonePayload<ExtArgs>[]
+    zoneLimitRequests: Prisma.$ZoneLimitRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2548,12 +3457,15 @@ export type $TutorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     role: $Enums.Role
     name: string
     address: string
-    emergencyContact: string
+    emergencyContact: string | null
     whatsappNumber: string
     whatsappVerifiedAt: Date | null
-    studentIdNumber: string
+    phoneNumber: string
+    phoneVerifiedAt: Date | null
+    studentIdNumber: string | null
     gender: $Enums.Gender
     parentsInfo: string | null
+    zoneLimit: number
     verificationStatus: $Enums.VerificationStatus
     isListed: boolean
     ratingAvg: runtime.Decimal
@@ -2965,6 +3877,9 @@ export interface Prisma__TutorClient<T, Null = never, ExtArgs extends runtime.Ty
   fees<T extends Prisma.Tutor$feesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$feesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformFeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.Tutor$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   location<T extends Prisma.Tutor$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$locationArgs<ExtArgs>>): Prisma.Prisma__TutorLocationClient<runtime.Types.Result.GetResult<Prisma.$TutorLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  requirements<T extends Prisma.Tutor$requirementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$requirementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorRequirementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  zones<T extends Prisma.Tutor$zonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$zonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  zoneLimitRequests<T extends Prisma.Tutor$zoneLimitRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$zoneLimitRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ZoneLimitRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3002,9 +3917,12 @@ export interface TutorFieldRefs {
   readonly emergencyContact: Prisma.FieldRef<"Tutor", 'String'>
   readonly whatsappNumber: Prisma.FieldRef<"Tutor", 'String'>
   readonly whatsappVerifiedAt: Prisma.FieldRef<"Tutor", 'DateTime'>
+  readonly phoneNumber: Prisma.FieldRef<"Tutor", 'String'>
+  readonly phoneVerifiedAt: Prisma.FieldRef<"Tutor", 'DateTime'>
   readonly studentIdNumber: Prisma.FieldRef<"Tutor", 'String'>
   readonly gender: Prisma.FieldRef<"Tutor", 'Gender'>
   readonly parentsInfo: Prisma.FieldRef<"Tutor", 'String'>
+  readonly zoneLimit: Prisma.FieldRef<"Tutor", 'Int'>
   readonly verificationStatus: Prisma.FieldRef<"Tutor", 'VerificationStatus'>
   readonly isListed: Prisma.FieldRef<"Tutor", 'Boolean'>
   readonly ratingAvg: Prisma.FieldRef<"Tutor", 'Decimal'>
@@ -3644,6 +4562,78 @@ export type Tutor$locationArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   include?: Prisma.TutorLocationInclude<ExtArgs> | null
   where?: Prisma.TutorLocationWhereInput
+}
+
+/**
+ * Tutor.requirements
+ */
+export type Tutor$requirementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TutorRequirement
+   */
+  select?: Prisma.TutorRequirementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TutorRequirement
+   */
+  omit?: Prisma.TutorRequirementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TutorRequirementInclude<ExtArgs> | null
+  where?: Prisma.TutorRequirementWhereInput
+  orderBy?: Prisma.TutorRequirementOrderByWithRelationInput | Prisma.TutorRequirementOrderByWithRelationInput[]
+  cursor?: Prisma.TutorRequirementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TutorRequirementScalarFieldEnum | Prisma.TutorRequirementScalarFieldEnum[]
+}
+
+/**
+ * Tutor.zones
+ */
+export type Tutor$zonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TutorZone
+   */
+  select?: Prisma.TutorZoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TutorZone
+   */
+  omit?: Prisma.TutorZoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TutorZoneInclude<ExtArgs> | null
+  where?: Prisma.TutorZoneWhereInput
+  orderBy?: Prisma.TutorZoneOrderByWithRelationInput | Prisma.TutorZoneOrderByWithRelationInput[]
+  cursor?: Prisma.TutorZoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TutorZoneScalarFieldEnum | Prisma.TutorZoneScalarFieldEnum[]
+}
+
+/**
+ * Tutor.zoneLimitRequests
+ */
+export type Tutor$zoneLimitRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ZoneLimitRequest
+   */
+  select?: Prisma.ZoneLimitRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ZoneLimitRequest
+   */
+  omit?: Prisma.ZoneLimitRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ZoneLimitRequestInclude<ExtArgs> | null
+  where?: Prisma.ZoneLimitRequestWhereInput
+  orderBy?: Prisma.ZoneLimitRequestOrderByWithRelationInput | Prisma.ZoneLimitRequestOrderByWithRelationInput[]
+  cursor?: Prisma.ZoneLimitRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ZoneLimitRequestScalarFieldEnum | Prisma.ZoneLimitRequestScalarFieldEnum[]
 }
 
 /**

@@ -31,6 +31,7 @@ export type TuitionRequirementAvgAggregateOutputType = {
   areaId: number | null
   classLevel: number | null
   daysPerWeek: number | null
+  availableDays: number | null
   salary: number | null
   studentCount: number | null
 }
@@ -40,6 +41,7 @@ export type TuitionRequirementSumAggregateOutputType = {
   areaId: number | null
   classLevel: number | null
   daysPerWeek: number | null
+  availableDays: number | null
   salary: number | null
   studentCount: number | null
 }
@@ -52,6 +54,7 @@ export type TuitionRequirementMinAggregateOutputType = {
   classLevel: number | null
   timeOfDay: Date | null
   daysPerWeek: number | null
+  availableDays: number | null
   salary: number | null
   studentCount: number | null
   hireByDate: Date | null
@@ -71,6 +74,7 @@ export type TuitionRequirementMaxAggregateOutputType = {
   classLevel: number | null
   timeOfDay: Date | null
   daysPerWeek: number | null
+  availableDays: number | null
   salary: number | null
   studentCount: number | null
   hireByDate: Date | null
@@ -90,6 +94,7 @@ export type TuitionRequirementCountAggregateOutputType = {
   classLevel: number
   timeOfDay: number
   daysPerWeek: number
+  availableDays: number
   salary: number
   studentCount: number
   hireByDate: number
@@ -108,6 +113,7 @@ export type TuitionRequirementAvgAggregateInputType = {
   areaId?: true
   classLevel?: true
   daysPerWeek?: true
+  availableDays?: true
   salary?: true
   studentCount?: true
 }
@@ -117,6 +123,7 @@ export type TuitionRequirementSumAggregateInputType = {
   areaId?: true
   classLevel?: true
   daysPerWeek?: true
+  availableDays?: true
   salary?: true
   studentCount?: true
 }
@@ -129,6 +136,7 @@ export type TuitionRequirementMinAggregateInputType = {
   classLevel?: true
   timeOfDay?: true
   daysPerWeek?: true
+  availableDays?: true
   salary?: true
   studentCount?: true
   hireByDate?: true
@@ -148,6 +156,7 @@ export type TuitionRequirementMaxAggregateInputType = {
   classLevel?: true
   timeOfDay?: true
   daysPerWeek?: true
+  availableDays?: true
   salary?: true
   studentCount?: true
   hireByDate?: true
@@ -167,6 +176,7 @@ export type TuitionRequirementCountAggregateInputType = {
   classLevel?: true
   timeOfDay?: true
   daysPerWeek?: true
+  availableDays?: true
   salary?: true
   studentCount?: true
   hireByDate?: true
@@ -273,6 +283,7 @@ export type TuitionRequirementGroupByOutputType = {
   classLevel: number | null
   timeOfDay: Date | null
   daysPerWeek: number | null
+  availableDays: number
   salary: number | null
   studentCount: number | null
   hireByDate: Date | null
@@ -315,6 +326,7 @@ export type TuitionRequirementWhereInput = {
   classLevel?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
+  availableDays?: Prisma.IntFilter<"TuitionRequirement"> | number
   salary?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   studentCount?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   hireByDate?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
@@ -339,6 +351,7 @@ export type TuitionRequirementOrderByWithRelationInput = {
   classLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOfDay?: Prisma.SortOrderInput | Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrderInput | Prisma.SortOrder
+  availableDays?: Prisma.SortOrder
   salary?: Prisma.SortOrderInput | Prisma.SortOrder
   studentCount?: Prisma.SortOrderInput | Prisma.SortOrder
   hireByDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -366,6 +379,7 @@ export type TuitionRequirementWhereUniqueInput = Prisma.AtLeast<{
   classLevel?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
+  availableDays?: Prisma.IntFilter<"TuitionRequirement"> | number
   salary?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   studentCount?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   hireByDate?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
@@ -390,6 +404,7 @@ export type TuitionRequirementOrderByWithAggregationInput = {
   classLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOfDay?: Prisma.SortOrderInput | Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrderInput | Prisma.SortOrder
+  availableDays?: Prisma.SortOrder
   salary?: Prisma.SortOrderInput | Prisma.SortOrder
   studentCount?: Prisma.SortOrderInput | Prisma.SortOrder
   hireByDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -417,6 +432,7 @@ export type TuitionRequirementScalarWhereWithAggregatesInput = {
   classLevel?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableWithAggregatesFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
+  availableDays?: Prisma.IntWithAggregatesFilter<"TuitionRequirement"> | number
   salary?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
   studentCount?: Prisma.IntNullableWithAggregatesFilter<"TuitionRequirement"> | number | null
   hireByDate?: Prisma.DateTimeNullableWithAggregatesFilter<"TuitionRequirement"> | Date | string | null
@@ -433,6 +449,7 @@ export type TuitionRequirementCreateInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -457,6 +474,7 @@ export type TuitionRequirementUncheckedCreateInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -475,6 +493,7 @@ export type TuitionRequirementUpdateInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -499,6 +518,7 @@ export type TuitionRequirementUncheckedUpdateInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -520,6 +540,7 @@ export type TuitionRequirementCreateManyInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -536,6 +557,7 @@ export type TuitionRequirementUpdateManyMutationInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -555,6 +577,7 @@ export type TuitionRequirementUncheckedUpdateManyInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -584,6 +607,7 @@ export type TuitionRequirementCountOrderByAggregateInput = {
   classLevel?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
+  availableDays?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
   hireByDate?: Prisma.SortOrder
@@ -600,6 +624,7 @@ export type TuitionRequirementAvgOrderByAggregateInput = {
   areaId?: Prisma.SortOrder
   classLevel?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
+  availableDays?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
 }
@@ -612,6 +637,7 @@ export type TuitionRequirementMaxOrderByAggregateInput = {
   classLevel?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
+  availableDays?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
   hireByDate?: Prisma.SortOrder
@@ -631,6 +657,7 @@ export type TuitionRequirementMinOrderByAggregateInput = {
   classLevel?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
+  availableDays?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
   hireByDate?: Prisma.SortOrder
@@ -647,6 +674,7 @@ export type TuitionRequirementSumOrderByAggregateInput = {
   areaId?: Prisma.SortOrder
   classLevel?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
+  availableDays?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
 }
@@ -787,14 +815,6 @@ export type TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput = {
   deleteMany?: Prisma.TuitionRequirementScalarWhereInput | Prisma.TuitionRequirementScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumGenderPrefFieldUpdateOperationsInput = {
   set?: $Enums.GenderPref
 }
@@ -838,6 +858,7 @@ export type TuitionRequirementCreateWithoutAreaInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -860,6 +881,7 @@ export type TuitionRequirementUncheckedCreateWithoutAreaInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -910,6 +932,7 @@ export type TuitionRequirementScalarWhereInput = {
   classLevel?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   timeOfDay?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
   daysPerWeek?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
+  availableDays?: Prisma.IntFilter<"TuitionRequirement"> | number
   salary?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   studentCount?: Prisma.IntNullableFilter<"TuitionRequirement"> | number | null
   hireByDate?: Prisma.DateTimeNullableFilter<"TuitionRequirement"> | Date | string | null
@@ -926,6 +949,7 @@ export type TuitionRequirementCreateWithoutCategoryInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -948,6 +972,7 @@ export type TuitionRequirementUncheckedCreateWithoutCategoryInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -992,6 +1017,7 @@ export type TuitionRequirementCreateWithoutStudentInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1014,6 +1040,7 @@ export type TuitionRequirementUncheckedCreateWithoutStudentInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1058,6 +1085,7 @@ export type TuitionRequirementCreateWithoutSubjectsInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1081,6 +1109,7 @@ export type TuitionRequirementUncheckedCreateWithoutSubjectsInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1114,6 +1143,7 @@ export type TuitionRequirementUpdateWithoutSubjectsInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1137,6 +1167,7 @@ export type TuitionRequirementUncheckedUpdateWithoutSubjectsInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1154,6 +1185,7 @@ export type TuitionRequirementCreateWithoutApplicationsInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1177,6 +1209,7 @@ export type TuitionRequirementUncheckedCreateWithoutApplicationsInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1210,6 +1243,7 @@ export type TuitionRequirementUpdateWithoutApplicationsInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1233,6 +1267,7 @@ export type TuitionRequirementUncheckedUpdateWithoutApplicationsInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1252,6 +1287,7 @@ export type TuitionRequirementCreateManyAreaInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1268,6 +1304,7 @@ export type TuitionRequirementUpdateWithoutAreaInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1290,6 +1327,7 @@ export type TuitionRequirementUncheckedUpdateWithoutAreaInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1310,6 +1348,7 @@ export type TuitionRequirementUncheckedUpdateManyWithoutAreaInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1328,6 +1367,7 @@ export type TuitionRequirementCreateManyCategoryInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1344,6 +1384,7 @@ export type TuitionRequirementUpdateWithoutCategoryInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1366,6 +1407,7 @@ export type TuitionRequirementUncheckedUpdateWithoutCategoryInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1386,6 +1428,7 @@ export type TuitionRequirementUncheckedUpdateManyWithoutCategoryInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1404,6 +1447,7 @@ export type TuitionRequirementCreateManyStudentInput = {
   classLevel?: number | null
   timeOfDay?: Date | string | null
   daysPerWeek?: number | null
+  availableDays?: number
   salary?: number | null
   studentCount?: number | null
   hireByDate?: Date | string | null
@@ -1420,6 +1464,7 @@ export type TuitionRequirementUpdateWithoutStudentInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1442,6 +1487,7 @@ export type TuitionRequirementUncheckedUpdateWithoutStudentInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1462,6 +1508,7 @@ export type TuitionRequirementUncheckedUpdateManyWithoutStudentInput = {
   classLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   timeOfDay?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
   salary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   studentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hireByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1521,6 +1568,7 @@ export type TuitionRequirementSelect<ExtArgs extends runtime.Types.Extensions.In
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
+  availableDays?: boolean
   salary?: boolean
   studentCount?: boolean
   hireByDate?: boolean
@@ -1546,6 +1594,7 @@ export type TuitionRequirementSelectCreateManyAndReturn<ExtArgs extends runtime.
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
+  availableDays?: boolean
   salary?: boolean
   studentCount?: boolean
   hireByDate?: boolean
@@ -1568,6 +1617,7 @@ export type TuitionRequirementSelectUpdateManyAndReturn<ExtArgs extends runtime.
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
+  availableDays?: boolean
   salary?: boolean
   studentCount?: boolean
   hireByDate?: boolean
@@ -1590,6 +1640,7 @@ export type TuitionRequirementSelectScalar = {
   classLevel?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
+  availableDays?: boolean
   salary?: boolean
   studentCount?: boolean
   hireByDate?: boolean
@@ -1601,7 +1652,7 @@ export type TuitionRequirementSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TuitionRequirementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "categoryId" | "areaId" | "classLevel" | "timeOfDay" | "daysPerWeek" | "salary" | "studentCount" | "hireByDate" | "tutorGenderPref" | "instituteName" | "tuitionType" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["tuitionRequirement"]>
+export type TuitionRequirementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "categoryId" | "areaId" | "classLevel" | "timeOfDay" | "daysPerWeek" | "availableDays" | "salary" | "studentCount" | "hireByDate" | "tutorGenderPref" | "instituteName" | "tuitionType" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["tuitionRequirement"]>
 export type TuitionRequirementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   category?: boolean | Prisma.TuitionRequirement$categoryArgs<ExtArgs>
@@ -1638,6 +1689,7 @@ export type $TuitionRequirementPayload<ExtArgs extends runtime.Types.Extensions.
     classLevel: number | null
     timeOfDay: Date | null
     daysPerWeek: number | null
+    availableDays: number
     salary: number | null
     studentCount: number | null
     hireByDate: Date | null
@@ -2082,6 +2134,7 @@ export interface TuitionRequirementFieldRefs {
   readonly classLevel: Prisma.FieldRef<"TuitionRequirement", 'Int'>
   readonly timeOfDay: Prisma.FieldRef<"TuitionRequirement", 'DateTime'>
   readonly daysPerWeek: Prisma.FieldRef<"TuitionRequirement", 'Int'>
+  readonly availableDays: Prisma.FieldRef<"TuitionRequirement", 'Int'>
   readonly salary: Prisma.FieldRef<"TuitionRequirement", 'Int'>
   readonly studentCount: Prisma.FieldRef<"TuitionRequirement", 'Int'>
   readonly hireByDate: Prisma.FieldRef<"TuitionRequirement", 'DateTime'>

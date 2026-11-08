@@ -20,8 +20,20 @@ export type ApplicationModel = runtime.Types.Result.DefaultSelection<Prisma.$App
 
 export type AggregateApplication = {
   _count: ApplicationCountAggregateOutputType | null
+  _avg: ApplicationAvgAggregateOutputType | null
+  _sum: ApplicationSumAggregateOutputType | null
   _min: ApplicationMinAggregateOutputType | null
   _max: ApplicationMaxAggregateOutputType | null
+}
+
+export type ApplicationAvgAggregateOutputType = {
+  matchScore: number | null
+  matchVersion: number | null
+}
+
+export type ApplicationSumAggregateOutputType = {
+  matchScore: number | null
+  matchVersion: number | null
 }
 
 export type ApplicationMinAggregateOutputType = {
@@ -35,6 +47,8 @@ export type ApplicationMinAggregateOutputType = {
   appliedAt: Date | null
   confirmedAt: Date | null
   endedAt: Date | null
+  matchScore: number | null
+  matchVersion: number | null
 }
 
 export type ApplicationMaxAggregateOutputType = {
@@ -48,6 +62,8 @@ export type ApplicationMaxAggregateOutputType = {
   appliedAt: Date | null
   confirmedAt: Date | null
   endedAt: Date | null
+  matchScore: number | null
+  matchVersion: number | null
 }
 
 export type ApplicationCountAggregateOutputType = {
@@ -61,9 +77,22 @@ export type ApplicationCountAggregateOutputType = {
   appliedAt: number
   confirmedAt: number
   endedAt: number
+  matchScore: number
+  matchVersion: number
+  matchParts: number
   _all: number
 }
 
+
+export type ApplicationAvgAggregateInputType = {
+  matchScore?: true
+  matchVersion?: true
+}
+
+export type ApplicationSumAggregateInputType = {
+  matchScore?: true
+  matchVersion?: true
+}
 
 export type ApplicationMinAggregateInputType = {
   id?: true
@@ -76,6 +105,8 @@ export type ApplicationMinAggregateInputType = {
   appliedAt?: true
   confirmedAt?: true
   endedAt?: true
+  matchScore?: true
+  matchVersion?: true
 }
 
 export type ApplicationMaxAggregateInputType = {
@@ -89,6 +120,8 @@ export type ApplicationMaxAggregateInputType = {
   appliedAt?: true
   confirmedAt?: true
   endedAt?: true
+  matchScore?: true
+  matchVersion?: true
 }
 
 export type ApplicationCountAggregateInputType = {
@@ -102,6 +135,9 @@ export type ApplicationCountAggregateInputType = {
   appliedAt?: true
   confirmedAt?: true
   endedAt?: true
+  matchScore?: true
+  matchVersion?: true
+  matchParts?: true
   _all?: true
 }
 
@@ -143,6 +179,18 @@ export type ApplicationAggregateArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ApplicationAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ApplicationSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ApplicationMinAggregateInputType
@@ -173,6 +221,8 @@ export type ApplicationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   _count?: ApplicationCountAggregateInputType | true
+  _avg?: ApplicationAvgAggregateInputType
+  _sum?: ApplicationSumAggregateInputType
   _min?: ApplicationMinAggregateInputType
   _max?: ApplicationMaxAggregateInputType
 }
@@ -188,7 +238,12 @@ export type ApplicationGroupByOutputType = {
   appliedAt: Date
   confirmedAt: Date | null
   endedAt: Date | null
+  matchScore: number | null
+  matchVersion: number | null
+  matchParts: runtime.JsonValue | null
   _count: ApplicationCountAggregateOutputType | null
+  _avg: ApplicationAvgAggregateOutputType | null
+  _sum: ApplicationSumAggregateOutputType | null
   _min: ApplicationMinAggregateOutputType | null
   _max: ApplicationMaxAggregateOutputType | null
 }
@@ -222,6 +277,9 @@ export type ApplicationWhereInput = {
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   endedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
+  matchScore?: Prisma.IntNullableFilter<"Application"> | number | null
+  matchVersion?: Prisma.IntNullableFilter<"Application"> | number | null
+  matchParts?: Prisma.JsonNullableFilter<"Application">
   requirement?: Prisma.XOR<Prisma.TuitionRequirementNullableScalarRelationFilter, Prisma.TuitionRequirementWhereInput> | null
   package?: Prisma.XOR<Prisma.TuitionPackageNullableScalarRelationFilter, Prisma.TuitionPackageWhereInput> | null
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
@@ -243,6 +301,9 @@ export type ApplicationOrderByWithRelationInput = {
   appliedAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   endedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchParts?: Prisma.SortOrderInput | Prisma.SortOrder
   requirement?: Prisma.TuitionRequirementOrderByWithRelationInput
   package?: Prisma.TuitionPackageOrderByWithRelationInput
   tutor?: Prisma.TutorOrderByWithRelationInput
@@ -269,6 +330,9 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   endedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
+  matchScore?: Prisma.IntNullableFilter<"Application"> | number | null
+  matchVersion?: Prisma.IntNullableFilter<"Application"> | number | null
+  matchParts?: Prisma.JsonNullableFilter<"Application">
   requirement?: Prisma.XOR<Prisma.TuitionRequirementNullableScalarRelationFilter, Prisma.TuitionRequirementWhereInput> | null
   package?: Prisma.XOR<Prisma.TuitionPackageNullableScalarRelationFilter, Prisma.TuitionPackageWhereInput> | null
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
@@ -290,9 +354,14 @@ export type ApplicationOrderByWithAggregationInput = {
   appliedAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   endedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  matchParts?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ApplicationCountOrderByAggregateInput
+  _avg?: Prisma.ApplicationAvgOrderByAggregateInput
   _max?: Prisma.ApplicationMaxOrderByAggregateInput
   _min?: Prisma.ApplicationMinOrderByAggregateInput
+  _sum?: Prisma.ApplicationSumOrderByAggregateInput
 }
 
 export type ApplicationScalarWhereWithAggregatesInput = {
@@ -309,6 +378,9 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   appliedAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Application"> | Date | string | null
   endedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Application"> | Date | string | null
+  matchScore?: Prisma.IntNullableWithAggregatesFilter<"Application"> | number | null
+  matchVersion?: Prisma.IntNullableWithAggregatesFilter<"Application"> | number | null
+  matchParts?: Prisma.JsonNullableWithAggregatesFilter<"Application">
 }
 
 export type ApplicationCreateInput = {
@@ -318,6 +390,9 @@ export type ApplicationCreateInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
@@ -339,6 +414,9 @@ export type ApplicationUncheckedCreateInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
@@ -352,6 +430,9 @@ export type ApplicationUpdateInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
@@ -373,6 +454,9 @@ export type ApplicationUncheckedUpdateInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
@@ -390,6 +474,9 @@ export type ApplicationCreateManyInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationUpdateManyMutationInput = {
@@ -399,6 +486,9 @@ export type ApplicationUpdateManyMutationInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationUncheckedUpdateManyInput = {
@@ -412,6 +502,9 @@ export type ApplicationUncheckedUpdateManyInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationListRelationFilter = {
@@ -445,6 +538,14 @@ export type ApplicationCountOrderByAggregateInput = {
   appliedAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
+  matchScore?: Prisma.SortOrder
+  matchVersion?: Prisma.SortOrder
+  matchParts?: Prisma.SortOrder
+}
+
+export type ApplicationAvgOrderByAggregateInput = {
+  matchScore?: Prisma.SortOrder
+  matchVersion?: Prisma.SortOrder
 }
 
 export type ApplicationMaxOrderByAggregateInput = {
@@ -458,6 +559,8 @@ export type ApplicationMaxOrderByAggregateInput = {
   appliedAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
+  matchScore?: Prisma.SortOrder
+  matchVersion?: Prisma.SortOrder
 }
 
 export type ApplicationMinOrderByAggregateInput = {
@@ -471,6 +574,13 @@ export type ApplicationMinOrderByAggregateInput = {
   appliedAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
+  matchScore?: Prisma.SortOrder
+  matchVersion?: Prisma.SortOrder
+}
+
+export type ApplicationSumOrderByAggregateInput = {
+  matchScore?: Prisma.SortOrder
+  matchVersion?: Prisma.SortOrder
 }
 
 export type ApplicationNullableScalarRelationFilter = {
@@ -726,6 +836,9 @@ export type ApplicationCreateWithoutStudentInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
@@ -745,6 +858,9 @@ export type ApplicationUncheckedCreateWithoutStudentInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
@@ -791,6 +907,9 @@ export type ApplicationScalarWhereInput = {
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   endedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
+  matchScore?: Prisma.IntNullableFilter<"Application"> | number | null
+  matchVersion?: Prisma.IntNullableFilter<"Application"> | number | null
+  matchParts?: Prisma.JsonNullableFilter<"Application">
 }
 
 export type ApplicationCreateWithoutTutorInput = {
@@ -800,6 +919,9 @@ export type ApplicationCreateWithoutTutorInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
@@ -819,6 +941,9 @@ export type ApplicationUncheckedCreateWithoutTutorInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
@@ -858,6 +983,9 @@ export type ApplicationCreateWithoutRequirementInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
@@ -877,6 +1005,9 @@ export type ApplicationUncheckedCreateWithoutRequirementInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
@@ -916,6 +1047,9 @@ export type ApplicationCreateWithoutPackageInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
@@ -935,6 +1069,9 @@ export type ApplicationUncheckedCreateWithoutPackageInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
@@ -974,6 +1111,9 @@ export type ApplicationCreateWithoutReportsInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
@@ -994,6 +1134,9 @@ export type ApplicationUncheckedCreateWithoutReportsInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
@@ -1022,6 +1165,9 @@ export type ApplicationUpdateWithoutReportsInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1042,6 +1188,9 @@ export type ApplicationUncheckedUpdateWithoutReportsInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1054,6 +1203,9 @@ export type ApplicationCreateWithoutDisputesInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
@@ -1074,6 +1226,9 @@ export type ApplicationUncheckedCreateWithoutDisputesInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
@@ -1102,6 +1257,9 @@ export type ApplicationUpdateWithoutDisputesInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1122,6 +1280,9 @@ export type ApplicationUncheckedUpdateWithoutDisputesInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1134,6 +1295,9 @@ export type ApplicationCreateWithoutFeesInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
@@ -1154,6 +1318,9 @@ export type ApplicationUncheckedCreateWithoutFeesInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
@@ -1182,6 +1349,9 @@ export type ApplicationUpdateWithoutFeesInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1202,6 +1372,9 @@ export type ApplicationUncheckedUpdateWithoutFeesInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1214,6 +1387,9 @@ export type ApplicationCreateWithoutNotificationsInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
   package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
@@ -1234,6 +1410,9 @@ export type ApplicationUncheckedCreateWithoutNotificationsInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
@@ -1262,6 +1441,9 @@ export type ApplicationUpdateWithoutNotificationsInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1282,6 +1464,9 @@ export type ApplicationUncheckedUpdateWithoutNotificationsInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1297,6 +1482,9 @@ export type ApplicationCreateManyStudentInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationUpdateWithoutStudentInput = {
@@ -1306,6 +1494,9 @@ export type ApplicationUpdateWithoutStudentInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1325,6 +1516,9 @@ export type ApplicationUncheckedUpdateWithoutStudentInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1341,6 +1535,9 @@ export type ApplicationUncheckedUpdateManyWithoutStudentInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationCreateManyTutorInput = {
@@ -1353,6 +1550,9 @@ export type ApplicationCreateManyTutorInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationUpdateWithoutTutorInput = {
@@ -1362,6 +1562,9 @@ export type ApplicationUpdateWithoutTutorInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1381,6 +1584,9 @@ export type ApplicationUncheckedUpdateWithoutTutorInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1397,6 +1603,9 @@ export type ApplicationUncheckedUpdateManyWithoutTutorInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationCreateManyRequirementInput = {
@@ -1409,6 +1618,9 @@ export type ApplicationCreateManyRequirementInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationUpdateWithoutRequirementInput = {
@@ -1418,6 +1630,9 @@ export type ApplicationUpdateWithoutRequirementInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1437,6 +1652,9 @@ export type ApplicationUncheckedUpdateWithoutRequirementInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1453,6 +1671,9 @@ export type ApplicationUncheckedUpdateManyWithoutRequirementInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationCreateManyPackageInput = {
@@ -1465,6 +1686,9 @@ export type ApplicationCreateManyPackageInput = {
   appliedAt?: Date | string
   confirmedAt?: Date | string | null
   endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApplicationUpdateWithoutPackageInput = {
@@ -1474,6 +1698,9 @@ export type ApplicationUpdateWithoutPackageInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
@@ -1493,6 +1720,9 @@ export type ApplicationUncheckedUpdateWithoutPackageInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
@@ -1509,6 +1739,9 @@ export type ApplicationUncheckedUpdateManyWithoutPackageInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 
@@ -1580,6 +1813,9 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   appliedAt?: boolean
   confirmedAt?: boolean
   endedAt?: boolean
+  matchScore?: boolean
+  matchVersion?: boolean
+  matchParts?: boolean
   requirement?: boolean | Prisma.Application$requirementArgs<ExtArgs>
   package?: boolean | Prisma.Application$packageArgs<ExtArgs>
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
@@ -1602,6 +1838,9 @@ export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   appliedAt?: boolean
   confirmedAt?: boolean
   endedAt?: boolean
+  matchScore?: boolean
+  matchVersion?: boolean
+  matchParts?: boolean
   requirement?: boolean | Prisma.Application$requirementArgs<ExtArgs>
   package?: boolean | Prisma.Application$packageArgs<ExtArgs>
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
@@ -1619,6 +1858,9 @@ export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   appliedAt?: boolean
   confirmedAt?: boolean
   endedAt?: boolean
+  matchScore?: boolean
+  matchVersion?: boolean
+  matchParts?: boolean
   requirement?: boolean | Prisma.Application$requirementArgs<ExtArgs>
   package?: boolean | Prisma.Application$packageArgs<ExtArgs>
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
@@ -1636,9 +1878,12 @@ export type ApplicationSelectScalar = {
   appliedAt?: boolean
   confirmedAt?: boolean
   endedAt?: boolean
+  matchScore?: boolean
+  matchVersion?: boolean
+  matchParts?: boolean
 }
 
-export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requirementId" | "packageId" | "tutorId" | "studentId" | "initiatedBy" | "status" | "appliedAt" | "confirmedAt" | "endedAt", ExtArgs["result"]["application"]>
+export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requirementId" | "packageId" | "tutorId" | "studentId" | "initiatedBy" | "status" | "appliedAt" | "confirmedAt" | "endedAt" | "matchScore" | "matchVersion" | "matchParts", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   requirement?: boolean | Prisma.Application$requirementArgs<ExtArgs>
   package?: boolean | Prisma.Application$packageArgs<ExtArgs>
@@ -1686,6 +1931,9 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     appliedAt: Date
     confirmedAt: Date | null
     endedAt: Date | null
+    matchScore: number | null
+    matchVersion: number | null
+    matchParts: runtime.JsonValue | null
   }, ExtArgs["result"]["application"]>
   composites: {}
 }
@@ -2127,6 +2375,9 @@ export interface ApplicationFieldRefs {
   readonly appliedAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly confirmedAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly endedAt: Prisma.FieldRef<"Application", 'DateTime'>
+  readonly matchScore: Prisma.FieldRef<"Application", 'Int'>
+  readonly matchVersion: Prisma.FieldRef<"Application", 'Int'>
+  readonly matchParts: Prisma.FieldRef<"Application", 'Json'>
 }
     
 

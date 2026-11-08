@@ -69,6 +69,11 @@ export const ModelName = {
   TutorVerification: 'TutorVerification',
   TutorCredential: 'TutorCredential',
   TutorVideo: 'TutorVideo',
+  TutorRequirement: 'TutorRequirement',
+  TutorRequirementSubject: 'TutorRequirementSubject',
+  TutorZone: 'TutorZone',
+  TutorRequirementZone: 'TutorRequirementZone',
+  ZoneLimitRequest: 'ZoneLimitRequest',
   TuitionRequirement: 'TuitionRequirement',
   RequirementSubject: 'RequirementSubject',
   TuitionPackage: 'TuitionPackage',
@@ -81,6 +86,7 @@ export const ModelName = {
   NotificationLog: 'NotificationLog',
   BlogPost: 'BlogPost',
   SiteContent: 'SiteContent',
+  PlatformSetting: 'PlatformSetting',
   AuditLog: 'AuditLog'
 } as const
 
@@ -228,6 +234,8 @@ export const StudentScalarFieldEnum = {
   emergencyContact: 'emergencyContact',
   whatsappNumber: 'whatsappNumber',
   whatsappVerifiedAt: 'whatsappVerifiedAt',
+  phoneNumber: 'phoneNumber',
+  phoneVerifiedAt: 'phoneVerifiedAt',
   studentIdNumber: 'studentIdNumber',
   verificationFileId: 'verificationFileId',
   verificationStatus: 'verificationStatus',
@@ -249,9 +257,12 @@ export const TutorScalarFieldEnum = {
   emergencyContact: 'emergencyContact',
   whatsappNumber: 'whatsappNumber',
   whatsappVerifiedAt: 'whatsappVerifiedAt',
+  phoneNumber: 'phoneNumber',
+  phoneVerifiedAt: 'phoneVerifiedAt',
   studentIdNumber: 'studentIdNumber',
   gender: 'gender',
   parentsInfo: 'parentsInfo',
+  zoneLimit: 'zoneLimit',
   verificationStatus: 'verificationStatus',
   isListed: 'isListed',
   ratingAvg: 'ratingAvg',
@@ -267,6 +278,7 @@ export const TutorLocationScalarFieldEnum = {
   id: 'id',
   tutorId: 'tutorId',
   placeId: 'placeId',
+  geogSource: 'geogSource',
   addressText: 'addressText',
   districtCode: 'districtCode',
   geogFetchedAt: 'geogFetchedAt',
@@ -282,6 +294,7 @@ export const StudentLocationScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
   placeId: 'placeId',
+  geogSource: 'geogSource',
   addressText: 'addressText',
   districtCode: 'districtCode',
   geogFetchedAt: 'geogFetchedAt',
@@ -349,6 +362,76 @@ export const TutorVideoScalarFieldEnum = {
 export type TutorVideoScalarFieldEnum = (typeof TutorVideoScalarFieldEnum)[keyof typeof TutorVideoScalarFieldEnum]
 
 
+export const TutorRequirementScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  name: 'name',
+  isDefault: 'isDefault',
+  isActive: 'isActive',
+  classLevelMin: 'classLevelMin',
+  classLevelMax: 'classLevelMax',
+  timeFrom: 'timeFrom',
+  timeTo: 'timeTo',
+  availableDays: 'availableDays',
+  minSalary: 'minSalary',
+  maxStudents: 'maxStudents',
+  availableFrom: 'availableFrom',
+  teachesOnline: 'teachesOnline',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutorRequirementScalarFieldEnum = (typeof TutorRequirementScalarFieldEnum)[keyof typeof TutorRequirementScalarFieldEnum]
+
+
+export const TutorRequirementSubjectScalarFieldEnum = {
+  requirementId: 'requirementId',
+  tutorId: 'tutorId',
+  subjectId: 'subjectId'
+} as const
+
+export type TutorRequirementSubjectScalarFieldEnum = (typeof TutorRequirementSubjectScalarFieldEnum)[keyof typeof TutorRequirementSubjectScalarFieldEnum]
+
+
+export const TutorZoneScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  label: 'label',
+  radiusM: 'radiusM',
+  placeId: 'placeId',
+  addressText: 'addressText',
+  geogSource: 'geogSource',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutorZoneScalarFieldEnum = (typeof TutorZoneScalarFieldEnum)[keyof typeof TutorZoneScalarFieldEnum]
+
+
+export const TutorRequirementZoneScalarFieldEnum = {
+  requirementId: 'requirementId',
+  zoneId: 'zoneId',
+  tutorId: 'tutorId'
+} as const
+
+export type TutorRequirementZoneScalarFieldEnum = (typeof TutorRequirementZoneScalarFieldEnum)[keyof typeof TutorRequirementZoneScalarFieldEnum]
+
+
+export const ZoneLimitRequestScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  requestedLimit: 'requestedLimit',
+  reason: 'reason',
+  status: 'status',
+  decidedById: 'decidedById',
+  decidedAt: 'decidedAt',
+  decisionNote: 'decisionNote',
+  createdAt: 'createdAt'
+} as const
+
+export type ZoneLimitRequestScalarFieldEnum = (typeof ZoneLimitRequestScalarFieldEnum)[keyof typeof ZoneLimitRequestScalarFieldEnum]
+
+
 export const TuitionRequirementScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
@@ -357,6 +440,7 @@ export const TuitionRequirementScalarFieldEnum = {
   classLevel: 'classLevel',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
+  availableDays: 'availableDays',
   salary: 'salary',
   studentCount: 'studentCount',
   hireByDate: 'hireByDate',
@@ -385,6 +469,7 @@ export const TuitionPackageScalarFieldEnum = {
   categoryId: 'categoryId',
   subjectId: 'subjectId',
   areaId: 'areaId',
+  requirementId: 'requirementId',
   classLevel: 'classLevel',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
@@ -411,7 +496,10 @@ export const ApplicationScalarFieldEnum = {
   status: 'status',
   appliedAt: 'appliedAt',
   confirmedAt: 'confirmedAt',
-  endedAt: 'endedAt'
+  endedAt: 'endedAt',
+  matchScore: 'matchScore',
+  matchVersion: 'matchVersion',
+  matchParts: 'matchParts'
 } as const
 
 export type ApplicationScalarFieldEnum = (typeof ApplicationScalarFieldEnum)[keyof typeof ApplicationScalarFieldEnum]
@@ -546,6 +634,16 @@ export const SiteContentScalarFieldEnum = {
 } as const
 
 export type SiteContentScalarFieldEnum = (typeof SiteContentScalarFieldEnum)[keyof typeof SiteContentScalarFieldEnum]
+
+
+export const PlatformSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedById: 'updatedById',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformSettingScalarFieldEnum = (typeof PlatformSettingScalarFieldEnum)[keyof typeof PlatformSettingScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {

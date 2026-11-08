@@ -8,9 +8,10 @@ export type SaveLocationInput = {
   longitude: number;
 };
 
+// Input is Places-sourced today; pin payloads will set geog_source differently.
 export async function upsertTutorLocation(tutorId: string, input: SaveLocationInput) {
   await prisma.$executeRaw`
-    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
+    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at, geog_source)
     VALUES (
       gen_random_uuid(),
       ${tutorId},
@@ -20,7 +21,8 @@ export async function upsertTutorLocation(tutorId: string, input: SaveLocationIn
       ST_SetSRID(ST_MakePoint(${input.longitude}, ${input.latitude}), 4326)::geography,
       NOW(),
       false,
-      NOW()
+      NOW(),
+      'PLACES'
     )
     ON CONFLICT (tutor_id) DO UPDATE SET
       place_id = EXCLUDED.place_id,
@@ -29,13 +31,14 @@ export async function upsertTutorLocation(tutorId: string, input: SaveLocationIn
       geog = EXCLUDED.geog,
       geog_fetched_at = NOW(),
       needs_readdress = false,
+      geog_source = 'PLACES',
       updated_at = NOW();
   `;
 }
 
 export async function upsertStudentLocation(studentId: string, input: SaveLocationInput) {
   await prisma.$executeRaw`
-    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at)
+    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at, geog_source)
     VALUES (
       gen_random_uuid(),
       ${studentId},
@@ -45,7 +48,8 @@ export async function upsertStudentLocation(studentId: string, input: SaveLocati
       ST_SetSRID(ST_MakePoint(${input.longitude}, ${input.latitude}), 4326)::geography,
       NOW(),
       false,
-      NOW()
+      NOW(),
+      'PLACES'
     )
     ON CONFLICT (student_id) DO UPDATE SET
       place_id = EXCLUDED.place_id,
@@ -54,6 +58,7 @@ export async function upsertStudentLocation(studentId: string, input: SaveLocati
       geog = EXCLUDED.geog,
       geog_fetched_at = NOW(),
       needs_readdress = false,
+      geog_source = 'PLACES',
       updated_at = NOW();
   `;
 }
@@ -122,24 +127,28 @@ export async function runLocationExpiry(): Promise<ExpiryCounts> {
       UPDATE tutor_location
       SET needs_readdress = true, updated_at = NOW()
       WHERE NOT needs_readdress
+        AND geog_source = 'PLACES'
         AND geog_fetched_at <= NOW() - make_interval(days => ${SOFT_DAYS});
     `,
     prisma.$executeRaw`
       UPDATE student_location
       SET needs_readdress = true, updated_at = NOW()
       WHERE NOT needs_readdress
+        AND geog_source = 'PLACES'
         AND geog_fetched_at <= NOW() - make_interval(days => ${SOFT_DAYS});
     `,
     prisma.$executeRaw`
       UPDATE tutor_location
       SET geog = NULL, needs_readdress = true, updated_at = NOW()
       WHERE geog IS NOT NULL
+        AND geog_source = 'PLACES'
         AND geog_fetched_at <= NOW() - make_interval(days => ${HARD_DAYS});
     `,
     prisma.$executeRaw`
       UPDATE student_location
       SET geog = NULL, needs_readdress = true, updated_at = NOW()
       WHERE geog IS NOT NULL
+        AND geog_source = 'PLACES'
         AND geog_fetched_at <= NOW() - make_interval(days => ${HARD_DAYS});
     `,
   ]);

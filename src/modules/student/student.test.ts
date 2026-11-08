@@ -84,6 +84,22 @@ describe("student routes", () => {
 
       expect(res.statusCode).toBe(409);
     });
+
+    it("rejects a WhatsApp number starting with the reserved deleted: prefix", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers,
+        payload: { ...studentPayload(area.id), whatsappNumber: "deleted:abc" },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
   });
 
   describe("PATCH /api/v1/students/me", () => {
@@ -118,6 +134,28 @@ describe("student routes", () => {
       });
 
       expect(res.statusCode).toBe(404);
+    });
+  });
+
+  describe("contact number uniqueness across accounts", () => {
+    it("rejects a phone number another account already uses", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const tutor = await createAccount({ role: "TUTOR" });
+      const taken = phone();
+      await createTutorProfile(tutor.id, { phoneNumber: taken });
+      const account = await createAccount({ role: "STUDENT" });
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers,
+        payload: { ...studentPayload(area.id), phoneNumber: taken },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
     });
   });
 

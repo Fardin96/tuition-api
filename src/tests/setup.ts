@@ -42,6 +42,12 @@ beforeEach(async () => {
       tutor_area,
       tutor_location,
       student_location,
+      tutor_requirement,
+      tutor_requirement_subject,
+      tutor_zone,
+      tutor_requirement_zone,
+      zone_limit_request,
+      platform_setting,
       tutor,
       student,
       file_asset,
@@ -55,5 +61,11 @@ beforeEach(async () => {
       account,
       super_admin_email
     RESTART IDENTITY CASCADE;
+  `);
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO platform_setting (key, value, updated_at) VALUES
+      ('require_tutor_verification', 'false'::jsonb, now()),
+      ('require_phone_verification', 'false'::jsonb, now())
+    ON CONFLICT (key) DO NOTHING;
   `);
 });
