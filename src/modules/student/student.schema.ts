@@ -5,7 +5,17 @@ export const studentProfileSchema = z.object({
   areaId: z.coerce.number().int().positive(),
   address: z.string().min(1).max(500),
   emergencyContact: z.string().min(1).max(50),
-  whatsappNumber: z.string().min(1).max(20),
+  phoneNumber: z
+    .string()
+    .min(1)
+    .max(20)
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number")
+    .optional(),
+  whatsappNumber: z
+    .string()
+    .min(1)
+    .max(20)
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
   studentIdNumber: z.string().min(1).max(100),
   placeId: z.string().min(1).max(255).optional(),
   latitude: z.number().min(-90).max(90).optional(),
@@ -30,6 +40,7 @@ export const studentResponseSchema = z.object({
   areaId: z.number(),
   address: z.string(),
   emergencyContact: z.string(),
+  phoneNumber: z.string(),
   whatsappNumber: z.string(),
   studentIdNumber: z.string(),
   whatsappVerifiedAt: z.string().nullable().optional(),

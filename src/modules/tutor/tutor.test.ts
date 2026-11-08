@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { describe, expect, it } from "vitest";
+import { mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 import {
   createAccount,
@@ -76,6 +77,21 @@ describe("tutor routes", () => {
       const res = await app.inject({ method: "POST", url: "/api/v1/tutors/me", headers, payload });
 
       expect(res.statusCode).toBe(409);
+    });
+
+    it("rejects a WhatsApp number starting with the reserved deleted: prefix", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers,
+        payload: tutorPayload({ whatsappNumber: "deleted:abc" }),
+      });
+
+      expect(res.statusCode).toBe(400);
     });
   });
 
@@ -493,6 +509,119 @@ describe("tutor routes", () => {
       const body = JSON.parse(res.body);
       expect(body.videos).toHaveLength(1);
       expect(body.videos[0].title).toBe("Approved");
+    });
+  });
+
+  describe("contact number uniqueness across accounts", () => {
+    it("rejects a phone number another account already uses (PhoneInUse)", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const other = await createAccount({ role: "STUDENT" });
+      const taken = phone();
+      await createStudentProfile(other.id, area.id, { phoneNumber: taken });
+      const account = await createAccount({ role: "TUTOR" });
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers,
+        payload: tutorPayload({ phoneNumber: taken }),
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
+    });
+
+    it("rejects a WhatsApp number that equals another account's phone (WhatsappInUse)", async () => {
+      const app = await createTestApp();
+      const other = await createAccount({ role: "TUTOR" });
+      const taken = phone();
+      await createTutorProfile(other.id, { phoneNumber: taken });
+      const account = await createAccount({ role: "TUTOR" });
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers,
+        payload: tutorPayload({ whatsappNumber: taken }),
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("This WhatsApp number is already in use.");
+    });
+
+    it("lets the same account use one number for phone and WhatsApp", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const headers = await getAuthHeaders(account);
+      const same = phone();
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers,
+        payload: tutorPayload({ whatsappNumber: same, phoneNumber: same }),
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).phoneNumber).toBe(same);
+    });
+
+    it("does not save a PATCH to a number taken by another account", async () => {
+      const app = await createTestApp();
+      const other = await createAccount({ role: "TUTOR" });
+      const taken = phone();
+      await createTutorProfile(other.id, { phoneNumber: taken });
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id);
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/tutors/me",
+        headers,
+        payload: { phoneNumber: taken },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
+      const saved = await prisma.tutor.findUnique({ where: { accountId: account.id } });
+      expect(saved?.phoneNumber).not.toBe(taken);
+    });
+
+    it("rejects a raw SQL insert of a number held by another account (trigger)", async () => {
+      const area = await createArea();
+      const owner = await createAccount({ role: "TUTOR" });
+      const taken = phone();
+      await createTutorProfile(owner.id, { phoneNumber: taken });
+      const student = await createAccount({ role: "STUDENT" });
+
+      await expect(
+        prisma.$executeRaw`
+          INSERT INTO student (id, account_id, name, area_id, address, emergency_contact,
+            whatsapp_number, phone_number, student_id_number, updated_at)
+          VALUES (gen_random_uuid(), ${student.id}::uuid, 'Raw', ${area.id}, 'addr', '+8801700000001',
+            ${taken}, ${taken}, ${`STU-${crypto.randomUUID()}`}, now())`,
+      ).rejects.toThrow(/contact_number_in_use/);
+    });
+
+    it("maps a trigger rejection that slips past the pre-check to PhoneInUse", async () => {
+      const area = await createArea();
+      const owner = await createAccount({ role: "TUTOR" });
+      const taken = phone();
+      await createTutorProfile(owner.id, { phoneNumber: taken });
+      const student = await createAccount({ role: "STUDENT" });
+      const profile = await createStudentProfile(student.id, area.id);
+
+      const err = await prisma.student
+        .update({ where: { id: profile.id }, data: { phoneNumber: taken } })
+        .catch((e: unknown) => e);
+
+      await expect(
+        mapContactNumberError(err, student.id, { phoneNumber: taken }),
+      ).rejects.toMatchObject({ name: "PhoneInUse", statusCode: 409 });
     });
   });
 });

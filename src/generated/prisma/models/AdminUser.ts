@@ -251,6 +251,8 @@ export type AdminUserWhereInput = {
   unblocksMade?: Prisma.AccountBlockListRelationFilter
   handledReports?: Prisma.ReportListRelationFilter
   handledDisputes?: Prisma.DisputeListRelationFilter
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestListRelationFilter
+  settingsEdits?: Prisma.PlatformSettingListRelationFilter
 }
 
 export type AdminUserOrderByWithRelationInput = {
@@ -279,6 +281,8 @@ export type AdminUserOrderByWithRelationInput = {
   unblocksMade?: Prisma.AccountBlockOrderByRelationAggregateInput
   handledReports?: Prisma.ReportOrderByRelationAggregateInput
   handledDisputes?: Prisma.DisputeOrderByRelationAggregateInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestOrderByRelationAggregateInput
+  settingsEdits?: Prisma.PlatformSettingOrderByRelationAggregateInput
 }
 
 export type AdminUserWhereUniqueInput = Prisma.AtLeast<{
@@ -311,6 +315,8 @@ export type AdminUserWhereUniqueInput = Prisma.AtLeast<{
   unblocksMade?: Prisma.AccountBlockListRelationFilter
   handledReports?: Prisma.ReportListRelationFilter
   handledDisputes?: Prisma.DisputeListRelationFilter
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestListRelationFilter
+  settingsEdits?: Prisma.PlatformSettingListRelationFilter
 }, "accountId" | "accountId_role">
 
 export type AdminUserOrderByWithAggregationInput = {
@@ -371,6 +377,8 @@ export type AdminUserCreateInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateInput = {
@@ -396,6 +404,8 @@ export type AdminUserUncheckedCreateInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUpdateInput = {
@@ -420,6 +430,8 @@ export type AdminUserUpdateInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateInput = {
@@ -445,6 +457,8 @@ export type AdminUserUncheckedUpdateInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateManyInput = {
@@ -764,6 +778,22 @@ export type AdminUserUpdateOneWithoutReviewedVerificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutReviewedVerificationsInput, Prisma.AdminUserUpdateWithoutReviewedVerificationsInput>, Prisma.AdminUserUncheckedUpdateWithoutReviewedVerificationsInput>
 }
 
+export type AdminUserCreateNestedOneWithoutZoneRequestsDecidedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutZoneRequestsDecidedInput, Prisma.AdminUserUncheckedCreateWithoutZoneRequestsDecidedInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutZoneRequestsDecidedInput
+  connect?: Prisma.AdminUserWhereUniqueInput
+}
+
+export type AdminUserUpdateOneWithoutZoneRequestsDecidedNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutZoneRequestsDecidedInput, Prisma.AdminUserUncheckedCreateWithoutZoneRequestsDecidedInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutZoneRequestsDecidedInput
+  upsert?: Prisma.AdminUserUpsertWithoutZoneRequestsDecidedInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
+  connect?: Prisma.AdminUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutZoneRequestsDecidedInput, Prisma.AdminUserUpdateWithoutZoneRequestsDecidedInput>, Prisma.AdminUserUncheckedUpdateWithoutZoneRequestsDecidedInput>
+}
+
 export type AdminUserCreateNestedOneWithoutHandledReportsInput = {
   create?: Prisma.XOR<Prisma.AdminUserCreateWithoutHandledReportsInput, Prisma.AdminUserUncheckedCreateWithoutHandledReportsInput>
   connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutHandledReportsInput
@@ -840,6 +870,22 @@ export type AdminUserUpdateOneWithoutContentEditsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutContentEditsInput, Prisma.AdminUserUpdateWithoutContentEditsInput>, Prisma.AdminUserUncheckedUpdateWithoutContentEditsInput>
 }
 
+export type AdminUserCreateNestedOneWithoutSettingsEditsInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutSettingsEditsInput, Prisma.AdminUserUncheckedCreateWithoutSettingsEditsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutSettingsEditsInput
+  connect?: Prisma.AdminUserWhereUniqueInput
+}
+
+export type AdminUserUpdateOneWithoutSettingsEditsNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutSettingsEditsInput, Prisma.AdminUserUncheckedCreateWithoutSettingsEditsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutSettingsEditsInput
+  upsert?: Prisma.AdminUserUpsertWithoutSettingsEditsInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
+  connect?: Prisma.AdminUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutSettingsEditsInput, Prisma.AdminUserUpdateWithoutSettingsEditsInput>, Prisma.AdminUserUncheckedUpdateWithoutSettingsEditsInput>
+}
+
 export type AdminUserCreateWithoutAccountInput = {
   name: string
   adminRole?: $Enums.AdminRole
@@ -861,6 +907,8 @@ export type AdminUserCreateWithoutAccountInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutAccountInput = {
@@ -884,6 +932,8 @@ export type AdminUserUncheckedCreateWithoutAccountInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutAccountInput = {
@@ -923,6 +973,8 @@ export type AdminUserUpdateWithoutAccountInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutAccountInput = {
@@ -946,6 +998,8 @@ export type AdminUserUncheckedUpdateWithoutAccountInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateWithoutApprovalsInput = {
@@ -969,6 +1023,8 @@ export type AdminUserCreateWithoutApprovalsInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutApprovalsInput = {
@@ -993,6 +1049,8 @@ export type AdminUserUncheckedCreateWithoutApprovalsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutApprovalsInput = {
@@ -1021,6 +1079,8 @@ export type AdminUserCreateWithoutApprovedByInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutApprovedByInput = {
@@ -1045,6 +1105,8 @@ export type AdminUserUncheckedCreateWithoutApprovedByInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutApprovedByInput = {
@@ -1078,6 +1140,8 @@ export type AdminUserCreateWithoutRemovalsInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutRemovalsInput = {
@@ -1102,6 +1166,8 @@ export type AdminUserUncheckedCreateWithoutRemovalsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutRemovalsInput = {
@@ -1130,6 +1196,8 @@ export type AdminUserCreateWithoutRemovedByInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutRemovedByInput = {
@@ -1154,6 +1222,8 @@ export type AdminUserUncheckedCreateWithoutRemovedByInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutRemovedByInput = {
@@ -1198,6 +1268,8 @@ export type AdminUserUpdateWithoutApprovalsInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutApprovalsInput = {
@@ -1222,6 +1294,8 @@ export type AdminUserUncheckedUpdateWithoutApprovalsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUpsertWithWhereUniqueWithoutApprovedByInput = {
@@ -1290,6 +1364,8 @@ export type AdminUserUpdateWithoutRemovalsInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutRemovalsInput = {
@@ -1314,6 +1390,8 @@ export type AdminUserUncheckedUpdateWithoutRemovalsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUpsertWithWhereUniqueWithoutRemovedByInput = {
@@ -1353,6 +1431,8 @@ export type AdminUserCreateWithoutBlocksMadeInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutBlocksMadeInput = {
@@ -1377,6 +1457,8 @@ export type AdminUserUncheckedCreateWithoutBlocksMadeInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutBlocksMadeInput = {
@@ -1405,6 +1487,8 @@ export type AdminUserCreateWithoutUnblocksMadeInput = {
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutUnblocksMadeInput = {
@@ -1429,6 +1513,8 @@ export type AdminUserUncheckedCreateWithoutUnblocksMadeInput = {
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutUnblocksMadeInput = {
@@ -1468,6 +1554,8 @@ export type AdminUserUpdateWithoutBlocksMadeInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutBlocksMadeInput = {
@@ -1492,6 +1580,8 @@ export type AdminUserUncheckedUpdateWithoutBlocksMadeInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUpsertWithoutUnblocksMadeInput = {
@@ -1526,6 +1616,8 @@ export type AdminUserUpdateWithoutUnblocksMadeInput = {
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutUnblocksMadeInput = {
@@ -1550,6 +1642,8 @@ export type AdminUserUncheckedUpdateWithoutUnblocksMadeInput = {
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateWithoutReviewedVerificationsInput = {
@@ -1573,6 +1667,8 @@ export type AdminUserCreateWithoutReviewedVerificationsInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutReviewedVerificationsInput = {
@@ -1597,6 +1693,8 @@ export type AdminUserUncheckedCreateWithoutReviewedVerificationsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutReviewedVerificationsInput = {
@@ -1636,6 +1734,8 @@ export type AdminUserUpdateWithoutReviewedVerificationsInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutReviewedVerificationsInput = {
@@ -1660,6 +1760,126 @@ export type AdminUserUncheckedUpdateWithoutReviewedVerificationsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type AdminUserCreateWithoutZoneRequestsDecidedInput = {
+  name: string
+  adminRole?: $Enums.AdminRole
+  status?: $Enums.AdminStatus
+  approvedAt?: Date | string | null
+  removedAt?: Date | string | null
+  mfaEnabled?: boolean
+  mfaSecretEnc?: string | null
+  createdAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutAdminUserInput
+  approvedBy?: Prisma.AdminUserCreateNestedOneWithoutApprovalsInput
+  approvals?: Prisma.AdminUserCreateNestedManyWithoutApprovedByInput
+  removedBy?: Prisma.AdminUserCreateNestedOneWithoutRemovalsInput
+  removals?: Prisma.AdminUserCreateNestedManyWithoutRemovedByInput
+  reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
+  recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
+  blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
+  contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
+  blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
+  unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
+  handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
+  handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
+}
+
+export type AdminUserUncheckedCreateWithoutZoneRequestsDecidedInput = {
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  adminRole?: $Enums.AdminRole
+  status?: $Enums.AdminStatus
+  approvedById?: string | null
+  approvedAt?: Date | string | null
+  removedById?: string | null
+  removedAt?: Date | string | null
+  mfaEnabled?: boolean
+  mfaSecretEnc?: string | null
+  createdAt?: Date | string
+  approvals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutApprovedByInput
+  removals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutRemovedByInput
+  reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
+  recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
+  contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
+  blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
+  unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
+  handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
+  handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
+}
+
+export type AdminUserCreateOrConnectWithoutZoneRequestsDecidedInput = {
+  where: Prisma.AdminUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutZoneRequestsDecidedInput, Prisma.AdminUserUncheckedCreateWithoutZoneRequestsDecidedInput>
+}
+
+export type AdminUserUpsertWithoutZoneRequestsDecidedInput = {
+  update: Prisma.XOR<Prisma.AdminUserUpdateWithoutZoneRequestsDecidedInput, Prisma.AdminUserUncheckedUpdateWithoutZoneRequestsDecidedInput>
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutZoneRequestsDecidedInput, Prisma.AdminUserUncheckedCreateWithoutZoneRequestsDecidedInput>
+  where?: Prisma.AdminUserWhereInput
+}
+
+export type AdminUserUpdateToOneWithWhereWithoutZoneRequestsDecidedInput = {
+  where?: Prisma.AdminUserWhereInput
+  data: Prisma.XOR<Prisma.AdminUserUpdateWithoutZoneRequestsDecidedInput, Prisma.AdminUserUncheckedUpdateWithoutZoneRequestsDecidedInput>
+}
+
+export type AdminUserUpdateWithoutZoneRequestsDecidedInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  adminRole?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  status?: Prisma.EnumAdminStatusFieldUpdateOperationsInput | $Enums.AdminStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mfaSecretEnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutAdminUserNestedInput
+  approvedBy?: Prisma.AdminUserUpdateOneWithoutApprovalsNestedInput
+  approvals?: Prisma.AdminUserUpdateManyWithoutApprovedByNestedInput
+  removedBy?: Prisma.AdminUserUpdateOneWithoutRemovalsNestedInput
+  removals?: Prisma.AdminUserUpdateManyWithoutRemovedByNestedInput
+  reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
+  recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
+  blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
+  contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
+  blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
+  unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
+  handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
+  handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type AdminUserUncheckedUpdateWithoutZoneRequestsDecidedInput = {
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  adminRole?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  status?: Prisma.EnumAdminStatusFieldUpdateOperationsInput | $Enums.AdminStatus
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mfaSecretEnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvals?: Prisma.AdminUserUncheckedUpdateManyWithoutApprovedByNestedInput
+  removals?: Prisma.AdminUserUncheckedUpdateManyWithoutRemovedByNestedInput
+  reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
+  recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
+  contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
+  blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
+  unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
+  handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
+  handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateWithoutHandledReportsInput = {
@@ -1683,6 +1903,8 @@ export type AdminUserCreateWithoutHandledReportsInput = {
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutHandledReportsInput = {
@@ -1707,6 +1929,8 @@ export type AdminUserUncheckedCreateWithoutHandledReportsInput = {
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutHandledReportsInput = {
@@ -1746,6 +1970,8 @@ export type AdminUserUpdateWithoutHandledReportsInput = {
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutHandledReportsInput = {
@@ -1770,6 +1996,8 @@ export type AdminUserUncheckedUpdateWithoutHandledReportsInput = {
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateWithoutHandledDisputesInput = {
@@ -1793,6 +2021,8 @@ export type AdminUserCreateWithoutHandledDisputesInput = {
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutHandledDisputesInput = {
@@ -1817,6 +2047,8 @@ export type AdminUserUncheckedCreateWithoutHandledDisputesInput = {
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutHandledDisputesInput = {
@@ -1856,6 +2088,8 @@ export type AdminUserUpdateWithoutHandledDisputesInput = {
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutHandledDisputesInput = {
@@ -1880,6 +2114,8 @@ export type AdminUserUncheckedUpdateWithoutHandledDisputesInput = {
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateWithoutRecordedPaymentsInput = {
@@ -1903,6 +2139,8 @@ export type AdminUserCreateWithoutRecordedPaymentsInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutRecordedPaymentsInput = {
@@ -1927,6 +2165,8 @@ export type AdminUserUncheckedCreateWithoutRecordedPaymentsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutRecordedPaymentsInput = {
@@ -1966,6 +2206,8 @@ export type AdminUserUpdateWithoutRecordedPaymentsInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutRecordedPaymentsInput = {
@@ -1990,6 +2232,8 @@ export type AdminUserUncheckedUpdateWithoutRecordedPaymentsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateWithoutBlogPostsInput = {
@@ -2013,6 +2257,8 @@ export type AdminUserCreateWithoutBlogPostsInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutBlogPostsInput = {
@@ -2037,6 +2283,8 @@ export type AdminUserUncheckedCreateWithoutBlogPostsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutBlogPostsInput = {
@@ -2076,6 +2324,8 @@ export type AdminUserUpdateWithoutBlogPostsInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutBlogPostsInput = {
@@ -2100,6 +2350,8 @@ export type AdminUserUncheckedUpdateWithoutBlogPostsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserCreateWithoutContentEditsInput = {
@@ -2123,6 +2375,8 @@ export type AdminUserCreateWithoutContentEditsInput = {
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserUncheckedCreateWithoutContentEditsInput = {
@@ -2147,6 +2401,8 @@ export type AdminUserUncheckedCreateWithoutContentEditsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
   handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
   handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type AdminUserCreateOrConnectWithoutContentEditsInput = {
@@ -2186,6 +2442,8 @@ export type AdminUserUpdateWithoutContentEditsInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutContentEditsInput = {
@@ -2210,6 +2468,126 @@ export type AdminUserUncheckedUpdateWithoutContentEditsInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type AdminUserCreateWithoutSettingsEditsInput = {
+  name: string
+  adminRole?: $Enums.AdminRole
+  status?: $Enums.AdminStatus
+  approvedAt?: Date | string | null
+  removedAt?: Date | string | null
+  mfaEnabled?: boolean
+  mfaSecretEnc?: string | null
+  createdAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutAdminUserInput
+  approvedBy?: Prisma.AdminUserCreateNestedOneWithoutApprovalsInput
+  approvals?: Prisma.AdminUserCreateNestedManyWithoutApprovedByInput
+  removedBy?: Prisma.AdminUserCreateNestedOneWithoutRemovalsInput
+  removals?: Prisma.AdminUserCreateNestedManyWithoutRemovedByInput
+  reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
+  recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
+  blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
+  contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
+  blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
+  unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
+  handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
+  handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+}
+
+export type AdminUserUncheckedCreateWithoutSettingsEditsInput = {
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  adminRole?: $Enums.AdminRole
+  status?: $Enums.AdminStatus
+  approvedById?: string | null
+  approvedAt?: Date | string | null
+  removedById?: string | null
+  removedAt?: Date | string | null
+  mfaEnabled?: boolean
+  mfaSecretEnc?: string | null
+  createdAt?: Date | string
+  approvals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutApprovedByInput
+  removals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutRemovedByInput
+  reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
+  recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
+  contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
+  blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
+  unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
+  handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
+  handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+}
+
+export type AdminUserCreateOrConnectWithoutSettingsEditsInput = {
+  where: Prisma.AdminUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutSettingsEditsInput, Prisma.AdminUserUncheckedCreateWithoutSettingsEditsInput>
+}
+
+export type AdminUserUpsertWithoutSettingsEditsInput = {
+  update: Prisma.XOR<Prisma.AdminUserUpdateWithoutSettingsEditsInput, Prisma.AdminUserUncheckedUpdateWithoutSettingsEditsInput>
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutSettingsEditsInput, Prisma.AdminUserUncheckedCreateWithoutSettingsEditsInput>
+  where?: Prisma.AdminUserWhereInput
+}
+
+export type AdminUserUpdateToOneWithWhereWithoutSettingsEditsInput = {
+  where?: Prisma.AdminUserWhereInput
+  data: Prisma.XOR<Prisma.AdminUserUpdateWithoutSettingsEditsInput, Prisma.AdminUserUncheckedUpdateWithoutSettingsEditsInput>
+}
+
+export type AdminUserUpdateWithoutSettingsEditsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  adminRole?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  status?: Prisma.EnumAdminStatusFieldUpdateOperationsInput | $Enums.AdminStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mfaSecretEnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutAdminUserNestedInput
+  approvedBy?: Prisma.AdminUserUpdateOneWithoutApprovalsNestedInput
+  approvals?: Prisma.AdminUserUpdateManyWithoutApprovedByNestedInput
+  removedBy?: Prisma.AdminUserUpdateOneWithoutRemovalsNestedInput
+  removals?: Prisma.AdminUserUpdateManyWithoutRemovedByNestedInput
+  reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
+  recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
+  blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
+  contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
+  blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
+  unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
+  handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
+  handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+}
+
+export type AdminUserUncheckedUpdateWithoutSettingsEditsInput = {
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  adminRole?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  status?: Prisma.EnumAdminStatusFieldUpdateOperationsInput | $Enums.AdminStatus
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mfaSecretEnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvals?: Prisma.AdminUserUncheckedUpdateManyWithoutApprovedByNestedInput
+  removals?: Prisma.AdminUserUncheckedUpdateManyWithoutRemovedByNestedInput
+  reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
+  recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
+  contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
+  blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
+  unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
+  handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
+  handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
 }
 
 export type AdminUserCreateManyApprovedByInput = {
@@ -2261,6 +2639,8 @@ export type AdminUserUpdateWithoutApprovedByInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutApprovedByInput = {
@@ -2285,6 +2665,8 @@ export type AdminUserUncheckedUpdateWithoutApprovedByInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateManyWithoutApprovedByInput = {
@@ -2322,6 +2704,8 @@ export type AdminUserUpdateWithoutRemovedByInput = {
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateWithoutRemovedByInput = {
@@ -2346,6 +2730,8 @@ export type AdminUserUncheckedUpdateWithoutRemovedByInput = {
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
   handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
   handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type AdminUserUncheckedUpdateManyWithoutRemovedByInput = {
@@ -2378,6 +2764,8 @@ export type AdminUserCountOutputType = {
   unblocksMade: number
   handledReports: number
   handledDisputes: number
+  zoneRequestsDecided: number
+  settingsEdits: number
 }
 
 export type AdminUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2391,6 +2779,8 @@ export type AdminUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   unblocksMade?: boolean | AdminUserCountOutputTypeCountUnblocksMadeArgs
   handledReports?: boolean | AdminUserCountOutputTypeCountHandledReportsArgs
   handledDisputes?: boolean | AdminUserCountOutputTypeCountHandledDisputesArgs
+  zoneRequestsDecided?: boolean | AdminUserCountOutputTypeCountZoneRequestsDecidedArgs
+  settingsEdits?: boolean | AdminUserCountOutputTypeCountSettingsEditsArgs
 }
 
 /**
@@ -2473,6 +2863,20 @@ export type AdminUserCountOutputTypeCountHandledDisputesArgs<ExtArgs extends run
   where?: Prisma.DisputeWhereInput
 }
 
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeCountZoneRequestsDecidedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ZoneLimitRequestWhereInput
+}
+
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeCountSettingsEditsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformSettingWhereInput
+}
+
 
 export type AdminUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   accountId?: boolean
@@ -2500,6 +2904,8 @@ export type AdminUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   unblocksMade?: boolean | Prisma.AdminUser$unblocksMadeArgs<ExtArgs>
   handledReports?: boolean | Prisma.AdminUser$handledReportsArgs<ExtArgs>
   handledDisputes?: boolean | Prisma.AdminUser$handledDisputesArgs<ExtArgs>
+  zoneRequestsDecided?: boolean | Prisma.AdminUser$zoneRequestsDecidedArgs<ExtArgs>
+  settingsEdits?: boolean | Prisma.AdminUser$settingsEditsArgs<ExtArgs>
   _count?: boolean | Prisma.AdminUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["adminUser"]>
 
@@ -2569,6 +2975,8 @@ export type AdminUserInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   unblocksMade?: boolean | Prisma.AdminUser$unblocksMadeArgs<ExtArgs>
   handledReports?: boolean | Prisma.AdminUser$handledReportsArgs<ExtArgs>
   handledDisputes?: boolean | Prisma.AdminUser$handledDisputesArgs<ExtArgs>
+  zoneRequestsDecided?: boolean | Prisma.AdminUser$zoneRequestsDecidedArgs<ExtArgs>
+  settingsEdits?: boolean | Prisma.AdminUser$settingsEditsArgs<ExtArgs>
   _count?: boolean | Prisma.AdminUserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AdminUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2598,6 +3006,8 @@ export type $AdminUserPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     unblocksMade: Prisma.$AccountBlockPayload<ExtArgs>[]
     handledReports: Prisma.$ReportPayload<ExtArgs>[]
     handledDisputes: Prisma.$DisputePayload<ExtArgs>[]
+    zoneRequestsDecided: Prisma.$ZoneLimitRequestPayload<ExtArgs>[]
+    settingsEdits: Prisma.$PlatformSettingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     accountId: string
@@ -3019,6 +3429,8 @@ export interface Prisma__AdminUserClient<T, Null = never, ExtArgs extends runtim
   unblocksMade<T extends Prisma.AdminUser$unblocksMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$unblocksMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   handledReports<T extends Prisma.AdminUser$handledReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$handledReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   handledDisputes<T extends Prisma.AdminUser$handledDisputesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$handledDisputesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DisputePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  zoneRequestsDecided<T extends Prisma.AdminUser$zoneRequestsDecidedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$zoneRequestsDecidedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ZoneLimitRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  settingsEdits<T extends Prisma.AdminUser$settingsEditsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$settingsEditsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3736,6 +4148,54 @@ export type AdminUser$handledDisputesArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.DisputeScalarFieldEnum | Prisma.DisputeScalarFieldEnum[]
+}
+
+/**
+ * AdminUser.zoneRequestsDecided
+ */
+export type AdminUser$zoneRequestsDecidedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ZoneLimitRequest
+   */
+  select?: Prisma.ZoneLimitRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ZoneLimitRequest
+   */
+  omit?: Prisma.ZoneLimitRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ZoneLimitRequestInclude<ExtArgs> | null
+  where?: Prisma.ZoneLimitRequestWhereInput
+  orderBy?: Prisma.ZoneLimitRequestOrderByWithRelationInput | Prisma.ZoneLimitRequestOrderByWithRelationInput[]
+  cursor?: Prisma.ZoneLimitRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ZoneLimitRequestScalarFieldEnum | Prisma.ZoneLimitRequestScalarFieldEnum[]
+}
+
+/**
+ * AdminUser.settingsEdits
+ */
+export type AdminUser$settingsEditsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformSetting
+   */
+  select?: Prisma.PlatformSettingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformSetting
+   */
+  omit?: Prisma.PlatformSettingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformSettingInclude<ExtArgs> | null
+  where?: Prisma.PlatformSettingWhereInput
+  orderBy?: Prisma.PlatformSettingOrderByWithRelationInput | Prisma.PlatformSettingOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformSettingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformSettingScalarFieldEnum | Prisma.PlatformSettingScalarFieldEnum[]
 }
 
 /**

@@ -392,6 +392,23 @@ export type EnumGenderWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumGenderFilter<$PrismaModel>
 }
 
+export type EnumGeogSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.GeogSource | Prisma.EnumGeogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGeogSourceFilter<$PrismaModel> | $Enums.GeogSource
+}
+
+export type EnumGeogSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.GeogSource | Prisma.EnumGeogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGeogSourceWithAggregatesFilter<$PrismaModel> | $Enums.GeogSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumGeogSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumGeogSourceFilter<$PrismaModel>
+}
+
 export type JsonNullableFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -471,20 +488,6 @@ export type IntNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
 }
 
-export type EnumGenderPrefFilter<$PrismaModel = never> = {
-  equals?: $Enums.GenderPref | Prisma.EnumGenderPrefFieldRefInput<$PrismaModel>
-  in?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
-  notIn?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumGenderPrefFilter<$PrismaModel> | $Enums.GenderPref
-}
-
-export type EnumListingStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.ListingStatus | Prisma.EnumListingStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
-}
-
 export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
@@ -499,6 +502,37 @@ export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
+}
+
+export type EnumZoneLimitRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ZoneLimitRequestStatus | Prisma.EnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumZoneLimitRequestStatusFilter<$PrismaModel> | $Enums.ZoneLimitRequestStatus
+}
+
+export type EnumZoneLimitRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ZoneLimitRequestStatus | Prisma.EnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumZoneLimitRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.ZoneLimitRequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumZoneLimitRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumZoneLimitRequestStatusFilter<$PrismaModel>
+}
+
+export type EnumGenderPrefFilter<$PrismaModel = never> = {
+  equals?: $Enums.GenderPref | Prisma.EnumGenderPrefFieldRefInput<$PrismaModel>
+  in?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGenderPrefFilter<$PrismaModel> | $Enums.GenderPref
+}
+
+export type EnumListingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ListingStatus | Prisma.EnumListingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
 }
 
 export type EnumGenderPrefWithAggregatesFilter<$PrismaModel = never> = {
@@ -1241,6 +1275,23 @@ export type NestedEnumGenderWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumGenderFilter<$PrismaModel>
 }
 
+export type NestedEnumGeogSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.GeogSource | Prisma.EnumGeogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGeogSourceFilter<$PrismaModel> | $Enums.GeogSource
+}
+
+export type NestedEnumGeogSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.GeogSource | Prisma.EnumGeogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GeogSource[] | Prisma.ListEnumGeogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGeogSourceWithAggregatesFilter<$PrismaModel> | $Enums.GeogSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumGeogSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumGeogSourceFilter<$PrismaModel>
+}
+
 export type NestedJsonNullableFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -1282,20 +1333,6 @@ export type NestedEnumModerationStatusWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumModerationStatusFilter<$PrismaModel>
 }
 
-export type NestedEnumGenderPrefFilter<$PrismaModel = never> = {
-  equals?: $Enums.GenderPref | Prisma.EnumGenderPrefFieldRefInput<$PrismaModel>
-  in?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
-  notIn?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumGenderPrefFilter<$PrismaModel> | $Enums.GenderPref
-}
-
-export type NestedEnumListingStatusFilter<$PrismaModel = never> = {
-  equals?: $Enums.ListingStatus | Prisma.EnumListingStatusFieldRefInput<$PrismaModel>
-  in?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
-  notIn?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
-}
-
 export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
@@ -1321,6 +1358,37 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumZoneLimitRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ZoneLimitRequestStatus | Prisma.EnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumZoneLimitRequestStatusFilter<$PrismaModel> | $Enums.ZoneLimitRequestStatus
+}
+
+export type NestedEnumZoneLimitRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ZoneLimitRequestStatus | Prisma.EnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ZoneLimitRequestStatus[] | Prisma.ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumZoneLimitRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.ZoneLimitRequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumZoneLimitRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumZoneLimitRequestStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumGenderPrefFilter<$PrismaModel = never> = {
+  equals?: $Enums.GenderPref | Prisma.EnumGenderPrefFieldRefInput<$PrismaModel>
+  in?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GenderPref[] | Prisma.ListEnumGenderPrefFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGenderPrefFilter<$PrismaModel> | $Enums.GenderPref
+}
+
+export type NestedEnumListingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ListingStatus | Prisma.EnumListingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ListingStatus[] | Prisma.ListEnumListingStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumListingStatusFilter<$PrismaModel> | $Enums.ListingStatus
 }
 
 export type NestedEnumGenderPrefWithAggregatesFilter<$PrismaModel = never> = {

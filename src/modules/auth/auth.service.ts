@@ -328,6 +328,10 @@ export async function hardDeleteAccount(accountId: string) {
         where: { updatedById: accountId },
         data: { updatedById: null },
       });
+      await tx.platformSetting.updateMany({
+        where: { updatedById: accountId },
+        data: { updatedById: null },
+      });
       await tx.blogPost.deleteMany({ where: { authorId: accountId } });
     }
 

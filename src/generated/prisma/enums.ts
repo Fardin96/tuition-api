@@ -155,6 +155,7 @@ export const PaymentMethod = {
   ROCKET: 'ROCKET',
   BANK: 'BANK',
   CASH: 'CASH',
+  SSLCOMMERZ: 'SSLCOMMERZ',
   OTHER: 'OTHER'
 } as const
 
@@ -235,10 +236,28 @@ export const NotificationEvent = {
   APPLICATION_RECEIVED: 'APPLICATION_RECEIVED',
   APPLICATION_CONFIRMED: 'APPLICATION_CONFIRMED',
   TUTOR_VERIFICATION_DECIDED: 'TUTOR_VERIFICATION_DECIDED',
-  PAYMENT_REMINDER: 'PAYMENT_REMINDER'
+  PAYMENT_REMINDER: 'PAYMENT_REMINDER',
+  ZONE_LIMIT_DECIDED: 'ZONE_LIMIT_DECIDED'
 } as const
 
 export type NotificationEvent = (typeof NotificationEvent)[keyof typeof NotificationEvent]
+
+
+export const GeogSource = {
+  PIN: 'PIN',
+  PLACES: 'PLACES'
+} as const
+
+export type GeogSource = (typeof GeogSource)[keyof typeof GeogSource]
+
+
+export const ZoneLimitRequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  DENIED: 'DENIED'
+} as const
+
+export type ZoneLimitRequestStatus = (typeof ZoneLimitRequestStatus)[keyof typeof ZoneLimitRequestStatus]
 
 
 export const NotificationStatus = {

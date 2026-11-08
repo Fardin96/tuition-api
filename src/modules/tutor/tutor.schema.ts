@@ -5,7 +5,17 @@ export const tutorProfileSchema = z.object({
   name: z.string().min(1).max(200),
   address: z.string().min(1).max(500),
   emergencyContact: z.string().min(1).max(50),
-  whatsappNumber: z.string().min(1).max(20),
+  phoneNumber: z
+    .string()
+    .min(1)
+    .max(20)
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number")
+    .optional(),
+  whatsappNumber: z
+    .string()
+    .min(1)
+    .max(20)
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
   studentIdNumber: z.string().min(1).max(100),
   gender: z.nativeEnum(Gender),
   parentsInfo: z.string().max(1000).optional(),
@@ -57,6 +67,7 @@ export const tutorResponseSchema = z.object({
   name: z.string(),
   address: z.string(),
   emergencyContact: z.string(),
+  phoneNumber: z.string(),
   whatsappNumber: z.string(),
   studentIdNumber: z.string(),
   gender: z.string(),

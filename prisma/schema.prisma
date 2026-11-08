@@ -17,6 +17,14 @@
 //    is already unique / PK).
 //  - Added FK-side indexes on platform_fee.application_id and
 //    notification_log.recipient_account_id.
+// v6 changes:
+//  - Payments: SSLCOMMERZ and CASH only, enforced by CHECK (enum values kept).
+//  - phone_number and phone_verified_at on tutor and student. Tutor emergency
+//    contact and student id number are optional.
+//  - Tutor requirements, tutor zones, zone_limit_request, platform_setting.
+//  - Pin locations: geog_source on tutor_location, student_location, tutor_zone.
+//  - Availability weekdays bitmask on tuition_requirement and tutor_requirement
+//    (bit0=Saturday ... bit6=Friday). Match log columns on application.
 //
 // Roles: STUDENT, TUTOR, ADMIN. "Student" covers parent and learner (one role).
 // Admin has two levels: ADMIN and SUPER_ADMIN (allowlisted emails only).
@@ -135,6 +143,7 @@ enum PaymentMethod {
   ROCKET
   BANK
   CASH
+  SSLCOMMERZ
   OTHER
 }
 
@@ -192,6 +201,18 @@ enum NotificationEvent {
   APPLICATION_CONFIRMED
   TUTOR_VERIFICATION_DECIDED
   PAYMENT_REMINDER
+  ZONE_LIMIT_DECIDED
+}
+
+enum GeogSource {
+  PIN
+  PLACES
+}
+
+enum ZoneLimitRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
 }
 
 enum NotificationStatus {
@@ -297,6 +318,8 @@ model AdminUser {
   unblocksMade          AccountBlock[]      @relation("UnblockedBy")
   handledReports        Report[]
   handledDisputes       Dispute[]
+  zoneRequestsDecided   ZoneLimitRequest[]
+  settingsEdits         PlatformSetting[]
 
   @@unique([accountId, role])
   @@map("admin_user")
@@ -412,6 +435,8 @@ model Student {
   emergencyContact   String             @map("emergency_contact")
   whatsappNumber     String             @unique @map("whatsapp_number") // E.164 text, never numeric
   whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
+  phoneNumber        String             @unique @map("phone_number")
+  phoneVerifiedAt    DateTime?          @map("phone_verified_at") @db.Timestamptz(3)
   studentIdNumber    String             @map("student_id_number")
   verificationFileId String?            @map("verification_file_id") @db.Uuid
   verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
@@ -441,16 +466,18 @@ model Tutor {
   role               Role               @default(TUTOR)
   name               String
   address            String
-  emergencyContact   String             @map("emergency_contact")
+  emergencyContact   String?            @map("emergency_contact")
   whatsappNumber     String             @unique @map("whatsapp_number")
   whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
-  studentIdNumber    String             @map("student_id_number")
+  phoneNumber        String             @unique @map("phone_number")
+  phoneVerifiedAt    DateTime?          @map("phone_verified_at") @db.Timestamptz(3)
+  studentIdNumber    String?            @map("student_id_number") // required only when submitting verification (#32)
   gender             Gender
   parentsInfo        String?            @map("parents_info")
+  zoneLimit          Int                @default(5) @map("zone_limit") @db.SmallInt
   // Denormalised current state, kept in step by trigger from tutor_verification (latest row).
   verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
-  // Set by the service: verified, active account. The directory filters on this.
-  // A trigger clears it when verification stops being APPROVED or the account is not ACTIVE.
+  // Maintained by recompute_is_listed() (constraints.sql): account ACTIVE and, only when platform_setting require_tutor_verification is true, verification APPROVED. Never set by hand.
   isListed           Boolean            @default(false) @map("is_listed")
   // Rating students give this tutor. Written only by the review trigger.
   ratingAvg          Decimal            @default(0) @map("rating_avg") @db.Decimal(3, 2)
@@ -470,6 +497,10 @@ model Tutor {
   reviews       Review[]            @relation("ReviewTutor")
   location      TutorLocation?
 
+  requirements      TutorRequirement[]
+  zones             TutorZone[]
+  zoneLimitRequests ZoneLimitRequest[]
+
   @@unique([accountId, role])
   @@index([isListed, ratingAvg(sort: Desc)])
   @@index([isListed, gender])
@@ -479,7 +510,8 @@ model Tutor {
 model TutorLocation {
   id             String                                @id @default(uuid(7)) @db.Uuid
   tutorId        String                                @unique @map("tutor_id") @db.Uuid
-  placeId        String                                @map("place_id")
+  placeId        String?                               @map("place_id")
+  geogSource     GeogSource                            @default(PIN) @map("geog_source")
   addressText    String                                @map("address_text")
   districtCode   String                                @map("district_code")
   geog           Unsupported("GEOGRAPHY(POINT,4326)")?
@@ -497,7 +529,8 @@ model TutorLocation {
 model StudentLocation {
   id             String                                @id @default(uuid(7)) @db.Uuid
   studentId      String                                @unique @map("student_id") @db.Uuid
-  placeId        String                                @map("place_id")
+  placeId        String?                               @map("place_id")
+  geogSource     GeogSource                            @default(PIN) @map("geog_source")
   addressText    String                                @map("address_text")
   districtCode   String                                @map("district_code")
   geog           Unsupported("GEOGRAPHY(POINT,4326)")?
@@ -532,6 +565,8 @@ model TutorSubject {
 
   tutor   Tutor   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   subject Subject @relation(fields: [subjectId], references: [id])
+
+  requirementSubjects TutorRequirementSubject[]
 
   @@id([tutorId, subjectId])
   @@index([subjectId, tutorId])
@@ -592,6 +627,106 @@ model TutorVideo {
   @@map("tutor_video")
 }
 
+// Tutor-side constraint set. The mirror of TuitionRequirement, used for matching.
+model TutorRequirement {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  tutorId       String   @map("tutor_id") @db.Uuid
+  name          String   @db.VarChar(60)                  // tutor's label, e.g. "Evening Math, Mirpur"
+  isDefault     Boolean  @default(false) @map("is_default")
+  isActive      Boolean  @default(true) @map("is_active")  // archive instead of delete
+  classLevelMin Int      @map("class_level_min") @db.SmallInt
+  classLevelMax Int      @map("class_level_max") @db.SmallInt
+  timeFrom      DateTime @map("time_from") @db.Time(0)
+  timeTo        DateTime @map("time_to") @db.Time(0)
+  availableDays Int      @default(127) @map("available_days") @db.SmallInt   // bit0=Sat ... bit6=Fri
+  minSalary     Int?     @map("min_salary")                // BDT/month floor; null = no floor
+  maxStudents   Int      @default(1) @map("max_students") @db.SmallInt
+  availableFrom DateTime @map("available_from") @db.Date
+  teachesOnline Boolean  @default(false) @map("teaches_online")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  tutor    Tutor                     @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  subjects TutorRequirementSubject[]
+  zones    TutorRequirementZone[]
+  packages TuitionPackage[]
+
+  @@unique([id, tutorId])            // target of the composite FKs below
+  @@index([tutorId, isActive])
+  @@map("tutor_requirement")
+}
+
+// Subjects of a constraint set. The composite FK to tutor_subject makes
+// "set subjects must be a subset of profile subjects" a database guarantee.
+model TutorRequirementSubject {
+  requirementId String @map("requirement_id") @db.Uuid
+  tutorId       String @map("tutor_id") @db.Uuid
+  subjectId     Int    @map("subject_id")
+
+  requirement  TutorRequirement @relation(fields: [requirementId, tutorId], references: [id, tutorId], onDelete: Cascade)
+  tutorSubject TutorSubject     @relation(fields: [tutorId, subjectId], references: [tutorId, subjectId], onDelete: Cascade)
+
+  @@id([requirementId, subjectId])
+  @@index([subjectId, requirementId])
+  @@map("tutor_requirement_subject")
+}
+
+// Teaching zone: a circle on the map. Quota per tutor = tutor.zone_limit.
+model TutorZone {
+  id          String                                 @id @default(uuid(7)) @db.Uuid
+  tutorId     String                                 @map("tutor_id") @db.Uuid
+  label       String                                 @db.VarChar(60)
+  // optional in Prisma only so the model stays creatable; NOT NULL is enforced in SQL (§2).
+  // Always insert/update via $executeRaw with ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography.
+  center      Unsupported("GEOGRAPHY(POINT,4326)")?
+  radiusM     Int                                    @map("radius_m")
+  placeId     String?                                @map("place_id")
+  addressText String?                                @map("address_text")
+  geogSource  GeogSource                             @default(PIN) @map("geog_source")
+  createdAt   DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                               @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  tutor        Tutor                  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  requirements TutorRequirementZone[]
+
+  @@unique([id, tutorId])
+  @@index([tutorId])
+  @@map("tutor_zone")
+}
+
+model TutorRequirementZone {
+  requirementId String @map("requirement_id") @db.Uuid
+  zoneId        String @map("zone_id") @db.Uuid
+  tutorId       String @map("tutor_id") @db.Uuid
+
+  requirement TutorRequirement @relation(fields: [requirementId, tutorId], references: [id, tutorId], onDelete: Cascade)
+  zone        TutorZone        @relation(fields: [zoneId, tutorId], references: [id, tutorId], onDelete: Cascade)
+
+  @@id([requirementId, zoneId])
+  @@index([zoneId])
+  @@map("tutor_requirement_zone")
+}
+
+// Tutor asks for a higher zone quota; admin approves or denies.
+model ZoneLimitRequest {
+  id             String                 @id @default(uuid(7)) @db.Uuid
+  tutorId        String                 @map("tutor_id") @db.Uuid
+  requestedLimit Int                    @map("requested_limit") @db.SmallInt
+  reason         String
+  status         ZoneLimitRequestStatus @default(PENDING)
+  decidedById    String?                @map("decided_by") @db.Uuid
+  decidedAt      DateTime?              @map("decided_at") @db.Timestamptz(3)
+  decisionNote   String?                @map("decision_note")
+  createdAt      DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  tutor     Tutor      @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  decidedBy AdminUser? @relation(fields: [decidedById], references: [accountId], onDelete: Restrict)
+
+  @@index([status, createdAt])
+  @@index([tutorId, createdAt(sort: Desc)])
+  @@map("zone_limit_request")
+}
+
 // ───────────────────────── listings ─────────────────────────
 
 // A student's search criteria: used as a filter to find tutors, and visible to
@@ -604,6 +739,7 @@ model TuitionRequirement {
   classLevel      Int?          @map("class_level") @db.SmallInt
   timeOfDay       DateTime?     @map("time_of_day") @db.Time(0)
   daysPerWeek     Int?          @map("days_per_week") @db.SmallInt
+  availableDays   Int           @default(127) @map("available_days") @db.SmallInt // bit0=Sat ... bit6=Fri
   salary          Int? // BDT per month
   studentCount    Int?          @default(1) @map("student_count") @db.SmallInt
   hireByDate      DateTime?     @map("hire_by_date") @db.Date
@@ -645,6 +781,7 @@ model TuitionPackage {
   categoryId       Int              @map("category_id")
   subjectId        Int              @map("subject_id")
   areaId           Int?             @map("area_id") // null = online / anywhere
+  requirementId    String?          @map("requirement_id") @db.Uuid // null = tutor's default requirement
   classLevel       Int              @map("class_level") @db.SmallInt
   timeOfDay        DateTime         @map("time_of_day") @db.Time(0)
   daysPerWeek      Int              @map("days_per_week") @db.SmallInt
@@ -661,10 +798,12 @@ model TuitionPackage {
   category     Category      @relation(fields: [categoryId], references: [id])
   subject      Subject       @relation(fields: [subjectId], references: [id])
   area         Area?         @relation(fields: [areaId], references: [id], onDelete: Restrict) // never turn a package "online" by deleting an area
+  requirement  TutorRequirement? @relation(fields: [requirementId], references: [id], onDelete: Restrict)
   applications Application[]
 
   @@index([tutorId, createdAt(sort: Desc)])
   @@index([status, moderationStatus, categoryId, subjectId, areaId, createdAt(sort: Desc)])
+  @@index([requirementId])
   @@map("tuition_package")
 }
 
@@ -694,6 +833,9 @@ model Application {
   appliedAt     DateTime          @default(now()) @map("applied_at") @db.Timestamptz(3)
   confirmedAt   DateTime?         @map("confirmed_at") @db.Timestamptz(3)
   endedAt       DateTime?         @map("ended_at") @db.Timestamptz(3)
+  matchScore    Int?              @map("match_score") @db.SmallInt // 0..100, written at apply time
+  matchVersion  Int?              @map("match_version") @db.SmallInt
+  matchParts    Json?             @map("match_parts") // component breakdown at decision time
 
   requirement   TuitionRequirement? @relation(fields: [requirementId], references: [id], onDelete: Restrict)
   package       TuitionPackage?     @relation(fields: [packageId], references: [id], onDelete: Restrict)
@@ -906,6 +1048,19 @@ model SiteContent {
   updatedBy AdminUser? @relation(fields: [updatedById], references: [accountId], onDelete: Restrict)
 
   @@map("site_content")
+}
+
+// Admin-switchable platform flags and numbers. Values are validated per key by a CHECK in constraints.sql.
+// Keys: require_tutor_verification (bool), require_phone_verification (bool), commission_percent (0..100).
+model PlatformSetting {
+  key         String     @id
+  value       Json
+  updatedById String?    @map("updated_by") @db.Uuid
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  updatedBy AdminUser? @relation(fields: [updatedById], references: [accountId], onDelete: Restrict)
+
+  @@map("platform_setting")
 }
 
 // Append-only (trigger in constraints.sql).

@@ -1,3 +1,4 @@
+import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 import { type SaveLocationInput, upsertStudentLocation } from "../location/location.service.js";
 
@@ -37,6 +38,7 @@ function serializeStudent(student: {
   areaId: number;
   address: string;
   emergencyContact: string;
+  phoneNumber: string;
   whatsappNumber: string;
   studentIdNumber: string;
   whatsappVerifiedAt: Date | null;
@@ -62,6 +64,7 @@ export async function createStudentProfile(
     areaId: number;
     address: string;
     emergencyContact: string;
+    phoneNumber?: string;
     whatsappNumber: string;
     studentIdNumber: string;
     placeId?: string;
@@ -77,6 +80,12 @@ export async function createStudentProfile(
     throw err;
   }
 
+  const numbers = {
+    phoneNumber: data.phoneNumber ?? data.whatsappNumber,
+    whatsappNumber: data.whatsappNumber,
+  };
+  await assertContactNumbersFree(accountId, numbers);
+
   const {
     placeId: _placeId,
     latitude: _latitude,
@@ -84,9 +93,9 @@ export async function createStudentProfile(
     districtCode: _districtCode,
     ...profileData
   } = data;
-  const student = await prisma.student.create({
-    data: { accountId, ...profileData },
-  });
+  const student = await prisma.student
+    .create({ data: { accountId, ...profileData, phoneNumber: numbers.phoneNumber } })
+    .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
 
   const locationInput = compileLocationInput(student.address, data);
   if (locationInput) {
@@ -103,6 +112,7 @@ export async function updateStudentProfile(
     areaId: number;
     address: string;
     emergencyContact: string;
+    phoneNumber: string;
     whatsappNumber: string;
     studentIdNumber: string;
     placeId?: string;
@@ -114,6 +124,9 @@ export async function updateStudentProfile(
   const existing = await prisma.student.findUnique({ where: { accountId } });
   if (!existing) return null;
 
+  const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
+  await assertContactNumbersFree(accountId, numbers);
+
   const {
     placeId: _placeId,
     latitude: _latitude,
@@ -121,10 +134,9 @@ export async function updateStudentProfile(
     districtCode: _districtCode,
     ...profileData
   } = data;
-  const student = await prisma.student.update({
-    where: { accountId },
-    data: profileData,
-  });
+  const student = await prisma.student
+    .update({ where: { accountId }, data: profileData })
+    .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
 
   const locationInput = compileLocationInput(student.address, data);
   if (locationInput) {

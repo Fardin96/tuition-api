@@ -28,6 +28,7 @@ export type StudentLocationMinAggregateOutputType = {
   id: string | null
   studentId: string | null
   placeId: string | null
+  geogSource: $Enums.GeogSource | null
   addressText: string | null
   districtCode: string | null
   geogFetchedAt: Date | null
@@ -40,6 +41,7 @@ export type StudentLocationMaxAggregateOutputType = {
   id: string | null
   studentId: string | null
   placeId: string | null
+  geogSource: $Enums.GeogSource | null
   addressText: string | null
   districtCode: string | null
   geogFetchedAt: Date | null
@@ -52,6 +54,7 @@ export type StudentLocationCountAggregateOutputType = {
   id: number
   studentId: number
   placeId: number
+  geogSource: number
   addressText: number
   districtCode: number
   geogFetchedAt: number
@@ -66,6 +69,7 @@ export type StudentLocationMinAggregateInputType = {
   id?: true
   studentId?: true
   placeId?: true
+  geogSource?: true
   addressText?: true
   districtCode?: true
   geogFetchedAt?: true
@@ -78,6 +82,7 @@ export type StudentLocationMaxAggregateInputType = {
   id?: true
   studentId?: true
   placeId?: true
+  geogSource?: true
   addressText?: true
   districtCode?: true
   geogFetchedAt?: true
@@ -90,6 +95,7 @@ export type StudentLocationCountAggregateInputType = {
   id?: true
   studentId?: true
   placeId?: true
+  geogSource?: true
   addressText?: true
   districtCode?: true
   geogFetchedAt?: true
@@ -174,7 +180,8 @@ export type StudentLocationGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type StudentLocationGroupByOutputType = {
   id: string
   studentId: string
-  placeId: string
+  placeId: string | null
+  geogSource: $Enums.GeogSource
   addressText: string
   districtCode: string
   geogFetchedAt: Date | null
@@ -207,7 +214,8 @@ export type StudentLocationWhereInput = {
   NOT?: Prisma.StudentLocationWhereInput | Prisma.StudentLocationWhereInput[]
   id?: Prisma.UuidFilter<"StudentLocation"> | string
   studentId?: Prisma.UuidFilter<"StudentLocation"> | string
-  placeId?: Prisma.StringFilter<"StudentLocation"> | string
+  placeId?: Prisma.StringNullableFilter<"StudentLocation"> | string | null
+  geogSource?: Prisma.EnumGeogSourceFilter<"StudentLocation"> | $Enums.GeogSource
   addressText?: Prisma.StringFilter<"StudentLocation"> | string
   districtCode?: Prisma.StringFilter<"StudentLocation"> | string
   geogFetchedAt?: Prisma.DateTimeNullableFilter<"StudentLocation"> | Date | string | null
@@ -220,7 +228,8 @@ export type StudentLocationWhereInput = {
 export type StudentLocationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
-  placeId?: Prisma.SortOrder
+  placeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  geogSource?: Prisma.SortOrder
   addressText?: Prisma.SortOrder
   districtCode?: Prisma.SortOrder
   geogFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -236,7 +245,8 @@ export type StudentLocationWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.StudentLocationWhereInput | Prisma.StudentLocationWhereInput[]
   OR?: Prisma.StudentLocationWhereInput[]
   NOT?: Prisma.StudentLocationWhereInput | Prisma.StudentLocationWhereInput[]
-  placeId?: Prisma.StringFilter<"StudentLocation"> | string
+  placeId?: Prisma.StringNullableFilter<"StudentLocation"> | string | null
+  geogSource?: Prisma.EnumGeogSourceFilter<"StudentLocation"> | $Enums.GeogSource
   addressText?: Prisma.StringFilter<"StudentLocation"> | string
   districtCode?: Prisma.StringFilter<"StudentLocation"> | string
   geogFetchedAt?: Prisma.DateTimeNullableFilter<"StudentLocation"> | Date | string | null
@@ -249,7 +259,8 @@ export type StudentLocationWhereUniqueInput = Prisma.AtLeast<{
 export type StudentLocationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
-  placeId?: Prisma.SortOrder
+  placeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  geogSource?: Prisma.SortOrder
   addressText?: Prisma.SortOrder
   districtCode?: Prisma.SortOrder
   geogFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -267,7 +278,8 @@ export type StudentLocationScalarWhereWithAggregatesInput = {
   NOT?: Prisma.StudentLocationScalarWhereWithAggregatesInput | Prisma.StudentLocationScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"StudentLocation"> | string
   studentId?: Prisma.UuidWithAggregatesFilter<"StudentLocation"> | string
-  placeId?: Prisma.StringWithAggregatesFilter<"StudentLocation"> | string
+  placeId?: Prisma.StringNullableWithAggregatesFilter<"StudentLocation"> | string | null
+  geogSource?: Prisma.EnumGeogSourceWithAggregatesFilter<"StudentLocation"> | $Enums.GeogSource
   addressText?: Prisma.StringWithAggregatesFilter<"StudentLocation"> | string
   districtCode?: Prisma.StringWithAggregatesFilter<"StudentLocation"> | string
   geogFetchedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"StudentLocation"> | Date | string | null
@@ -278,7 +290,8 @@ export type StudentLocationScalarWhereWithAggregatesInput = {
 
 export type StudentLocationCreateInput = {
   id?: string
-  placeId: string
+  placeId?: string | null
+  geogSource?: $Enums.GeogSource
   addressText: string
   districtCode: string
   geogFetchedAt?: Date | string | null
@@ -291,7 +304,8 @@ export type StudentLocationCreateInput = {
 export type StudentLocationUncheckedCreateInput = {
   id?: string
   studentId: string
-  placeId: string
+  placeId?: string | null
+  geogSource?: $Enums.GeogSource
   addressText: string
   districtCode: string
   geogFetchedAt?: Date | string | null
@@ -302,7 +316,8 @@ export type StudentLocationUncheckedCreateInput = {
 
 export type StudentLocationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  placeId?: Prisma.StringFieldUpdateOperationsInput | string
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
   addressText?: Prisma.StringFieldUpdateOperationsInput | string
   districtCode?: Prisma.StringFieldUpdateOperationsInput | string
   geogFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -315,7 +330,8 @@ export type StudentLocationUpdateInput = {
 export type StudentLocationUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  placeId?: Prisma.StringFieldUpdateOperationsInput | string
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
   addressText?: Prisma.StringFieldUpdateOperationsInput | string
   districtCode?: Prisma.StringFieldUpdateOperationsInput | string
   geogFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -327,7 +343,8 @@ export type StudentLocationUncheckedUpdateInput = {
 export type StudentLocationCreateManyInput = {
   id?: string
   studentId: string
-  placeId: string
+  placeId?: string | null
+  geogSource?: $Enums.GeogSource
   addressText: string
   districtCode: string
   geogFetchedAt?: Date | string | null
@@ -338,7 +355,8 @@ export type StudentLocationCreateManyInput = {
 
 export type StudentLocationUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  placeId?: Prisma.StringFieldUpdateOperationsInput | string
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
   addressText?: Prisma.StringFieldUpdateOperationsInput | string
   districtCode?: Prisma.StringFieldUpdateOperationsInput | string
   geogFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -350,7 +368,8 @@ export type StudentLocationUpdateManyMutationInput = {
 export type StudentLocationUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
-  placeId?: Prisma.StringFieldUpdateOperationsInput | string
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
   addressText?: Prisma.StringFieldUpdateOperationsInput | string
   districtCode?: Prisma.StringFieldUpdateOperationsInput | string
   geogFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -368,6 +387,7 @@ export type StudentLocationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
   placeId?: Prisma.SortOrder
+  geogSource?: Prisma.SortOrder
   addressText?: Prisma.SortOrder
   districtCode?: Prisma.SortOrder
   geogFetchedAt?: Prisma.SortOrder
@@ -380,6 +400,7 @@ export type StudentLocationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
   placeId?: Prisma.SortOrder
+  geogSource?: Prisma.SortOrder
   addressText?: Prisma.SortOrder
   districtCode?: Prisma.SortOrder
   geogFetchedAt?: Prisma.SortOrder
@@ -392,6 +413,7 @@ export type StudentLocationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
   placeId?: Prisma.SortOrder
+  geogSource?: Prisma.SortOrder
   addressText?: Prisma.SortOrder
   districtCode?: Prisma.SortOrder
   geogFetchedAt?: Prisma.SortOrder
@@ -434,7 +456,8 @@ export type StudentLocationUncheckedUpdateOneWithoutStudentNestedInput = {
 
 export type StudentLocationCreateWithoutStudentInput = {
   id?: string
-  placeId: string
+  placeId?: string | null
+  geogSource?: $Enums.GeogSource
   addressText: string
   districtCode: string
   geogFetchedAt?: Date | string | null
@@ -445,7 +468,8 @@ export type StudentLocationCreateWithoutStudentInput = {
 
 export type StudentLocationUncheckedCreateWithoutStudentInput = {
   id?: string
-  placeId: string
+  placeId?: string | null
+  geogSource?: $Enums.GeogSource
   addressText: string
   districtCode: string
   geogFetchedAt?: Date | string | null
@@ -472,7 +496,8 @@ export type StudentLocationUpdateToOneWithWhereWithoutStudentInput = {
 
 export type StudentLocationUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  placeId?: Prisma.StringFieldUpdateOperationsInput | string
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
   addressText?: Prisma.StringFieldUpdateOperationsInput | string
   districtCode?: Prisma.StringFieldUpdateOperationsInput | string
   geogFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -483,7 +508,8 @@ export type StudentLocationUpdateWithoutStudentInput = {
 
 export type StudentLocationUncheckedUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  placeId?: Prisma.StringFieldUpdateOperationsInput | string
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
   addressText?: Prisma.StringFieldUpdateOperationsInput | string
   districtCode?: Prisma.StringFieldUpdateOperationsInput | string
   geogFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -498,6 +524,7 @@ export type StudentLocationSelect<ExtArgs extends runtime.Types.Extensions.Inter
   id?: boolean
   studentId?: boolean
   placeId?: boolean
+  geogSource?: boolean
   addressText?: boolean
   districtCode?: boolean
   geogFetchedAt?: boolean
@@ -511,6 +538,7 @@ export type StudentLocationSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   studentId?: boolean
   placeId?: boolean
+  geogSource?: boolean
   addressText?: boolean
   districtCode?: boolean
   geogFetchedAt?: boolean
@@ -524,6 +552,7 @@ export type StudentLocationSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   studentId?: boolean
   placeId?: boolean
+  geogSource?: boolean
   addressText?: boolean
   districtCode?: boolean
   geogFetchedAt?: boolean
@@ -537,6 +566,7 @@ export type StudentLocationSelectScalar = {
   id?: boolean
   studentId?: boolean
   placeId?: boolean
+  geogSource?: boolean
   addressText?: boolean
   districtCode?: boolean
   geogFetchedAt?: boolean
@@ -545,7 +575,7 @@ export type StudentLocationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type StudentLocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "placeId" | "addressText" | "districtCode" | "geogFetchedAt" | "needsReaddress" | "createdAt" | "updatedAt", ExtArgs["result"]["studentLocation"]>
+export type StudentLocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "placeId" | "geogSource" | "addressText" | "districtCode" | "geogFetchedAt" | "needsReaddress" | "createdAt" | "updatedAt", ExtArgs["result"]["studentLocation"]>
 export type StudentLocationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }
@@ -564,7 +594,8 @@ export type $StudentLocationPayload<ExtArgs extends runtime.Types.Extensions.Int
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     studentId: string
-    placeId: string
+    placeId: string | null
+    geogSource: $Enums.GeogSource
     addressText: string
     districtCode: string
     geogFetchedAt: Date | null
@@ -998,6 +1029,7 @@ export interface StudentLocationFieldRefs {
   readonly id: Prisma.FieldRef<"StudentLocation", 'String'>
   readonly studentId: Prisma.FieldRef<"StudentLocation", 'String'>
   readonly placeId: Prisma.FieldRef<"StudentLocation", 'String'>
+  readonly geogSource: Prisma.FieldRef<"StudentLocation", 'GeogSource'>
   readonly addressText: Prisma.FieldRef<"StudentLocation", 'String'>
   readonly districtCode: Prisma.FieldRef<"StudentLocation", 'String'>
   readonly geogFetchedAt: Prisma.FieldRef<"StudentLocation", 'DateTime'>

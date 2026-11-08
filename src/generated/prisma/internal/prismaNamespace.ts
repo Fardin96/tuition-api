@@ -415,6 +415,11 @@ export const ModelName = {
   TutorVerification: 'TutorVerification',
   TutorCredential: 'TutorCredential',
   TutorVideo: 'TutorVideo',
+  TutorRequirement: 'TutorRequirement',
+  TutorRequirementSubject: 'TutorRequirementSubject',
+  TutorZone: 'TutorZone',
+  TutorRequirementZone: 'TutorRequirementZone',
+  ZoneLimitRequest: 'ZoneLimitRequest',
   TuitionRequirement: 'TuitionRequirement',
   RequirementSubject: 'RequirementSubject',
   TuitionPackage: 'TuitionPackage',
@@ -427,6 +432,7 @@ export const ModelName = {
   NotificationLog: 'NotificationLog',
   BlogPost: 'BlogPost',
   SiteContent: 'SiteContent',
+  PlatformSetting: 'PlatformSetting',
   AuditLog: 'AuditLog'
 } as const
 
@@ -443,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "category" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "category" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1779,6 +1785,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TutorRequirement: {
+      payload: Prisma.$TutorRequirementPayload<ExtArgs>
+      fields: Prisma.TutorRequirementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutorRequirementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutorRequirementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>
+        }
+        findFirst: {
+          args: Prisma.TutorRequirementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutorRequirementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>
+        }
+        findMany: {
+          args: Prisma.TutorRequirementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>[]
+        }
+        create: {
+          args: Prisma.TutorRequirementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>
+        }
+        createMany: {
+          args: Prisma.TutorRequirementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutorRequirementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>[]
+        }
+        delete: {
+          args: Prisma.TutorRequirementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>
+        }
+        update: {
+          args: Prisma.TutorRequirementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutorRequirementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutorRequirementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutorRequirementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutorRequirementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementPayload>
+        }
+        aggregate: {
+          args: Prisma.TutorRequirementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutorRequirement>
+        }
+        groupBy: {
+          args: Prisma.TutorRequirementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorRequirementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutorRequirementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorRequirementCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutorRequirementSubject: {
+      payload: Prisma.$TutorRequirementSubjectPayload<ExtArgs>
+      fields: Prisma.TutorRequirementSubjectFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutorRequirementSubjectFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutorRequirementSubjectFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>
+        }
+        findFirst: {
+          args: Prisma.TutorRequirementSubjectFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutorRequirementSubjectFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>
+        }
+        findMany: {
+          args: Prisma.TutorRequirementSubjectFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>[]
+        }
+        create: {
+          args: Prisma.TutorRequirementSubjectCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>
+        }
+        createMany: {
+          args: Prisma.TutorRequirementSubjectCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutorRequirementSubjectCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>[]
+        }
+        delete: {
+          args: Prisma.TutorRequirementSubjectDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>
+        }
+        update: {
+          args: Prisma.TutorRequirementSubjectUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutorRequirementSubjectDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutorRequirementSubjectUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutorRequirementSubjectUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutorRequirementSubjectUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementSubjectPayload>
+        }
+        aggregate: {
+          args: Prisma.TutorRequirementSubjectAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutorRequirementSubject>
+        }
+        groupBy: {
+          args: Prisma.TutorRequirementSubjectGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorRequirementSubjectGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutorRequirementSubjectCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorRequirementSubjectCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutorZone: {
+      payload: Prisma.$TutorZonePayload<ExtArgs>
+      fields: Prisma.TutorZoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutorZoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutorZoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>
+        }
+        findFirst: {
+          args: Prisma.TutorZoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutorZoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>
+        }
+        findMany: {
+          args: Prisma.TutorZoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>[]
+        }
+        create: {
+          args: Prisma.TutorZoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>
+        }
+        createMany: {
+          args: Prisma.TutorZoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutorZoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>[]
+        }
+        delete: {
+          args: Prisma.TutorZoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>
+        }
+        update: {
+          args: Prisma.TutorZoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>
+        }
+        deleteMany: {
+          args: Prisma.TutorZoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutorZoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutorZoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>[]
+        }
+        upsert: {
+          args: Prisma.TutorZoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorZonePayload>
+        }
+        aggregate: {
+          args: Prisma.TutorZoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutorZone>
+        }
+        groupBy: {
+          args: Prisma.TutorZoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorZoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutorZoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorZoneCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutorRequirementZone: {
+      payload: Prisma.$TutorRequirementZonePayload<ExtArgs>
+      fields: Prisma.TutorRequirementZoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutorRequirementZoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutorRequirementZoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>
+        }
+        findFirst: {
+          args: Prisma.TutorRequirementZoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutorRequirementZoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>
+        }
+        findMany: {
+          args: Prisma.TutorRequirementZoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>[]
+        }
+        create: {
+          args: Prisma.TutorRequirementZoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>
+        }
+        createMany: {
+          args: Prisma.TutorRequirementZoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutorRequirementZoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>[]
+        }
+        delete: {
+          args: Prisma.TutorRequirementZoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>
+        }
+        update: {
+          args: Prisma.TutorRequirementZoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>
+        }
+        deleteMany: {
+          args: Prisma.TutorRequirementZoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutorRequirementZoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutorRequirementZoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>[]
+        }
+        upsert: {
+          args: Prisma.TutorRequirementZoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutorRequirementZonePayload>
+        }
+        aggregate: {
+          args: Prisma.TutorRequirementZoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutorRequirementZone>
+        }
+        groupBy: {
+          args: Prisma.TutorRequirementZoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorRequirementZoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutorRequirementZoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutorRequirementZoneCountAggregateOutputType> | number
+        }
+      }
+    }
+    ZoneLimitRequest: {
+      payload: Prisma.$ZoneLimitRequestPayload<ExtArgs>
+      fields: Prisma.ZoneLimitRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ZoneLimitRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ZoneLimitRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.ZoneLimitRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ZoneLimitRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>
+        }
+        findMany: {
+          args: Prisma.ZoneLimitRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>[]
+        }
+        create: {
+          args: Prisma.ZoneLimitRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>
+        }
+        createMany: {
+          args: Prisma.ZoneLimitRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ZoneLimitRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.ZoneLimitRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>
+        }
+        update: {
+          args: Prisma.ZoneLimitRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.ZoneLimitRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ZoneLimitRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ZoneLimitRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.ZoneLimitRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ZoneLimitRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.ZoneLimitRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateZoneLimitRequest>
+        }
+        groupBy: {
+          args: Prisma.ZoneLimitRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ZoneLimitRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ZoneLimitRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ZoneLimitRequestCountAggregateOutputType> | number
+        }
+      }
+    }
     TuitionRequirement: {
       payload: Prisma.$TuitionRequirementPayload<ExtArgs>
       fields: Prisma.TuitionRequirementFieldRefs
@@ -2667,6 +3043,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlatformSetting: {
+      payload: Prisma.$PlatformSettingPayload<ExtArgs>
+      fields: Prisma.PlatformSettingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlatformSettingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlatformSettingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>
+        }
+        findFirst: {
+          args: Prisma.PlatformSettingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlatformSettingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>
+        }
+        findMany: {
+          args: Prisma.PlatformSettingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>[]
+        }
+        create: {
+          args: Prisma.PlatformSettingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>
+        }
+        createMany: {
+          args: Prisma.PlatformSettingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlatformSettingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>[]
+        }
+        delete: {
+          args: Prisma.PlatformSettingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>
+        }
+        update: {
+          args: Prisma.PlatformSettingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlatformSettingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlatformSettingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlatformSettingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlatformSettingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingPayload>
+        }
+        aggregate: {
+          args: Prisma.PlatformSettingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlatformSetting>
+        }
+        groupBy: {
+          args: Prisma.PlatformSettingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformSettingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlatformSettingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformSettingCountAggregateOutputType> | number
+        }
+      }
+    }
     AuditLog: {
       payload: Prisma.$AuditLogPayload<ExtArgs>
       fields: Prisma.AuditLogFieldRefs
@@ -2908,6 +3358,8 @@ export const StudentScalarFieldEnum = {
   emergencyContact: 'emergencyContact',
   whatsappNumber: 'whatsappNumber',
   whatsappVerifiedAt: 'whatsappVerifiedAt',
+  phoneNumber: 'phoneNumber',
+  phoneVerifiedAt: 'phoneVerifiedAt',
   studentIdNumber: 'studentIdNumber',
   verificationFileId: 'verificationFileId',
   verificationStatus: 'verificationStatus',
@@ -2929,9 +3381,12 @@ export const TutorScalarFieldEnum = {
   emergencyContact: 'emergencyContact',
   whatsappNumber: 'whatsappNumber',
   whatsappVerifiedAt: 'whatsappVerifiedAt',
+  phoneNumber: 'phoneNumber',
+  phoneVerifiedAt: 'phoneVerifiedAt',
   studentIdNumber: 'studentIdNumber',
   gender: 'gender',
   parentsInfo: 'parentsInfo',
+  zoneLimit: 'zoneLimit',
   verificationStatus: 'verificationStatus',
   isListed: 'isListed',
   ratingAvg: 'ratingAvg',
@@ -2947,6 +3402,7 @@ export const TutorLocationScalarFieldEnum = {
   id: 'id',
   tutorId: 'tutorId',
   placeId: 'placeId',
+  geogSource: 'geogSource',
   addressText: 'addressText',
   districtCode: 'districtCode',
   geogFetchedAt: 'geogFetchedAt',
@@ -2962,6 +3418,7 @@ export const StudentLocationScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
   placeId: 'placeId',
+  geogSource: 'geogSource',
   addressText: 'addressText',
   districtCode: 'districtCode',
   geogFetchedAt: 'geogFetchedAt',
@@ -3029,6 +3486,76 @@ export const TutorVideoScalarFieldEnum = {
 export type TutorVideoScalarFieldEnum = (typeof TutorVideoScalarFieldEnum)[keyof typeof TutorVideoScalarFieldEnum]
 
 
+export const TutorRequirementScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  name: 'name',
+  isDefault: 'isDefault',
+  isActive: 'isActive',
+  classLevelMin: 'classLevelMin',
+  classLevelMax: 'classLevelMax',
+  timeFrom: 'timeFrom',
+  timeTo: 'timeTo',
+  availableDays: 'availableDays',
+  minSalary: 'minSalary',
+  maxStudents: 'maxStudents',
+  availableFrom: 'availableFrom',
+  teachesOnline: 'teachesOnline',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutorRequirementScalarFieldEnum = (typeof TutorRequirementScalarFieldEnum)[keyof typeof TutorRequirementScalarFieldEnum]
+
+
+export const TutorRequirementSubjectScalarFieldEnum = {
+  requirementId: 'requirementId',
+  tutorId: 'tutorId',
+  subjectId: 'subjectId'
+} as const
+
+export type TutorRequirementSubjectScalarFieldEnum = (typeof TutorRequirementSubjectScalarFieldEnum)[keyof typeof TutorRequirementSubjectScalarFieldEnum]
+
+
+export const TutorZoneScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  label: 'label',
+  radiusM: 'radiusM',
+  placeId: 'placeId',
+  addressText: 'addressText',
+  geogSource: 'geogSource',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutorZoneScalarFieldEnum = (typeof TutorZoneScalarFieldEnum)[keyof typeof TutorZoneScalarFieldEnum]
+
+
+export const TutorRequirementZoneScalarFieldEnum = {
+  requirementId: 'requirementId',
+  zoneId: 'zoneId',
+  tutorId: 'tutorId'
+} as const
+
+export type TutorRequirementZoneScalarFieldEnum = (typeof TutorRequirementZoneScalarFieldEnum)[keyof typeof TutorRequirementZoneScalarFieldEnum]
+
+
+export const ZoneLimitRequestScalarFieldEnum = {
+  id: 'id',
+  tutorId: 'tutorId',
+  requestedLimit: 'requestedLimit',
+  reason: 'reason',
+  status: 'status',
+  decidedById: 'decidedById',
+  decidedAt: 'decidedAt',
+  decisionNote: 'decisionNote',
+  createdAt: 'createdAt'
+} as const
+
+export type ZoneLimitRequestScalarFieldEnum = (typeof ZoneLimitRequestScalarFieldEnum)[keyof typeof ZoneLimitRequestScalarFieldEnum]
+
+
 export const TuitionRequirementScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
@@ -3037,6 +3564,7 @@ export const TuitionRequirementScalarFieldEnum = {
   classLevel: 'classLevel',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
+  availableDays: 'availableDays',
   salary: 'salary',
   studentCount: 'studentCount',
   hireByDate: 'hireByDate',
@@ -3065,6 +3593,7 @@ export const TuitionPackageScalarFieldEnum = {
   categoryId: 'categoryId',
   subjectId: 'subjectId',
   areaId: 'areaId',
+  requirementId: 'requirementId',
   classLevel: 'classLevel',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
@@ -3091,7 +3620,10 @@ export const ApplicationScalarFieldEnum = {
   status: 'status',
   appliedAt: 'appliedAt',
   confirmedAt: 'confirmedAt',
-  endedAt: 'endedAt'
+  endedAt: 'endedAt',
+  matchScore: 'matchScore',
+  matchVersion: 'matchVersion',
+  matchParts: 'matchParts'
 } as const
 
 export type ApplicationScalarFieldEnum = (typeof ApplicationScalarFieldEnum)[keyof typeof ApplicationScalarFieldEnum]
@@ -3226,6 +3758,16 @@ export const SiteContentScalarFieldEnum = {
 } as const
 
 export type SiteContentScalarFieldEnum = (typeof SiteContentScalarFieldEnum)[keyof typeof SiteContentScalarFieldEnum]
+
+
+export const PlatformSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedById: 'updatedById',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformSettingScalarFieldEnum = (typeof PlatformSettingScalarFieldEnum)[keyof typeof PlatformSettingScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {
@@ -3473,6 +4015,20 @@ export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
 
 
 /**
+ * Reference to a field of type 'GeogSource'
+ */
+export type EnumGeogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GeogSource'>
+    
+
+
+/**
+ * Reference to a field of type 'GeogSource[]'
+ */
+export type ListEnumGeogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GeogSource[]'>
+    
+
+
+/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -3497,6 +4053,20 @@ export type EnumModerationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
  * Reference to a field of type 'ModerationStatus[]'
  */
 export type ListEnumModerationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ZoneLimitRequestStatus'
+ */
+export type EnumZoneLimitRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ZoneLimitRequestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ZoneLimitRequestStatus[]'
+ */
+export type ListEnumZoneLimitRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ZoneLimitRequestStatus[]'>
     
 
 
@@ -3934,6 +4504,11 @@ export type GlobalOmitConfig = {
   tutorVerification?: Prisma.TutorVerificationOmit
   tutorCredential?: Prisma.TutorCredentialOmit
   tutorVideo?: Prisma.TutorVideoOmit
+  tutorRequirement?: Prisma.TutorRequirementOmit
+  tutorRequirementSubject?: Prisma.TutorRequirementSubjectOmit
+  tutorZone?: Prisma.TutorZoneOmit
+  tutorRequirementZone?: Prisma.TutorRequirementZoneOmit
+  zoneLimitRequest?: Prisma.ZoneLimitRequestOmit
   tuitionRequirement?: Prisma.TuitionRequirementOmit
   requirementSubject?: Prisma.RequirementSubjectOmit
   tuitionPackage?: Prisma.TuitionPackageOmit
@@ -3946,6 +4521,7 @@ export type GlobalOmitConfig = {
   notificationLog?: Prisma.NotificationLogOmit
   blogPost?: Prisma.BlogPostOmit
   siteContent?: Prisma.SiteContentOmit
+  platformSetting?: Prisma.PlatformSettingOmit
   auditLog?: Prisma.AuditLogOmit
 }
 

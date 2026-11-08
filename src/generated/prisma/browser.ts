@@ -108,6 +108,31 @@ export type TutorCredential = Prisma.TutorCredentialModel
  */
 export type TutorVideo = Prisma.TutorVideoModel
 /**
+ * Model TutorRequirement
+ * 
+ */
+export type TutorRequirement = Prisma.TutorRequirementModel
+/**
+ * Model TutorRequirementSubject
+ * 
+ */
+export type TutorRequirementSubject = Prisma.TutorRequirementSubjectModel
+/**
+ * Model TutorZone
+ * 
+ */
+export type TutorZone = Prisma.TutorZoneModel
+/**
+ * Model TutorRequirementZone
+ * 
+ */
+export type TutorRequirementZone = Prisma.TutorRequirementZoneModel
+/**
+ * Model ZoneLimitRequest
+ * 
+ */
+export type ZoneLimitRequest = Prisma.ZoneLimitRequestModel
+/**
  * Model TuitionRequirement
  * 
  */
@@ -167,6 +192,11 @@ export type BlogPost = Prisma.BlogPostModel
  * 
  */
 export type SiteContent = Prisma.SiteContentModel
+/**
+ * Model PlatformSetting
+ * 
+ */
+export type PlatformSetting = Prisma.PlatformSettingModel
 /**
  * Model AuditLog
  * 
