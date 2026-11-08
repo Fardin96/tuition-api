@@ -15,6 +15,7 @@ ca-certificate.crt
 # planning
 endpoints.md
 GATES.md
+before-launch-checklist.md
 
 # husky generated files
 /.husky/_
@@ -22,3 +23,6 @@ GATES.md
 # ai-stuff
 skills-lock.json
 .agents/
+
+# backup files
+.backups/

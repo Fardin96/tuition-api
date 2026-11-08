@@ -52,23 +52,23 @@ curl http://localhost:3000/api/v1/health
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `yarn dev` | Start dev server with watch |
-| `yarn build` | Build production bundle to `dist/` |
-| `yarn start` | Run production bundle (env vars injected by host) |
-| `yarn db:migrate:create` | Create a new empty migration |
-| `yarn db:migrate` | Apply migrations in dev |
-| `bash scripts/migrate.sh` | Apply migrations in production (run automatically by the pre-deploy job) |
-| `npx prisma migrate deploy` | Apply migrations locally/manually |
-| `yarn db:generate` | Regenerate Prisma client |
-| `yarn db:seed` | Run seed script |
-| `yarn db:studio` | Open Prisma Studio |
-| `yarn lint` / `yarn lint:fix` | Biome |
-| `yarn typecheck` | TypeScript |
-| `yarn test` | Vitest (watch) |
-| `yarn test:ci` | Vitest (single run) |
-| `yarn cron:weekly-location-expiry` | Run the weekly location-expiry cron manually |
+| Script                             | Purpose                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------ |
+| `yarn dev`                         | Start dev server with watch                                              |
+| `yarn build`                       | Build production bundle to `dist/`                                       |
+| `yarn start`                       | Run production bundle (env vars injected by host)                        |
+| `yarn db:migrate:create`           | Create a new empty migration                                             |
+| `yarn db:migrate`                  | Apply migrations in dev                                                  |
+| `bash scripts/migrate.sh`          | Apply migrations in production (run automatically by the pre-deploy job) |
+| `npx prisma migrate deploy`        | Apply migrations locally/manually                                        |
+| `yarn db:generate`                 | Regenerate Prisma client                                                 |
+| `yarn db:seed`                     | Run seed script                                                          |
+| `yarn db:studio`                   | Open Prisma Studio                                                       |
+| `yarn lint` / `yarn lint:fix`      | Biome                                                                    |
+| `yarn typecheck`                   | TypeScript                                                               |
+| `yarn test`                        | Vitest (watch)                                                           |
+| `yarn test:ci`                     | Vitest (single run)                                                      |
+| `yarn cron:weekly-location-expiry` | Run the weekly location-expiry cron manually                             |
 
 ## Deploy to DigitalOcean App Platform
 
@@ -149,6 +149,10 @@ Required once you build auth/files/notifications:
 - `R2_ENDPOINT`, `R2_REGION`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_URL_PREFIX`
 - `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`
 - `SUPER_ADMIN_EMAIL_1`, `SUPER_ADMIN_EMAIL_2`
+
+## Documentation
+
+- [Important Commands Reference](docs/important_commands.md) — `pg_dump`, migrations, dev commands, deploy, and other commands you'll need
 
 ## Project structure
 
