@@ -34,7 +34,7 @@ ALTER TABLE account ADD CONSTRAINT account_deleted_matches
   CHECK ((status = 'DELETED') = (deleted_at IS NOT NULL));
 
 -- ═════════ 2. WhatsApp numbers: E.164 text, e.g. +8801712345678 ═══════
--- [v6] tombstone format `deleted:<accountId>:<original>` (soft delete frees the real number).
+-- [v6] tombstone format `deleted:<accountId>:<original>` (soft delete frees the real number). NULL allowed: WhatsApp is optional.
 ALTER TABLE student ADD CONSTRAINT student_whatsapp_e164
   CHECK (whatsapp_number ~ '^\+[1-9][0-9]{7,14}$' OR whatsapp_number LIKE 'deleted:%');
 ALTER TABLE tutor ADD CONSTRAINT tutor_whatsapp_e164

@@ -33,6 +33,7 @@ Quick reference for running and recovering Prisma migrations in this repo.
 | `20261107000400_v6_validate`                | v6_validate                | Runs`VALIDATE CONSTRAINT` on all NOT VALID constraints. `fee_payment_method_allowed` stays NOT VALID if violating rows exist.                                                          |
 | `20261107000500_v6_contact_unique`          | v6_contact_unique          | Global phone/WhatsApp uniqueness across student+tutor via trigger`contact_number_guard` with pre-flight hard fail on existing duplicates.                                              |
 | `20261111000100_pr1_hardening`              | pr1_hardening              | `dispute_raised_by_idx` plus a row lock (`FOR NO KEY UPDATE`) in `review_recompute()` so concurrent reviews cannot write a stale average. Additive, no pre-flight needed.              |
+| `20261112000100_whatsapp_optional`          | whatsapp_optional          | Drops NOT NULL on `student.whatsapp_number` and `tutor.whatsapp_number`. `phone_number` stays required. No data change.                                                              |
 
 **Note:** v6 ran cleanly on a restored copy of the production backup before being pushed.
 

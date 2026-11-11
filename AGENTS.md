@@ -102,7 +102,7 @@ Required once auth/files/notifications are used:
 - **Listing**: `is_listed` is written ONLY by `recompute_is_listed()` (SQL). Never set it by hand in services.
 - **Location payload**: profile routes take a nested `location {lat, lng, addressText, district, placeId?}` (`src/modules/location/location.schema.ts`); `district` is normalized by `src/lib/districts.ts`. Write only through `upsertLocation`.
 - **Location rows** carry `geog_source`. `PIN` never expires; the cron only touches `PLACES`. Geography and zone writes go through raw SQL, because Prisma cannot write `Unsupported` types.
-- **Contact numbers**: `phone_number` and `whatsapp_number` are globally unique across student and tutor, enforced by trigger `contact_number_guard` and service `assertContactNumbersFree` (409 `PhoneInUse` / `WhatsappInUse`). The same account may reuse a number; `deleted:` tombstones are ignored.
+- **Contact numbers**: `phone_number` is required on student and tutor; `whatsapp_number` is optional (NULL allowed, cleared by PATCH `whatsappNumber: null`). Both are globally unique across student and tutor, enforced by trigger `contact_number_guard` and service `assertContactNumbersFree` (409 `PhoneInUse` / `WhatsappInUse`). The same account may reuse a number; `deleted:` tombstones are ignored. The services never copy one number into the other.
 - **Apply gate**: readiness comes from SQL `tutor_missing_requirements()`. Do not duplicate those checks in TypeScript.
 
 ## Schema v6

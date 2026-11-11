@@ -284,7 +284,7 @@ export type TutorGroupByOutputType = {
   name: string
   address: string
   emergencyContact: string | null
-  whatsappNumber: string
+  whatsappNumber: string | null
   whatsappVerifiedAt: Date | null
   phoneNumber: string
   phoneVerifiedAt: Date | null
@@ -330,7 +330,7 @@ export type TutorWhereInput = {
   name?: Prisma.StringFilter<"Tutor"> | string
   address?: Prisma.StringFilter<"Tutor"> | string
   emergencyContact?: Prisma.StringNullableFilter<"Tutor"> | string | null
-  whatsappNumber?: Prisma.StringFilter<"Tutor"> | string
+  whatsappNumber?: Prisma.StringNullableFilter<"Tutor"> | string | null
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Tutor"> | Date | string | null
   phoneNumber?: Prisma.StringFilter<"Tutor"> | string
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Tutor"> | Date | string | null
@@ -367,7 +367,7 @@ export type TutorOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   address?: Prisma.SortOrder
   emergencyContact?: Prisma.SortOrderInput | Prisma.SortOrder
-  whatsappNumber?: Prisma.SortOrder
+  whatsappNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -445,7 +445,7 @@ export type TutorOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   address?: Prisma.SortOrder
   emergencyContact?: Prisma.SortOrderInput | Prisma.SortOrder
-  whatsappNumber?: Prisma.SortOrder
+  whatsappNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -476,7 +476,7 @@ export type TutorScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
   address?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
   emergencyContact?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
-  whatsappNumber?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
+  whatsappNumber?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
   whatsappVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tutor"> | Date | string | null
   phoneNumber?: Prisma.StringWithAggregatesFilter<"Tutor"> | string
   phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tutor"> | Date | string | null
@@ -497,7 +497,7 @@ export type TutorCreateInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -534,7 +534,7 @@ export type TutorUncheckedCreateInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -568,7 +568,7 @@ export type TutorUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -605,7 +605,7 @@ export type TutorUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -641,7 +641,7 @@ export type TutorCreateManyInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -662,7 +662,7 @@ export type TutorUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -685,7 +685,7 @@ export type TutorUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1020,7 +1020,7 @@ export type TutorCreateWithoutAccountInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1054,7 +1054,7 @@ export type TutorUncheckedCreateWithoutAccountInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1104,7 +1104,7 @@ export type TutorUpdateWithoutAccountInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1138,7 +1138,7 @@ export type TutorUncheckedUpdateWithoutAccountInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1172,7 +1172,7 @@ export type TutorCreateWithoutLocationInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1208,7 +1208,7 @@ export type TutorUncheckedCreateWithoutLocationInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1257,7 +1257,7 @@ export type TutorUpdateWithoutLocationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1293,7 +1293,7 @@ export type TutorUncheckedUpdateWithoutLocationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1326,7 +1326,7 @@ export type TutorCreateWithoutAreasInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1362,7 +1362,7 @@ export type TutorUncheckedCreateWithoutAreasInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1411,7 +1411,7 @@ export type TutorUpdateWithoutAreasInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1447,7 +1447,7 @@ export type TutorUncheckedUpdateWithoutAreasInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1480,7 +1480,7 @@ export type TutorCreateWithoutSubjectsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1516,7 +1516,7 @@ export type TutorUncheckedCreateWithoutSubjectsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1565,7 +1565,7 @@ export type TutorUpdateWithoutSubjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1601,7 +1601,7 @@ export type TutorUncheckedUpdateWithoutSubjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1634,7 +1634,7 @@ export type TutorCreateWithoutVerificationsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1670,7 +1670,7 @@ export type TutorUncheckedCreateWithoutVerificationsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1719,7 +1719,7 @@ export type TutorUpdateWithoutVerificationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1755,7 +1755,7 @@ export type TutorUncheckedUpdateWithoutVerificationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1788,7 +1788,7 @@ export type TutorCreateWithoutCredentialsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1824,7 +1824,7 @@ export type TutorUncheckedCreateWithoutCredentialsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1873,7 +1873,7 @@ export type TutorUpdateWithoutCredentialsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1909,7 +1909,7 @@ export type TutorUncheckedUpdateWithoutCredentialsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1942,7 +1942,7 @@ export type TutorCreateWithoutVideosInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1978,7 +1978,7 @@ export type TutorUncheckedCreateWithoutVideosInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2027,7 +2027,7 @@ export type TutorUpdateWithoutVideosInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2063,7 +2063,7 @@ export type TutorUncheckedUpdateWithoutVideosInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2096,7 +2096,7 @@ export type TutorCreateWithoutRequirementsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2132,7 +2132,7 @@ export type TutorUncheckedCreateWithoutRequirementsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2181,7 +2181,7 @@ export type TutorUpdateWithoutRequirementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2217,7 +2217,7 @@ export type TutorUncheckedUpdateWithoutRequirementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2250,7 +2250,7 @@ export type TutorCreateWithoutZonesInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2286,7 +2286,7 @@ export type TutorUncheckedCreateWithoutZonesInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2335,7 +2335,7 @@ export type TutorUpdateWithoutZonesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2371,7 +2371,7 @@ export type TutorUncheckedUpdateWithoutZonesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2404,7 +2404,7 @@ export type TutorCreateWithoutZoneLimitRequestsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2440,7 +2440,7 @@ export type TutorUncheckedCreateWithoutZoneLimitRequestsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2489,7 +2489,7 @@ export type TutorUpdateWithoutZoneLimitRequestsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2525,7 +2525,7 @@ export type TutorUncheckedUpdateWithoutZoneLimitRequestsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2558,7 +2558,7 @@ export type TutorCreateWithoutPackagesInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2594,7 +2594,7 @@ export type TutorUncheckedCreateWithoutPackagesInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2643,7 +2643,7 @@ export type TutorUpdateWithoutPackagesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2679,7 +2679,7 @@ export type TutorUncheckedUpdateWithoutPackagesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2712,7 +2712,7 @@ export type TutorCreateWithoutApplicationsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2748,7 +2748,7 @@ export type TutorUncheckedCreateWithoutApplicationsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2797,7 +2797,7 @@ export type TutorUpdateWithoutApplicationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2833,7 +2833,7 @@ export type TutorUncheckedUpdateWithoutApplicationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2866,7 +2866,7 @@ export type TutorCreateWithoutReviewsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2902,7 +2902,7 @@ export type TutorUncheckedCreateWithoutReviewsInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -2951,7 +2951,7 @@ export type TutorUpdateWithoutReviewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2987,7 +2987,7 @@ export type TutorUncheckedUpdateWithoutReviewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3020,7 +3020,7 @@ export type TutorCreateWithoutFeesInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -3056,7 +3056,7 @@ export type TutorUncheckedCreateWithoutFeesInput = {
   name: string
   address: string
   emergencyContact?: string | null
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -3105,7 +3105,7 @@ export type TutorUpdateWithoutFeesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3141,7 +3141,7 @@ export type TutorUncheckedUpdateWithoutFeesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3458,7 +3458,7 @@ export type $TutorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     name: string
     address: string
     emergencyContact: string | null
-    whatsappNumber: string
+    whatsappNumber: string | null
     whatsappVerifiedAt: Date | null
     phoneNumber: string
     phoneVerifiedAt: Date | null

@@ -135,8 +135,6 @@ export async function createStudentProfile(
     studentIdNumber?: string;
   } = {},
 ) {
-  const whatsappNumber =
-    overrides.whatsappNumber ?? `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`;
   return prisma.student.create({
     data: {
       accountId,
@@ -144,8 +142,10 @@ export async function createStudentProfile(
       name: overrides.name ?? "Test Student",
       address: overrides.address ?? "123 Test Lane",
       emergencyContact: overrides.emergencyContact ?? "+8801700000001",
-      whatsappNumber,
-      phoneNumber: overrides.phoneNumber ?? whatsappNumber,
+      whatsappNumber: overrides.whatsappNumber ?? null,
+      phoneNumber:
+        overrides.phoneNumber ??
+        `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
       studentIdNumber: overrides.studentIdNumber ?? `STU-${crypto.randomUUID()}`,
     },
   });
@@ -165,16 +165,16 @@ export async function createTutorProfile(
     verificationStatus?: "NOT_SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED";
   } = {},
 ) {
-  const whatsappNumber =
-    overrides.whatsappNumber ?? `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`;
   return prisma.tutor.create({
     data: {
       accountId,
       name: overrides.name ?? "Test Tutor",
       address: overrides.address ?? "456 Tutor Road",
       emergencyContact: overrides.emergencyContact ?? "+8801700000002",
-      whatsappNumber,
-      phoneNumber: overrides.phoneNumber ?? whatsappNumber,
+      whatsappNumber: overrides.whatsappNumber ?? null,
+      phoneNumber:
+        overrides.phoneNumber ??
+        `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`,
       studentIdNumber: overrides.studentIdNumber ?? `TUT-${crypto.randomUUID()}`,
       gender: overrides.gender ?? "MALE",
       isListed: overrides.isListed ?? false,

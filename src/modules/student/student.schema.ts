@@ -10,13 +10,14 @@ export const studentProfileSchema = z.object({
     .string()
     .min(1)
     .max(20)
-    .refine((v) => !v.startsWith("deleted:"), "Invalid number")
-    .optional(),
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
   whatsappNumber: z
     .string()
     .min(1)
     .max(20)
-    .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number")
+    .nullable()
+    .optional(),
   studentIdNumber: z.string().min(1).max(100),
   location: locationSchema.optional(),
 });
@@ -39,7 +40,7 @@ export const studentResponseSchema = z.object({
   address: z.string(),
   emergencyContact: z.string(),
   phoneNumber: z.string(),
-  whatsappNumber: z.string(),
+  whatsappNumber: z.string().nullable(),
   studentIdNumber: z.string(),
   whatsappVerifiedAt: z.string().nullable().optional(),
   verificationStatus: z.string(),

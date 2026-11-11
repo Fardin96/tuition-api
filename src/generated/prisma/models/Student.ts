@@ -273,7 +273,7 @@ export type StudentGroupByOutputType = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber: string | null
   whatsappVerifiedAt: Date | null
   phoneNumber: string
   phoneVerifiedAt: Date | null
@@ -317,7 +317,7 @@ export type StudentWhereInput = {
   areaId?: Prisma.IntFilter<"Student"> | number
   address?: Prisma.StringFilter<"Student"> | string
   emergencyContact?: Prisma.StringFilter<"Student"> | string
-  whatsappNumber?: Prisma.StringFilter<"Student"> | string
+  whatsappNumber?: Prisma.StringNullableFilter<"Student"> | string | null
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   phoneNumber?: Prisma.StringFilter<"Student"> | string
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
@@ -345,7 +345,7 @@ export type StudentOrderByWithRelationInput = {
   areaId?: Prisma.SortOrder
   address?: Prisma.SortOrder
   emergencyContact?: Prisma.SortOrder
-  whatsappNumber?: Prisma.SortOrder
+  whatsappNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -405,7 +405,7 @@ export type StudentOrderByWithAggregationInput = {
   areaId?: Prisma.SortOrder
   address?: Prisma.SortOrder
   emergencyContact?: Prisma.SortOrder
-  whatsappNumber?: Prisma.SortOrder
+  whatsappNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -434,7 +434,7 @@ export type StudentScalarWhereWithAggregatesInput = {
   areaId?: Prisma.IntWithAggregatesFilter<"Student"> | number
   address?: Prisma.StringWithAggregatesFilter<"Student"> | string
   emergencyContact?: Prisma.StringWithAggregatesFilter<"Student"> | string
-  whatsappNumber?: Prisma.StringWithAggregatesFilter<"Student"> | string
+  whatsappNumber?: Prisma.StringNullableWithAggregatesFilter<"Student"> | string | null
   whatsappVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
   phoneNumber?: Prisma.StringWithAggregatesFilter<"Student"> | string
   phoneVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
@@ -452,7 +452,7 @@ export type StudentCreateInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -479,7 +479,7 @@ export type StudentUncheckedCreateInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -501,7 +501,7 @@ export type StudentUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -528,7 +528,7 @@ export type StudentUncheckedUpdateInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -553,7 +553,7 @@ export type StudentCreateManyInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -571,7 +571,7 @@ export type StudentUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -591,7 +591,7 @@ export type StudentUncheckedUpdateManyInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -893,7 +893,7 @@ export type StudentCreateWithoutAccountInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -917,7 +917,7 @@ export type StudentUncheckedCreateWithoutAccountInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -955,7 +955,7 @@ export type StudentUpdateWithoutAccountInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -979,7 +979,7 @@ export type StudentUncheckedUpdateWithoutAccountInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1001,7 +1001,7 @@ export type StudentCreateWithoutAreaInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1026,7 +1026,7 @@ export type StudentUncheckedCreateWithoutAreaInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1080,7 +1080,7 @@ export type StudentScalarWhereInput = {
   areaId?: Prisma.IntFilter<"Student"> | number
   address?: Prisma.StringFilter<"Student"> | string
   emergencyContact?: Prisma.StringFilter<"Student"> | string
-  whatsappNumber?: Prisma.StringFilter<"Student"> | string
+  whatsappNumber?: Prisma.StringNullableFilter<"Student"> | string | null
   whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   phoneNumber?: Prisma.StringFilter<"Student"> | string
   phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
@@ -1098,7 +1098,7 @@ export type StudentCreateWithoutVerificationFileInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1124,7 +1124,7 @@ export type StudentUncheckedCreateWithoutVerificationFileInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1171,7 +1171,7 @@ export type StudentCreateWithoutLocationInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1197,7 +1197,7 @@ export type StudentUncheckedCreateWithoutLocationInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1234,7 +1234,7 @@ export type StudentUpdateWithoutLocationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1260,7 +1260,7 @@ export type StudentUncheckedUpdateWithoutLocationInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1281,7 +1281,7 @@ export type StudentCreateWithoutRequirementsInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1307,7 +1307,7 @@ export type StudentUncheckedCreateWithoutRequirementsInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1344,7 +1344,7 @@ export type StudentUpdateWithoutRequirementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1370,7 +1370,7 @@ export type StudentUncheckedUpdateWithoutRequirementsInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1391,7 +1391,7 @@ export type StudentCreateWithoutApplicationsInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1417,7 +1417,7 @@ export type StudentUncheckedCreateWithoutApplicationsInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1454,7 +1454,7 @@ export type StudentUpdateWithoutApplicationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1480,7 +1480,7 @@ export type StudentUncheckedUpdateWithoutApplicationsInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1501,7 +1501,7 @@ export type StudentCreateWithoutReviewsGivenInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1527,7 +1527,7 @@ export type StudentUncheckedCreateWithoutReviewsGivenInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1564,7 +1564,7 @@ export type StudentUpdateWithoutReviewsGivenInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1590,7 +1590,7 @@ export type StudentUncheckedUpdateWithoutReviewsGivenInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1613,7 +1613,7 @@ export type StudentCreateManyAreaInput = {
   name: string
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1631,7 +1631,7 @@ export type StudentUpdateWithoutAreaInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1656,7 +1656,7 @@ export type StudentUncheckedUpdateWithoutAreaInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1680,7 +1680,7 @@ export type StudentUncheckedUpdateManyWithoutAreaInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1701,7 +1701,7 @@ export type StudentCreateManyVerificationFileInput = {
   areaId: number
   address: string
   emergencyContact: string
-  whatsappNumber: string
+  whatsappNumber?: string | null
   whatsappVerifiedAt?: Date | string | null
   phoneNumber: string
   phoneVerifiedAt?: Date | string | null
@@ -1718,7 +1718,7 @@ export type StudentUpdateWithoutVerificationFileInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1744,7 +1744,7 @@ export type StudentUncheckedUpdateWithoutVerificationFileInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1768,7 +1768,7 @@ export type StudentUncheckedUpdateManyWithoutVerificationFileInput = {
   areaId?: Prisma.IntFieldUpdateOperationsInput | number
   address?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
-  whatsappNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1968,7 +1968,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     areaId: number
     address: string
     emergencyContact: string
-    whatsappNumber: string
+    whatsappNumber: string | null
     whatsappVerifiedAt: Date | null
     phoneNumber: string
     phoneVerifiedAt: Date | null
