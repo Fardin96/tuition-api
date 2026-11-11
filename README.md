@@ -90,6 +90,7 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
 
 ## Deploy to DigitalOcean App Platform
 
+0. The app drains on SIGTERM and holds at most 3 connections per process (`?connection_limit=` overrides), so rolling deploys stay inside the 22-connection budget. It logs pool stats every 60 s.
 1. The App Platform app uses an **existing** DigitalOcean managed Postgres cluster — set `DATABASE_URL` and `DATABASE_POOL_URL` in the UI or `.do/app.yaml`.
 2. Enable the `postgis` extension on the managed database before first deploy:
    ```bash

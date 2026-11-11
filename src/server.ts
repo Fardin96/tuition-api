@@ -1,10 +1,13 @@
+import "./lib/bigint.js";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
+import etag from "@fastify/etag";
 import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import Fastify from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { env } from "./config/env.js";
+import { pool, startPoolStats } from "./lib/prisma.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
@@ -34,6 +37,7 @@ export async function buildApp() {
     allowedHeaders: ["Content-Type", "Authorization"],
   });
   await app.register(cookie);
+  await app.register(etag);
   await app.register(rateLimit, {
     max: 100,
     timeWindow: "1 minute",
@@ -81,6 +85,18 @@ async function main() {
     app.log.error(err);
     process.exit(1);
   }
+  startPoolStats(app.log);
+
+  // DO App Platform sends SIGTERM on every deploy; release connections before the new instance starts.
+  const shutdown = async (signal: string) => {
+    app.log.info(`${signal} received, draining`);
+    setTimeout(() => process.exit(1), 10_000).unref();
+    await app.close();
+    await pool.end();
+    process.exit(0);
+  };
+  process.once("SIGTERM", () => shutdown("SIGTERM"));
+  process.once("SIGINT", () => shutdown("SIGINT"));
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

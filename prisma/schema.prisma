@@ -927,6 +927,7 @@ model Dispute {
 
   @@index([status, createdAt])
   @@index([applicationId])
+  @@index([raisedById, createdAt(sort: Desc)], map: "dispute_raised_by_idx")
   @@map("dispute")
 }
 

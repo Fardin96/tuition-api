@@ -113,11 +113,13 @@ DECLARE r review%ROWTYPE;
 BEGIN
   IF TG_OP = 'DELETE' THEN r := OLD; ELSE r := NEW; END IF;
   IF r.direction = 'STUDENT_TO_TUTOR' THEN
+    PERFORM 1 FROM tutor WHERE id = r.tutor_id FOR NO KEY UPDATE;
     UPDATE tutor SET
       rating_count = (SELECT count(*) FROM review WHERE tutor_id = r.tutor_id AND direction = 'STUDENT_TO_TUTOR' AND status = 'VISIBLE'),
       rating_avg   = COALESCE((SELECT round(avg(rating), 2) FROM review WHERE tutor_id = r.tutor_id AND direction = 'STUDENT_TO_TUTOR' AND status = 'VISIBLE'), 0)
     WHERE id = r.tutor_id;
   ELSE
+    PERFORM 1 FROM student WHERE id = r.student_id FOR NO KEY UPDATE;
     UPDATE student SET
       rating_count = (SELECT count(*) FROM review WHERE student_id = r.student_id AND direction = 'TUTOR_TO_STUDENT' AND status = 'VISIBLE'),
       rating_avg   = COALESCE((SELECT round(avg(rating), 2) FROM review WHERE student_id = r.student_id AND direction = 'TUTOR_TO_STUDENT' AND status = 'VISIBLE'), 0)
@@ -458,6 +460,8 @@ ALTER TABLE dispute
     status NOT IN ('RESOLVED', 'DISMISSED') OR (handled_by IS NOT NULL AND resolved_at IS NOT NULL));
 CREATE UNIQUE INDEX dispute_one_open_per_raiser
   ON dispute (application_id, raised_by) WHERE status IN ('OPEN', 'UNDER_REVIEW');
+-- /disputes/mine filters on raised_by and sorts by created_at.
+CREATE INDEX dispute_raised_by_idx ON dispute (raised_by, created_at DESC);
 
 -- Only the two parties of a running match can dispute it.
 CREATE OR REPLACE FUNCTION dispute_guard() RETURNS trigger AS $$

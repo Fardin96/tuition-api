@@ -609,6 +609,13 @@
   resolved "https://registry.yarnpkg.com/@fastify/error/-/error-4.2.1.tgz#6ec02a481559abc5ac8fd478f8a1f9391ee8188e"
   integrity sha512-MYBumuIwP+5MIpXSyKm6/o1Eigcoij186lWUssX3LH5U8KWqU0ktZhzC4CErIX9EJeQeRGI+zJZQWakBlFbUcg==
 
+"@fastify/etag@^6.2.2":
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/@fastify/etag/-/etag-6.2.2.tgz#44cab95b225b5edc078bf41f1a029d6959a5e454"
+  integrity sha512-bNztff45KwrPFcIZQNI3fkcuQe4+XEUtNekcXMw7jRQ2iysRjw4UCjlXA7WJl/kl/n9hFiZ3rYmd0tEgsMEAhw==
+  dependencies:
+    fastify-plugin "^6.0.0"
+
 "@fastify/fast-json-stringify-compiler@^5.0.0":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@fastify/fast-json-stringify-compiler/-/fast-json-stringify-compiler-5.1.1.tgz#e15a1c0b2f0e237bec364012d4a5e33baf40d44a"

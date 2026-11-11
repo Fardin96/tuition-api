@@ -32,6 +32,7 @@ Quick reference for running and recovering Prisma migrations in this repo.
 | `20261107000300_v6_constraints`             | v6_constraints             | Adds CHECKs (NOT VALID), indexes, triggers, functions (`recompute_is_listed`, `tutor_missing_requirements`), seeds, phone NOT NULL + unique indexes, transitional phone-fill triggers. |
 | `20261107000400_v6_validate`                | v6_validate                | Runs`VALIDATE CONSTRAINT` on all NOT VALID constraints. `fee_payment_method_allowed` stays NOT VALID if violating rows exist.                                                          |
 | `20261107000500_v6_contact_unique`          | v6_contact_unique          | Global phone/WhatsApp uniqueness across student+tutor via trigger`contact_number_guard` with pre-flight hard fail on existing duplicates.                                              |
+| `20261111000100_pr1_hardening`              | pr1_hardening              | `dispute_raised_by_idx` plus a row lock (`FOR NO KEY UPDATE`) in `review_recompute()` so concurrent reviews cannot write a stale average. Additive, no pre-flight needed.              |
 
 **Note:** v6 ran cleanly on a restored copy of the production backup before being pushed.
 
@@ -271,7 +272,7 @@ unset DATABASE_URL DATABASE_POOL_URL TEST_DATABASE_URL
 
 ### `lock_timeout` / `statement_timeout` during deploy
 **Cause:** Brief lock contention on `ADD CONSTRAINT`, `CREATE TRIGGER`, or `VALIDATE`.
-**Fix:** Retry the deploy. Migrations 03 and 04 set `SET LOCAL statement_timeout = '60s'` and `lock_timeout = '5s'`.
+**Fix:** Retry the deploy. The app's own pool sets `statement_timeout = 10s` per connection (direct URLs only), so it never affects the Prisma CLI. Migrations 03 and 04 set `SET LOCAL statement_timeout = '60s'` and `lock_timeout = '5s'`.
 
 ### Failed migration rolls back but earlier ones stay applied
 **Cause:** Prisma rolls back only the failed file.

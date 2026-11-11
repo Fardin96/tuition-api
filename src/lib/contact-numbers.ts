@@ -2,7 +2,7 @@ import { prisma } from "./prisma.js";
 
 type ContactNumbers = { phoneNumber?: string; whatsappNumber?: string };
 
-async function isNumberUsedByOtherAccount(accountId: string, number: string) {
+export async function isNumberUsedByOtherAccount(accountId: string, number: string) {
   const rows = await prisma.$queryRaw<{ taken: boolean }[]>`
     SELECT (
       EXISTS (SELECT 1 FROM student WHERE account_id <> ${accountId}::uuid

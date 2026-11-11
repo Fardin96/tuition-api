@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { requireRole } from "../../plugins/auth.js";
+import { publicCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
 import {
   type TutorAreasInput,
@@ -215,6 +216,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      publicCache(request, reply, "public, max-age=60, stale-while-revalidate=300");
       const query = request.query as TutorSearchQuery;
       const tutors = await searchTutors({
         area: query.area,
@@ -245,6 +247,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      publicCache(request, reply, "public, max-age=60, stale-while-revalidate=300");
       const { id } = request.params as TutorIdParam;
       const tutor = await getPublicTutorProfile(id);
       if (!tutor) {
@@ -275,6 +278,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      publicCache(request, reply, "public, max-age=300, stale-while-revalidate=600");
       const { id } = request.params as TutorIdParam;
       const reviews = await getTutorReviews(id);
       return reply.send({
@@ -420,7 +424,8 @@ export async function publicVideoRoutes(app: FastifyInstance) {
         },
       },
     },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      publicCache(request, reply, "public, max-age=300, stale-while-revalidate=600");
       const videos = await getApprovedVideos();
       return reply.send({
         videos: videos.map((v) => ({
