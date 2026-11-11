@@ -18,6 +18,7 @@ This file captures the essential, non-obvious guidance an agent needs to work in
 | `yarn db:seed` | Run seed script (`tsx --env-file-if-exists=.env src/seed/index.ts`) |
 | `yarn db:studio` | Open Prisma Studio |
 | `yarn lint` / `yarn lint:fix` | Biome lint/check |
+| `yarn lint:sql` | Squawk lint of new migrations (see Migration safety) |
 | `yarn format` | Biome format (write) |
 | `yarn typecheck` | TypeScript (`tsc --noEmit`) |
 | `yarn test` | Vitest (watch mode) |
@@ -33,10 +34,15 @@ This file captures the essential, non-obvious guidance an agent needs to work in
 - The test setup (`src/tests/setup.ts`) runs `npx prisma migrate deploy` before each test suite. Tests use a real PostgreSQL DB with PostGIS.
 - Test DB: set `TEST_DATABASE_URL` in `.env` (format: `postgresql://user:password@localhost:5432/tuition_test?sslmode=disable`). Tests use `TEST_DATABASE_URL` when set, otherwise `DATABASE_URL`.
 - Vitest config uses `pool: "threads"` and `fileParallelism: false` — tests are not parallelized.
+- **Migration safety:** rehearse pending migrations with `bash scripts/migrate-safe.sh '<prod direct url>'` (`--drill` = restore check only). It dumps prod, restores to a local scratch DB, applies the migrations there, and writes `.backups/.rehearsed`. Prod is only read. Full guide: `docs/migrations.md`.
+- **Pre-push gate:** `.husky/pre-push` blocks a push that changes `prisma/migrations` unless `.backups/.rehearsed` matches the current migration files. `git push --no-verify` skips ALL checks; never use it for an unrehearsed migration.
+- **Squawk:** `yarn lint:sql` runs in CI on new migrations only. The 9 existing ones are in `excluded_paths` in `.squawk.toml`; never add new migrations there. Silence a deliberate warning with `-- squawk-ignore <rule>`.
+- **Backups:** `.backups/` is gitignored and holds PII dumps. Dumps older than 14 days are deleted automatically.
+- **Agents never run `migrate-safe.sh` against production.** It needs the user's prod URL and a DO Trusted Sources IP; ask the user first.
 
 ## Lint / Typecheck / Test order
 
-The pre-push hook and CI enforce: **`lint -> typecheck -> test:ci -> build`**. Always run in this order on a PR. Skipping any step may cause the hook or CI to fail.
+The pre-push hook and CI enforce: **`lint -> typecheck -> test:ci -> build`**. Always run in this order on a PR. Skipping any step may cause the hook or CI to fail. The pre-push hook also runs the migration rehearsal gate first when `prisma/migrations` changed.
 
 ## Environment variables (from .env.example)
 
@@ -95,7 +101,7 @@ Required once auth/files/notifications are used:
 
 ## Schema v6
 
-- Plan and migration order: `prisma/MIGRATION_PLAN_v6.md`. Launch steps: `before-launch-checklist.md`, section 12.
+- Plan and migration order: `.misc/MIGRATION_PLAN_v6.md` (pre-flight: `.misc/pre-flight.sql`, `.misc/v6-preflight.sh`). Launch steps: `before-launch-checklist.md`, section 12.
 - `endpoints.md` in this repo is listed in `.gitignore`, so its changes are not committed. The copy in `../tution-media/endpoints.md` is the other half and must stay in sync, except for its State column.
 - Transitional: the phone fill triggers (`student_phone_fill_trg`, `tutor_phone_fill_trg`, function `phone_number_fill()`) are dropped by the contract migration after the feature release (R3).
 
