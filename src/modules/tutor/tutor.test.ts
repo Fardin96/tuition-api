@@ -624,4 +624,149 @@ describe("tutor routes", () => {
       ).rejects.toMatchObject({ name: "PhoneInUse", statusCode: 409 });
     });
   });
+
+  describe("public DTO allowlist", () => {
+    it("leaves contact details and private fields out of the list and profile", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id, {
+        isListed: true,
+        whatsappNumber: "+8801755555555",
+        phoneNumber: "+8801766666666",
+        address: "Secret Lane 9",
+        emergencyContact: "+8801777777777",
+        studentIdNumber: "PRIV-ID-1",
+      });
+      await prisma.tutor.update({
+        where: { id: tutor.id },
+        data: { parentsInfo: "Parent Secret" },
+      });
+
+      const list = await app.inject({ method: "GET", url: "/api/v1/tutors" });
+      const profile = await app.inject({ method: "GET", url: `/api/v1/tutors/${tutor.id}` });
+
+      expect(JSON.parse(list.body).tutors).toHaveLength(1);
+      expect(JSON.parse(profile.body).tutor.name).toBe("Test Tutor");
+      for (const body of [list.body, profile.body]) {
+        for (const secret of [
+          "+8801755555555",
+          "+8801766666666",
+          "+8801777777777",
+          "Secret Lane 9",
+          "PRIV-ID-1",
+          "Parent Secret",
+          account.id,
+        ]) {
+          expect(body).not.toContain(secret);
+        }
+        for (const key of [
+          "phoneNumber",
+          "whatsappNumber",
+          "parentsInfo",
+          "emergencyContact",
+          "studentIdNumber",
+          "address",
+          "accountId",
+        ]) {
+          expect(body).not.toContain(`"${key}"`);
+        }
+      }
+    });
+  });
+
+  describe("public cache headers", () => {
+    const publicCache = "public, max-age=60, stale-while-revalidate=300";
+
+    it("caches anonymous reads and revalidates with ETag", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id, { isListed: true });
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/tutors" });
+      expect(res.headers["cache-control"]).toBe(publicCache);
+      expect(res.headers.vary).toBe("Authorization");
+
+      const revalidated = await app.inject({
+        method: "GET",
+        url: "/api/v1/tutors",
+        headers: { "if-none-match": res.headers.etag as string },
+      });
+      expect(revalidated.statusCode).toBe(304);
+    });
+
+    it("marks signed-in reads as private and not stored", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id, { isListed: true });
+      const headers = await getAuthHeaders(account);
+
+      for (const url of [
+        "/api/v1/tutors",
+        `/api/v1/tutors/${tutor.id}`,
+        `/api/v1/tutors/${tutor.id}/reviews`,
+        "/api/v1/videos",
+      ]) {
+        const res = await app.inject({ method: "GET", url, headers });
+        expect(res.headers["cache-control"]).toBe("private, no-store");
+      }
+    });
+
+    it("uses the longer window for reviews and videos", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id, { isListed: true });
+
+      for (const url of [`/api/v1/tutors/${tutor.id}/reviews`, "/api/v1/videos"]) {
+        const res = await app.inject({ method: "GET", url });
+        expect(res.headers["cache-control"]).toBe(
+          "public, max-age=300, stale-while-revalidate=600",
+        );
+      }
+    });
+  });
+
+  describe("review rating race", () => {
+    it("keeps rating_count and rating_avg correct for concurrent reviews of one tutor", async () => {
+      const tutorAccount = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(tutorAccount.id, { isListed: true });
+      const area = await createArea();
+      const category = await createCategory();
+      const ratings = [5, 3, 4, 2];
+
+      const students = [];
+      for (const _ of ratings) {
+        const account = await createAccount({ role: "STUDENT" });
+        const student = await createStudentProfile(account.id, area.id);
+        const requirement = await createRequirement({
+          studentId: student.id,
+          categoryId: category.id,
+        });
+        await createApplication({
+          requirementId: requirement.id,
+          tutorId: tutor.id,
+          studentId: student.id,
+          initiatedBy: "STUDENT",
+          status: "CONFIRMED",
+        });
+        students.push(student);
+      }
+
+      await Promise.all(
+        students.map((student, i) =>
+          prisma.review.create({
+            data: {
+              tutorId: tutor.id,
+              studentId: student.id,
+              direction: "STUDENT_TO_TUTOR",
+              rating: ratings[i],
+            },
+          }),
+        ),
+      );
+
+      const row = await prisma.tutor.findUniqueOrThrow({ where: { id: tutor.id } });
+      expect(row.ratingCount).toBe(4);
+      expect(Number(row.ratingAvg)).toBe(3.5);
+    });
+  });
 });

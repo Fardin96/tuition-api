@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma.js";
 
 export async function healthRoutes(app: FastifyInstance) {
   app.get("/", async (_request, reply) => {
+    reply.header("Cache-Control", "no-store");
     let db = "ok";
     try {
       await prisma.$queryRaw`SELECT 1 as ok`;

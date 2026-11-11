@@ -365,6 +365,233 @@ describe("me routes", () => {
       });
       expect(sessions).toBe(0);
     });
+
+    it("tombstones numbers, closes listings and withdraws applications on both sides", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const category = await createCategory();
+      const subject = await createSubject();
+
+      const studentAccount = await createAccount({ role: "STUDENT" });
+      const student = await createStudentProfile(studentAccount.id, area.id, {
+        whatsappNumber: "+8801711111111",
+        phoneNumber: "+8801722222222",
+      });
+      await createSession(studentAccount.id);
+      const requirement = await createRequirement({ studentId: student.id });
+
+      const tutorAccount = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(tutorAccount.id, {
+        isListed: true,
+        whatsappNumber: "+8801733333333",
+        phoneNumber: "+8801744444444",
+      });
+      const pkg = await prisma.tuitionPackage.create({
+        data: {
+          tutorId: tutor.id,
+          categoryId: category.id,
+          subjectId: subject.id,
+          classLevel: 10,
+          timeOfDay: new Date("2024-01-01T10:00:00Z"),
+          daysPerWeek: 3,
+          expectedSalary: 5000,
+          availableFrom: new Date("2024-01-01"),
+          status: "OPEN",
+        },
+      });
+
+      const otherStudentAccount = await createAccount({ role: "STUDENT" });
+      const otherStudent = await createStudentProfile(otherStudentAccount.id, area.id);
+      const otherRequirement = await createRequirement({ studentId: otherStudent.id });
+      const pendingToTutor = await createApplication({
+        requirementId: otherRequirement.id,
+        tutorId: tutor.id,
+        studentId: otherStudent.id,
+        initiatedBy: "STUDENT",
+      });
+      const pendingToStudent = await createApplication({
+        requirementId: requirement.id,
+        tutorId: tutor.id,
+        studentId: student.id,
+        initiatedBy: "TUTOR",
+      });
+
+      const studentRes = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/me",
+        headers: await getAuthHeaders(studentAccount),
+      });
+      const tutorRes = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/me",
+        headers: await getAuthHeaders(tutorAccount),
+      });
+      expect(studentRes.statusCode).toBe(204);
+      expect(tutorRes.statusCode).toBe(204);
+
+      const deletedStudent = await prisma.student.findUniqueOrThrow({ where: { id: student.id } });
+      expect(deletedStudent.phoneNumber).toBe(`deleted:${studentAccount.id}:+8801722222222`);
+      expect(deletedStudent.whatsappNumber).toBe(`deleted:${studentAccount.id}:+8801711111111`);
+      expect(
+        await prisma.session.count({ where: { accountId: studentAccount.id, revokedAt: null } }),
+      ).toBe(0);
+      expect(
+        (await prisma.tuitionRequirement.findUniqueOrThrow({ where: { id: requirement.id } }))
+          .status,
+      ).toBe("CLOSED");
+      expect(
+        (await prisma.application.findUniqueOrThrow({ where: { id: pendingToTutor.id } })).status,
+      ).toBe("WITHDRAWN");
+      expect(
+        (await prisma.application.findUniqueOrThrow({ where: { id: pendingToStudent.id } })).status,
+      ).toBe("WITHDRAWN");
+
+      const deletedTutor = await prisma.tutor.findUniqueOrThrow({ where: { id: tutor.id } });
+      expect(deletedTutor.phoneNumber).toBe(`deleted:${tutorAccount.id}:+8801744444444`);
+      expect(deletedTutor.isListed).toBe(false);
+      expect(
+        (await prisma.tuitionPackage.findUniqueOrThrow({ where: { id: pkg.id } })).status,
+      ).toBe("CLOSED");
+
+      const reused = await createAccount({ role: "STUDENT" });
+      await expect(
+        createStudentProfile(reused.id, area.id, {
+          whatsappNumber: "+8801711111111",
+          phoneNumber: "+8801722222222",
+        }),
+      ).resolves.toMatchObject({ whatsappNumber: "+8801711111111" });
+    });
+  });
+});
+
+async function superAdmin() {
+  await prisma.superAdminEmail.create({ data: { slot: 1, email: "root@example.com" } });
+  const account = await createAccount({ role: "ADMIN", email: "root@example.com" });
+  await prisma.adminUser.create({
+    data: { accountId: account.id, name: "Root", adminRole: "SUPER_ADMIN", status: "ACTIVE" },
+  });
+  return account;
+}
+
+describe("createOrUpdateAccount", () => {
+  const payload = (sub: string, email: string) => ({ sub, email });
+
+  it("refuses sign-in for a self-deleted account; sign-up reactivates it and restores its numbers", async () => {
+    const area = await createArea();
+    const account = await createAccount({
+      role: "STUDENT",
+      email: "back@example.com",
+      googleSub: "google-back",
+    });
+    const student = await createStudentProfile(account.id, area.id, {
+      whatsappNumber: "+8801711111111",
+      phoneNumber: "+8801722222222",
+    });
+    await authService.softDeleteAccount(account.id);
+
+    await expect(
+      authService.createOrUpdateAccount(payload("google-back", "back@example.com"), undefined),
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      message: "Account was deleted. Sign up to reactivate it.",
+    });
+
+    const result = await authService.createOrUpdateAccount(
+      payload("google-back", "back@example.com"),
+      "STUDENT",
+    );
+
+    expect(result.isNew).toBe(false);
+    expect(result.account.status).toBe("ACTIVE");
+    expect(result.account.deletedAt).toBeNull();
+    const restored = await prisma.student.findUniqueOrThrow({ where: { id: student.id } });
+    expect(restored.phoneNumber).toBe("+8801722222222");
+    expect(restored.whatsappNumber).toBe("+8801711111111");
+  });
+
+  it("keeps a restored number tombstoned when another account has taken it", async () => {
+    const area = await createArea();
+    const account = await createAccount({ role: "STUDENT", googleSub: "google-taken" });
+    const student = await createStudentProfile(account.id, area.id, {
+      whatsappNumber: "+8801711111111",
+      phoneNumber: "+8801722222222",
+    });
+    await authService.softDeleteAccount(account.id);
+    const other = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(other.id, { phoneNumber: "+8801722222222" });
+
+    await authService.createOrUpdateAccount(payload("google-taken", account.email), "STUDENT");
+
+    const restored = await prisma.student.findUniqueOrThrow({ where: { id: student.id } });
+    expect(restored.whatsappNumber).toBe("+8801711111111");
+    expect(restored.phoneNumber).toBe(`deleted:${account.id}:+8801722222222`);
+  });
+
+  it("rejects a blocked, self-deleted account on sign-up too", async () => {
+    const admin = await superAdmin();
+    const account = await createAccount({
+      role: "STUDENT",
+      email: "blk@example.com",
+      googleSub: "google-blk",
+    });
+    await authService.softDeleteAccount(account.id);
+    await prisma.accountBlock.create({
+      data: { accountId: account.id, blockedById: admin.id, reason: "spam" },
+    });
+
+    await expect(
+      authService.createOrUpdateAccount(payload("google-blk", "blk@example.com"), "STUDENT"),
+    ).rejects.toMatchObject({ statusCode: 403, message: "Account is blocked" });
+  });
+
+  it("rejects a blocked account, and unblocking restores it to ACTIVE", async () => {
+    const admin = await superAdmin();
+    const account = await createAccount({
+      role: "STUDENT",
+      email: "blocked@example.com",
+      googleSub: "google-blocked",
+    });
+    const block = await prisma.accountBlock.create({
+      data: { accountId: account.id, blockedById: admin.id, reason: "spam" },
+    });
+
+    await expect(
+      authService.createOrUpdateAccount(
+        payload("google-blocked", "blocked@example.com"),
+        undefined,
+      ),
+    ).rejects.toThrow("Account is blocked");
+
+    await prisma.accountBlock.update({
+      where: { id: block.id },
+      data: { unblockedAt: new Date(), unblockedById: admin.id },
+    });
+    const unblocked = await prisma.account.findUniqueOrThrow({ where: { id: account.id } });
+    expect(unblocked.status).toBe("ACTIVE");
+  });
+
+  it("keeps a deleted account deleted when its block is lifted", async () => {
+    const admin = await superAdmin();
+    const account = await createAccount({
+      role: "STUDENT",
+      email: "gone@example.com",
+      googleSub: "google-gone",
+    });
+    await authService.softDeleteAccount(account.id);
+    const block = await prisma.accountBlock.create({
+      data: { accountId: account.id, blockedById: admin.id, reason: "spam" },
+    });
+
+    await expect(
+      authService.createOrUpdateAccount(payload("google-gone", "gone@example.com"), undefined),
+    ).rejects.toThrow("Account is blocked");
+
+    await prisma.accountBlock.update({
+      where: { id: block.id },
+      data: { unblockedAt: new Date(), unblockedById: admin.id },
+    });
+    const stillDeleted = await prisma.account.findUniqueOrThrow({ where: { id: account.id } });
+    expect(stillDeleted.status).toBe("DELETED");
   });
 });
 
@@ -509,15 +736,55 @@ describe("DELETE /api/v1/me/hard-delete", () => {
   });
 });
 
+describe("blocked and deleted accounts lose access", () => {
+  it("rejects a self-deleted account's token on a protected route", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const headers = await getAuthHeaders(account);
+    await authService.softDeleteAccount(account.id);
+
+    const res = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("rejects a blocked account's token on a protected route", async () => {
+    const app = await createTestApp();
+    const admin = await superAdmin();
+    const account = await createAccount({ role: "STUDENT" });
+    const headers = await getAuthHeaders(account);
+    await prisma.accountBlock.create({
+      data: { accountId: account.id, blockedById: admin.id, reason: "spam" },
+    });
+
+    const res = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("refuses to soft-delete a blocked account", async () => {
+    const admin = await superAdmin();
+    const account = await createAccount({ role: "STUDENT" });
+    await prisma.accountBlock.create({
+      data: { accountId: account.id, blockedById: admin.id, reason: "spam" },
+    });
+
+    await expect(authService.softDeleteAccount(account.id)).rejects.toMatchObject({
+      statusCode: 403,
+    });
+  });
+});
+
 describe("auth service", () => {
   it("round-trips an access token", async () => {
+    const account = await createAccount({ role: "STUDENT" });
     const token = await authService.signAccessToken({
-      accountId: "acc-id",
+      accountId: account.id,
       role: "STUDENT",
-      email: "test@example.com",
+      email: account.email,
     });
     const payload = await authService.verifyAccessToken(token);
-    expect(payload.accountId).toBe("acc-id");
+    expect(payload.accountId).toBe(account.id);
     expect(payload.role).toBe("STUDENT");
   });
 

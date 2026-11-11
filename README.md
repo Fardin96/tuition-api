@@ -50,6 +50,23 @@ curl http://localhost:3000/api/v1/health
 
 `prisma/constraints.sql` contains CHECKs, triggers, and partial indexes that Prisma cannot model. It is appended to the **end** of the generated initial migration (`prisma/migrations/20261020122427_init/migration.sql`) before applying. On future migrations, review the generated SQL and **never accept a DROP INDEX** for indexes named in `constraints.sql`.
 
+## Migrating safely
+
+Rehearse pending migrations on a copy of prod before you push them:
+
+```bash
+bash scripts/migrate-safe.sh '<prod direct url>'          # full rehearsal, writes .backups/.rehearsed
+bash scripts/migrate-safe.sh --drill '<prod direct url>'  # restore check only, no migrations
+```
+
+Use the direct URL (port 25060) and add your IP to DO Trusted Sources first. Prod is only read.
+
+- The pre-push hook blocks a push that changes `prisma/migrations` until the rehearsal matches the current files. `git push --no-verify` skips every check, so never use it for an unrehearsed migration.
+- CI runs Squawk (`yarn lint:sql`) on new migrations.
+- Dumps contain PII and live in `.backups/` (gitignored). Dumps older than 14 days are deleted automatically.
+
+See [Migrations Reference](docs/migrations.md) for the full procedure.
+
 ## Scripts
 
 | Script                             | Purpose                                                                  |
@@ -65,6 +82,7 @@ curl http://localhost:3000/api/v1/health
 | `yarn db:seed`                     | Run seed script                                                          |
 | `yarn db:studio`                   | Open Prisma Studio                                                       |
 | `yarn lint` / `yarn lint:fix`      | Biome                                                                    |
+| `yarn lint:sql`                    | Squawk lint of new migrations (CI)                                       |
 | `yarn typecheck`                   | TypeScript                                                               |
 | `yarn test`                        | Vitest (watch)                                                           |
 | `yarn test:ci`                     | Vitest (single run)                                                      |
@@ -72,6 +90,7 @@ curl http://localhost:3000/api/v1/health
 
 ## Deploy to DigitalOcean App Platform
 
+0. The app drains on SIGTERM and holds at most 3 connections per process (`?connection_limit=` overrides), so rolling deploys stay inside the 22-connection budget. It logs pool stats every 60 s.
 1. The App Platform app uses an **existing** DigitalOcean managed Postgres cluster — set `DATABASE_URL` and `DATABASE_POOL_URL` in the UI or `.do/app.yaml`.
 2. Enable the `postgis` extension on the managed database before first deploy:
    ```bash

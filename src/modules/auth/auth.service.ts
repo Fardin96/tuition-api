@@ -4,6 +4,7 @@ import { env } from "../../config/env.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import type { Role } from "../../generated/prisma/enums.js";
 import type { AccountModel } from "../../generated/prisma/models/Account.js";
+import { isNumberUsedByOtherAccount } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 
 const GOOGLE_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
@@ -71,6 +72,14 @@ export async function verifyAccessToken(token: string): Promise<AccessTokenPaylo
   if (payload.type !== "access") {
     throw new Error("Invalid token type");
   }
+  // Checked per request so a block or self-delete takes effect before the token expires.
+  const account = await prisma.account.findUnique({
+    where: { id: payload.accountId as string },
+    select: { status: true },
+  });
+  if (account?.status !== "ACTIVE") {
+    throw new Error("Account is not active");
+  }
   return {
     accountId: payload.accountId as string,
     role: payload.role as Role,
@@ -113,7 +122,12 @@ export async function rotateRefreshToken(
     where: { refreshTokenHash: oldHash },
     include: { account: true },
   });
-  if (!session || session.revokedAt || session.expiresAt < new Date()) {
+  if (
+    !session ||
+    session.revokedAt ||
+    session.expiresAt < new Date() ||
+    session.account.status !== "ACTIVE"
+  ) {
     throw new Error("Invalid or expired refresh token");
   }
 
@@ -190,6 +204,50 @@ export async function findAccountByGoogleSub(googleSub: string) {
   });
 }
 
+function tombstone(accountId: string, number: string) {
+  const prefix = `deleted:${accountId}:`;
+  return number.startsWith(prefix) ? number : `${prefix}${number}`;
+}
+
+// A number another account has since taken stays tombstoned instead of failing sign-up.
+async function restoreNumber(accountId: string, value: string) {
+  const prefix = `deleted:${accountId}:`;
+  if (!value.startsWith(prefix)) return value;
+  const original = value.slice(prefix.length);
+  return (await isNumberUsedByOtherAccount(accountId, original)) ? value : original;
+}
+
+async function reactivateAccount(accountId: string) {
+  const account = await prisma.account.findUniqueOrThrow({
+    where: { id: accountId },
+    include: { student: true, tutor: true },
+  });
+  return prisma.$transaction(async (tx) => {
+    if (account.student) {
+      await tx.student.update({
+        where: { id: account.student.id },
+        data: {
+          phoneNumber: await restoreNumber(accountId, account.student.phoneNumber),
+          whatsappNumber: await restoreNumber(accountId, account.student.whatsappNumber),
+        },
+      });
+    }
+    if (account.tutor) {
+      await tx.tutor.update({
+        where: { id: account.tutor.id },
+        data: {
+          phoneNumber: await restoreNumber(accountId, account.tutor.phoneNumber),
+          whatsappNumber: await restoreNumber(accountId, account.tutor.whatsappNumber),
+        },
+      });
+    }
+    return tx.account.update({
+      where: { id: accountId },
+      data: { status: "ACTIVE", deletedAt: null, lastLoginAt: new Date() },
+    });
+  });
+}
+
 export async function createOrUpdateAccount(
   payload: GoogleTokenPayload,
   role: Role | undefined,
@@ -200,8 +258,24 @@ export async function createOrUpdateAccount(
   });
 
   if (existing) {
-    if (existing.status === "DELETED") {
-      throw new Error("Account has been deleted");
+    // Blocks are checked on sign-in and sign-up alike; a DELETED account can still carry an open block.
+    const deleted = existing.status === "DELETED";
+    const openBlock = deleted
+      ? await prisma.accountBlock.findFirst({
+          where: { accountId: existing.id, unblockedAt: null },
+          select: { id: true },
+        })
+      : null;
+    if (existing.status === "BLOCKED" || openBlock) {
+      throw Object.assign(new Error("Account is blocked"), { statusCode: 403 });
+    }
+    if (deleted && !role) {
+      throw Object.assign(new Error("Account was deleted. Sign up to reactivate it."), {
+        statusCode: 403,
+      });
+    }
+    if (deleted) {
+      return { account: await reactivateAccount(existing.id), isNew: false };
     }
     const account = await prisma.account.update({
       where: { id: existing.id },
@@ -268,23 +342,72 @@ export async function recordConsent(accountId: string, version: string) {
 }
 
 export async function softDeleteAccount(accountId: string) {
-  await prisma.session.updateMany({
-    where: { accountId, revokedAt: null },
-    data: { revokedAt: new Date() },
-  });
-  return prisma.account.update({
+  const account = await prisma.account.findUniqueOrThrow({
     where: { id: accountId },
-    data: { deletedAt: new Date(), status: "DELETED" },
+    include: { student: true, tutor: true },
+  });
+  if (account.status === "DELETED") return account;
+  if (account.status === "BLOCKED") {
+    throw Object.assign(new Error("Account is blocked"), { statusCode: 403 });
+  }
+  const now = new Date();
+
+  return prisma.$transaction(async (tx) => {
+    // Tombstones keep the unique phone/WhatsApp columns free for the real numbers.
+    if (account.student) {
+      await tx.student.update({
+        where: { id: account.student.id },
+        data: {
+          phoneNumber: tombstone(accountId, account.student.phoneNumber),
+          whatsappNumber: tombstone(accountId, account.student.whatsappNumber),
+        },
+      });
+      await tx.tuitionRequirement.updateMany({
+        where: { studentId: account.student.id, status: "OPEN" },
+        data: { status: "CLOSED" },
+      });
+      await tx.application.updateMany({
+        where: { studentId: account.student.id, status: "PENDING" },
+        data: { status: "WITHDRAWN" },
+      });
+    }
+    if (account.tutor) {
+      await tx.tutor.update({
+        where: { id: account.tutor.id },
+        data: {
+          phoneNumber: tombstone(accountId, account.tutor.phoneNumber),
+          whatsappNumber: tombstone(accountId, account.tutor.whatsappNumber),
+        },
+      });
+      await tx.tuitionPackage.updateMany({
+        where: { tutorId: account.tutor.id, status: "OPEN" },
+        data: { status: "CLOSED" },
+      });
+      await tx.application.updateMany({
+        where: { tutorId: account.tutor.id, status: "PENDING" },
+        data: { status: "WITHDRAWN" },
+      });
+    }
+    await tx.session.updateMany({
+      where: { accountId, revokedAt: null },
+      data: { revokedAt: now },
+    });
+    return tx.account.update({
+      where: { id: accountId },
+      data: { deletedAt: now, status: "DELETED" },
+    });
   });
 }
 
 export async function hardDeleteAccount(accountId: string) {
   await prisma.$transaction(async (tx) => {
-    const [student, tutor, admin] = await Promise.all([
-      tx.student.findUnique({ where: { accountId }, select: { id: true } }),
-      tx.tutor.findUnique({ where: { accountId }, select: { id: true } }),
-      tx.adminUser.findUnique({ where: { accountId }, select: { accountId: true } }),
-    ]);
+    // Sequential: a transaction client cannot run queries concurrently (pg deprecation warning).
+    const student = await tx.student.findUnique({ where: { accountId }, select: { id: true } });
+    const tutor = await tx.tutor.findUnique({ where: { accountId }, select: { id: true } });
+    const admin = await tx.adminUser.findUnique({
+      where: { accountId },
+      select: { accountId: true },
+    });
 
     const studentId = student?.id;
     const tutorId = tutor?.id;

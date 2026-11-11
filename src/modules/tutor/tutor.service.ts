@@ -10,6 +10,21 @@ function toNumber(value: unknown) {
   return Number(value);
 }
 
+// Default-deny: public reads list fields here, never the whole row (contact numbers, address, parents, IDs).
+export const tutorPublicSelect = {
+  id: true,
+  name: true,
+  gender: true,
+  ratingAvg: true,
+  ratingCount: true,
+  verificationStatus: true,
+  isListed: true,
+  createdAt: true,
+  updatedAt: true,
+  areas: { select: { area: { select: { id: true, name: true } } } },
+  subjects: { select: { subject: { select: { id: true, name: true } } } },
+} as const;
+
 function serializeTutor(
   tutor: {
     id: string;
@@ -226,19 +241,15 @@ export async function searchTutors(filters: {
   return prisma.tutor.findMany({
     where,
     orderBy: { ratingAvg: "desc" },
-    include: {
-      areas: { include: { area: { select: { id: true, name: true } } } },
-      subjects: { include: { subject: { select: { id: true, name: true } } } },
-    },
+    select: tutorPublicSelect,
   });
 }
 
 export async function getPublicTutorProfile(tutorId: string) {
   const tutor = await prisma.tutor.findUnique({
     where: { id: tutorId },
-    include: {
-      areas: { include: { area: { select: { id: true, name: true } } } },
-      subjects: { include: { subject: { select: { id: true, name: true } } } },
+    select: {
+      ...tutorPublicSelect,
       credentials: { include: { file: { select: { id: true, status: true } } } },
       videos: {
         where: { status: "APPROVED" },
@@ -248,11 +259,13 @@ export async function getPublicTutorProfile(tutorId: string) {
   });
   if (!tutor) return null;
   return {
-    ...serializeTutor(tutor, await getTutorNeedsReaddress(tutor.id)),
+    ...tutor,
+    ratingAvg: toNumber(tutor.ratingAvg),
+    createdAt: tutor.createdAt.toISOString(),
+    updatedAt: tutor.updatedAt.toISOString(),
+    needsReaddress: await getTutorNeedsReaddress(tutor.id),
     areas: tutor.areas.map((a) => a.area),
     subjects: tutor.subjects.map((s) => s.subject),
-    credentials: tutor.credentials,
-    videos: tutor.videos,
   };
 }
 
