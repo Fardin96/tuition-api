@@ -1,0 +1,18 @@
+pg_version = "16"
+
+# Applied, Prisma-generated history. Lint only new migrations; these were
+# reviewed by hand (v6 uses expand/backfill/validate) and cannot be edited.
+excluded_paths = [
+    "prisma/migrations/20261020122427_init/migration.sql",
+    "prisma/migrations/20261022876543_location_postgis/migration.sql",
+    "prisma/migrations/20261026000000_draft_requirements/migration.sql",
+    "prisma/migrations/20261027000000_multi_subject_requirements/migration.sql",
+    "prisma/migrations/20261107000100_v6_expand/migration.sql",
+    "prisma/migrations/20261107000200_v6_backfill/migration.sql",
+    "prisma/migrations/20261107000300_v6_constraints/migration.sql",
+    "prisma/migrations/20261107000400_v6_validate/migration.sql",
+    "prisma/migrations/20261107000500_v6_contact_unique/migration.sql",
+]
+
+# Prisma tracks failed migrations itself (`migrate resolve`), so IF EXISTS / transaction advice only adds noise.
+excluded_rules = ["prefer-robust-stmts"]

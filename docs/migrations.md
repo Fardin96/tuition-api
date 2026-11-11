@@ -39,6 +39,134 @@ Quick reference for running and recovering Prisma migrations in this repo.
 
 ## 3. Safe migration procedure
 
+### Automated: `scripts/migrate-safe.sh`
+
+Does steps 1 to 5 of the manual procedure below in one command, plus checks on the migration files. Prod is only read.
+
+```bash
+bash scripts/migrate-safe.sh '<prod direct url>'          # full rehearsal
+bash scripts/migrate-safe.sh --drill '<prod direct url>'  # restore drill
+bash scripts/migrate-safe.sh --keep '<prod direct url>'   # keep the scratch DB for inspection (any position)
+```
+
+Use the direct URL (port 25060) and add your IP to DO Trusted Sources first. Wrap the URL in single quotes (zsh).
+
+| Flag | What it does |
+| --- | --- |
+| (none) | Dumps prod, restores into a local scratch DB, applies the pending migrations there, checks `migrate status` and row counts, prints `SAFE TO PUSH` and writes `.backups/.rehearsed`. |
+| `--drill` | Dumps prod, restores it and compares row counts with prod. Applies no migrations, so it works with nothing pending. Proves your backups restore. |
+| `--keep` | Does not drop the scratch DB on success. On failure the DB is always kept. |
+
+| What it catches | Step |
+| --- | --- |
+| Wrong DB or pooler URL, IP not trusted, `pg_dump` older than the server | 0 |
+| Stuck failed migration (P3009) | 1, 8 |
+| Applied migration edited after apply | 1 |
+| Applied on prod but missing locally (warning only, as with the renamed `location_postgis`) | 1 |
+| Protected `DROP INDEX` not recreated in the same file | 2 |
+| Risky SQL: data loss, table rewrites, locks (warnings, asks `y/N`) | 2 |
+| Backup that does not restore | 4, 5 |
+| Data that makes a migration abort (the rehearsal runs on a fresh prod copy) | 6 |
+| Slow migration (over 60s) | 6 |
+| Rows lost after migrate | 7 |
+
+**When it runs**
+
+- By hand, before pushing a migration.
+- The pre-push hook blocks pushes that touch `prisma/migrations` unless `.backups/.rehearsed` matches the current migration files.
+- Monthly `--drill`. DO keeps 7 daily backups, but only a restored dump proves a backup works.
+
+**`git push --no-verify`** skips ALL pre-push checks (the rehearsal gate, lint, typecheck, tests, build). Use it only when the hook is wrong or you cannot run it, for example a docs-only push with no `DATABASE_URL`, or an emergency fix. Never use it to push an unrehearsed migration.
+
+**`.rehearsed` stamp.** It is a hash of every `migration.sql`. Any edit, add or delete changes the hash, so you must rehearse again.
+
+Optional monthly drill via cron. One-time setup:
+
+```bash
+security add-generic-password -s tuition-prod-db -a doadmin -w '<prod direct url>'
+```
+
+`crontab -e`:
+
+```
+0 9 1 * * PATH=/opt/homebrew/opt/libpq/bin:/opt/homebrew/bin:$PATH; cd /Volumes/HomeX/projects/products/tuition-api && bash scripts/migrate-safe.sh --drill "$(security find-generic-password -s tuition-prod-db -w)" >> .backups/drill.log 2>&1
+```
+
+Cron needs your laptop IP in DO Trusted Sources.
+
+### Squawk (CI)
+
+[Squawk](https://squawkhq.com) is a Postgres migration linter. It runs in CI via `yarn lint:sql` on every push and PR, so it also catches pushes that used `--no-verify`. Install: `yarn add -D squawk-cli` (already done). Run locally with `yarn lint:sql`. It checks only migrations added after the existing history (listed in `excluded_paths` in `.squawk.toml`). Each new migration is linted with all rules. To silence a deliberate warning, add `-- squawk-ignore <rule>` above the statement, or add the rule to `excluded_rules` in `.squawk.toml` with a reason. Squawk complements the protected-index check in `migrate-safe.sh`; it does not replace it.
+
+- `prefer-robust-stmts` is excluded globally in `.squawk.toml` because Prisma handles failed migrations; every other rule stays on.
+- Squawk checks lock and downtime risk, not query speed; use `EXPLAIN ANALYZE` for query performance.
+- Only migrations added after the 9 listed in `excluded_paths` are linted. Do not add new migrations to that list.
+- For a deliberate warning, put `-- squawk-ignore <rule>` on the line above the statement with a short reason, instead of adding the rule to `excluded_rules`.
+
+### Testing the script
+
+Never test against production. Build a fake prod from the Nov 7 backup (pre-v6, so all five v6 migrations are pending).
+
+```bash
+P='postgresql://user:password@localhost:5432'
+createdb tuition_fakeprod
+psql "$P/tuition_fakeprod" -c 'CREATE EXTENSION IF NOT EXISTS postgis'
+pg_restore --no-acl --no-owner -d "$P/tuition_fakeprod" .backups/backup-2026-11-07.dump
+```
+
+1. **Pass.** Expect about 8 lock warnings and `Continue? [y/N]`. Answer `y`. Expect `SAFE TO PUSH` and `.backups/.rehearsed` to exist.
+
+   ```bash
+   bash scripts/migrate-safe.sh "$P/tuition_fakeprod"
+   ```
+
+2. **Fail, duplicate number.** Stops at migration 05. Expect `FAIL: migration failed on the copy`, the `contact_number_unique pre-flight failed` error, exit 1, and the scratch DB kept.
+
+   ```bash
+   psql "$P/tuition_fakeprod" -c "update tutor set whatsapp_number=(select whatsapp_number from student limit 1)"
+   bash scripts/migrate-safe.sh "$P/tuition_fakeprod"
+   ```
+
+3. **Fail, pooler URL.** Expect failure at step 0, before any connection.
+
+   ```bash
+   bash scripts/migrate-safe.sh 'postgresql://x:y@host:25061/db'
+   ```
+
+4. **Fail, edited applied migration.** Case 2 leaves a duplicate number in `tuition_fakeprod`, so drop and recreate it with the setup block above first. Then apply the migrations, then add a comment line to one `prisma/migrations/*/migration.sql` and run the script. Expect `edited after apply`. Delete the added line by hand afterwards.
+
+   ```bash
+   DATABASE_URL="$P/tuition_fakeprod" npx prisma migrate deploy
+   bash scripts/migrate-safe.sh "$P/tuition_fakeprod"
+   ```
+
+5. **Drill.** Expect `restore drill passed`.
+
+   ```bash
+   bash scripts/migrate-safe.sh --drill "$P/tuition_fakeprod"
+   ```
+
+6. **Hook gate.** Run on a branch whose `prisma/migrations` differs from `origin/main`. Expect `Migrations changed since last rehearsal`. Cancel, or use a branch with no remote so nothing is pushed.
+
+   ```bash
+   rm .backups/.rehearsed
+   git push
+   ```
+
+Cleanup:
+
+```bash
+dropdb tuition_fakeprod
+dropdb --if-exists $(psql "$P/postgres" -Atc "select datname from pg_database where datname like 'tuition_rehearsal_%'")
+rm -f .backups/prod-*.dump .backups/.rehearsed
+```
+
+Remove `.backups/.rehearsed` after testing so the hook still demands a real run against production.
+
+### Manual procedure
+
+Use this if the script is unavailable. This is the method v6 was first rehearsed with.
+
 1. **Dump production** with `pg_dump` (custom format, `--no-acl --no-owner`) after adding your IP to DO Trusted Sources. Use the direct URL (port 25060) with `sslrootcert=ca-certificate.crt&sslmode=verify-full`.
 
    ```bash
