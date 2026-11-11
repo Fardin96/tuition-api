@@ -1,57 +1,41 @@
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
-import { type SaveLocationInput, upsertStudentLocation } from "../location/location.service.js";
+import {
+  findOwnLocation,
+  type OwnLocation,
+  type SaveLocationInput,
+  upsertLocation,
+} from "../location/location.service.js";
 
 function toNumber(value: unknown) {
   return Number(value);
 }
 
-function locationFieldsPresent<
-  T extends { placeId?: string; latitude?: number; longitude?: number; districtCode?: string },
->(data: T): data is T & SaveLocationInput {
-  return (
-    data.placeId !== undefined &&
-    data.latitude !== undefined &&
-    data.longitude !== undefined &&
-    data.districtCode !== undefined
-  );
-}
-
-function compileLocationInput<T extends { address?: string | null }>(
-  profileAddress: string,
-  data: T & Partial<SaveLocationInput>,
-): SaveLocationInput | null {
-  if (!locationFieldsPresent(data)) return null;
-  return {
-    placeId: data.placeId,
-    addressText: data.address ?? profileAddress,
-    districtCode: data.districtCode,
-    latitude: data.latitude,
-    longitude: data.longitude,
-  };
-}
-
-function serializeStudent(student: {
-  id: string;
-  accountId: string;
-  name: string;
-  areaId: number;
-  address: string;
-  emergencyContact: string;
-  phoneNumber: string;
-  whatsappNumber: string;
-  studentIdNumber: string;
-  whatsappVerifiedAt: Date | null;
-  verificationStatus: string;
-  ratingAvg: unknown;
-  ratingCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}) {
+function serializeStudent(
+  student: {
+    id: string;
+    accountId: string;
+    name: string;
+    areaId: number;
+    address: string;
+    emergencyContact: string;
+    phoneNumber: string;
+    whatsappNumber: string;
+    studentIdNumber: string;
+    whatsappVerifiedAt: Date | null;
+    verificationStatus: string;
+    ratingAvg: unknown;
+    ratingCount: number;
+    createdAt: Date;
+    updatedAt: Date;
+  },
+  location: OwnLocation | null,
+) {
   return {
     ...student,
     ratingAvg: toNumber(student.ratingAvg),
     whatsappVerifiedAt: student.whatsappVerifiedAt?.toISOString() ?? null,
+    location,
     createdAt: student.createdAt.toISOString(),
     updatedAt: student.updatedAt.toISOString(),
   };
@@ -67,10 +51,7 @@ export async function createStudentProfile(
     phoneNumber?: string;
     whatsappNumber: string;
     studentIdNumber: string;
-    placeId?: string;
-    latitude?: number;
-    longitude?: number;
-    districtCode?: string;
+    location?: SaveLocationInput;
   },
 ) {
   const existing = await prisma.student.findUnique({ where: { accountId } });
@@ -86,23 +67,18 @@ export async function createStudentProfile(
   };
   await assertContactNumbersFree(accountId, numbers);
 
-  const {
-    placeId: _placeId,
-    latitude: _latitude,
-    longitude: _longitude,
-    districtCode: _districtCode,
-    ...profileData
-  } = data;
-  const student = await prisma.student
-    .create({ data: { accountId, ...profileData, phoneNumber: numbers.phoneNumber } })
-    .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+  const { location, ...profileData } = data;
+  const student = await prisma.$transaction(async (tx) => {
+    const created = await tx.student
+      .create({ data: { accountId, ...profileData, phoneNumber: numbers.phoneNumber } })
+      .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+    if (location) {
+      await upsertLocation("student_location", created.id, location, tx);
+    }
+    return created;
+  });
 
-  const locationInput = compileLocationInput(student.address, data);
-  if (locationInput) {
-    await upsertStudentLocation(student.id, locationInput);
-  }
-
-  return serializeStudent(student);
+  return serializeStudent(student, await findOwnLocation("student_location", student.id));
 }
 
 export async function updateStudentProfile(
@@ -115,10 +91,7 @@ export async function updateStudentProfile(
     phoneNumber: string;
     whatsappNumber: string;
     studentIdNumber: string;
-    placeId?: string;
-    latitude?: number;
-    longitude?: number;
-    districtCode?: string;
+    location?: SaveLocationInput;
   }>,
 ) {
   const existing = await prisma.student.findUnique({ where: { accountId } });
@@ -127,23 +100,18 @@ export async function updateStudentProfile(
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
 
-  const {
-    placeId: _placeId,
-    latitude: _latitude,
-    longitude: _longitude,
-    districtCode: _districtCode,
-    ...profileData
-  } = data;
-  const student = await prisma.student
-    .update({ where: { accountId }, data: profileData })
-    .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+  const { location, ...profileData } = data;
+  const student = await prisma.$transaction(async (tx) => {
+    const updated = await tx.student
+      .update({ where: { accountId }, data: profileData })
+      .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+    if (location) {
+      await upsertLocation("student_location", updated.id, location, tx);
+    }
+    return updated;
+  });
 
-  const locationInput = compileLocationInput(student.address, data);
-  if (locationInput) {
-    await upsertStudentLocation(student.id, locationInput);
-  }
-
-  return serializeStudent(student);
+  return serializeStudent(student, await findOwnLocation("student_location", student.id));
 }
 
 export async function getStudentById(studentId: string) {

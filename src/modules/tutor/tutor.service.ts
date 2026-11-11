@@ -1,9 +1,11 @@
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 import {
+  findOwnLocation,
   getTutorNeedsReaddress,
+  type OwnLocation,
   type SaveLocationInput,
-  upsertTutorLocation,
+  upsertLocation,
 } from "../location/location.service.js";
 
 function toNumber(value: unknown) {
@@ -45,27 +47,17 @@ function serializeTutor(
     createdAt: Date;
     updatedAt: Date;
   },
-  needsReaddress?: boolean,
+  location: OwnLocation | null,
 ) {
   return {
     ...tutor,
     ratingAvg: toNumber(tutor.ratingAvg),
     whatsappVerifiedAt: tutor.whatsappVerifiedAt?.toISOString() ?? null,
-    needsReaddress,
+    location,
+    needsReaddress: location?.needsReaddress ?? false,
     createdAt: tutor.createdAt.toISOString(),
     updatedAt: tutor.updatedAt.toISOString(),
   };
-}
-
-function locationFieldsPresent<
-  T extends { placeId?: string; latitude?: number; longitude?: number; districtCode?: string },
->(data: T): data is T & SaveLocationInput {
-  return (
-    data.placeId !== undefined &&
-    data.latitude !== undefined &&
-    data.longitude !== undefined &&
-    data.districtCode !== undefined
-  );
 }
 
 export async function createTutorProfile(
@@ -79,10 +71,7 @@ export async function createTutorProfile(
     studentIdNumber: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     parentsInfo?: string;
-    placeId?: string;
-    latitude?: number;
-    longitude?: number;
-    districtCode?: string;
+    location?: SaveLocationInput;
   },
 ) {
   const existing = await prisma.tutor.findUnique({ where: { accountId } });
@@ -98,32 +87,19 @@ export async function createTutorProfile(
   };
   await assertContactNumbersFree(accountId, numbers);
 
-  const locationInput = locationFieldsPresent(data)
-    ? {
-        placeId: data.placeId,
-        addressText: data.address,
-        districtCode: data.districtCode,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      }
-    : null;
+  const { location, ...profileData } = data;
+  const tutor = await prisma.$transaction(async (tx) => {
+    const created = await tx.tutor
+      .create({ data: { accountId, ...profileData, phoneNumber: numbers.phoneNumber } })
+      .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+    if (location) {
+      await upsertLocation("tutor_location", created.id, location, tx);
+    }
+    await tx.$executeRaw`SELECT recompute_is_listed(${created.id}::uuid)`;
+    return created;
+  });
 
-  const {
-    placeId: _placeId,
-    latitude: _latitude,
-    longitude: _longitude,
-    districtCode: _districtCode,
-    ...profileData
-  } = data;
-  const tutor = await prisma.tutor
-    .create({ data: { accountId, ...profileData, phoneNumber: numbers.phoneNumber } })
-    .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
-
-  if (locationInput) {
-    await upsertTutorLocation(tutor.id, locationInput);
-  }
-
-  return serializeTutor(tutor, await getTutorNeedsReaddress(tutor.id));
+  return serializeTutor(tutor, await findOwnLocation("tutor_location", tutor.id));
 }
 
 export async function updateTutorProfile(
@@ -137,10 +113,7 @@ export async function updateTutorProfile(
     studentIdNumber: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     parentsInfo?: string;
-    placeId?: string;
-    latitude?: number;
-    longitude?: number;
-    districtCode?: string;
+    location?: SaveLocationInput;
   }>,
 ) {
   const existing = await prisma.tutor.findUnique({ where: { accountId } });
@@ -149,45 +122,38 @@ export async function updateTutorProfile(
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
 
-  const locationInput = locationFieldsPresent(data)
-    ? {
-        placeId: data.placeId,
-        addressText: data.address ?? existing.address,
-        districtCode: data.districtCode,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      }
-    : null;
-
-  const {
-    placeId: _placeId,
-    latitude: _latitude,
-    longitude: _longitude,
-    districtCode: _districtCode,
-    ...profileData
-  } = data;
+  const { location, ...profileData } = data;
   const tutor = await prisma.tutor
     .update({ where: { accountId }, data: profileData })
     .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
 
-  if (locationInput) {
-    await upsertTutorLocation(tutor.id, locationInput);
+  if (location) {
+    await upsertLocation("tutor_location", tutor.id, location);
   }
 
-  return serializeTutor(tutor, await getTutorNeedsReaddress(tutor.id));
+  return serializeTutor(tutor, await findOwnLocation("tutor_location", tutor.id));
 }
 
 export async function replaceTutorAreas(accountId: string, areaIds: number[]) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
+  const next = new Set(areaIds);
 
-  await prisma.$transaction([
-    prisma.tutorArea.deleteMany({ where: { tutorId: tutor.id } }),
-    prisma.tutorArea.createMany({
-      data: areaIds.map((areaId) => ({ tutorId: tutor.id, areaId })),
+  await prisma.$transaction(async (tx) => {
+    const current = await tx.tutorArea.findMany({
+      where: { tutorId: tutor.id },
+      select: { areaId: true },
+    });
+    const currentIds = new Set(current.map((row) => row.areaId));
+    const removed = [...currentIds].filter((id) => !next.has(id));
+    const added = [...next].filter((id) => !currentIds.has(id));
+
+    await tx.tutorArea.deleteMany({ where: { tutorId: tutor.id, areaId: { in: removed } } });
+    await tx.tutorArea.createMany({
+      data: added.map((areaId) => ({ tutorId: tutor.id, areaId })),
       skipDuplicates: true,
-    }),
-  ]);
+    });
+  });
 
   return prisma.tutorArea.findMany({
     where: { tutorId: tutor.id },
@@ -199,13 +165,39 @@ export async function replaceTutorSubjects(accountId: string, subjectIds: number
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
 
-  await prisma.$transaction([
-    prisma.tutorSubject.deleteMany({ where: { tutorId: tutor.id } }),
-    prisma.tutorSubject.createMany({
-      data: subjectIds.map((subjectId) => ({ tutorId: tutor.id, subjectId })),
+  const next = new Set(subjectIds);
+
+  await prisma.$transaction(async (tx) => {
+    const current = await tx.tutorSubject.findMany({
+      where: { tutorId: tutor.id },
+      select: { subjectId: true },
+    });
+    const currentIds = new Set(current.map((row) => row.subjectId));
+    const removed = [...currentIds].filter((id) => !next.has(id));
+    const added = [...next].filter((id) => !currentIds.has(id));
+
+    // The composite FK cascades removed subjects into tutor_requirement_subject; refuse if that empties an active set.
+    const orphaned = await tx.$queryRaw<{ id: string }[]>`
+      SELECT r.id FROM tutor_requirement r
+      JOIN tutor_requirement_subject s ON s.requirement_id = r.id
+      WHERE r.tutor_id = ${tutor.id}::uuid AND r.is_active
+      GROUP BY r.id
+      HAVING bool_and(s.subject_id = ANY(${removed}::int[]))`;
+    if (orphaned.length > 0) {
+      throw Object.assign(new Error("A requirement would be left with no subjects."), {
+        name: "RequirementLosesLastSubject",
+        statusCode: 409,
+        code: "REQUIREMENT_LOSES_LAST_SUBJECT",
+        requirementIds: orphaned.map((row) => row.id),
+      });
+    }
+
+    await tx.tutorSubject.deleteMany({ where: { tutorId: tutor.id, subjectId: { in: removed } } });
+    await tx.tutorSubject.createMany({
+      data: added.map((subjectId) => ({ tutorId: tutor.id, subjectId })),
       skipDuplicates: true,
-    }),
-  ]);
+    });
+  });
 
   return prisma.tutorSubject.findMany({
     where: { tutorId: tutor.id },

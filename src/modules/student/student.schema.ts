@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
 export const studentProfileSchema = z.object({
   name: z.string().min(1).max(200),
@@ -17,10 +18,7 @@ export const studentProfileSchema = z.object({
     .max(20)
     .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
   studentIdNumber: z.string().min(1).max(100),
-  placeId: z.string().min(1).max(255).optional(),
-  latitude: z.number().min(-90).max(90).optional(),
-  longitude: z.number().min(-180).max(180).optional(),
-  districtCode: z.string().min(1).max(100).optional(),
+  location: locationSchema.optional(),
 });
 
 export type StudentProfileInput = z.infer<typeof studentProfileSchema>;
@@ -47,6 +45,7 @@ export const studentResponseSchema = z.object({
   verificationStatus: z.string(),
   ratingAvg: z.number(),
   ratingCount: z.number(),
+  location: ownLocationResponseSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });

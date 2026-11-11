@@ -25,6 +25,17 @@ export async function buildApp() {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
+  app.setErrorHandler((error, _request, reply) => {
+    const err = error as Error & { statusCode?: number };
+    const status = err.statusCode ?? 500;
+    app.log.error(err);
+    return reply.status(status).send({
+      error: err.name,
+      message:
+        env.NODE_ENV === "production" && status >= 500 ? "Internal server error" : err.message,
+    });
+  });
+
   const productionOrigins = env.FRONTEND_URL
     ? env.FRONTEND_URL.split(",").map((url) => url.trim())
     : ["https://tution-media-mocha.vercel.app"];
@@ -63,15 +74,6 @@ export async function buildApp() {
   await app.register(tutorRoutes, { prefix: "/api/v1/tutors" });
   await app.register(requirementRoutes, { prefix: "/api/v1/requirements" });
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
-
-  app.setErrorHandler((error, _request, reply) => {
-    const err = error as Error & { statusCode?: number };
-    app.log.error(err);
-    return reply.status(err.statusCode ?? 500).send({
-      error: err.name,
-      message: env.NODE_ENV === "production" ? "Internal server error" : err.message,
-    });
-  });
 
   return app;
 }

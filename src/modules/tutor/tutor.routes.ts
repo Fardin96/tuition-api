@@ -112,7 +112,16 @@ export async function tutorRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
       const { subjectIds } = request.body as TutorSubjectsInput;
-      const subjects = await replaceTutorSubjects(account.accountId, subjectIds);
+      let subjects: Awaited<ReturnType<typeof replaceTutorSubjects>>;
+      try {
+        subjects = await replaceTutorSubjects(account.accountId, subjectIds);
+      } catch (err) {
+        const e = err as Error & { code?: string; requirementIds?: string[] };
+        if (e.code !== "REQUIREMENT_LOSES_LAST_SUBJECT") throw err;
+        return reply
+          .status(409)
+          .send({ error: e.name, message: e.message, requirementIds: e.requirementIds });
+      }
       if (!subjects) {
         return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
       }
