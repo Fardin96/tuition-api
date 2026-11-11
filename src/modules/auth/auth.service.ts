@@ -6,6 +6,7 @@ import type { Role } from "../../generated/prisma/enums.js";
 import type { AccountModel } from "../../generated/prisma/models/Account.js";
 import { isNumberUsedByOtherAccount } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
+import { findOwnLocation } from "../location/location.service.js";
 
 const GOOGLE_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
 const GOOGLE_JWKS_URI = "https://www.googleapis.com/oauth2/v3/certs";
@@ -524,12 +525,35 @@ export async function hardDeleteAccount(accountId: string) {
 }
 
 export async function getMe(accountId: string) {
-  return prisma.account.findUnique({
+  const me = await prisma.account.findUnique({
     where: { id: accountId },
-    include: {
-      student: { include: { location: { select: { needsReaddress: true } } } },
-      tutor: { include: { location: { select: { needsReaddress: true } } } },
-      adminUser: true,
-    },
+    include: { student: true, tutor: true, adminUser: true },
   });
+  if (!me) return me;
+  const student = me.student && {
+    ...me.student,
+    location: await findOwnLocation("student_location", me.student.id),
+  };
+  const tutor = me.tutor && {
+    ...me.tutor,
+    location: await findOwnLocation("tutor_location", me.tutor.id),
+  };
+  if (!tutor) return { ...me, student, tutor };
+
+  const [readiness] = await prisma.$queryRaw<
+    { missing: string[]; verificationRequired: boolean }[]
+  >`
+    SELECT tutor_missing_requirements(${tutor.id}::uuid) AS missing,
+           COALESCE((SELECT (value #>> '{}')::boolean FROM platform_setting
+                     WHERE key = 'require_tutor_verification'), false) AS "verificationRequired"`;
+  return {
+    ...me,
+    student,
+    tutor,
+    applyReadiness: {
+      ready: readiness.missing.length === 0,
+      missing: readiness.missing,
+      verificationRequired: readiness.verificationRequired,
+    },
+  };
 }

@@ -1,66 +1,76 @@
+import { Prisma } from "../../generated/prisma/client.js";
 import { prisma } from "../../lib/prisma.js";
 
 export type SaveLocationInput = {
-  placeId: string;
+  lat: number;
+  lng: number;
   addressText: string;
   districtCode: string;
-  latitude: number;
-  longitude: number;
+  placeId?: string;
 };
 
-// Input is Places-sourced today; pin payloads will set geog_source differently.
-export async function upsertTutorLocation(tutorId: string, input: SaveLocationInput) {
-  await prisma.$executeRaw`
-    INSERT INTO tutor_location (id, tutor_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at, geog_source)
+export type OwnLocation = {
+  lat: number | null;
+  lng: number | null;
+  addressText: string;
+  districtCode: string;
+  placeId: string | null;
+  needsReaddress: boolean;
+};
+
+const LOCATION_TABLES = {
+  tutor_location: { table: Prisma.sql`tutor_location`, owner: Prisma.sql`tutor_id` },
+  student_location: { table: Prisma.sql`student_location`, owner: Prisma.sql`student_id` },
+};
+
+export async function upsertLocation(
+  kind: keyof typeof LOCATION_TABLES,
+  ownerId: string,
+  input: SaveLocationInput,
+  db: Prisma.TransactionClient = prisma,
+) {
+  const { table, owner } = LOCATION_TABLES[kind];
+  const placed = input.placeId !== undefined;
+  const source = placed ? Prisma.sql`'PLACES'` : Prisma.sql`'PIN'`;
+  const fetchedAt = placed ? Prisma.sql`NOW()` : Prisma.sql`NULL`;
+  await db.$executeRaw`
+    INSERT INTO ${table} (id, ${owner}, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at, geog_source)
     VALUES (
       gen_random_uuid(),
-      ${tutorId},
-      ${input.placeId},
+      ${ownerId},
+      ${input.placeId ?? null},
       ${input.addressText},
       ${input.districtCode},
-      ST_SetSRID(ST_MakePoint(${input.longitude}, ${input.latitude}), 4326)::geography,
-      NOW(),
+      ST_SetSRID(ST_MakePoint(${input.lng}, ${input.lat}), 4326)::geography,
+      ${fetchedAt},
       false,
       NOW(),
-      'PLACES'
+      ${source}
     )
-    ON CONFLICT (tutor_id) DO UPDATE SET
+    ON CONFLICT (${owner}) DO UPDATE SET
       place_id = EXCLUDED.place_id,
       address_text = EXCLUDED.address_text,
       district_code = EXCLUDED.district_code,
       geog = EXCLUDED.geog,
-      geog_fetched_at = NOW(),
+      geog_fetched_at = EXCLUDED.geog_fetched_at,
       needs_readdress = false,
-      geog_source = 'PLACES',
+      geog_source = EXCLUDED.geog_source,
       updated_at = NOW();
   `;
 }
 
-export async function upsertStudentLocation(studentId: string, input: SaveLocationInput) {
-  await prisma.$executeRaw`
-    INSERT INTO student_location (id, student_id, place_id, address_text, district_code, geog, geog_fetched_at, needs_readdress, updated_at, geog_source)
-    VALUES (
-      gen_random_uuid(),
-      ${studentId},
-      ${input.placeId},
-      ${input.addressText},
-      ${input.districtCode},
-      ST_SetSRID(ST_MakePoint(${input.longitude}, ${input.latitude}), 4326)::geography,
-      NOW(),
-      false,
-      NOW(),
-      'PLACES'
-    )
-    ON CONFLICT (student_id) DO UPDATE SET
-      place_id = EXCLUDED.place_id,
-      address_text = EXCLUDED.address_text,
-      district_code = EXCLUDED.district_code,
-      geog = EXCLUDED.geog,
-      geog_fetched_at = NOW(),
-      needs_readdress = false,
-      geog_source = 'PLACES',
-      updated_at = NOW();
+export async function findOwnLocation(
+  kind: keyof typeof LOCATION_TABLES,
+  ownerId: string,
+): Promise<OwnLocation | null> {
+  const { table, owner } = LOCATION_TABLES[kind];
+  const [row] = await prisma.$queryRaw<OwnLocation[]>`
+    SELECT ST_Y(geog::geometry) AS lat, ST_X(geog::geometry) AS lng,
+           address_text AS "addressText", district_code AS "districtCode",
+           place_id AS "placeId", needs_readdress AS "needsReaddress"
+    FROM ${table} WHERE ${owner} = ${ownerId}
   `;
+  return row ?? null;
 }
 
 export async function getTutorNeedsReaddress(tutorId: string): Promise<boolean> {

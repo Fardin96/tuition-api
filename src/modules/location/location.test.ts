@@ -29,10 +29,13 @@ describe("location service and routes", () => {
         whatsappNumber: "+8801700000002",
         studentIdNumber: "TUTOR-1",
         gender: "MALE",
-        placeId: "place-1",
-        latitude: 23.81,
-        longitude: 90.41,
-        districtCode: "dhaka",
+        location: {
+          lat: 23.81,
+          lng: 90.41,
+          addressText: "Some Road",
+          district: "Dhaka",
+          placeId: "place-1",
+        },
       },
     });
 
@@ -64,10 +67,13 @@ describe("location service and routes", () => {
         emergencyContact: "+8801700000001",
         whatsappNumber: "+8801700000001",
         studentIdNumber: "STU-1",
-        placeId: "place-2",
-        latitude: 23.73,
-        longitude: 90.4,
-        districtCode: "dhaka",
+        location: {
+          lat: 23.73,
+          lng: 90.4,
+          addressText: "Some Road",
+          district: "Dhaka",
+          placeId: "place-2",
+        },
       },
     });
 
@@ -186,5 +192,203 @@ describe("location service and routes", () => {
     `;
     expect(hardRow?.needs_readdress).toBe(true);
     expect(hardRow?.geog).toBeNull();
+  });
+});
+
+describe("location payload", () => {
+  const location = {
+    lat: 23.81,
+    lng: 90.41,
+    addressText: "Road 1, Dhanmondi",
+    district: "Dhaka",
+  };
+  const tutorBody = {
+    name: "Tutor Name",
+    address: "Tutor Address",
+    emergencyContact: "+8801700000002",
+    whatsappNumber: "+8801700000002",
+    studentIdNumber: "TUTOR-1",
+    gender: "MALE",
+  };
+
+  async function tutorLocationRow(tutorId: string) {
+    const [row] = await prisma.$queryRaw<
+      { geog_source: string; place_id: string | null; district_code: string }[]
+    >`SELECT geog_source, place_id, district_code FROM tutor_location WHERE tutor_id = ${tutorId}`;
+    return row;
+  }
+
+  it("rejects coordinates outside Bangladesh", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { ...tutorBody, location: { ...location, lat: 10, lng: 100 } },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("rejects an unknown district", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { ...tutorBody, location: { ...location, district: "Atlantis" } },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("rejects a partial location object", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const { lng: _lng, ...partial } = location;
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/students/me",
+      headers: await getAuthHeaders(account),
+      payload: {
+        name: "Student Name",
+        areaId: area.id,
+        address: "Student Address",
+        emergencyContact: "+8801700000001",
+        whatsappNumber: "+8801700000001",
+        studentIdNumber: "STU-1",
+        location: partial,
+      },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("maps district aliases to canonical codes", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { ...tutorBody, location: { ...location, district: "Chittagong District" } },
+    });
+    expect(res.statusCode).toBe(201);
+    const tutor = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect((await tutorLocationRow(tutor.id))?.district_code).toBe("chattogram");
+  });
+
+  it("marks a pin without placeId as PIN and one with placeId as PLACES", async () => {
+    const app = await createTestApp();
+    const pinAccount = await createAccount({ role: "TUTOR" });
+    const placesAccount = await createAccount({ role: "TUTOR" });
+
+    await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(pinAccount),
+      payload: { ...tutorBody, location },
+    });
+    await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(placesAccount),
+      payload: {
+        ...tutorBody,
+        whatsappNumber: "+8801700000003",
+        location: { ...location, placeId: "place-9" },
+      },
+    });
+
+    const pinTutor = await prisma.tutor.findUniqueOrThrow({ where: { accountId: pinAccount.id } });
+    const placesTutor = await prisma.tutor.findUniqueOrThrow({
+      where: { accountId: placesAccount.id },
+    });
+    expect(await tutorLocationRow(pinTutor.id)).toMatchObject({
+      geog_source: "PIN",
+      place_id: null,
+    });
+    expect(await tutorLocationRow(placesTutor.id)).toMatchObject({
+      geog_source: "PLACES",
+      place_id: "place-9",
+    });
+  });
+
+  it("returns the owner's location from GET /me and keeps it on PATCH without location", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const headers = await getAuthHeaders(account);
+    await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers,
+      payload: { ...tutorBody, location: { ...location, placeId: "place-3" } },
+    });
+
+    const patch = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers,
+      payload: { name: "Renamed" },
+    });
+    expect(patch.statusCode).toBe(200);
+    expect(JSON.parse(patch.body).location).toMatchObject({
+      lat: 23.81,
+      lng: 90.41,
+      districtCode: "dhaka",
+      placeId: "place-3",
+    });
+
+    const me = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+    expect(JSON.parse(me.body).account.tutor.location).toMatchObject({
+      lat: 23.81,
+      lng: 90.41,
+      addressText: "Road 1, Dhanmondi",
+      districtCode: "dhaka",
+      placeId: "place-3",
+      needsReaddress: false,
+    });
+  });
+
+  it("GET /me returns the student location", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const headers = await getAuthHeaders(account);
+    await app.inject({
+      method: "POST",
+      url: "/api/v1/students/me",
+      headers,
+      payload: {
+        name: "Student Name",
+        areaId: area.id,
+        address: "Student Address",
+        emergencyContact: "+8801700000001",
+        whatsappNumber: "+8801700000001",
+        studentIdNumber: "STU-1",
+        location,
+      },
+    });
+
+    const me = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+    expect(JSON.parse(me.body).account.student.location).toMatchObject({
+      lat: 23.81,
+      districtCode: "dhaka",
+      placeId: null,
+    });
+  });
+
+  it("lists a new tutor when verification is not required", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: tutorBody,
+    });
+    expect(res.statusCode).toBe(201);
+    const tutor = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(tutor.isListed).toBe(true);
   });
 });

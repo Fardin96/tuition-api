@@ -13,6 +13,7 @@ import {
   createTutorProfile,
   getAuthHeaders,
 } from "../../tests/helpers.js";
+import { createStudentProfile as createStudentProfileService } from "./student.service.js";
 
 function phone() {
   return `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`;
@@ -156,6 +157,22 @@ describe("student routes", () => {
 
       expect(res.statusCode).toBe(409);
       expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
+    });
+  });
+
+  describe("createStudentProfile location atomicity", () => {
+    it("leaves no student row when the location write fails", async () => {
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+
+      await expect(
+        createStudentProfileService(account.id, {
+          ...studentPayload(area.id),
+          location: { lat: 200, lng: 90, addressText: "Out of range", districtCode: "dhaka" },
+        }),
+      ).rejects.toThrow();
+
+      expect(await prisma.student.findUnique({ where: { accountId: account.id } })).toBeNull();
     });
   });
 

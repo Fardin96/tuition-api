@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Gender } from "../../generated/prisma/enums.js";
+import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
 export const tutorProfileSchema = z.object({
   name: z.string().min(1).max(200),
@@ -19,10 +20,7 @@ export const tutorProfileSchema = z.object({
   studentIdNumber: z.string().min(1).max(100),
   gender: z.nativeEnum(Gender),
   parentsInfo: z.string().max(1000).optional(),
-  placeId: z.string().min(1).max(255).optional(),
-  latitude: z.number().min(-90).max(90).optional(),
-  longitude: z.number().min(-180).max(180).optional(),
-  districtCode: z.string().min(1).max(100).optional(),
+  location: locationSchema.optional(),
 });
 
 export type TutorProfileInput = z.infer<typeof tutorProfileSchema>;
@@ -78,6 +76,7 @@ export const tutorResponseSchema = z.object({
   ratingAvg: z.number(),
   ratingCount: z.number(),
   needsReaddress: z.boolean().optional(),
+  location: ownLocationResponseSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });

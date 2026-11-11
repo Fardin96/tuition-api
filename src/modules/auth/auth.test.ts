@@ -345,6 +345,33 @@ describe("me routes", () => {
       const res = await app.inject({ method: "GET", url: "/api/v1/me" });
       expect(res.statusCode).toBe(401);
     });
+
+    it("returns applyReadiness with the missing list for a tutor", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id);
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+
+      expect(res.statusCode).toBe(200);
+      const { applyReadiness } = JSON.parse(res.body).account;
+      expect(applyReadiness).toEqual({
+        ready: false,
+        missing: ["location_pin", "area", "default_requirement"],
+        verificationRequired: false,
+      });
+    });
+
+    it("omits applyReadiness for a student", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+
+      expect(JSON.parse(res.body).account.applyReadiness).toBeUndefined();
+    });
   });
 
   describe("DELETE /api/v1/me", () => {

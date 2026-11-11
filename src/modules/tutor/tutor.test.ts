@@ -163,6 +163,39 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(404);
     });
+
+    it("only touches the diff: kept rows are not rewritten", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const kept = await createArea();
+      const dropped = await createArea();
+      const added = await createArea();
+      await prisma.tutorArea.createMany({
+        data: [
+          { tutorId: tutor.id, areaId: kept.id },
+          { tutorId: tutor.id, areaId: dropped.id },
+        ],
+      });
+      const keptXmin = () =>
+        prisma.$queryRaw<{ xmin: string }[]>`
+          SELECT xmin::text AS xmin FROM tutor_area
+          WHERE tutor_id = ${tutor.id}::uuid AND area_id = ${kept.id}`;
+      const [before] = await keptXmin();
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers: await getAuthHeaders(account),
+        payload: { areaIds: [kept.id, added.id, added.id] },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const ids = JSON.parse(res.body).areas.map((a: { area: { id: number } }) => a.area.id);
+      expect(ids.sort()).toEqual([kept.id, added.id].sort());
+      const [after] = await keptXmin();
+      expect(after.xmin).toBe(before.xmin);
+    });
   });
 
   describe("PUT /api/v1/tutors/me/subjects", () => {
@@ -182,6 +215,103 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(200);
       expect(JSON.parse(res.body).subjects).toHaveLength(1);
+    });
+
+    async function createActiveRequirement(tutorId: string, subjectIds: number[]) {
+      const requirement = await prisma.tutorRequirement.create({
+        data: {
+          tutorId,
+          name: "Evening Math",
+          classLevelMin: 6,
+          classLevelMax: 10,
+          timeFrom: new Date("1970-01-01T10:00:00Z"),
+          timeTo: new Date("1970-01-01T12:00:00Z"),
+          availableFrom: new Date("2024-01-01"),
+          teachesOnline: true,
+        },
+      });
+      await prisma.tutorRequirementSubject.createMany({
+        data: subjectIds.map((subjectId) => ({
+          requirementId: requirement.id,
+          tutorId,
+          subjectId,
+        })),
+      });
+      return requirement;
+    }
+
+    it("keeps requirement subjects of subjects that stay", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const [s1, s2, s3] = [await createSubject(), await createSubject(), await createSubject()];
+      await prisma.tutorSubject.createMany({
+        data: [s1, s2].map((s) => ({ tutorId: tutor.id, subjectId: s.id })),
+      });
+      const requirement = await createActiveRequirement(tutor.id, [s1.id, s2.id]);
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/subjects",
+        headers: await getAuthHeaders(account),
+        payload: { subjectIds: [s1.id, s3.id] },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const rows = await prisma.tutorRequirementSubject.findMany({
+        where: { requirementId: requirement.id },
+      });
+      expect(rows.map((r) => r.subjectId)).toEqual([s1.id]);
+    });
+
+    it("refuses to remove the last subject of an active requirement (409)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const s1 = await createSubject();
+      const s2 = await createSubject();
+      await prisma.tutorSubject.create({ data: { tutorId: tutor.id, subjectId: s1.id } });
+      const requirement = await createActiveRequirement(tutor.id, [s1.id]);
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/subjects",
+        headers: await getAuthHeaders(account),
+        payload: { subjectIds: [s2.id] },
+      });
+
+      expect(res.statusCode).toBe(409);
+      const body = JSON.parse(res.body);
+      expect(body.error).toBe("RequirementLosesLastSubject");
+      expect(body.requirementIds).toEqual([requirement.id]);
+      expect(await prisma.tutorSubject.findMany({ where: { tutorId: tutor.id } })).toHaveLength(1);
+      expect(
+        await prisma.tutorRequirementSubject.findMany({ where: { requirementId: requirement.id } }),
+      ).toHaveLength(1);
+    });
+
+    it("allows removing a subject from a requirement that keeps others", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const s1 = await createSubject();
+      const s2 = await createSubject();
+      await prisma.tutorSubject.createMany({
+        data: [s1, s2].map((s) => ({ tutorId: tutor.id, subjectId: s.id })),
+      });
+      const requirement = await createActiveRequirement(tutor.id, [s1.id, s2.id]);
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/subjects",
+        headers: await getAuthHeaders(account),
+        payload: { subjectIds: [s1.id] },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(
+        await prisma.tutorRequirementSubject.findMany({ where: { requirementId: requirement.id } }),
+      ).toHaveLength(1);
     });
   });
 
