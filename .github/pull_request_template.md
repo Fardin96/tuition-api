@@ -1,5 +1,4 @@
 ---
-about: Propose a change to the codebase
 title: 'feat: '
 ---
 

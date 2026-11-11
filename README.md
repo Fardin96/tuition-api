@@ -55,7 +55,7 @@ curl http://localhost:3000/api/v1/health
 | Script                             | Purpose                                                                  |
 | ---------------------------------- | ------------------------------------------------------------------------ |
 | `yarn dev`                         | Start dev server with watch                                              |
-| `yarn build`                       | Build production bundle to `dist/`                                       |
+| `yarn build`                       | Build production bundle to`dist/`                                        |
 | `yarn start`                       | Run production bundle (env vars injected by host)                        |
 | `yarn db:migrate:create`           | Create a new empty migration                                             |
 | `yarn db:migrate`                  | Apply migrations in dev                                                  |
@@ -150,9 +150,10 @@ Required once you build auth/files/notifications:
 - `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`
 - `SUPER_ADMIN_EMAIL_1`, `SUPER_ADMIN_EMAIL_2`
 
-## Documentation
+## Docs
 
 - [Important Commands Reference](docs/important_commands.md) — `pg_dump`, migrations, dev commands, deploy, and other commands you'll need
+- [Migrations Reference](docs/migrations.md) — How migrations run, history, safe procedure, commands, failures, and rules
 
 ## Project structure
 

@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Lint migration SQL
+        run: yarn lint:sql
+
       - name: Generate Prisma client
         run: yarn db:generate
 

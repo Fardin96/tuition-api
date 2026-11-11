@@ -1160,6 +1160,41 @@
   dependencies:
     tslib "^2.6.2"
 
+"@squawk-cli/darwin-arm64@2.72.0":
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/@squawk-cli/darwin-arm64/-/darwin-arm64-2.72.0.tgz#12d511c82be4fb0959389e997458064ead045b65"
+  integrity sha512-x9GbT+MpokUApC0hTO3aiZGXIk9NQRHIgilENX3078OVWtYQZ8K+nvZ8Fx3Hs2L3tDMVpK+G3ZO8eF7+vm+uIw==
+
+"@squawk-cli/darwin-x64@2.72.0":
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/@squawk-cli/darwin-x64/-/darwin-x64-2.72.0.tgz#18ccfe8495c7a36a4cdfce51ae506769f6d84f26"
+  integrity sha512-U49fefGycKA6/ClFvG1N2XsVubKCKXXAWya2fizDi64wmKc+9khNEkniHwLb12Xr/0gd9cJTLF7pXCPhba4TDg==
+
+"@squawk-cli/linux-arm64-musl@2.72.0":
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/@squawk-cli/linux-arm64-musl/-/linux-arm64-musl-2.72.0.tgz#b19de9a27280e0ea7b11641a67c84daa635b3a16"
+  integrity sha512-unIaLzFKyDaSyOIXXKBBsXgHehr9/DqQvTNKKKMjVlNMOOsHlCHASwPQDmlfjnlRgcL0dGPGZ9j+jJqUhNbCYQ==
+
+"@squawk-cli/linux-arm64@2.72.0":
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/@squawk-cli/linux-arm64/-/linux-arm64-2.72.0.tgz#bc53e0baf859ce9e481a036f5fb31719241a8bca"
+  integrity sha512-Nb1SKgcrwnM+PWDFEn6Q1I0jYWdATicvbpkryiJcSGnr1SwwRKKEcM23qPNzjyxJvjQeE8GoAQ4O22J23ULWwQ==
+
+"@squawk-cli/linux-x64-musl@2.72.0":
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/@squawk-cli/linux-x64-musl/-/linux-x64-musl-2.72.0.tgz#db89b4044909711c960049b2dfa6af3c10293599"
+  integrity sha512-VS5Lste4yQyrwrXJ1TuRO40BZlq898MZtRTb49X9KDQl0yj6ZrQ8KD8K00bZUzH2m/iv9QQtSNLynyMt533Xbw==
+
+"@squawk-cli/linux-x64@2.72.0":
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/@squawk-cli/linux-x64/-/linux-x64-2.72.0.tgz#b6caaaa15deaac43b4372b7f3d24a3732f281ba7"
+  integrity sha512-7M2tL5E8EhI9aCAFiUQe5jfMcdSBk3aSboep1U16ZqRQo6fXLUVfvpATdEXj0c4J8e9AcavTAMXSc2rQnNBRVA==
+
+"@squawk-cli/win32-x64@2.72.0":
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/@squawk-cli/win32-x64/-/win32-x64-2.72.0.tgz#3b5708a4d2ed92f530a8591e64f0a5acf97d4f6a"
+  integrity sha512-PeSXhOZIlB7n4eMApujqDF1jGrTPDBnMAYohL95RZ5IoYvr9TSDqoH23rpdguj+TBDxfA9GA3KSO2fXB5NwwBw==
+
 "@standard-schema/spec@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@standard-schema/spec/-/spec-1.1.0.tgz#a79b55dbaf8604812f52d140b2c9ab41bc150bb8"
@@ -2828,6 +2863,19 @@ sqlstring@^2.3.2:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/sqlstring/-/sqlstring-2.3.3.tgz#2ddc21f03bce2c387ed60680e739922c65751d0c"
   integrity sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==
+
+squawk-cli@^2.72.0:
+  version "2.72.0"
+  resolved "https://registry.yarnpkg.com/squawk-cli/-/squawk-cli-2.72.0.tgz#051fd42233de48c88417f7fcc4c65284aa960a1b"
+  integrity sha512-4vKiq4quUG8lMBZvzh19NBsqPgoB5CFNAhZwFLFk3exFLJD58viyKR9Jd8jyvRdJ6Y4GBGp23upirSPRMI5WlQ==
+  optionalDependencies:
+    "@squawk-cli/darwin-arm64" "2.72.0"
+    "@squawk-cli/darwin-x64" "2.72.0"
+    "@squawk-cli/linux-arm64" "2.72.0"
+    "@squawk-cli/linux-arm64-musl" "2.72.0"
+    "@squawk-cli/linux-x64" "2.72.0"
+    "@squawk-cli/linux-x64-musl" "2.72.0"
+    "@squawk-cli/win32-x64" "2.72.0"
 
 std-env@3.10.0:
   version "3.10.0"
