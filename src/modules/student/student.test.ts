@@ -25,6 +25,7 @@ function studentPayload(areaId: number) {
     areaId,
     address: "Student Address",
     emergencyContact: "+8801700000001",
+    phoneNumber: phone(),
     whatsappNumber: phone(),
     studentIdNumber: `STU-${crypto.randomUUID()}`,
   };
@@ -50,6 +51,47 @@ describe("student routes", () => {
       expect(body.name).toBe("Student Name");
       expect(body.areaId).toBe(area.id);
       expect(body.verificationStatus).toBe("NOT_SUBMITTED");
+    });
+
+    it("creates profiles without a WhatsApp number", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const { whatsappNumber: _whatsapp, ...payload } = studentPayload(area.id);
+
+      const first = await createAccount({ role: "STUDENT" });
+      const second = await createAccount({ role: "STUDENT" });
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(first),
+        payload,
+      });
+      const other = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(second),
+        payload: { ...payload, phoneNumber: phone() },
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).whatsappNumber).toBeNull();
+      expect(other.statusCode).toBe(201);
+    });
+
+    it("rejects a profile without a phone number", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const { phoneNumber: _phone, ...payload } = studentPayload(area.id);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload,
+      });
+
+      expect(res.statusCode).toBe(400);
     });
 
     it("rejects non-student accounts", async () => {
@@ -122,6 +164,30 @@ describe("student routes", () => {
       expect(JSON.parse(res.body).name).toBe("Updated Name");
     });
 
+    it("clears the WhatsApp number and its verification when set to null", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      await createStudentProfile(account.id, area.id, { whatsappNumber: phone() });
+      await prisma.student.update({
+        where: { accountId: account.id },
+        data: { whatsappVerifiedAt: new Date() },
+      });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: { whatsappNumber: null },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).whatsappNumber).toBeNull();
+      expect(JSON.parse(res.body).whatsappVerifiedAt).toBeNull();
+      const saved = await prisma.student.findUniqueOrThrow({ where: { accountId: account.id } });
+      expect(saved.whatsappNumber).toBeNull();
+    });
+
     it("returns 404 when no profile exists", async () => {
       const app = await createTestApp();
       const account = await createAccount({ role: "STUDENT" });
@@ -157,6 +223,59 @@ describe("student routes", () => {
 
       expect(res.statusCode).toBe(409);
       expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
+    });
+
+    it("rejects a phone that another account uses as its WhatsApp number", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const tutor = await createAccount({ role: "TUTOR" });
+      const taken = phone();
+      await createTutorProfile(tutor.id, { whatsappNumber: taken });
+      const account = await createAccount({ role: "STUDENT" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: { ...studentPayload(area.id), phoneNumber: taken },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
+    });
+
+    it("rejects a WhatsApp number that another account uses as its phone", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const tutor = await createAccount({ role: "TUTOR" });
+      const taken = phone();
+      await createTutorProfile(tutor.id, { phoneNumber: taken });
+      const account = await createAccount({ role: "STUDENT" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: { ...studentPayload(area.id), whatsappNumber: taken },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("This WhatsApp number is already in use.");
+    });
+
+    it("GET /me returns a null WhatsApp number", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      await createStudentProfile(account.id, area.id);
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/me",
+        headers: await getAuthHeaders(account),
+      });
+
+      expect(JSON.parse(res.body).account.student.whatsappNumber).toBeNull();
     });
   });
 

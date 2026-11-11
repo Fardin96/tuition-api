@@ -20,7 +20,7 @@ function serializeStudent(
     address: string;
     emergencyContact: string;
     phoneNumber: string;
-    whatsappNumber: string;
+    whatsappNumber: string | null;
     studentIdNumber: string;
     whatsappVerifiedAt: Date | null;
     verificationStatus: string;
@@ -48,8 +48,8 @@ export async function createStudentProfile(
     areaId: number;
     address: string;
     emergencyContact: string;
-    phoneNumber?: string;
-    whatsappNumber: string;
+    phoneNumber: string;
+    whatsappNumber?: string | null;
     studentIdNumber: string;
     location?: SaveLocationInput;
   },
@@ -61,16 +61,13 @@ export async function createStudentProfile(
     throw err;
   }
 
-  const numbers = {
-    phoneNumber: data.phoneNumber ?? data.whatsappNumber,
-    whatsappNumber: data.whatsappNumber,
-  };
+  const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
 
   const { location, ...profileData } = data;
   const student = await prisma.$transaction(async (tx) => {
     const created = await tx.student
-      .create({ data: { accountId, ...profileData, phoneNumber: numbers.phoneNumber } })
+      .create({ data: { accountId, ...profileData } })
       .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
     if (location) {
       await upsertLocation("student_location", created.id, location, tx);
@@ -89,7 +86,7 @@ export async function updateStudentProfile(
     address: string;
     emergencyContact: string;
     phoneNumber: string;
-    whatsappNumber: string;
+    whatsappNumber: string | null;
     studentIdNumber: string;
     location?: SaveLocationInput;
   }>,
@@ -101,9 +98,14 @@ export async function updateStudentProfile(
   await assertContactNumbersFree(accountId, numbers);
 
   const { location, ...profileData } = data;
+  const whatsappChanged =
+    data.whatsappNumber !== undefined && data.whatsappNumber !== existing.whatsappNumber;
   const student = await prisma.$transaction(async (tx) => {
     const updated = await tx.student
-      .update({ where: { accountId }, data: profileData })
+      .update({
+        where: { accountId },
+        data: whatsappChanged ? { ...profileData, whatsappVerifiedAt: null } : profileData,
+      })
       .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
     if (location) {
       await upsertLocation("student_location", updated.id, location, tx);

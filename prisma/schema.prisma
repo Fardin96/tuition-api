@@ -433,7 +433,7 @@ model Student {
   areaId             Int                @map("area_id")
   address            String
   emergencyContact   String             @map("emergency_contact")
-  whatsappNumber     String             @unique @map("whatsapp_number") // E.164 text, never numeric
+  whatsappNumber     String?            @unique @map("whatsapp_number") // E.164 text, never numeric; optional
   whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
   phoneNumber        String             @unique @map("phone_number")
   phoneVerifiedAt    DateTime?          @map("phone_verified_at") @db.Timestamptz(3)
@@ -467,7 +467,7 @@ model Tutor {
   name               String
   address            String
   emergencyContact   String?            @map("emergency_contact")
-  whatsappNumber     String             @unique @map("whatsapp_number")
+  whatsappNumber     String?            @unique @map("whatsapp_number")
   whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
   phoneNumber        String             @unique @map("phone_number")
   phoneVerifiedAt    DateTime?          @map("phone_verified_at") @db.Timestamptz(3)

@@ -1,6 +1,6 @@
 import { prisma } from "./prisma.js";
 
-type ContactNumbers = { phoneNumber?: string; whatsappNumber?: string };
+type ContactNumbers = { phoneNumber?: string; whatsappNumber?: string | null };
 
 export async function isNumberUsedByOtherAccount(accountId: string, number: string) {
   const rows = await prisma.$queryRaw<{ taken: boolean }[]>`

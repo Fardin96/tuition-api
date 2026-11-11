@@ -10,13 +10,14 @@ export const tutorProfileSchema = z.object({
     .string()
     .min(1)
     .max(20)
-    .refine((v) => !v.startsWith("deleted:"), "Invalid number")
-    .optional(),
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
   whatsappNumber: z
     .string()
     .min(1)
     .max(20)
-    .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
+    .refine((v) => !v.startsWith("deleted:"), "Invalid number")
+    .nullable()
+    .optional(),
   studentIdNumber: z.string().min(1).max(100),
   gender: z.nativeEnum(Gender),
   parentsInfo: z.string().max(1000).optional(),
@@ -66,7 +67,7 @@ export const tutorResponseSchema = z.object({
   address: z.string(),
   emergencyContact: z.string(),
   phoneNumber: z.string(),
-  whatsappNumber: z.string(),
+  whatsappNumber: z.string().nullable(),
   studentIdNumber: z.string(),
   gender: z.string(),
   parentsInfo: z.string().nullable().optional(),

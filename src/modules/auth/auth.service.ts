@@ -229,7 +229,9 @@ async function reactivateAccount(accountId: string) {
         where: { id: account.student.id },
         data: {
           phoneNumber: await restoreNumber(accountId, account.student.phoneNumber),
-          whatsappNumber: await restoreNumber(accountId, account.student.whatsappNumber),
+          whatsappNumber:
+            account.student.whatsappNumber &&
+            (await restoreNumber(accountId, account.student.whatsappNumber)),
         },
       });
     }
@@ -238,7 +240,9 @@ async function reactivateAccount(accountId: string) {
         where: { id: account.tutor.id },
         data: {
           phoneNumber: await restoreNumber(accountId, account.tutor.phoneNumber),
-          whatsappNumber: await restoreNumber(accountId, account.tutor.whatsappNumber),
+          whatsappNumber:
+            account.tutor.whatsappNumber &&
+            (await restoreNumber(accountId, account.tutor.whatsappNumber)),
         },
       });
     }
@@ -360,7 +364,8 @@ export async function softDeleteAccount(accountId: string) {
         where: { id: account.student.id },
         data: {
           phoneNumber: tombstone(accountId, account.student.phoneNumber),
-          whatsappNumber: tombstone(accountId, account.student.whatsappNumber),
+          whatsappNumber:
+            account.student.whatsappNumber && tombstone(accountId, account.student.whatsappNumber),
         },
       });
       await tx.tuitionRequirement.updateMany({
@@ -377,7 +382,8 @@ export async function softDeleteAccount(accountId: string) {
         where: { id: account.tutor.id },
         data: {
           phoneNumber: tombstone(accountId, account.tutor.phoneNumber),
-          whatsappNumber: tombstone(accountId, account.tutor.whatsappNumber),
+          whatsappNumber:
+            account.tutor.whatsappNumber && tombstone(accountId, account.tutor.whatsappNumber),
         },
       });
       await tx.tuitionPackage.updateMany({

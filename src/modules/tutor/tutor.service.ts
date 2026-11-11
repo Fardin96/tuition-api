@@ -35,7 +35,7 @@ function serializeTutor(
     address: string;
     emergencyContact: string | null;
     phoneNumber: string;
-    whatsappNumber: string;
+    whatsappNumber: string | null;
     studentIdNumber: string | null;
     gender: string;
     parentsInfo: string | null;
@@ -66,8 +66,8 @@ export async function createTutorProfile(
     name: string;
     address: string;
     emergencyContact: string;
-    phoneNumber?: string;
-    whatsappNumber: string;
+    phoneNumber: string;
+    whatsappNumber?: string | null;
     studentIdNumber: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     parentsInfo?: string;
@@ -81,16 +81,13 @@ export async function createTutorProfile(
     throw err;
   }
 
-  const numbers = {
-    phoneNumber: data.phoneNumber ?? data.whatsappNumber,
-    whatsappNumber: data.whatsappNumber,
-  };
+  const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
 
   const { location, ...profileData } = data;
   const tutor = await prisma.$transaction(async (tx) => {
     const created = await tx.tutor
-      .create({ data: { accountId, ...profileData, phoneNumber: numbers.phoneNumber } })
+      .create({ data: { accountId, ...profileData } })
       .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
     if (location) {
       await upsertLocation("tutor_location", created.id, location, tx);
@@ -109,7 +106,7 @@ export async function updateTutorProfile(
     address: string;
     emergencyContact: string;
     phoneNumber: string;
-    whatsappNumber: string;
+    whatsappNumber: string | null;
     studentIdNumber: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     parentsInfo?: string;
@@ -123,8 +120,13 @@ export async function updateTutorProfile(
   await assertContactNumbersFree(accountId, numbers);
 
   const { location, ...profileData } = data;
+  const whatsappChanged =
+    data.whatsappNumber !== undefined && data.whatsappNumber !== existing.whatsappNumber;
   const tutor = await prisma.tutor
-    .update({ where: { accountId }, data: profileData })
+    .update({
+      where: { accountId },
+      data: whatsappChanged ? { ...profileData, whatsappVerifiedAt: null } : profileData,
+    })
     .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
 
   if (location) {

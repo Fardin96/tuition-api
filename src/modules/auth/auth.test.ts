@@ -554,6 +554,29 @@ describe("createOrUpdateAccount", () => {
     expect(restored.phoneNumber).toBe(`deleted:${account.id}:+8801722222222`);
   });
 
+  it("round-trips a profile without a WhatsApp number through soft delete and reactivation", async () => {
+    const area = await createArea();
+    const account = await createAccount({
+      role: "STUDENT",
+      email: "nowa@example.com",
+      googleSub: "google-nowa",
+    });
+    const student = await createStudentProfile(account.id, area.id, {
+      phoneNumber: "+8801722222222",
+    });
+    await authService.softDeleteAccount(account.id);
+
+    const deleted = await prisma.student.findUniqueOrThrow({ where: { id: student.id } });
+    expect(deleted.phoneNumber).toBe(`deleted:${account.id}:+8801722222222`);
+    expect(deleted.whatsappNumber).toBeNull();
+
+    await authService.createOrUpdateAccount(payload("google-nowa", "nowa@example.com"), "STUDENT");
+
+    const restored = await prisma.student.findUniqueOrThrow({ where: { id: student.id } });
+    expect(restored.phoneNumber).toBe("+8801722222222");
+    expect(restored.whatsappNumber).toBeNull();
+  });
+
   it("rejects a blocked, self-deleted account on sign-up too", async () => {
     const admin = await superAdmin();
     const account = await createAccount({

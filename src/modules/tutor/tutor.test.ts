@@ -25,6 +25,7 @@ function tutorPayload(overrides: Record<string, unknown> = {}) {
     name: "Tutor Name",
     address: "Tutor Address",
     emergencyContact: "+8801700000002",
+    phoneNumber: phone(),
     whatsappNumber: phone(),
     studentIdNumber: `TUT-${crypto.randomUUID()}`,
     gender: "MALE",
@@ -50,6 +51,37 @@ describe("tutor routes", () => {
       const body = JSON.parse(res.body);
       expect(body.name).toBe("Tutor Name");
       expect(body.isListed).toBe(false);
+    });
+
+    it("creates a tutor profile without a WhatsApp number", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const { whatsappNumber: _whatsapp, ...payload } = tutorPayload();
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload,
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).whatsappNumber).toBeNull();
+    });
+
+    it("rejects a tutor profile without a phone number", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const { phoneNumber: _phone, ...payload } = tutorPayload();
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload,
+      });
+
+      expect(res.statusCode).toBe(400);
     });
 
     it("rejects non-tutor accounts", async () => {
@@ -111,6 +143,27 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(200);
       expect(JSON.parse(res.body).name).toBe("Updated Tutor");
+    });
+
+    it("clears the WhatsApp number and its verification when set to null", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id, { whatsappNumber: phone() });
+      await prisma.tutor.update({
+        where: { accountId: account.id },
+        data: { whatsappVerifiedAt: new Date() },
+      });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: { whatsappNumber: null },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).whatsappNumber).toBeNull();
+      expect(JSON.parse(res.body).whatsappVerifiedAt).toBeNull();
     });
 
     it("returns 404 when no profile exists", async () => {
@@ -680,6 +733,25 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(409);
       expect(JSON.parse(res.body).message).toBe("This WhatsApp number is already in use.");
+    });
+
+    it("rejects a phone that equals another account's WhatsApp number (PhoneInUse)", async () => {
+      const app = await createTestApp();
+      const other = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const taken = phone();
+      await createStudentProfile(other.id, area.id, { whatsappNumber: taken });
+      const account = await createAccount({ role: "TUTOR" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload({ phoneNumber: taken }),
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
     });
 
     it("lets the same account use one number for phone and WhatsApp", async () => {
