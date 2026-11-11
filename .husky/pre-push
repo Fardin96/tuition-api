@@ -17,6 +17,8 @@ if [ -z "$DATABASE_URL" ] && [ -z "$TEST_DATABASE_URL" ]; then
   exit 1
 fi
 
+# Refresh origin/main so migrations already merged on GitHub do not trigger the gate. Offline: use the last known state.
+git fetch -q origin main 2>/dev/null || echo "warn: git fetch origin failed, comparing with the last fetched origin/main"
 if git rev-parse --verify -q origin/main >/dev/null && [ -n "$(git diff --name-only origin/main...HEAD -- prisma/migrations)" ]; then
   want=$(find prisma/migrations -name migration.sql | LC_ALL=C sort | xargs shasum -a 256 | shasum -a 256 | cut -d' ' -f1)
   if [ "$(cat .backups/.rehearsed 2>/dev/null)" != "$want" ]; then

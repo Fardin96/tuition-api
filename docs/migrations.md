@@ -51,6 +51,8 @@ bash scripts/migrate-safe.sh --keep '<prod direct url>'   # keep the scratch DB 
 
 Use the direct URL (port 25060) and add your IP to DO Trusted Sources first. Wrap the URL in single quotes (zsh).
 
+If the `pg_dump` on your `PATH` is older than the server, the script looks in the Homebrew dirs (`/opt/homebrew/opt/libpq/bin`, `postgresql@<N>/bin`) and uses `pg_dump` and `pg_restore` from there. If none is new enough, run `brew install libpq`.
+
 | Flag | What it does |
 | --- | --- |
 | (none) | Dumps prod, restores into a local scratch DB, applies the pending migrations there, checks `migrate status` and row counts, prints `SAFE TO PUSH` and writes `.backups/.rehearsed`. |

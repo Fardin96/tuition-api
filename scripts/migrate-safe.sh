@@ -61,8 +61,17 @@ case "$PROD" in *:25061*|*pgbouncer*) fail "use the direct URL (port 25060), not
 for t in psql pg_dump pg_restore shasum npx; do command -v "$t" >/dev/null || fail "$t not on PATH"; done
 db=$(q "$PROD" 'select current_database()') || fail "cannot connect to prod. Add your IP to DO Trusted Sources; quote the URL in single quotes"
 server=$(q "$PROD" 'show server_version_num')
-client=$(pg_dump --version | grep -oE '[0-9]+' | head -1)
-[ "$client" -ge $((server / 10000)) ] || fail "pg_dump $client is older than server $((server / 10000)) (hint: brew install libpq, put its bin first in PATH)"
+need=$((server / 10000))
+major() { "$1" --version | grep -oE '[0-9]+' | head -1; }
+client=$(major pg_dump)
+if [ "$client" -lt "$need" ]; then
+  # Homebrew installs newer clients outside PATH (libpq is keg-only). Use pg_dump and pg_restore from the same dir.
+  for dir in /opt/homebrew/opt/libpq/bin /opt/homebrew/opt/postgresql@"$need"/bin /usr/local/opt/libpq/bin /usr/local/opt/postgresql@"$need"/bin; do
+    [ -x "$dir/pg_dump" ] && [ -x "$dir/pg_restore" ] && [ "$(major "$dir/pg_dump")" -ge "$need" ] || continue
+    PATH="$dir:$PATH"; client=$(major pg_dump); break
+  done
+fi
+[ "$client" -ge "$need" ] || fail "pg_dump $client is older than server $need and no newer one found in Homebrew (brew install libpq)"
 ok "target database: $db (server $((server / 10000)), pg_dump $client)"
 
 if [ "$mode" = full ]; then
