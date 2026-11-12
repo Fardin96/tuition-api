@@ -83,3 +83,77 @@ export const tutorResponseSchema = z.object({
 });
 
 export type TutorNearbyQuery = z.infer<typeof tutorNearbyQuerySchema>;
+
+export const tutorRequirementIdParamSchema = z.object({ id: z.string().uuid() });
+
+export type TutorRequirementIdParam = z.infer<typeof tutorRequirementIdParamSchema>;
+
+const hhmm = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+
+const availableDaysSchema = z.number().int().min(1).max(127);
+const maxStudentsSchema = z.number().int().min(1);
+const zoneIdsSchema = z.array(z.string().uuid()).refine((v) => new Set(v).size === v.length);
+
+const tutorRequirementBaseSchema = z.object({
+  name: z.string().trim().min(1).max(60),
+  classLevelMin: z.number().int().min(1).max(20),
+  classLevelMax: z.number().int().min(1).max(20),
+  timeFrom: z.string().regex(hhmm),
+  timeTo: z.string().regex(hhmm),
+  availableDays: availableDaysSchema,
+  minSalary: z.number().int().positive().nullable().optional(),
+  maxStudents: maxStudentsSchema,
+  availableFrom: z.string().regex(isoDate),
+  teachesOnline: z.boolean(),
+  subjectIds: z
+    .array(z.number().int().positive())
+    .min(1)
+    .refine((v) => new Set(v).size === v.length),
+  zoneIds: zoneIdsSchema,
+});
+
+export const createTutorRequirementSchema = tutorRequirementBaseSchema
+  .extend({
+    availableDays: availableDaysSchema.default(127),
+    maxStudents: maxStudentsSchema.default(1),
+    teachesOnline: z.boolean().default(false),
+    zoneIds: zoneIdsSchema.default([]),
+  })
+  .strict()
+  .refine((v) => v.classLevelMax >= v.classLevelMin, "classLevelMax must be >= classLevelMin")
+  .refine((v) => v.timeTo > v.timeFrom, "timeTo must be after timeFrom");
+
+export type CreateTutorRequirementInput = z.infer<typeof createTutorRequirementSchema>;
+
+export const updateTutorRequirementSchema = tutorRequirementBaseSchema
+  .partial()
+  .strict()
+  .refine((v) => Object.keys(v).length > 0, "At least one field is required");
+
+export type UpdateTutorRequirementInput = z.infer<typeof updateTutorRequirementSchema>;
+
+export const tutorRequirementResponseSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  isDefault: z.boolean(),
+  isActive: z.boolean(),
+  classLevelMin: z.number(),
+  classLevelMax: z.number(),
+  timeFrom: z.string(),
+  timeTo: z.string(),
+  availableDays: z.number(),
+  minSalary: z.number().nullable(),
+  maxStudents: z.number(),
+  availableFrom: z.string(),
+  teachesOnline: z.boolean(),
+  subjectIds: z.array(z.number()),
+  zoneIds: z.array(z.string()),
+  mappedPackageCount: z.number(),
+});
+
+export type TutorRequirementResponse = z.infer<typeof tutorRequirementResponseSchema>;
+
+export const tutorRequirementListResponseSchema = z.object({
+  requirements: z.array(tutorRequirementResponseSchema),
+});

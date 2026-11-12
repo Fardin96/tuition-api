@@ -309,3 +309,98 @@ export async function createFileAsset(
     },
   });
 }
+
+export async function createTutorZone(
+  tutorId: string,
+  overrides: { label?: string; lng?: number; lat?: number; radiusM?: number } = {},
+) {
+  const lng = overrides.lng ?? 90.4125;
+  const lat = overrides.lat ?? 23.8103;
+  const [zone] = await prisma.$queryRaw<{ id: string }[]>`
+    INSERT INTO tutor_zone (id, tutor_id, label, center, radius_m, geog_source, updated_at)
+    VALUES (
+      gen_random_uuid(),
+      ${tutorId}::uuid,
+      ${overrides.label ?? "Zone"},
+      ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography,
+      ${overrides.radiusM ?? 2000},
+      'PIN'::"GeogSource",
+      NOW()
+    )
+    RETURNING id;
+  `;
+  return zone.id;
+}
+
+export async function createTutorRequirement(
+  tutorId: string,
+  overrides: {
+    name?: string;
+    isDefault?: boolean;
+    isActive?: boolean;
+    subjectIds?: number[];
+    zoneIds?: string[];
+  } = {},
+) {
+  const requirement = await prisma.tutorRequirement.create({
+    data: {
+      tutorId,
+      name: overrides.name ?? "Evening Math",
+      isDefault: overrides.isDefault ?? false,
+      isActive: overrides.isActive ?? true,
+      classLevelMin: 6,
+      classLevelMax: 10,
+      timeFrom: new Date("1970-01-01T10:00:00Z"),
+      timeTo: new Date("1970-01-01T12:00:00Z"),
+      availableFrom: new Date("2024-01-01"),
+      teachesOnline: true,
+    },
+  });
+  if (overrides.subjectIds?.length) {
+    await prisma.tutorRequirementSubject.createMany({
+      data: overrides.subjectIds.map((subjectId) => ({
+        requirementId: requirement.id,
+        tutorId,
+        subjectId,
+      })),
+    });
+  }
+  if (overrides.zoneIds?.length) {
+    await prisma.tutorRequirementZone.createMany({
+      data: overrides.zoneIds.map((zoneId) => ({
+        requirementId: requirement.id,
+        tutorId,
+        zoneId,
+      })),
+    });
+  }
+  return requirement;
+}
+
+export async function createTuitionPackage(
+  tutorId: string,
+  overrides: {
+    requirementId?: string | null;
+    status?: ListingStatus;
+    categoryId?: number;
+    subjectId?: number;
+  } = {},
+) {
+  const categoryId = overrides.categoryId ?? (await createCategory()).id;
+  const subjectId = overrides.subjectId ?? (await createSubject()).id;
+  return prisma.tuitionPackage.create({
+    data: {
+      tutorId,
+      categoryId,
+      subjectId,
+      requirementId: overrides.requirementId,
+      classLevel: 10,
+      timeOfDay: new Date("2024-01-01T10:00:00Z"),
+      daysPerWeek: 3,
+      expectedSalary: 5000,
+      availableFrom: new Date("2024-01-01"),
+      status: overrides.status ?? "OPEN",
+      moderationStatus: "APPROVED",
+    },
+  });
+}
