@@ -8,7 +8,11 @@ import {
   type SaveLocationInput,
   upsertLocation,
 } from "../location/location.service.js";
-import type { CreateTutorRequirementInput, UpdateTutorRequirementInput } from "./tutor.schema.js";
+import type {
+  CreateTutorRequirementInput,
+  TutorRequirementListQuery,
+  UpdateTutorRequirementInput,
+} from "./tutor.schema.js";
 
 function toNumber(value: unknown) {
   return Number(value);
@@ -444,15 +448,32 @@ async function findSerializedRequirement(tutorId: string, id: string) {
   return serializeTutorRequirement(row, await mappedPackageCounts(tutorId));
 }
 
-export async function listTutorRequirements(accountId: string) {
+export async function listTutorRequirements(
+  accountId: string,
+  status: TutorRequirementListQuery["status"] = "active",
+) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
 
-  const rows = await prisma.tutorRequirement.findMany({
-    where: { tutorId: tutor.id, isActive: true },
-    include: requirementInclude,
-    orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
-  });
+  const activeRows =
+    status === "archived"
+      ? []
+      : await prisma.tutorRequirement.findMany({
+          where: { tutorId: tutor.id, isActive: true },
+          include: requirementInclude,
+          orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+        });
+  // shortcut: archived list capped at 50, switch to cursor pagination if tutors exceed it
+  const archivedRows =
+    status === "active"
+      ? []
+      : await prisma.tutorRequirement.findMany({
+          where: { tutorId: tutor.id, isActive: false },
+          include: requirementInclude,
+          orderBy: { updatedAt: "desc" },
+          take: 50,
+        });
+  const rows = [...activeRows, ...archivedRows];
   const counts = await mappedPackageCounts(tutor.id);
   return rows.map((row) => serializeTutorRequirement(row, counts));
 }
