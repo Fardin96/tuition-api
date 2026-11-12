@@ -1,3 +1,4 @@
+import type { Prisma, TutorRequirement } from "../../generated/prisma/client.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 import {
@@ -7,6 +8,7 @@ import {
   type SaveLocationInput,
   upsertLocation,
 } from "../location/location.service.js";
+import type { CreateTutorRequirementInput, UpdateTutorRequirementInput } from "./tutor.schema.js";
 
 function toNumber(value: unknown) {
   return Number(value);
@@ -318,4 +320,380 @@ export async function getApprovedVideos() {
     },
     orderBy: { sortOrder: "asc" },
   });
+}
+
+const MAX_ACTIVE_REQUIREMENTS = 10;
+
+const requirementInclude = {
+  subjects: { select: { subjectId: true }, orderBy: { subjectId: "asc" } },
+  zones: { select: { zoneId: true } },
+} as const;
+
+type TutorRequirementRow = TutorRequirement & {
+  subjects: { subjectId: number }[];
+  zones: { zoneId: string }[];
+};
+
+type RequirementValues = Omit<CreateTutorRequirementInput, "subjectIds" | "zoneIds">;
+
+const hhmmOf = (d: Date) => d.toISOString().slice(11, 16);
+const ymdOf = (d: Date) => d.toISOString().slice(0, 10);
+const toTime = (t: string) => new Date(`1970-01-01T${t}:00Z`);
+const toDay = (d: string) => new Date(`${d}T00:00:00Z`);
+
+function requirementError(
+  name: string,
+  statusCode: number,
+  code: string,
+  message: string,
+  extras: object = {},
+) {
+  return Object.assign(new Error(message), { name, statusCode, code, ...extras });
+}
+
+function limitError() {
+  return requirementError(
+    "RequirementLimitReached",
+    409,
+    "REQUIREMENT_LIMIT_REACHED",
+    `A tutor can have at most ${MAX_ACTIVE_REQUIREMENTS} active requirements`,
+  );
+}
+
+function inUseError(packageIds: string[]) {
+  return requirementError(
+    "RequirementInUse",
+    409,
+    "REQUIREMENT_IN_USE",
+    "Requirement is used by open packages",
+    { packageIds },
+  );
+}
+
+function requirementData(values: RequirementValues) {
+  return {
+    ...values,
+    timeFrom: toTime(values.timeFrom),
+    timeTo: toTime(values.timeTo),
+    availableFrom: toDay(values.availableFrom),
+  };
+}
+
+function mapRequirementFkError(error: unknown): never {
+  if ((error as { code?: string }).code === "P2003") {
+    throw requirementError(
+      "InvalidSubjectOrZone",
+      400,
+      "INVALID_SUBJECT_OR_ZONE",
+      "Subject or zone is not part of this tutor's profile",
+    );
+  }
+  throw error;
+}
+
+// The archive trigger raises restrict_violation (SQLSTATE 23001) when open packages still use the set.
+function isArchiveBlocked(error: unknown) {
+  const { message = "", meta } = error as {
+    message?: string;
+    meta?: { database_error_code?: string };
+  };
+  return meta?.database_error_code === "23001" || message.includes("mapped to open packages");
+}
+
+async function lockTutor(tx: Prisma.TransactionClient, tutorId: string) {
+  await tx.$queryRaw`SELECT id FROM tutor WHERE id = ${tutorId}::uuid FOR UPDATE`;
+}
+
+// One grouped query. Key null = OPEN packages without a requirement (they belong to the default set).
+async function mappedPackageCounts(tutorId: string) {
+  const rows = await prisma.$queryRaw<{ requirementId: string | null; count: number }[]>`
+    SELECT requirement_id AS "requirementId", count(*)::int AS count
+    FROM tuition_package
+    WHERE tutor_id = ${tutorId}::uuid AND status = 'OPEN'
+    GROUP BY requirement_id`;
+  return new Map<string | null, number>(rows.map((row) => [row.requirementId, row.count]));
+}
+
+function serializeTutorRequirement(row: TutorRequirementRow, counts: Map<string | null, number>) {
+  return {
+    id: row.id,
+    name: row.name,
+    isDefault: row.isDefault,
+    isActive: row.isActive,
+    classLevelMin: row.classLevelMin,
+    classLevelMax: row.classLevelMax,
+    timeFrom: hhmmOf(row.timeFrom),
+    timeTo: hhmmOf(row.timeTo),
+    availableDays: row.availableDays,
+    minSalary: row.minSalary,
+    maxStudents: row.maxStudents,
+    availableFrom: ymdOf(row.availableFrom),
+    teachesOnline: row.teachesOnline,
+    subjectIds: row.subjects.map((s) => s.subjectId),
+    zoneIds: row.zones.map((z) => z.zoneId),
+    mappedPackageCount: (counts.get(row.id) ?? 0) + (row.isDefault ? (counts.get(null) ?? 0) : 0),
+  };
+}
+
+async function findSerializedRequirement(tutorId: string, id: string) {
+  const row = await prisma.tutorRequirement.findFirst({
+    where: { id, tutorId },
+    include: requirementInclude,
+  });
+  if (!row) return null;
+  return serializeTutorRequirement(row, await mappedPackageCounts(tutorId));
+}
+
+export async function listTutorRequirements(accountId: string) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  if (!tutor) return null;
+
+  const rows = await prisma.tutorRequirement.findMany({
+    where: { tutorId: tutor.id, isActive: true },
+    include: requirementInclude,
+    orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+  });
+  const counts = await mappedPackageCounts(tutor.id);
+  return rows.map((row) => serializeTutorRequirement(row, counts));
+}
+
+export async function getTutorRequirement(accountId: string, id: string) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  if (!tutor) return null;
+  return findSerializedRequirement(tutor.id, id);
+}
+
+export async function createTutorRequirement(
+  accountId: string,
+  input: CreateTutorRequirementInput,
+) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  if (!tutor) return null;
+  const { subjectIds, zoneIds, ...values } = input;
+
+  try {
+    const id = await prisma.$transaction(async (tx) => {
+      await lockTutor(tx, tutor.id);
+      const activeCount = await tx.tutorRequirement.count({
+        where: { tutorId: tutor.id, isActive: true },
+      });
+      if (activeCount >= MAX_ACTIVE_REQUIREMENTS) throw limitError();
+      const hasDefault =
+        (await tx.tutorRequirement.count({ where: { tutorId: tutor.id, isDefault: true } })) > 0;
+
+      const created = await tx.tutorRequirement.create({
+        data: { ...requirementData(values), tutorId: tutor.id, isDefault: !hasDefault },
+        select: { id: true },
+      });
+      await tx.tutorRequirementSubject.createMany({
+        data: subjectIds.map((subjectId) => ({
+          requirementId: created.id,
+          subjectId,
+          tutorId: tutor.id,
+        })),
+      });
+      await tx.tutorRequirementZone.createMany({
+        data: zoneIds.map((zoneId) => ({ requirementId: created.id, zoneId, tutorId: tutor.id })),
+      });
+      return created.id;
+    });
+    return findSerializedRequirement(tutor.id, id);
+  } catch (error) {
+    mapRequirementFkError(error);
+  }
+}
+
+export async function updateTutorRequirement(
+  accountId: string,
+  id: string,
+  input: UpdateTutorRequirementInput,
+) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  if (!tutor) return null;
+  const existing = await prisma.tutorRequirement.findFirst({ where: { id, tutorId: tutor.id } });
+  if (!existing) return null;
+
+  const { subjectIds, zoneIds, ...scalars } = input;
+  const values: RequirementValues = {
+    name: existing.name,
+    classLevelMin: existing.classLevelMin,
+    classLevelMax: existing.classLevelMax,
+    timeFrom: hhmmOf(existing.timeFrom),
+    timeTo: hhmmOf(existing.timeTo),
+    availableDays: existing.availableDays,
+    minSalary: existing.minSalary,
+    maxStudents: existing.maxStudents,
+    availableFrom: ymdOf(existing.availableFrom),
+    teachesOnline: existing.teachesOnline,
+    ...scalars,
+  };
+  if (
+    values.classLevelMin < 1 ||
+    values.classLevelMax > 20 ||
+    values.classLevelMax < values.classLevelMin ||
+    values.timeTo <= values.timeFrom
+  ) {
+    throw requirementError(
+      "InvalidRequirement",
+      400,
+      "INVALID_REQUIREMENT",
+      "Invalid requirement values",
+    );
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      if (subjectIds !== undefined) {
+        const current = await tx.tutorRequirementSubject.findMany({
+          where: { requirementId: id },
+          select: { subjectId: true },
+        });
+        const { removed, added } = diffIds(
+          current.map((row) => row.subjectId),
+          subjectIds,
+        );
+        await tx.tutorRequirementSubject.deleteMany({
+          where: { requirementId: id, subjectId: { in: removed } },
+        });
+        await tx.tutorRequirementSubject.createMany({
+          data: added.map((subjectId) => ({ requirementId: id, tutorId: tutor.id, subjectId })),
+          skipDuplicates: true,
+        });
+      }
+
+      if (zoneIds !== undefined) {
+        const current = await tx.tutorRequirementZone.findMany({
+          where: { requirementId: id },
+          select: { zoneId: true },
+        });
+        const { removed, added } = diffIds(
+          current.map((row) => row.zoneId),
+          zoneIds,
+        );
+        await tx.tutorRequirementZone.deleteMany({
+          where: { requirementId: id, zoneId: { in: removed } },
+        });
+        await tx.tutorRequirementZone.createMany({
+          data: added.map((zoneId) => ({ requirementId: id, tutorId: tutor.id, zoneId })),
+          skipDuplicates: true,
+        });
+      }
+
+      await tx.tutorRequirement.update({ where: { id }, data: requirementData(values) });
+    });
+    return findSerializedRequirement(tutor.id, id);
+  } catch (error) {
+    mapRequirementFkError(error);
+  }
+}
+
+function diffIds<T>(current: T[], next: T[]) {
+  const currentSet = new Set(current);
+  const nextSet = new Set(next);
+  return {
+    removed: current.filter((id) => !nextSet.has(id)),
+    added: [...nextSet].filter((id) => !currentSet.has(id)),
+  };
+}
+
+export async function setDefaultTutorRequirement(accountId: string, id: string) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  if (!tutor) return null;
+
+  const found = await prisma.$transaction(async (tx) => {
+    await lockTutor(tx, tutor.id);
+    const row = await tx.tutorRequirement.findFirst({
+      where: { id, tutorId: tutor.id },
+      select: { isActive: true, isDefault: true },
+    });
+    if (!row) return false;
+    if (!row.isActive) {
+      throw requirementError(
+        "RequirementArchived",
+        409,
+        "REQUIREMENT_ARCHIVED",
+        "An archived requirement cannot be the default",
+      );
+    }
+    if (!row.isDefault) {
+      await tx.tutorRequirement.updateMany({
+        where: { tutorId: tutor.id, isDefault: true },
+        data: { isDefault: false },
+      });
+      await tx.tutorRequirement.update({ where: { id }, data: { isDefault: true } });
+    }
+    return true;
+  });
+  return found ? findSerializedRequirement(tutor.id, id) : null;
+}
+
+export async function archiveTutorRequirement(accountId: string, id: string) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  if (!tutor) return null;
+
+  try {
+    const found = await prisma.$transaction(async (tx) => {
+      await lockTutor(tx, tutor.id);
+      const row = await tx.tutorRequirement.findFirst({
+        where: { id, tutorId: tutor.id },
+        select: { isActive: true, isDefault: true },
+      });
+      if (!row) return false;
+      if (!row.isActive) return true;
+      if (row.isDefault) {
+        throw requirementError(
+          "RequirementIsDefault",
+          409,
+          "REQUIREMENT_IS_DEFAULT",
+          "The default requirement cannot be archived",
+        );
+      }
+      const packages = await tx.tuitionPackage.findMany({
+        where: { requirementId: id, status: "OPEN" },
+        select: { id: true },
+      });
+      if (packages.length > 0) throw inUseError(packages.map((p) => p.id));
+      await tx.tutorRequirement.update({ where: { id }, data: { isActive: false } });
+      return true;
+    });
+    return found ? findSerializedRequirement(tutor.id, id) : null;
+  } catch (error) {
+    if (!isArchiveBlocked(error)) throw error;
+    const packages = await prisma.tuitionPackage.findMany({
+      where: { requirementId: id, status: "OPEN" },
+      select: { id: true },
+    });
+    throw inUseError(packages.map((p) => p.id));
+  }
+}
+
+export async function restoreTutorRequirement(accountId: string, id: string) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  if (!tutor) return null;
+
+  const found = await prisma.$transaction(async (tx) => {
+    await lockTutor(tx, tutor.id);
+    const row = await tx.tutorRequirement.findFirst({
+      where: { id, tutorId: tutor.id },
+      select: { isActive: true },
+    });
+    if (!row) return false;
+    if (row.isActive) return true;
+    const subjectCount = await tx.tutorRequirementSubject.count({ where: { requirementId: id } });
+    if (subjectCount === 0) {
+      throw requirementError(
+        "RequirementHasNoSubjects",
+        409,
+        "REQUIREMENT_NO_SUBJECTS",
+        "Add at least one subject before restoring this requirement",
+      );
+    }
+    const activeCount = await tx.tutorRequirement.count({
+      where: { tutorId: tutor.id, isActive: true },
+    });
+    if (activeCount >= MAX_ACTIVE_REQUIREMENTS) throw limitError();
+    await tx.tutorRequirement.update({ where: { id }, data: { isActive: true } });
+    return true;
+  });
+  return found ? findSerializedRequirement(tutor.id, id) : null;
 }

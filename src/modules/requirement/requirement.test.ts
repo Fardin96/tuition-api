@@ -514,7 +514,7 @@ describe("requirement module", () => {
     expect(response.statusCode).toBe(400);
   });
 
-  it("should reject requirement creation with classLevel exceeding 17", async () => {
+  it("should reject requirement creation with classLevel exceeding 20", async () => {
     const app = await createTestApp();
     const account = await createAccount({ role: "STUDENT" });
     const area = await createArea();
@@ -531,7 +531,7 @@ describe("requirement module", () => {
         categoryId: category.id,
         areaId: area.id,
         subjectIds: [subject.id],
-        classLevel: 18,
+        classLevel: 21,
         timeOfDay: "10:00",
         daysPerWeek: 3,
         salary: 5000,
@@ -541,6 +541,36 @@ describe("requirement module", () => {
     });
 
     expect(response.statusCode).toBe(400);
+  });
+
+  it("should accept requirement creation with classLevel 20", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const category = await createCategory();
+    const subject = await createSubject();
+    await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers: authHeaders,
+      payload: {
+        categoryId: category.id,
+        areaId: area.id,
+        subjectIds: [subject.id],
+        classLevel: 20,
+        timeOfDay: "10:00",
+        daysPerWeek: 3,
+        salary: 5000,
+        hireByDate: "2024-12-31",
+        tuitionType: "Home Tutoring Solo",
+      },
+    });
+
+    expect(response.statusCode).toBe(201);
+    expect(response.json().classLevel).toBe(20);
   });
 
   it("should allow creating an incomplete requirement with status DRAFT", async () => {

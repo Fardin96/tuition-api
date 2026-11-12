@@ -12,7 +12,10 @@ import {
   createStudentProfile,
   createSubject,
   createTestApp,
+  createTuitionPackage,
   createTutorProfile,
+  createTutorRequirement,
+  createTutorZone,
   getAuthHeaders,
 } from "../../tests/helpers.js";
 
@@ -969,6 +972,461 @@ describe("tutor routes", () => {
       const row = await prisma.tutor.findUniqueOrThrow({ where: { id: tutor.id } });
       expect(row.ratingCount).toBe(4);
       expect(Number(row.ratingAvg)).toBe(3.5);
+    });
+  });
+
+  describe("tutor requirements (/me/requirements)", () => {
+    const base = "/api/v1/tutors/me/requirements";
+
+    function requirementPayload(overrides: Record<string, unknown> = {}) {
+      return {
+        name: "Evening Math",
+        classLevelMin: 6,
+        classLevelMax: 10,
+        timeFrom: "10:00",
+        timeTo: "12:00",
+        availableDays: 127,
+        minSalary: 5000,
+        maxStudents: 2,
+        availableFrom: "2024-01-01",
+        teachesOnline: true,
+        subjectIds: [],
+        zoneIds: [],
+        ...overrides,
+      };
+    }
+
+    async function setupTutor(subjectCount = 1, zoneCount = 0) {
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const subjects = [];
+      for (let i = 0; i < subjectCount; i++) subjects.push(await createSubject());
+      await prisma.tutorSubject.createMany({
+        data: subjects.map((s) => ({ tutorId: tutor.id, subjectId: s.id })),
+      });
+      const zoneIds: string[] = [];
+      for (let i = 0; i < zoneCount; i++) zoneIds.push(await createTutorZone(tutor.id));
+      return { account, tutor, subjects, zoneIds, headers: await getAuthHeaders(account) };
+    }
+
+    it("makes the first set the default", async () => {
+      const app = await createTestApp();
+      const { headers, subjects } = await setupTutor();
+
+      const res = await app.inject({
+        method: "POST",
+        url: base,
+        headers,
+        payload: requirementPayload({ subjectIds: [subjects[0].id] }),
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).isDefault).toBe(true);
+    });
+
+    it("creates later sets as non-default", async () => {
+      const app = await createTestApp();
+      const { headers, subjects } = await setupTutor();
+      const payload = requirementPayload({ subjectIds: [subjects[0].id] });
+      await app.inject({ method: "POST", url: base, headers, payload });
+
+      const res = await app.inject({ method: "POST", url: base, headers, payload });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).isDefault).toBe(false);
+    });
+
+    it("rejects an 11th active set (409)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers, subjects } = await setupTutor();
+      for (let i = 0; i < 10; i++) await createTutorRequirement(tutor.id);
+
+      const res = await app.inject({
+        method: "POST",
+        url: base,
+        headers,
+        payload: requirementPayload({ subjectIds: [subjects[0].id] }),
+      });
+
+      expect(res.statusCode).toBe(409);
+    });
+
+    it("rejects a subject that is not on the tutor's profile (400)", async () => {
+      const app = await createTestApp();
+      const { headers } = await setupTutor();
+      const other = await createSubject();
+
+      const res = await app.inject({
+        method: "POST",
+        url: base,
+        headers,
+        payload: requirementPayload({ subjectIds: [other.id] }),
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("rejects another tutor's zone (400)", async () => {
+      const app = await createTestApp();
+      const { headers, subjects } = await setupTutor();
+      const otherAccount = await createAccount({ role: "TUTOR" });
+      const otherTutor = await createTutorProfile(otherAccount.id);
+      const otherZone = await createTutorZone(otherTutor.id);
+
+      const res = await app.inject({
+        method: "POST",
+        url: base,
+        headers,
+        payload: requirementPayload({ subjectIds: [subjects[0].id], zoneIds: [otherZone] }),
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("returns 404 for another tutor's set", async () => {
+      const app = await createTestApp();
+      const { headers } = await setupTutor();
+      const otherAccount = await createAccount({ role: "TUTOR" });
+      const otherTutor = await createTutorProfile(otherAccount.id);
+      const otherSet = await createTutorRequirement(otherTutor.id);
+
+      const res = await app.inject({ method: "GET", url: `${base}/${otherSet.id}`, headers });
+
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("forbids students (403)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+
+      const res = await app.inject({
+        method: "GET",
+        url: base,
+        headers: await getAuthHeaders(account),
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+
+    it("hides archived sets from the list", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      await createTutorRequirement(tutor.id, { name: "Active Set" });
+      await createTutorRequirement(tutor.id, { name: "Archived Set", isActive: false });
+
+      const res = await app.inject({ method: "GET", url: base, headers });
+
+      expect(res.statusCode).toBe(200);
+      const names = JSON.parse(res.body).requirements.map((r: { name: string }) => r.name);
+      expect(names).toEqual(["Active Set"]);
+    });
+
+    it("returns an archived set on detail GET with isActive false", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const archived = await createTutorRequirement(tutor.id, { isActive: false });
+
+      const res = await app.inject({ method: "GET", url: `${base}/${archived.id}`, headers });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).isActive).toBe(false);
+    });
+
+    it("allows editing an archived set (200)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const archived = await createTutorRequirement(tutor.id, { isActive: false });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: `${base}/${archived.id}`,
+        headers,
+        payload: { name: "Renamed" },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).name).toBe("Renamed");
+    });
+
+    it("rejects a merged class range that is invalid (400)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const set = await createTutorRequirement(tutor.id, { isDefault: true });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: `${base}/${set.id}`,
+        headers,
+        payload: { classLevelMin: 15 },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("rejects an empty subjectIds list on PATCH (400)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const set = await createTutorRequirement(tutor.id, { isDefault: true });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: `${base}/${set.id}`,
+        headers,
+        payload: { subjectIds: [] },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("applies subject and zone diffs on PATCH", async () => {
+      const app = await createTestApp();
+      const { tutor, headers, subjects, zoneIds } = await setupTutor(3, 3);
+      const [s1, s2, s3] = subjects;
+      const [z1, z2, z3] = zoneIds;
+      const set = await createTutorRequirement(tutor.id, {
+        isDefault: true,
+        subjectIds: [s1.id, s2.id],
+        zoneIds: [z1, z2],
+      });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: `${base}/${set.id}`,
+        headers,
+        payload: { subjectIds: [s1.id, s3.id], zoneIds: [z2, z3] },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body);
+      expect([...body.subjectIds].sort()).toEqual([s1.id, s3.id].sort());
+      expect([...body.zoneIds].sort()).toEqual([z2, z3].sort());
+      const subjectRows = await prisma.tutorRequirementSubject.findMany({
+        where: { requirementId: set.id },
+      });
+      const zoneRows = await prisma.tutorRequirementZone.findMany({
+        where: { requirementId: set.id },
+      });
+      expect(subjectRows.map((r) => r.subjectId).sort()).toEqual([s1.id, s3.id].sort());
+      expect(zoneRows.map((r) => r.zoneId).sort()).toEqual([z2, z3].sort());
+    });
+
+    it("moves the default when set-default is called", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const first = await createTutorRequirement(tutor.id, { isDefault: true });
+      const second = await createTutorRequirement(tutor.id);
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${base}/${second.id}/default`,
+        headers,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).isDefault).toBe(true);
+      const oldDefault = await prisma.tutorRequirement.findUniqueOrThrow({
+        where: { id: first.id },
+      });
+      expect(oldDefault.isDefault).toBe(false);
+    });
+
+    it("refuses set-default on an archived set (409)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      await createTutorRequirement(tutor.id, { isDefault: true });
+      const archived = await createTutorRequirement(tutor.id, { isActive: false });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${base}/${archived.id}/default`,
+        headers,
+      });
+
+      expect(res.statusCode).toBe(409);
+    });
+
+    it("refuses to archive the default set (409)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const set = await createTutorRequirement(tutor.id, { isDefault: true });
+
+      const res = await app.inject({ method: "DELETE", url: `${base}/${set.id}`, headers });
+
+      expect(res.statusCode).toBe(409);
+    });
+
+    it("refuses to archive a set used by an OPEN package (409) and lists it", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      await createTutorRequirement(tutor.id, { isDefault: true });
+      const set = await createTutorRequirement(tutor.id);
+      const pkg = await createTuitionPackage(tutor.id, { requirementId: set.id });
+
+      const res = await app.inject({ method: "DELETE", url: `${base}/${set.id}`, headers });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).packageIds).toContain(pkg.id);
+      const row = await prisma.tutorRequirement.findUniqueOrThrow({ where: { id: set.id } });
+      expect(row.isActive).toBe(true);
+    });
+
+    it("archives an unused non-default set (200)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      await createTutorRequirement(tutor.id, { isDefault: true });
+      const set = await createTutorRequirement(tutor.id);
+
+      const res = await app.inject({ method: "DELETE", url: `${base}/${set.id}`, headers });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).isActive).toBe(false);
+    });
+
+    it("restores an archived set (200)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers, subjects } = await setupTutor();
+      await createTutorRequirement(tutor.id, { isDefault: true });
+      const archived = await createTutorRequirement(tutor.id, {
+        isActive: false,
+        subjectIds: [subjects[0].id],
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${base}/${archived.id}/restore`,
+        headers,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).isActive).toBe(true);
+    });
+
+    it("refuses to restore when 10 sets are already active (409)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers, subjects } = await setupTutor();
+      for (let i = 0; i < 10; i++) {
+        await createTutorRequirement(tutor.id, { isDefault: i === 0 });
+      }
+      const archived = await createTutorRequirement(tutor.id, {
+        isActive: false,
+        subjectIds: [subjects[0].id],
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${base}/${archived.id}/restore`,
+        headers,
+      });
+
+      expect(res.statusCode).toBe(409);
+    });
+
+    it("restoring an active set returns 200", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const set = await createTutorRequirement(tutor.id, { isDefault: true });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${base}/${set.id}/restore`,
+        headers,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).isActive).toBe(true);
+    });
+
+    it("counts OPEN packages, including null-requirement ones on the default set", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const defaultSet = await createTutorRequirement(tutor.id, { isDefault: true });
+      const other = await createTutorRequirement(tutor.id);
+      await createTuitionPackage(tutor.id, { requirementId: defaultSet.id });
+      await createTuitionPackage(tutor.id, { requirementId: null });
+      await createTuitionPackage(tutor.id, { requirementId: other.id });
+      await createTuitionPackage(tutor.id, { requirementId: defaultSet.id, status: "CLOSED" });
+
+      const res = await app.inject({ method: "GET", url: base, headers });
+
+      const sets: { id: string; mappedPackageCount: number }[] = JSON.parse(res.body).requirements;
+      expect(sets.find((s) => s.id === defaultSet.id)?.mappedPackageCount).toBe(2);
+      expect(sets.find((s) => s.id === other.id)?.mappedPackageCount).toBe(1);
+    });
+
+    it("accepts class level 20 and rejects 21 (400)", async () => {
+      const app = await createTestApp();
+      const { headers, subjects } = await setupTutor();
+      const subjectIds = [subjects[0].id];
+
+      const accepted = await app.inject({
+        method: "POST",
+        url: base,
+        headers,
+        payload: requirementPayload({ classLevelMin: 20, classLevelMax: 20, subjectIds }),
+      });
+      const rejected = await app.inject({
+        method: "POST",
+        url: base,
+        headers,
+        payload: requirementPayload({ classLevelMax: 21, subjectIds }),
+      });
+
+      expect(accepted.statusCode).toBe(201);
+      expect(rejected.statusCode).toBe(400);
+    });
+
+    it("PATCH with one field leaves the other fields and zones unchanged", async () => {
+      const app = await createTestApp();
+      const { headers, subjects, zoneIds } = await setupTutor(1, 1);
+      const created = await app.inject({
+        method: "POST",
+        url: base,
+        headers,
+        payload: requirementPayload({
+          availableDays: 31,
+          maxStudents: 3,
+          teachesOnline: false,
+          minSalary: 7000,
+          subjectIds: [subjects[0].id],
+          zoneIds,
+        }),
+      });
+      const id = JSON.parse(created.body).id;
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: `${base}/${id}`,
+        headers,
+        payload: { name: "Renamed" },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body);
+      expect(body.name).toBe("Renamed");
+      expect(body.availableDays).toBe(31);
+      expect(body.maxStudents).toBe(3);
+      expect(body.teachesOnline).toBe(false);
+      expect(body.minSalary).toBe(7000);
+      expect(body.zoneIds).toContain(zoneIds[0]);
+    });
+
+    it("restore rejects an archived set that has no subjects (409)", async () => {
+      const app = await createTestApp();
+      const { tutor, headers, subjects } = await setupTutor();
+      await createTutorRequirement(tutor.id, { isDefault: true, subjectIds: [subjects[0].id] });
+      const second = await createTutorRequirement(tutor.id, { subjectIds: [subjects[0].id] });
+      await app.inject({ method: "DELETE", url: `${base}/${second.id}`, headers });
+      await prisma.tutorRequirementSubject.deleteMany({ where: { requirementId: second.id } });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${base}/${second.id}/restore`,
+        headers,
+      });
+
+      expect(res.statusCode).toBe(409);
+      const detail = await app.inject({ method: "GET", url: `${base}/${second.id}`, headers });
+      expect(JSON.parse(detail.body).isActive).toBe(false);
     });
   });
 });

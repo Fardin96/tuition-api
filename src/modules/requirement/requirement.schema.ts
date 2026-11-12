@@ -32,8 +32,11 @@ export const CLASS_LEVELS: Record<number, string> = {
   15: "University year 2",
   16: "University year 3",
   17: "University year 4",
+  18: "Masters 1st year",
+  19: "Masters 2nd year",
+  20: "Other",
 };
-export const classLevelSchema = z.coerce.number().int().min(1).max(17);
+export const classLevelSchema = z.coerce.number().int().min(1).max(20);
 
 // HH:MM -> stored as a time; we convert to a Date during persistence.
 export const timeOfDaySchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/);

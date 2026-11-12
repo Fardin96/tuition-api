@@ -4,6 +4,8 @@ import { requireRole } from "../../plugins/auth.js";
 import { publicCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
 import {
+  type CreateTutorRequirementInput,
+  createTutorRequirementSchema,
   type TutorAreasInput,
   type TutorIdParam,
   type TutorNearbyQuery,
@@ -14,26 +16,38 @@ import {
   tutorIdParamSchema,
   tutorNearbyQuerySchema,
   tutorProfileSchema,
+  tutorRequirementIdParamSchema,
+  tutorRequirementListResponseSchema,
+  tutorRequirementResponseSchema,
   tutorResponseSchema,
   tutorSearchQuerySchema,
   tutorSubjectsSchema,
   type UpdateTutorProfileInput,
+  type UpdateTutorRequirementInput,
   updateTutorProfileSchema,
+  updateTutorRequirementSchema,
 } from "./tutor.schema.js";
 import {
+  archiveTutorRequirement,
   createTutorProfile,
+  createTutorRequirement,
   deleteTutorCredential,
   deleteTutorVideo,
   getApprovedVideos,
   getPublicTutorProfile,
   getTutorCredentials,
+  getTutorRequirement,
   getTutorReviews,
   getTutorVerifications,
   getTutorVideos,
+  listTutorRequirements,
   replaceTutorAreas,
   replaceTutorSubjects,
+  restoreTutorRequirement,
   searchTutors,
+  setDefaultTutorRequirement,
   updateTutorProfile,
+  updateTutorRequirement,
 } from "./tutor.service.js";
 
 export async function tutorRoutes(app: FastifyInstance) {
@@ -408,6 +422,155 @@ export async function tutorRoutes(app: FastifyInstance) {
         return reply.status(404).send({ error: "NotFound", message: "Video not found" });
       }
       return reply.status(204).send();
+    },
+  );
+
+  app.get(
+    "/me/requirements",
+    {
+      schema: {
+        response: { 200: tutorRequirementListResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const requirements = await listTutorRequirements(account.accountId);
+      if (!requirements) {
+        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+      }
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send({ requirements });
+    },
+  );
+
+  app.post(
+    "/me/requirements",
+    {
+      schema: {
+        body: createTutorRequirementSchema,
+        response: { 201: tutorRequirementResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const body = request.body as CreateTutorRequirementInput;
+      const requirement = await createTutorRequirement(account.accountId, body);
+      if (!requirement) {
+        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+      }
+      reply.header("Cache-Control", "private, no-store");
+      return reply.status(201).send(requirement);
+    },
+  );
+
+  app.get(
+    "/me/requirements/:id",
+    {
+      schema: {
+        params: tutorRequirementIdParamSchema,
+        response: { 200: tutorRequirementResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { id } = request.params as { id: string };
+      const requirement = await getTutorRequirement(account.accountId, id);
+      if (!requirement) {
+        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+      }
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send(requirement);
+    },
+  );
+
+  app.patch(
+    "/me/requirements/:id",
+    {
+      schema: {
+        params: tutorRequirementIdParamSchema,
+        body: updateTutorRequirementSchema,
+        response: { 200: tutorRequirementResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { id } = request.params as { id: string };
+      const body = request.body as UpdateTutorRequirementInput;
+      const requirement = await updateTutorRequirement(account.accountId, id, body);
+      if (!requirement) {
+        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+      }
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send(requirement);
+    },
+  );
+
+  app.post(
+    "/me/requirements/:id/default",
+    {
+      schema: {
+        params: tutorRequirementIdParamSchema,
+        response: { 200: tutorRequirementResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { id } = request.params as { id: string };
+      const requirement = await setDefaultTutorRequirement(account.accountId, id);
+      if (!requirement) {
+        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+      }
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send(requirement);
+    },
+  );
+
+  app.delete(
+    "/me/requirements/:id",
+    {
+      schema: {
+        params: tutorRequirementIdParamSchema,
+        response: { 200: tutorRequirementResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { id } = request.params as { id: string };
+      let requirement: Awaited<ReturnType<typeof archiveTutorRequirement>>;
+      try {
+        requirement = await archiveTutorRequirement(account.accountId, id);
+      } catch (err) {
+        const e = err as Error & { code?: string; packageIds?: string[] };
+        if (e.code !== "REQUIREMENT_IN_USE") throw err;
+        return reply
+          .status(409)
+          .send({ error: e.name, message: e.message, packageIds: e.packageIds });
+      }
+      if (!requirement) {
+        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+      }
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send(requirement);
+    },
+  );
+
+  app.post(
+    "/me/requirements/:id/restore",
+    {
+      schema: {
+        params: tutorRequirementIdParamSchema,
+        response: { 200: tutorRequirementResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { id } = request.params as { id: string };
+      const requirement = await restoreTutorRequirement(account.accountId, id);
+      if (!requirement) {
+        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+      }
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send(requirement);
     },
   );
 }
