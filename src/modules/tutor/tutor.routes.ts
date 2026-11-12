@@ -10,6 +10,7 @@ import {
   type TutorIdParam,
   type TutorNearbyQuery,
   type TutorProfileInput,
+  type TutorRequirementListQuery,
   type TutorSearchQuery,
   type TutorSubjectsInput,
   tutorAreasSchema,
@@ -17,6 +18,7 @@ import {
   tutorNearbyQuerySchema,
   tutorProfileSchema,
   tutorRequirementIdParamSchema,
+  tutorRequirementListQuerySchema,
   tutorRequirementListResponseSchema,
   tutorRequirementResponseSchema,
   tutorResponseSchema,
@@ -429,12 +431,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements",
     {
       schema: {
+        querystring: tutorRequirementListQuerySchema,
         response: { 200: tutorRequirementListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
-      const requirements = await listTutorRequirements(account.accountId);
+      const { status } = request.query as TutorRequirementListQuery;
+      const requirements = await listTutorRequirements(account.accountId, status);
       if (!requirements) {
         return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
       }

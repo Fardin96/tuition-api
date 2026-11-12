@@ -154,6 +154,12 @@ export const tutorRequirementResponseSchema = z.object({
 
 export type TutorRequirementResponse = z.infer<typeof tutorRequirementResponseSchema>;
 
+export const tutorRequirementListQuerySchema = z.object({
+  status: z.enum(["active", "archived", "all"]).default("active"),
+});
+
+export type TutorRequirementListQuery = z.infer<typeof tutorRequirementListQuerySchema>;
+
 export const tutorRequirementListResponseSchema = z.object({
   requirements: z.array(tutorRequirementResponseSchema),
 });

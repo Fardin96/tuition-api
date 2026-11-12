@@ -1121,6 +1121,84 @@ describe("tutor routes", () => {
       expect(names).toEqual(["Active Set"]);
     });
 
+    it("lists only archived sets, newest-changed first, for status=archived", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      await createTutorRequirement(tutor.id, { name: "Active Set" });
+      const older = await createTutorRequirement(tutor.id, {
+        name: "Older Archived",
+        isActive: false,
+      });
+      const newer = await createTutorRequirement(tutor.id, {
+        name: "Newer Archived",
+        isActive: false,
+      });
+      await prisma.tutorRequirement.update({
+        where: { id: older.id },
+        data: { updatedAt: new Date("2024-01-01T00:00:00Z") },
+      });
+      await prisma.tutorRequirement.update({
+        where: { id: newer.id },
+        data: { updatedAt: new Date("2024-02-01T00:00:00Z") },
+      });
+
+      const res = await app.inject({ method: "GET", url: `${base}?status=archived`, headers });
+
+      expect(res.statusCode).toBe(200);
+      const requirements = JSON.parse(res.body).requirements;
+      expect(requirements.map((r: { name: string }) => r.name)).toEqual([
+        "Newer Archived",
+        "Older Archived",
+      ]);
+      expect(requirements.every((r: { isActive: boolean }) => r.isActive === false)).toBe(true);
+    });
+
+    it("lists active sets before archived ones for status=all", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      await createTutorRequirement(tutor.id, { name: "Archived Set", isActive: false });
+      await createTutorRequirement(tutor.id, { name: "Active Set", isDefault: true });
+
+      const res = await app.inject({ method: "GET", url: `${base}?status=all`, headers });
+
+      expect(res.statusCode).toBe(200);
+      const names = JSON.parse(res.body).requirements.map((r: { name: string }) => r.name);
+      expect(names).toEqual(["Active Set", "Archived Set"]);
+    });
+
+    it("rejects an unknown status (400)", async () => {
+      const app = await createTestApp();
+      const { headers } = await setupTutor();
+
+      const res = await app.inject({ method: "GET", url: `${base}?status=deleted`, headers });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("moves a restored set from the archived list to the active list", async () => {
+      const app = await createTestApp();
+      const { tutor, headers, subjects } = await setupTutor();
+      await createTutorRequirement(tutor.id, { isDefault: true });
+      const archived = await createTutorRequirement(tutor.id, {
+        name: "Restored Set",
+        isActive: false,
+        subjectIds: [subjects[0].id],
+      });
+
+      await app.inject({ method: "POST", url: `${base}/${archived.id}/restore`, headers });
+      const active = await app.inject({ method: "GET", url: base, headers });
+      const archivedList = await app.inject({
+        method: "GET",
+        url: `${base}?status=archived`,
+        headers,
+      });
+
+      expect(JSON.parse(active.body).requirements.map((r: { id: string }) => r.id)).toContain(
+        archived.id,
+      );
+      expect(JSON.parse(archivedList.body).requirements).toEqual([]);
+    });
+
     it("returns an archived set on detail GET with isActive false", async () => {
       const app = await createTestApp();
       const { tutor, headers } = await setupTutor();
