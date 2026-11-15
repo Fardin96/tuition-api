@@ -72,7 +72,9 @@ If the `pg_dump` on your `PATH` is older than the server, the script looks in th
 | Backup that does not restore | 4, 5 |
 | Data that makes a migration abort (the rehearsal runs on a fresh prod copy) | 6 |
 | Slow migration (over 60s) | 6 |
-| Rows lost after migrate | 7 |
+| Rows lost after migrate (fails unless a pending migration declares the table with `-- rehearse-expect-loss: table ...`) | 7 |
+
+**Intended row loss.** A migration that deletes or drops data on purpose declares it with a header line anywhere in its `migration.sql`: `-- rehearse-expect-loss: table_a table_b` (space-separated table names). Step 7 accepts a row-count drop only for tables declared by a pending migration, and prints them with `(declared)`. A declared loss still gives a WARN, so step 9 asks `Continue? [y/N]` and a human confirms it is intended. Any undeclared loss still fails step 7. A declaration whose count does not drop is harmless and is ignored.
 
 **When it runs**
 

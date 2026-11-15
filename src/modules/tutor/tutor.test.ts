@@ -6,7 +6,6 @@ import {
   createAccount,
   createApplication,
   createArea,
-  createCategory,
   createFileAsset,
   createRequirement,
   createStudentProfile,
@@ -378,8 +377,9 @@ describe("tutor routes", () => {
         data: {
           tutorId,
           name: "Evening Math",
-          classLevelMin: 6,
-          classLevelMax: 10,
+          levelMin: 6,
+          levelMax: 10,
+          curricula: ["BANGLA_MEDIUM"],
           timeFrom: new Date("1970-01-01T10:00:00Z"),
           timeTo: new Date("1970-01-01T12:00:00Z"),
           availableFrom: new Date("2024-01-01"),
@@ -610,13 +610,11 @@ describe("tutor routes", () => {
       const tutorAccount = await createAccount({ role: "TUTOR" });
       const studentAccount = await createAccount({ role: "STUDENT" });
       const area = await createArea();
-      const category = await createCategory();
       const subject = await createSubject();
       const tutor = await createTutorProfile(tutorAccount.id);
       const student = await createStudentProfile(studentAccount.id, area.id);
       const requirement = await createRequirement({
         studentId: student.id,
-        categoryId: category.id,
         areaId: area.id,
         subjectId: subject.id,
       });
@@ -1047,7 +1045,6 @@ describe("tutor routes", () => {
       const tutorAccount = await createAccount({ role: "TUTOR" });
       const tutor = await createTutorProfile(tutorAccount.id, { isListed: true });
       const area = await createArea();
-      const category = await createCategory();
       const ratings = [5, 3, 4, 2];
 
       const students = [];
@@ -1056,7 +1053,6 @@ describe("tutor routes", () => {
         const student = await createStudentProfile(account.id, area.id);
         const requirement = await createRequirement({
           studentId: student.id,
-          categoryId: category.id,
         });
         await createApplication({
           requirementId: requirement.id,
@@ -1093,8 +1089,11 @@ describe("tutor routes", () => {
     function requirementPayload(overrides: Record<string, unknown> = {}) {
       return {
         name: "Evening Math",
-        classLevelMin: 6,
-        classLevelMax: 10,
+        levelMin: 6,
+        levelMax: 10,
+        curricula: ["BANGLA_MEDIUM", "ENGLISH_VERSION"],
+        academicGroups: [],
+        admissionTargets: [],
         timeFrom: "10:00",
         timeTo: "12:00",
         availableDays: 127,
@@ -1355,7 +1354,7 @@ describe("tutor routes", () => {
         method: "PATCH",
         url: `${base}/${set.id}`,
         headers,
-        payload: { classLevelMin: 15 },
+        payload: { levelMin: 12 },
       });
 
       expect(res.statusCode).toBe(400);
@@ -1564,7 +1563,7 @@ describe("tutor routes", () => {
       expect(sets.find((s) => s.id === other.id)?.mappedPackageCount).toBe(1);
     });
 
-    it("accepts class level 20 and rejects 21 (400)", async () => {
+    it("accepts level 13 and rejects 14 (400)", async () => {
       const app = await createTestApp();
       const { headers, subjects } = await setupTutor();
       const subjectIds = [subjects[0].id];
@@ -1573,13 +1572,13 @@ describe("tutor routes", () => {
         method: "POST",
         url: base,
         headers,
-        payload: requirementPayload({ classLevelMin: 20, classLevelMax: 20, subjectIds }),
+        payload: requirementPayload({ levelMin: 13, levelMax: 13, subjectIds }),
       });
       const rejected = await app.inject({
         method: "POST",
         url: base,
         headers,
-        payload: requirementPayload({ classLevelMax: 21, subjectIds }),
+        payload: requirementPayload({ levelMax: 14, subjectIds }),
       });
 
       expect(accepted.statusCode).toBe(201);
@@ -1642,6 +1641,146 @@ describe("tutor routes", () => {
       expect(JSON.parse(res.body).code).toBe("REQUIREMENT_NO_SUBJECTS");
       const detail = await app.inject({ method: "GET", url: `${base}/${second.id}`, headers });
       expect(JSON.parse(detail.body).isActive).toBe(false);
+    });
+
+    describe("education coverage fields", () => {
+      async function postSet(app: Awaited<ReturnType<typeof createTestApp>>, payload: object) {
+        const { headers, subjects } = await setupTutor();
+        return app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [subjects[0].id], ...payload }),
+        });
+      }
+
+      it("accepts the full level range with curriculum, group and target and echoes them", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({
+            levelMin: -4,
+            levelMax: 13,
+            curricula: ["MADRASAH"],
+            academicGroups: ["MUJABBID"],
+            admissionTargets: ["ISSB"],
+            subjectIds: [subjects[0].id],
+          }),
+        });
+
+        expect(res.statusCode).toBe(201);
+        expect(JSON.parse(res.body)).toMatchObject({
+          levelMin: -4,
+          levelMax: 13,
+          curricula: ["MADRASAH"],
+          academicGroups: ["MUJABBID"],
+          admissionTargets: ["ISSB"],
+        });
+      });
+
+      it("rejects an empty curricula list (400)", async () => {
+        const app = await createTestApp();
+
+        const res = await postSet(app, { curricula: [] });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      });
+
+      it("rejects a group when the range does not cover levels 9 to 12 (400)", async () => {
+        const app = await createTestApp();
+
+        const res = await postSet(app, {
+          levelMin: 1,
+          levelMax: 8,
+          academicGroups: ["SCIENCE"],
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+        expect(JSON.parse(res.body).issues).toContainEqual(
+          expect.objectContaining({ path: ["academicGroups"] }),
+        );
+      });
+
+      it("rejects a group that no chosen curriculum offers (400)", async () => {
+        const app = await createTestApp();
+
+        const res = await postSet(app, {
+          levelMin: 9,
+          levelMax: 12,
+          curricula: ["MADRASAH"],
+          academicGroups: ["BUSINESS"],
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      });
+
+      it("rejects admission targets when the range does not reach level 13 (400)", async () => {
+        const app = await createTestApp();
+
+        const res = await postSet(app, {
+          levelMin: 9,
+          levelMax: 12,
+          admissionTargets: ["MEDICAL"],
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      });
+
+      it("rejects a range whose minimum is above its maximum (400)", async () => {
+        const app = await createTestApp();
+
+        const res = await postSet(app, { levelMin: 5, levelMax: 4 });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      });
+
+      it("rejects a PATCH that leaves a group outside the merged range (400)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor();
+        const set = await createTutorRequirement(tutor.id, {
+          isDefault: true,
+          levelMin: 9,
+          levelMax: 12,
+          curricula: ["BANGLA_MEDIUM"],
+          academicGroups: ["SCIENCE"],
+        });
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { levelMax: 8 },
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).error).toBe("InvalidRequirement");
+        expect(JSON.parse(res.body).code).toBe("INVALID_REQUIREMENT");
+      });
+
+      it("accepts a PATCH that switches curricula on a plain set (200)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor();
+        const set = await createTutorRequirement(tutor.id, { isDefault: true });
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { curricula: ["EM_IB"] },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(JSON.parse(res.body).curricula).toEqual(["EM_IB"]);
+      });
     });
   });
 });

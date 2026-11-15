@@ -1,6 +1,7 @@
 import type { Prisma, TutorRequirement } from "../../generated/prisma/client.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { toDistrictCode } from "../../lib/districts.js";
+import { validateTutorCoverage } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import {
@@ -429,8 +430,11 @@ function serializeTutorRequirement(row: TutorRequirementRow, counts: Map<string 
     name: row.name,
     isDefault: row.isDefault,
     isActive: row.isActive,
-    classLevelMin: row.classLevelMin,
-    classLevelMax: row.classLevelMax,
+    levelMin: row.levelMin,
+    levelMax: row.levelMax,
+    curricula: row.curricula,
+    academicGroups: row.academicGroups,
+    admissionTargets: row.admissionTargets,
     timeFrom: hhmmOf(row.timeFrom),
     timeTo: hhmmOf(row.timeTo),
     availableDays: row.availableDays,
@@ -542,8 +546,11 @@ export async function updateTutorRequirement(
   const { subjectIds, zoneIds, ...scalars } = input;
   const values: RequirementValues = {
     name: existing.name,
-    classLevelMin: existing.classLevelMin,
-    classLevelMax: existing.classLevelMax,
+    levelMin: existing.levelMin,
+    levelMax: existing.levelMax,
+    curricula: existing.curricula,
+    academicGroups: existing.academicGroups,
+    admissionTargets: existing.admissionTargets,
     timeFrom: hhmmOf(existing.timeFrom),
     timeTo: hhmmOf(existing.timeTo),
     availableDays: existing.availableDays,
@@ -553,13 +560,16 @@ export async function updateTutorRequirement(
     teachesOnline: existing.teachesOnline,
     ...scalars,
   };
-  if (
-    values.classLevelMin < 1 ||
-    values.classLevelMax > 20 ||
-    values.classLevelMax < values.classLevelMin ||
-    values.timeTo <= values.timeFrom
-  ) {
-    throw appError("InvalidRequirement", 400, "Invalid requirement values");
+  const issues = validateTutorCoverage(values);
+  if (issues.length > 0) {
+    throw appError("InvalidRequirement", 400, issues[0].message, {
+      fields: issues.map((i) => i.path),
+    });
+  }
+  if (values.timeTo <= values.timeFrom) {
+    throw appError("InvalidRequirement", 400, "timeTo must be after timeFrom", {
+      fields: ["timeTo"],
+    });
   }
 
   try {

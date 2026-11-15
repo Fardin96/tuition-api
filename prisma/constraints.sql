@@ -47,16 +47,52 @@ ALTER TABLE tutor ADD CONSTRAINT tutor_phone_e164
 
 -- ═════════ 3. Value ranges and state shapes ════════════════════════════
 ALTER TABLE tuition_requirement
-  ADD CONSTRAINT requirement_class_level_range CHECK (class_level BETWEEN 1 AND 20),
   ADD CONSTRAINT requirement_days_range        CHECK (days_per_week BETWEEN 1 AND 7),
   ADD CONSTRAINT requirement_salary_positive   CHECK (salary > 0),
   ADD CONSTRAINT requirement_students_min      CHECK (student_count >= 1);
 
 ALTER TABLE tuition_package
-  ADD CONSTRAINT package_class_level_range CHECK (class_level BETWEEN 1 AND 20),
   ADD CONSTRAINT package_days_range        CHECK (days_per_week BETWEEN 1 AND 7),
   ADD CONSTRAINT package_salary_positive   CHECK (expected_salary > 0),
   ADD CONSTRAINT package_students_min      CHECK (student_count >= 1);
+
+-- [PR B] Education level (migrations 20261116000100..500). Same rules as src/lib/education.ts.
+-- Array columns stay nullable for Prisma, so each array CHECK also rejects NULL.
+ALTER TABLE tuition_requirement
+  ADD CONSTRAINT requirement_level_range CHECK (level_code BETWEEN -4 AND 13),
+  ADD CONSTRAINT requirement_group_valid CHECK (
+    academic_group IS NULL OR (
+      level_code IS NOT NULL AND curriculum IS NOT NULL AND level_code BETWEEN 9 AND 12 AND (
+        (curriculum IN ('BANGLA_MEDIUM', 'ENGLISH_VERSION') AND academic_group IN ('SCIENCE', 'BUSINESS', 'HUMANITIES'))
+        OR (curriculum = 'MADRASAH' AND academic_group IN ('SCIENCE', 'HUMANITIES', 'MUJABBID'))
+      )
+    )
+  ),
+  ADD CONSTRAINT requirement_targets_valid CHECK (
+    admission_targets IS NOT NULL AND (cardinality(admission_targets) = 0 OR COALESCE(level_code = 13, false))
+  ),
+  ADD CONSTRAINT requirement_retaker_valid CHECK (NOT is_retaker OR COALESCE(level_code IN (10, 12, 13), false)),
+  ADD CONSTRAINT requirement_note_valid CHECK (
+    level_note IS NULL OR (level_note = btrim(level_note) AND char_length(level_note) BETWEEN 1 AND 40)
+  );
+
+ALTER TABLE tuition_package
+  ADD CONSTRAINT package_level_range CHECK (level_code BETWEEN -4 AND 13),
+  ADD CONSTRAINT package_group_valid CHECK (
+    academic_group IS NULL OR (
+      level_code IS NOT NULL AND curriculum IS NOT NULL AND level_code BETWEEN 9 AND 12 AND (
+        (curriculum IN ('BANGLA_MEDIUM', 'ENGLISH_VERSION') AND academic_group IN ('SCIENCE', 'BUSINESS', 'HUMANITIES'))
+        OR (curriculum = 'MADRASAH' AND academic_group IN ('SCIENCE', 'HUMANITIES', 'MUJABBID'))
+      )
+    )
+  ),
+  ADD CONSTRAINT package_targets_valid CHECK (
+    admission_targets IS NOT NULL AND (cardinality(admission_targets) = 0 OR COALESCE(level_code = 13, false))
+  ),
+  ADD CONSTRAINT package_retaker_valid CHECK (NOT is_retaker OR COALESCE(level_code IN (10, 12, 13), false)),
+  ADD CONSTRAINT package_note_valid CHECK (
+    level_note IS NULL OR (level_note = btrim(level_note) AND char_length(level_note) BETWEEN 1 AND 40)
+  );
 
 ALTER TABLE review     ADD CONSTRAINT review_rating_range CHECK (rating BETWEEN 1 AND 5);
 
@@ -510,9 +546,26 @@ CREATE UNIQUE INDEX fee_payment_gateway_ref_uniq
   ON fee_payment (txn_reference) WHERE method = 'SSLCOMMERZ' AND kind = 'PAYMENT';
 
 -- ═════════ 14. Tutor requirement ═══════════════════════════════════════════
--- [v6] class_level_max is capped at 20, matching requirement_class_level_range.
+-- [PR B] levels run -4..13 in age order; tr_class_range (1..20) is gone.
 ALTER TABLE tutor_requirement
-  ADD CONSTRAINT tr_class_range CHECK (class_level_min >= 1 AND class_level_max <= 20 AND class_level_max >= class_level_min),
+  ADD CONSTRAINT tr_level_range CHECK (level_min >= -4 AND level_max <= 13 AND level_max >= level_min),
+  ADD CONSTRAINT tr_curricula_valid CHECK (curricula IS NOT NULL AND cardinality(curricula) >= 1),
+  -- Groups need the range to touch 9-12, and each group needs a curriculum that offers it.
+  ADD CONSTRAINT tr_groups_valid CHECK (
+    academic_groups IS NOT NULL AND (
+      cardinality(academic_groups) = 0 OR (
+        level_min <= 12 AND level_max >= 9
+        AND curricula && ARRAY['BANGLA_MEDIUM', 'ENGLISH_VERSION', 'MADRASAH']::"Curriculum"[]
+        AND (NOT ('BUSINESS'::"AcademicGroup" = ANY (academic_groups))
+             OR curricula && ARRAY['BANGLA_MEDIUM', 'ENGLISH_VERSION']::"Curriculum"[])
+        AND (NOT ('MUJABBID'::"AcademicGroup" = ANY (academic_groups))
+             OR 'MADRASAH'::"Curriculum" = ANY (curricula))
+      )
+    )
+  ),
+  ADD CONSTRAINT tr_targets_valid CHECK (
+    admission_targets IS NOT NULL AND (cardinality(admission_targets) = 0 OR level_max = 13)
+  ),
   ADD CONSTRAINT tr_time_window CHECK (time_to > time_from),
   ADD CONSTRAINT tr_days_valid  CHECK (available_days BETWEEN 1 AND 127),
   ADD CONSTRAINT tr_salary_pos  CHECK (min_salary IS NULL OR min_salary > 0),

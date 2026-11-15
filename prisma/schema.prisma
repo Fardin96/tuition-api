@@ -230,6 +230,38 @@ enum PostStatus {
   ARCHIVED
 }
 
+// Education model: labels and the curriculum/level/group rules live in src/lib/education.ts.
+enum Curriculum {
+  BANGLA_MEDIUM
+  ENGLISH_VERSION
+  EM_CAMBRIDGE
+  EM_EDEXCEL
+  EM_IB
+  EM_AMERICAN
+  MADRASAH
+}
+
+enum AcademicGroup {
+  SCIENCE
+  BUSINESS
+  HUMANITIES
+  MUJABBID
+}
+
+// Exam streams, not university clusters (clusters change every year).
+enum AdmissionTarget {
+  ENGINEERING
+  MEDICAL
+  VARSITY_SCIENCE
+  VARSITY_HUMANITIES
+  VARSITY_BUSINESS
+  AGRICULTURE
+  IBA_BUP
+  PRIVATE_UNI
+  ABROAD_TESTS
+  ISSB
+}
+
 // ───────────────────────── accounts & admin ─────────────────────────
 // Login = short-lived access token + a refresh token kept in `session` (hash
 // only). OTP state lives with the OTP provider. Consent is two columns on
@@ -368,20 +400,6 @@ model Area {
 
   @@unique([district, name])
   @@map("area")
-}
-
-// Broad level, e.g. SSC / HSC / Admission. Admin-managed.
-model Category {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  slug      String  @unique
-  sortOrder Int     @default(0) @map("sort_order")
-  isActive  Boolean @default(true) @map("is_active")
-
-  requirements TuitionRequirement[]
-  packages     TuitionPackage[]
-
-  @@map("category")
 }
 
 // The clean subject list (Math, English, Physics...). Admin-managed.
@@ -629,29 +647,32 @@ model TutorVideo {
 
 // Tutor-side constraint set. The mirror of TuitionRequirement, used for matching.
 model TutorRequirement {
-  id            String   @id @default(uuid(7)) @db.Uuid
-  tutorId       String   @map("tutor_id") @db.Uuid
-  name          String   @db.VarChar(60)                  // tutor's label, e.g. "Evening Math, Mirpur"
-  isDefault     Boolean  @default(false) @map("is_default")
-  isActive      Boolean  @default(true) @map("is_active")  // archive instead of delete
-  classLevelMin Int      @map("class_level_min") @db.SmallInt
-  classLevelMax Int      @map("class_level_max") @db.SmallInt
-  timeFrom      DateTime @map("time_from") @db.Time(0)
-  timeTo        DateTime @map("time_to") @db.Time(0)
-  availableDays Int      @default(127) @map("available_days") @db.SmallInt   // bit0=Sat ... bit6=Fri
-  minSalary     Int?     @map("min_salary")                // BDT/month floor; null = no floor
-  maxStudents   Int      @default(1) @map("max_students") @db.SmallInt
-  availableFrom DateTime @map("available_from") @db.Date
-  teachesOnline Boolean  @default(false) @map("teaches_online")
-  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id               String            @id @default(uuid(7)) @db.Uuid
+  tutorId          String            @map("tutor_id") @db.Uuid
+  name             String            @db.VarChar(60) // tutor's label, e.g. "Evening Math, Mirpur"
+  isDefault        Boolean           @default(false) @map("is_default")
+  isActive         Boolean           @default(true) @map("is_active") // archive instead of delete
+  levelMin         Int               @map("level_min") @db.SmallInt // -4..13, age order
+  levelMax         Int               @map("level_max") @db.SmallInt
+  curricula        Curriculum[] // at least one
+  academicGroups   AcademicGroup[]   @default([]) @map("academic_groups") // empty = any group
+  admissionTargets AdmissionTarget[] @default([]) @map("admission_targets") // empty = any target
+  timeFrom         DateTime          @map("time_from") @db.Time(0)
+  timeTo           DateTime          @map("time_to") @db.Time(0)
+  availableDays    Int               @default(127) @map("available_days") @db.SmallInt // bit0=Sat ... bit6=Fri
+  minSalary        Int?              @map("min_salary") // BDT/month floor; null = no floor
+  maxStudents      Int               @default(1) @map("max_students") @db.SmallInt
+  availableFrom    DateTime          @map("available_from") @db.Date
+  teachesOnline    Boolean           @default(false) @map("teaches_online")
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   tutor    Tutor                     @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   subjects TutorRequirementSubject[]
   zones    TutorRequirementZone[]
   packages TuitionPackage[]
 
-  @@unique([id, tutorId])            // target of the composite FKs below
+  @@unique([id, tutorId]) // target of the composite FKs below
   @@index([tutorId, isActive])
   @@map("tutor_requirement")
 }
@@ -673,18 +694,18 @@ model TutorRequirementSubject {
 
 // Teaching zone: a circle on the map. Quota per tutor = tutor.zone_limit.
 model TutorZone {
-  id          String                                 @id @default(uuid(7)) @db.Uuid
-  tutorId     String                                 @map("tutor_id") @db.Uuid
-  label       String                                 @db.VarChar(60)
+  id          String                                @id @default(uuid(7)) @db.Uuid
+  tutorId     String                                @map("tutor_id") @db.Uuid
+  label       String                                @db.VarChar(60)
   // optional in Prisma only so the model stays creatable; NOT NULL is enforced in SQL (§2).
   // Always insert/update via $executeRaw with ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography.
   center      Unsupported("GEOGRAPHY(POINT,4326)")?
-  radiusM     Int                                    @map("radius_m")
-  placeId     String?                                @map("place_id")
-  addressText String?                                @map("address_text")
-  geogSource  GeogSource                             @default(PIN) @map("geog_source")
-  createdAt   DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt   DateTime                               @updatedAt @map("updated_at") @db.Timestamptz(3)
+  radiusM     Int                                   @map("radius_m")
+  placeId     String?                               @map("place_id")
+  addressText String?                               @map("address_text")
+  geogSource  GeogSource                            @default(PIN) @map("geog_source")
+  createdAt   DateTime                              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                              @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   tutor        Tutor                  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   requirements TutorRequirementZone[]
@@ -732,32 +753,35 @@ model ZoneLimitRequest {
 // A student's search criteria: used as a filter to find tutors, and visible to
 // tutors who may apply. A student can have any number. No admin approval.
 model TuitionRequirement {
-  id              String        @id @default(uuid(7)) @db.Uuid
-  studentId       String        @map("student_id") @db.Uuid
-  categoryId      Int?          @map("category_id")
-  areaId          Int?          @map("area_id") // where the tuition happens
-  classLevel      Int?          @map("class_level") @db.SmallInt
-  timeOfDay       DateTime?     @map("time_of_day") @db.Time(0)
-  daysPerWeek     Int?          @map("days_per_week") @db.SmallInt
-  availableDays   Int           @default(127) @map("available_days") @db.SmallInt // bit0=Sat ... bit6=Fri
-  salary          Int? // BDT per month
-  studentCount    Int?          @default(1) @map("student_count") @db.SmallInt
-  hireByDate      DateTime?     @map("hire_by_date") @db.Date
-  tutorGenderPref GenderPref    @default(ANY) @map("tutor_gender_pref")
-  instituteName   String?       @map("institute_name")
-  tuitionType     String?       @map("tuition_type") @db.VarChar(30)
-  status          ListingStatus @default(OPEN)
-  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id               String            @id @default(uuid(7)) @db.Uuid
+  studentId        String            @map("student_id") @db.Uuid
+  areaId           Int?              @map("area_id") // where the tuition happens
+  levelCode        Int?              @map("level_code") @db.SmallInt // -4..13; null only on drafts
+  curriculum       Curriculum? // null only on drafts
+  academicGroup    AcademicGroup?    @map("academic_group") // levels 9-12 only
+  admissionTargets AdmissionTarget[] @default([]) @map("admission_targets") // level 13 only
+  isRetaker        Boolean           @default(false) @map("is_retaker") // levels 10, 12, 13 only
+  levelNote        String?           @map("level_note") // max 40 chars (CHECK); display only, never matched
+  timeOfDay        DateTime?         @map("time_of_day") @db.Time(0)
+  daysPerWeek      Int?              @map("days_per_week") @db.SmallInt
+  availableDays    Int               @default(127) @map("available_days") @db.SmallInt // bit0=Sat ... bit6=Fri
+  salary           Int? // BDT per month
+  studentCount     Int?              @default(1) @map("student_count") @db.SmallInt
+  hireByDate       DateTime?         @map("hire_by_date") @db.Date
+  tutorGenderPref  GenderPref        @default(ANY) @map("tutor_gender_pref")
+  instituteName    String?           @map("institute_name")
+  tuitionType      String?           @map("tuition_type") @db.VarChar(30)
+  status           ListingStatus     @default(OPEN)
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   student      Student              @relation(fields: [studentId], references: [id])
-  category     Category?            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   area         Area?                @relation(fields: [areaId], references: [id], onDelete: Restrict)
   subjects     RequirementSubject[]
   applications Application[]
 
   @@index([studentId, createdAt(sort: Desc)])
-  @@index([status, categoryId, areaId, createdAt(sort: Desc)])
+  @@index([status, curriculum, levelCode, areaId, createdAt(sort: Desc)])
   @@map("tuition_requirement")
 }
 
@@ -766,8 +790,8 @@ model RequirementSubject {
   requirementId String @map("requirement_id") @db.Uuid
   subjectId     Int    @map("subject_id")
 
-  requirement   TuitionRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
-  subject       Subject            @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  requirement TuitionRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  subject     Subject            @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
   @@id([requirementId, subjectId])
   @@index([subjectId, requirementId])
@@ -776,33 +800,36 @@ model RequirementSubject {
 
 // Created by a tutor. Needs admin approval before students can see it.
 model TuitionPackage {
-  id               String           @id @default(uuid(7)) @db.Uuid
-  tutorId          String           @map("tutor_id") @db.Uuid
-  categoryId       Int              @map("category_id")
-  subjectId        Int              @map("subject_id")
-  areaId           Int?             @map("area_id") // null = online / anywhere
-  requirementId    String?          @map("requirement_id") @db.Uuid // null = tutor's default requirement
-  classLevel       Int              @map("class_level") @db.SmallInt
-  timeOfDay        DateTime         @map("time_of_day") @db.Time(0)
-  daysPerWeek      Int              @map("days_per_week") @db.SmallInt
-  expectedSalary   Int              @map("expected_salary")
-  studentCount     Int              @default(1) @map("student_count") @db.SmallInt
-  availableFrom    DateTime         @map("available_from") @db.Date
-  status           ListingStatus    @default(OPEN)
-  moderationStatus ModerationStatus @default(PENDING) @map("moderation_status")
-  moderationNote   String?          @map("moderation_note")
-  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id               String            @id @default(uuid(7)) @db.Uuid
+  tutorId          String            @map("tutor_id") @db.Uuid
+  subjectId        Int               @map("subject_id")
+  areaId           Int?              @map("area_id") // null = online / anywhere
+  requirementId    String?           @map("requirement_id") @db.Uuid // null = tutor's default requirement
+  levelCode        Int               @map("level_code") @db.SmallInt // same rules as TuitionRequirement
+  curriculum       Curriculum
+  academicGroup    AcademicGroup?    @map("academic_group")
+  admissionTargets AdmissionTarget[] @default([]) @map("admission_targets")
+  isRetaker        Boolean           @default(false) @map("is_retaker")
+  levelNote        String?           @map("level_note")
+  timeOfDay        DateTime          @map("time_of_day") @db.Time(0)
+  daysPerWeek      Int               @map("days_per_week") @db.SmallInt
+  expectedSalary   Int               @map("expected_salary")
+  studentCount     Int               @default(1) @map("student_count") @db.SmallInt
+  availableFrom    DateTime          @map("available_from") @db.Date
+  status           ListingStatus     @default(OPEN)
+  moderationStatus ModerationStatus  @default(PENDING) @map("moderation_status")
+  moderationNote   String?           @map("moderation_note")
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  tutor        Tutor         @relation(fields: [tutorId], references: [id])
-  category     Category      @relation(fields: [categoryId], references: [id])
-  subject      Subject       @relation(fields: [subjectId], references: [id])
-  area         Area?         @relation(fields: [areaId], references: [id], onDelete: Restrict) // never turn a package "online" by deleting an area
+  tutor        Tutor             @relation(fields: [tutorId], references: [id])
+  subject      Subject           @relation(fields: [subjectId], references: [id])
+  area         Area?             @relation(fields: [areaId], references: [id], onDelete: Restrict) // never turn a package "online" by deleting an area
   requirement  TutorRequirement? @relation(fields: [requirementId], references: [id], onDelete: Restrict)
   applications Application[]
 
   @@index([tutorId, createdAt(sort: Desc)])
-  @@index([status, moderationStatus, categoryId, subjectId, areaId, createdAt(sort: Desc)])
+  @@index([status, moderationStatus, curriculum, levelCode, subjectId, areaId, createdAt(sort: Desc)])
   @@index([requirementId])
   @@map("tuition_package")
 }
@@ -1054,10 +1081,10 @@ model SiteContent {
 // Admin-switchable platform flags and numbers. Values are validated per key by a CHECK in constraints.sql.
 // Keys: require_tutor_verification (bool), require_phone_verification (bool), commission_percent (0..100).
 model PlatformSetting {
-  key         String     @id
+  key         String   @id
   value       Json
-  updatedById String?    @map("updated_by") @db.Uuid
-  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedById String?  @map("updated_by") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   updatedBy AdminUser? @relation(fields: [updatedById], references: [accountId], onDelete: Restrict)
 

@@ -15,6 +15,7 @@ import { type AppError, ERROR_CODES, errorCodeOf } from "./lib/errors.js";
 import { pool, startPoolStats } from "./lib/prisma.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
+import { lookupRoutes } from "./modules/lookups/lookups.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
 import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
@@ -94,6 +95,7 @@ export async function buildApp() {
   await app.register(tutorRoutes, { prefix: "/api/v1/tutors" });
   await app.register(requirementRoutes, { prefix: "/api/v1/requirements" });
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
+  await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
 
   return app;
 }

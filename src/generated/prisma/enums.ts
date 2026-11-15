@@ -279,3 +279,42 @@ export const PostStatus = {
 } as const
 
 export type PostStatus = (typeof PostStatus)[keyof typeof PostStatus]
+
+
+export const Curriculum = {
+  BANGLA_MEDIUM: 'BANGLA_MEDIUM',
+  ENGLISH_VERSION: 'ENGLISH_VERSION',
+  EM_CAMBRIDGE: 'EM_CAMBRIDGE',
+  EM_EDEXCEL: 'EM_EDEXCEL',
+  EM_IB: 'EM_IB',
+  EM_AMERICAN: 'EM_AMERICAN',
+  MADRASAH: 'MADRASAH'
+} as const
+
+export type Curriculum = (typeof Curriculum)[keyof typeof Curriculum]
+
+
+export const AcademicGroup = {
+  SCIENCE: 'SCIENCE',
+  BUSINESS: 'BUSINESS',
+  HUMANITIES: 'HUMANITIES',
+  MUJABBID: 'MUJABBID'
+} as const
+
+export type AcademicGroup = (typeof AcademicGroup)[keyof typeof AcademicGroup]
+
+
+export const AdmissionTarget = {
+  ENGINEERING: 'ENGINEERING',
+  MEDICAL: 'MEDICAL',
+  VARSITY_SCIENCE: 'VARSITY_SCIENCE',
+  VARSITY_HUMANITIES: 'VARSITY_HUMANITIES',
+  VARSITY_BUSINESS: 'VARSITY_BUSINESS',
+  AGRICULTURE: 'AGRICULTURE',
+  IBA_BUP: 'IBA_BUP',
+  PRIVATE_UNI: 'PRIVATE_UNI',
+  ABROAD_TESTS: 'ABROAD_TESTS',
+  ISSB: 'ISSB'
+} as const
+
+export type AdmissionTarget = (typeof AdmissionTarget)[keyof typeof AdmissionTarget]
