@@ -48,8 +48,10 @@ export const tutorAreasSchema = z.object({
 
 export type TutorAreasInput = z.infer<typeof tutorAreasSchema>;
 
+export const MAX_PROFILE_SUBJECTS = 50;
+
 export const tutorSubjectsSchema = z.object({
-  subjectIds: z.array(z.coerce.number().int().positive()).max(50),
+  subjectIds: z.array(z.coerce.number().int().positive()).max(MAX_PROFILE_SUBJECTS),
 });
 
 export type TutorSubjectsInput = z.infer<typeof tutorSubjectsSchema>;
@@ -122,6 +124,8 @@ const tutorRequirementBaseSchema = z.object({
     .min(1)
     .refine((v) => new Set(v).size === v.length),
   zoneIds: zoneIdsSchema,
+  // Adds the requirement's subjects to the tutor's profile in the same transaction when they are missing.
+  syncProfileSubjects: z.boolean().optional(),
 });
 
 export const createTutorRequirementSchema = tutorRequirementBaseSchema
@@ -146,7 +150,10 @@ export type CreateTutorRequirementInput = z.infer<typeof createTutorRequirementS
 export const updateTutorRequirementSchema = tutorRequirementBaseSchema
   .partial()
   .strict()
-  .refine((v) => Object.keys(v).length > 0, "At least one field is required");
+  .refine(
+    (v) => Object.keys(v).some((key) => key !== "syncProfileSubjects"),
+    "At least one field is required",
+  );
 
 export type UpdateTutorRequirementInput = z.infer<typeof updateTutorRequirementSchema>;
 

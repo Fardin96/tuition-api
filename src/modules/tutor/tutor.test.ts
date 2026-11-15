@@ -1782,5 +1782,204 @@ describe("tutor routes", () => {
         expect(JSON.parse(res.body).curricula).toEqual(["EM_IB"]);
       });
     });
+
+    describe("syncProfileSubjects", () => {
+      it("adds a new subject to the profile when creating a set with the flag (201)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor();
+        const extra = await createSubject();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [extra.id], syncProfileSubjects: true }),
+        });
+
+        expect(res.statusCode).toBe(201);
+        expect(JSON.parse(res.body).subjectIds).toEqual([extra.id]);
+        const profile = await prisma.tutorSubject.findMany({ where: { tutorId: tutor.id } });
+        expect(profile.map((row) => row.subjectId)).toContain(extra.id);
+      });
+
+      it("rejects a subject missing from the profile without the flag (400)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor();
+        const extra = await createSubject();
+        const before = await prisma.tutorSubject.count({ where: { tutorId: tutor.id } });
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [extra.id] }),
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("INVALID_SUBJECT_OR_ZONE");
+        expect(await prisma.tutorSubject.count({ where: { tutorId: tutor.id } })).toBe(before);
+      });
+
+      it.each([false, true])(
+        "treats an unknown subject as a validation error (syncProfileSubjects=%s)",
+        async (sync) => {
+          const app = await createTestApp();
+          const { headers } = await setupTutor();
+
+          const res = await app.inject({
+            method: "POST",
+            url: base,
+            headers,
+            payload: requirementPayload({ subjectIds: [999999], syncProfileSubjects: sync }),
+          });
+
+          expect(res.statusCode).toBe(400);
+          expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+          expect(JSON.parse(res.body).message).toBe("Unknown subject");
+        },
+      );
+
+      it("treats an inactive subject as unknown (400)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor();
+        const inactive = await createSubject();
+        await prisma.subject.update({ where: { id: inactive.id }, data: { isActive: false } });
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [inactive.id], syncProfileSubjects: true }),
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).message).toBe("Unknown subject");
+        expect(
+          await prisma.tutorSubject.findFirst({
+            where: { tutorId: tutor.id, subjectId: inactive.id },
+          }),
+        ).toBeNull();
+      });
+
+      it("rolls the profile back when the set write fails (400)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor();
+        const extra = await createSubject();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({
+            subjectIds: [extra.id],
+            zoneIds: [crypto.randomUUID()],
+            syncProfileSubjects: true,
+          }),
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("INVALID_SUBJECT_OR_ZONE");
+        expect(
+          await prisma.tutorSubject.findFirst({
+            where: { tutorId: tutor.id, subjectId: extra.id },
+          }),
+        ).toBeNull();
+      });
+
+      it("adds a new subject to the profile when editing a set with the flag (200)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers, subjects } = await setupTutor();
+        const set = await createTutorRequirement(tutor.id, { subjectIds: [subjects[0].id] });
+        const extra = await createSubject();
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { subjectIds: [subjects[0].id, extra.id], syncProfileSubjects: true },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(JSON.parse(res.body).subjectIds).toEqual(
+          [subjects[0].id, extra.id].sort((a, b) => a - b),
+        );
+        const profile = await prisma.tutorSubject.findMany({ where: { tutorId: tutor.id } });
+        expect(profile.map((row) => row.subjectId)).toContain(extra.id);
+      });
+
+      it("rejects a PATCH that only sets the flag (400)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor();
+        const set = await createTutorRequirement(tutor.id);
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { syncProfileSubjects: true },
+        });
+
+        expect(res.statusCode).toBe(400);
+      });
+
+      it("refuses to grow the profile past 50 subjects (400)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers } = await setupTutor(50);
+        const extra = await createSubject();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [extra.id], syncProfileSubjects: true }),
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).error).toBe("ValidationError");
+        expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+        expect(JSON.parse(res.body).message).toBe("A tutor can have at most 50 subjects");
+        expect(await prisma.tutorSubject.count({ where: { tutorId: tutor.id } })).toBe(50);
+      });
+
+      it("does not echo the flag in the response", async () => {
+        const app = await createTestApp();
+        const { headers } = await setupTutor();
+        const extra = await createSubject();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [extra.id], syncProfileSubjects: true }),
+        });
+
+        expect(res.statusCode).toBe(201);
+        expect(JSON.parse(res.body)).not.toHaveProperty("syncProfileSubjects");
+      });
+
+      it("lets PUT /me/subjects drop the only subject of an archived set (200)", async () => {
+        const app = await createTestApp();
+        const { tutor, headers, subjects } = await setupTutor(2);
+        const [s1, s2] = subjects;
+        const archived = await createTutorRequirement(tutor.id, {
+          isActive: false,
+          subjectIds: [s1.id],
+        });
+
+        const res = await app.inject({
+          method: "PUT",
+          url: "/api/v1/tutors/me/subjects",
+          headers,
+          payload: { subjectIds: [s2.id] },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(
+          await prisma.tutorRequirementSubject.findMany({
+            where: { requirementId: archived.id },
+          }),
+        ).toHaveLength(0);
+      });
+    });
   });
 });

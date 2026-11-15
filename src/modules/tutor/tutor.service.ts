@@ -16,6 +16,7 @@ import type {
   TutorRequirementListQuery,
   UpdateTutorRequirementInput,
 } from "./tutor.schema.js";
+import { MAX_PROFILE_SUBJECTS } from "./tutor.schema.js";
 
 function toNumber(value: unknown) {
   return Number(value);
@@ -200,6 +201,7 @@ export async function replaceTutorSubjects(accountId: string, subjectIds: number
   const next = new Set(subjectIds);
 
   await prisma.$transaction(async (tx) => {
+    await lockTutor(tx, tutor.id);
     const current = await tx.tutorSubject.findMany({
       where: { tutorId: tutor.id },
       select: { subjectId: true },
@@ -362,7 +364,10 @@ type TutorRequirementRow = TutorRequirement & {
   zones: { zoneId: string }[];
 };
 
-type RequirementValues = Omit<CreateTutorRequirementInput, "subjectIds" | "zoneIds">;
+type RequirementValues = Omit<
+  CreateTutorRequirementInput,
+  "subjectIds" | "zoneIds" | "syncProfileSubjects"
+>;
 
 const hhmmOf = (d: Date) => d.toISOString().slice(11, 16);
 const ymdOf = (d: Date) => d.toISOString().slice(0, 10);
@@ -412,6 +417,45 @@ function isArchiveBlocked(error: unknown) {
 
 async function lockTutor(tx: Prisma.TransactionClient, tutorId: string) {
   await tx.$queryRaw`SELECT id FROM tutor WHERE id = ${tutorId}::uuid FOR UPDATE`;
+}
+
+// Runs inside the caller's transaction, after lockTutor. With `sync`, subjects missing from the profile are added to it.
+async function prepareSetSubjects(
+  tx: Prisma.TransactionClient,
+  tutorId: string,
+  subjectIds: number[],
+  sync: boolean,
+) {
+  const found = await tx.subject.findMany({
+    where: { id: { in: subjectIds }, isActive: true },
+    select: { id: true },
+  });
+  const foundIds = new Set(found.map((row) => row.id));
+  const missingIds = subjectIds.filter((id) => !foundIds.has(id));
+  if (missingIds.length > 0) {
+    throw appError("ValidationError", 400, "Unknown subject", { subjectIds: missingIds });
+  }
+  if (!sync) return;
+
+  const current = await tx.tutorSubject.findMany({
+    where: { tutorId },
+    select: { subjectId: true },
+  });
+  const currentIds = new Set(current.map((row) => row.subjectId));
+  const missing = subjectIds.filter((id) => !currentIds.has(id));
+  if (missing.length === 0) return;
+  if (current.length + missing.length > MAX_PROFILE_SUBJECTS) {
+    throw appError(
+      "ValidationError",
+      400,
+      `A tutor can have at most ${MAX_PROFILE_SUBJECTS} subjects`,
+      { subjectIds: missing },
+    );
+  }
+  await tx.tutorSubject.createMany({
+    data: missing.map((subjectId) => ({ tutorId, subjectId })),
+    skipDuplicates: true,
+  });
 }
 
 // One grouped query. Key null = OPEN packages without a requirement (they belong to the default set).
@@ -499,11 +543,12 @@ export async function createTutorRequirement(
 ) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
-  const { subjectIds, zoneIds, ...values } = input;
+  const { subjectIds, zoneIds, syncProfileSubjects, ...values } = input;
 
   try {
     const id = await prisma.$transaction(async (tx) => {
       await lockTutor(tx, tutor.id);
+      await prepareSetSubjects(tx, tutor.id, subjectIds, syncProfileSubjects === true);
       const activeCount = await tx.tutorRequirement.count({
         where: { tutorId: tutor.id, isActive: true },
       });
@@ -543,7 +588,7 @@ export async function updateTutorRequirement(
   const existing = await prisma.tutorRequirement.findFirst({ where: { id, tutorId: tutor.id } });
   if (!existing) return null;
 
-  const { subjectIds, zoneIds, ...scalars } = input;
+  const { subjectIds, zoneIds, syncProfileSubjects, ...scalars } = input;
   const values: RequirementValues = {
     name: existing.name,
     levelMin: existing.levelMin,
@@ -574,7 +619,9 @@ export async function updateTutorRequirement(
 
   try {
     await prisma.$transaction(async (tx) => {
+      await lockTutor(tx, tutor.id);
       if (subjectIds !== undefined) {
+        await prepareSetSubjects(tx, tutor.id, subjectIds, syncProfileSubjects === true);
         const current = await tx.tutorRequirementSubject.findMany({
           where: { requirementId: id },
           select: { subjectId: true },
