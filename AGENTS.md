@@ -105,6 +105,7 @@ Required once auth/files/notifications are used:
 - **Contact numbers**: `phone_number` is required on student and tutor; `whatsapp_number` is optional (NULL allowed, cleared by PATCH `whatsappNumber: null`). Both are globally unique across student and tutor, enforced by trigger `contact_number_guard` and service `assertContactNumbersFree` (409 `PhoneInUse` / `WhatsappInUse`). The same account may reuse a number; `deleted:` tombstones are ignored. The services never copy one number into the other.
 - **Apply gate**: readiness comes from SQL `tutor_missing_requirements()`. Do not duplicate those checks in TypeScript.
 - **Education levels**: `src/lib/education.ts` is the single source for curricula, levels, labels and rules; `GET /lookups/education` serves it. Every rule the DB can enforce is also a CHECK; `src/lib/education.test.ts` has a parity test that inserts every curriculum x level x group combination and asserts TS and Postgres agree. Change both together.
+- **Requirement-set subjects**: a set's subjects must be on the profile (composite FK). `syncProfileSubjects: true` adds missing ones in the same transaction. Set create/edit and PUT /tutors/me/subjects all lock the tutor row first (`lockTutor`).
 
 ## Schema v6
 
