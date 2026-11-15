@@ -403,7 +403,6 @@ export const ModelName = {
   SuperAdminEmail: 'SuperAdminEmail',
   AccountBlock: 'AccountBlock',
   Area: 'Area',
-  Category: 'Category',
   Subject: 'Subject',
   FileAsset: 'FileAsset',
   Student: 'Student',
@@ -449,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "category" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -894,80 +893,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AreaCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AreaCountAggregateOutputType> | number
-        }
-      }
-    }
-    Category: {
-      payload: Prisma.$CategoryPayload<ExtArgs>
-      fields: Prisma.CategoryFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.CategoryFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.CategoryFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
-        }
-        findFirst: {
-          args: Prisma.CategoryFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.CategoryFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
-        }
-        findMany: {
-          args: Prisma.CategoryFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
-        }
-        create: {
-          args: Prisma.CategoryCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
-        }
-        createMany: {
-          args: Prisma.CategoryCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.CategoryCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
-        }
-        delete: {
-          args: Prisma.CategoryDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
-        }
-        update: {
-          args: Prisma.CategoryUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
-        }
-        deleteMany: {
-          args: Prisma.CategoryDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.CategoryUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.CategoryUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
-        }
-        upsert: {
-          args: Prisma.CategoryUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
-        }
-        aggregate: {
-          args: Prisma.CategoryAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateCategory>
-        }
-        groupBy: {
-          args: Prisma.CategoryGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CategoryGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.CategoryCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CategoryCountAggregateOutputType> | number
         }
       }
     }
@@ -3310,17 +3235,6 @@ export const AreaScalarFieldEnum = {
 export type AreaScalarFieldEnum = (typeof AreaScalarFieldEnum)[keyof typeof AreaScalarFieldEnum]
 
 
-export const CategoryScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  slug: 'slug',
-  sortOrder: 'sortOrder',
-  isActive: 'isActive'
-} as const
-
-export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
-
-
 export const SubjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -3492,8 +3406,11 @@ export const TutorRequirementScalarFieldEnum = {
   name: 'name',
   isDefault: 'isDefault',
   isActive: 'isActive',
-  classLevelMin: 'classLevelMin',
-  classLevelMax: 'classLevelMax',
+  levelMin: 'levelMin',
+  levelMax: 'levelMax',
+  curricula: 'curricula',
+  academicGroups: 'academicGroups',
+  admissionTargets: 'admissionTargets',
   timeFrom: 'timeFrom',
   timeTo: 'timeTo',
   availableDays: 'availableDays',
@@ -3559,9 +3476,13 @@ export type ZoneLimitRequestScalarFieldEnum = (typeof ZoneLimitRequestScalarFiel
 export const TuitionRequirementScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
-  categoryId: 'categoryId',
   areaId: 'areaId',
-  classLevel: 'classLevel',
+  levelCode: 'levelCode',
+  curriculum: 'curriculum',
+  academicGroup: 'academicGroup',
+  admissionTargets: 'admissionTargets',
+  isRetaker: 'isRetaker',
+  levelNote: 'levelNote',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
   availableDays: 'availableDays',
@@ -3590,11 +3511,15 @@ export type RequirementSubjectScalarFieldEnum = (typeof RequirementSubjectScalar
 export const TuitionPackageScalarFieldEnum = {
   id: 'id',
   tutorId: 'tutorId',
-  categoryId: 'categoryId',
   subjectId: 'subjectId',
   areaId: 'areaId',
   requirementId: 'requirementId',
-  classLevel: 'classLevel',
+  levelCode: 'levelCode',
+  curriculum: 'curriculum',
+  academicGroup: 'academicGroup',
+  admissionTargets: 'admissionTargets',
+  isRetaker: 'isRetaker',
+  levelNote: 'levelNote',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
   expectedSalary: 'expectedSalary',
@@ -4057,6 +3982,48 @@ export type ListEnumModerationStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'Curriculum[]'
+ */
+export type ListEnumCurriculumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Curriculum[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Curriculum'
+ */
+export type EnumCurriculumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Curriculum'>
+    
+
+
+/**
+ * Reference to a field of type 'AcademicGroup[]'
+ */
+export type ListEnumAcademicGroupFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AcademicGroup[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AcademicGroup'
+ */
+export type EnumAcademicGroupFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AcademicGroup'>
+    
+
+
+/**
+ * Reference to a field of type 'AdmissionTarget[]'
+ */
+export type ListEnumAdmissionTargetFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdmissionTarget[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AdmissionTarget'
+ */
+export type EnumAdmissionTargetFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdmissionTarget'>
+    
+
+
+/**
  * Reference to a field of type 'ZoneLimitRequestStatus'
  */
 export type EnumZoneLimitRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ZoneLimitRequestStatus'>
@@ -4492,7 +4459,6 @@ export type GlobalOmitConfig = {
   superAdminEmail?: Prisma.SuperAdminEmailOmit
   accountBlock?: Prisma.AccountBlockOmit
   area?: Prisma.AreaOmit
-  category?: Prisma.CategoryOmit
   subject?: Prisma.SubjectOmit
   fileAsset?: Prisma.FileAssetOmit
   student?: Prisma.StudentOmit

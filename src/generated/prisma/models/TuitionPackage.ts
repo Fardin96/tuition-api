@@ -27,20 +27,18 @@ export type AggregateTuitionPackage = {
 }
 
 export type TuitionPackageAvgAggregateOutputType = {
-  categoryId: number | null
   subjectId: number | null
   areaId: number | null
-  classLevel: number | null
+  levelCode: number | null
   daysPerWeek: number | null
   expectedSalary: number | null
   studentCount: number | null
 }
 
 export type TuitionPackageSumAggregateOutputType = {
-  categoryId: number | null
   subjectId: number | null
   areaId: number | null
-  classLevel: number | null
+  levelCode: number | null
   daysPerWeek: number | null
   expectedSalary: number | null
   studentCount: number | null
@@ -49,11 +47,14 @@ export type TuitionPackageSumAggregateOutputType = {
 export type TuitionPackageMinAggregateOutputType = {
   id: string | null
   tutorId: string | null
-  categoryId: number | null
   subjectId: number | null
   areaId: number | null
   requirementId: string | null
-  classLevel: number | null
+  levelCode: number | null
+  curriculum: $Enums.Curriculum | null
+  academicGroup: $Enums.AcademicGroup | null
+  isRetaker: boolean | null
+  levelNote: string | null
   timeOfDay: Date | null
   daysPerWeek: number | null
   expectedSalary: number | null
@@ -69,11 +70,14 @@ export type TuitionPackageMinAggregateOutputType = {
 export type TuitionPackageMaxAggregateOutputType = {
   id: string | null
   tutorId: string | null
-  categoryId: number | null
   subjectId: number | null
   areaId: number | null
   requirementId: string | null
-  classLevel: number | null
+  levelCode: number | null
+  curriculum: $Enums.Curriculum | null
+  academicGroup: $Enums.AcademicGroup | null
+  isRetaker: boolean | null
+  levelNote: string | null
   timeOfDay: Date | null
   daysPerWeek: number | null
   expectedSalary: number | null
@@ -89,11 +93,15 @@ export type TuitionPackageMaxAggregateOutputType = {
 export type TuitionPackageCountAggregateOutputType = {
   id: number
   tutorId: number
-  categoryId: number
   subjectId: number
   areaId: number
   requirementId: number
-  classLevel: number
+  levelCode: number
+  curriculum: number
+  academicGroup: number
+  admissionTargets: number
+  isRetaker: number
+  levelNote: number
   timeOfDay: number
   daysPerWeek: number
   expectedSalary: number
@@ -109,20 +117,18 @@ export type TuitionPackageCountAggregateOutputType = {
 
 
 export type TuitionPackageAvgAggregateInputType = {
-  categoryId?: true
   subjectId?: true
   areaId?: true
-  classLevel?: true
+  levelCode?: true
   daysPerWeek?: true
   expectedSalary?: true
   studentCount?: true
 }
 
 export type TuitionPackageSumAggregateInputType = {
-  categoryId?: true
   subjectId?: true
   areaId?: true
-  classLevel?: true
+  levelCode?: true
   daysPerWeek?: true
   expectedSalary?: true
   studentCount?: true
@@ -131,11 +137,14 @@ export type TuitionPackageSumAggregateInputType = {
 export type TuitionPackageMinAggregateInputType = {
   id?: true
   tutorId?: true
-  categoryId?: true
   subjectId?: true
   areaId?: true
   requirementId?: true
-  classLevel?: true
+  levelCode?: true
+  curriculum?: true
+  academicGroup?: true
+  isRetaker?: true
+  levelNote?: true
   timeOfDay?: true
   daysPerWeek?: true
   expectedSalary?: true
@@ -151,11 +160,14 @@ export type TuitionPackageMinAggregateInputType = {
 export type TuitionPackageMaxAggregateInputType = {
   id?: true
   tutorId?: true
-  categoryId?: true
   subjectId?: true
   areaId?: true
   requirementId?: true
-  classLevel?: true
+  levelCode?: true
+  curriculum?: true
+  academicGroup?: true
+  isRetaker?: true
+  levelNote?: true
   timeOfDay?: true
   daysPerWeek?: true
   expectedSalary?: true
@@ -171,11 +183,15 @@ export type TuitionPackageMaxAggregateInputType = {
 export type TuitionPackageCountAggregateInputType = {
   id?: true
   tutorId?: true
-  categoryId?: true
   subjectId?: true
   areaId?: true
   requirementId?: true
-  classLevel?: true
+  levelCode?: true
+  curriculum?: true
+  academicGroup?: true
+  admissionTargets?: true
+  isRetaker?: true
+  levelNote?: true
   timeOfDay?: true
   daysPerWeek?: true
   expectedSalary?: true
@@ -278,11 +294,15 @@ export type TuitionPackageGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type TuitionPackageGroupByOutputType = {
   id: string
   tutorId: string
-  categoryId: number
   subjectId: number
   areaId: number | null
   requirementId: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup: $Enums.AcademicGroup | null
+  admissionTargets: $Enums.AdmissionTarget[]
+  isRetaker: boolean
+  levelNote: string | null
   timeOfDay: Date
   daysPerWeek: number
   expectedSalary: number
@@ -321,11 +341,15 @@ export type TuitionPackageWhereInput = {
   NOT?: Prisma.TuitionPackageWhereInput | Prisma.TuitionPackageWhereInput[]
   id?: Prisma.UuidFilter<"TuitionPackage"> | string
   tutorId?: Prisma.UuidFilter<"TuitionPackage"> | string
-  categoryId?: Prisma.IntFilter<"TuitionPackage"> | number
   subjectId?: Prisma.IntFilter<"TuitionPackage"> | number
   areaId?: Prisma.IntNullableFilter<"TuitionPackage"> | number | null
   requirementId?: Prisma.UuidNullableFilter<"TuitionPackage"> | string | null
-  classLevel?: Prisma.IntFilter<"TuitionPackage"> | number
+  levelCode?: Prisma.IntFilter<"TuitionPackage"> | number
+  curriculum?: Prisma.EnumCurriculumFilter<"TuitionPackage"> | $Enums.Curriculum
+  academicGroup?: Prisma.EnumAcademicGroupNullableFilter<"TuitionPackage"> | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TuitionPackage">
+  isRetaker?: Prisma.BoolFilter<"TuitionPackage"> | boolean
+  levelNote?: Prisma.StringNullableFilter<"TuitionPackage"> | string | null
   timeOfDay?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
   daysPerWeek?: Prisma.IntFilter<"TuitionPackage"> | number
   expectedSalary?: Prisma.IntFilter<"TuitionPackage"> | number
@@ -337,7 +361,6 @@ export type TuitionPackageWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
-  category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
   area?: Prisma.XOR<Prisma.AreaNullableScalarRelationFilter, Prisma.AreaWhereInput> | null
   requirement?: Prisma.XOR<Prisma.TutorRequirementNullableScalarRelationFilter, Prisma.TutorRequirementWhereInput> | null
@@ -347,11 +370,15 @@ export type TuitionPackageWhereInput = {
 export type TuitionPackageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   tutorId?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   areaId?: Prisma.SortOrderInput | Prisma.SortOrder
   requirementId?: Prisma.SortOrderInput | Prisma.SortOrder
-  classLevel?: Prisma.SortOrder
+  levelCode?: Prisma.SortOrder
+  curriculum?: Prisma.SortOrder
+  academicGroup?: Prisma.SortOrderInput | Prisma.SortOrder
+  admissionTargets?: Prisma.SortOrder
+  isRetaker?: Prisma.SortOrder
+  levelNote?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   expectedSalary?: Prisma.SortOrder
@@ -363,7 +390,6 @@ export type TuitionPackageOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tutor?: Prisma.TutorOrderByWithRelationInput
-  category?: Prisma.CategoryOrderByWithRelationInput
   subject?: Prisma.SubjectOrderByWithRelationInput
   area?: Prisma.AreaOrderByWithRelationInput
   requirement?: Prisma.TutorRequirementOrderByWithRelationInput
@@ -376,11 +402,15 @@ export type TuitionPackageWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TuitionPackageWhereInput[]
   NOT?: Prisma.TuitionPackageWhereInput | Prisma.TuitionPackageWhereInput[]
   tutorId?: Prisma.UuidFilter<"TuitionPackage"> | string
-  categoryId?: Prisma.IntFilter<"TuitionPackage"> | number
   subjectId?: Prisma.IntFilter<"TuitionPackage"> | number
   areaId?: Prisma.IntNullableFilter<"TuitionPackage"> | number | null
   requirementId?: Prisma.UuidNullableFilter<"TuitionPackage"> | string | null
-  classLevel?: Prisma.IntFilter<"TuitionPackage"> | number
+  levelCode?: Prisma.IntFilter<"TuitionPackage"> | number
+  curriculum?: Prisma.EnumCurriculumFilter<"TuitionPackage"> | $Enums.Curriculum
+  academicGroup?: Prisma.EnumAcademicGroupNullableFilter<"TuitionPackage"> | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TuitionPackage">
+  isRetaker?: Prisma.BoolFilter<"TuitionPackage"> | boolean
+  levelNote?: Prisma.StringNullableFilter<"TuitionPackage"> | string | null
   timeOfDay?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
   daysPerWeek?: Prisma.IntFilter<"TuitionPackage"> | number
   expectedSalary?: Prisma.IntFilter<"TuitionPackage"> | number
@@ -392,7 +422,6 @@ export type TuitionPackageWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
-  category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
   area?: Prisma.XOR<Prisma.AreaNullableScalarRelationFilter, Prisma.AreaWhereInput> | null
   requirement?: Prisma.XOR<Prisma.TutorRequirementNullableScalarRelationFilter, Prisma.TutorRequirementWhereInput> | null
@@ -402,11 +431,15 @@ export type TuitionPackageWhereUniqueInput = Prisma.AtLeast<{
 export type TuitionPackageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   tutorId?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   areaId?: Prisma.SortOrderInput | Prisma.SortOrder
   requirementId?: Prisma.SortOrderInput | Prisma.SortOrder
-  classLevel?: Prisma.SortOrder
+  levelCode?: Prisma.SortOrder
+  curriculum?: Prisma.SortOrder
+  academicGroup?: Prisma.SortOrderInput | Prisma.SortOrder
+  admissionTargets?: Prisma.SortOrder
+  isRetaker?: Prisma.SortOrder
+  levelNote?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   expectedSalary?: Prisma.SortOrder
@@ -430,11 +463,15 @@ export type TuitionPackageScalarWhereWithAggregatesInput = {
   NOT?: Prisma.TuitionPackageScalarWhereWithAggregatesInput | Prisma.TuitionPackageScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"TuitionPackage"> | string
   tutorId?: Prisma.UuidWithAggregatesFilter<"TuitionPackage"> | string
-  categoryId?: Prisma.IntWithAggregatesFilter<"TuitionPackage"> | number
   subjectId?: Prisma.IntWithAggregatesFilter<"TuitionPackage"> | number
   areaId?: Prisma.IntNullableWithAggregatesFilter<"TuitionPackage"> | number | null
   requirementId?: Prisma.UuidNullableWithAggregatesFilter<"TuitionPackage"> | string | null
-  classLevel?: Prisma.IntWithAggregatesFilter<"TuitionPackage"> | number
+  levelCode?: Prisma.IntWithAggregatesFilter<"TuitionPackage"> | number
+  curriculum?: Prisma.EnumCurriculumWithAggregatesFilter<"TuitionPackage"> | $Enums.Curriculum
+  academicGroup?: Prisma.EnumAcademicGroupNullableWithAggregatesFilter<"TuitionPackage"> | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TuitionPackage">
+  isRetaker?: Prisma.BoolWithAggregatesFilter<"TuitionPackage"> | boolean
+  levelNote?: Prisma.StringNullableWithAggregatesFilter<"TuitionPackage"> | string | null
   timeOfDay?: Prisma.DateTimeWithAggregatesFilter<"TuitionPackage"> | Date | string
   daysPerWeek?: Prisma.IntWithAggregatesFilter<"TuitionPackage"> | number
   expectedSalary?: Prisma.IntWithAggregatesFilter<"TuitionPackage"> | number
@@ -449,7 +486,12 @@ export type TuitionPackageScalarWhereWithAggregatesInput = {
 
 export type TuitionPackageCreateInput = {
   id?: string
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -461,7 +503,6 @@ export type TuitionPackageCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutPackagesInput
-  category: Prisma.CategoryCreateNestedOneWithoutPackagesInput
   subject: Prisma.SubjectCreateNestedOneWithoutPackagesInput
   area?: Prisma.AreaCreateNestedOneWithoutPackagesInput
   requirement?: Prisma.TutorRequirementCreateNestedOneWithoutPackagesInput
@@ -471,11 +512,15 @@ export type TuitionPackageCreateInput = {
 export type TuitionPackageUncheckedCreateInput = {
   id?: string
   tutorId: string
-  categoryId: number
   subjectId: number
   areaId?: number | null
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -491,7 +536,12 @@ export type TuitionPackageUncheckedCreateInput = {
 
 export type TuitionPackageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -503,7 +553,6 @@ export type TuitionPackageUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPackagesNestedInput
-  category?: Prisma.CategoryUpdateOneRequiredWithoutPackagesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutPackagesNestedInput
   area?: Prisma.AreaUpdateOneWithoutPackagesNestedInput
   requirement?: Prisma.TutorRequirementUpdateOneWithoutPackagesNestedInput
@@ -513,11 +562,15 @@ export type TuitionPackageUpdateInput = {
 export type TuitionPackageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -534,11 +587,15 @@ export type TuitionPackageUncheckedUpdateInput = {
 export type TuitionPackageCreateManyInput = {
   id?: string
   tutorId: string
-  categoryId: number
   subjectId: number
   areaId?: number | null
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -553,7 +610,12 @@ export type TuitionPackageCreateManyInput = {
 
 export type TuitionPackageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -569,11 +631,15 @@ export type TuitionPackageUpdateManyMutationInput = {
 export type TuitionPackageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -599,11 +665,15 @@ export type TuitionPackageOrderByRelationAggregateInput = {
 export type TuitionPackageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tutorId?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
   requirementId?: Prisma.SortOrder
-  classLevel?: Prisma.SortOrder
+  levelCode?: Prisma.SortOrder
+  curriculum?: Prisma.SortOrder
+  academicGroup?: Prisma.SortOrder
+  admissionTargets?: Prisma.SortOrder
+  isRetaker?: Prisma.SortOrder
+  levelNote?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   expectedSalary?: Prisma.SortOrder
@@ -617,10 +687,9 @@ export type TuitionPackageCountOrderByAggregateInput = {
 }
 
 export type TuitionPackageAvgOrderByAggregateInput = {
-  categoryId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
-  classLevel?: Prisma.SortOrder
+  levelCode?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   expectedSalary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
@@ -629,11 +698,14 @@ export type TuitionPackageAvgOrderByAggregateInput = {
 export type TuitionPackageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tutorId?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
   requirementId?: Prisma.SortOrder
-  classLevel?: Prisma.SortOrder
+  levelCode?: Prisma.SortOrder
+  curriculum?: Prisma.SortOrder
+  academicGroup?: Prisma.SortOrder
+  isRetaker?: Prisma.SortOrder
+  levelNote?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   expectedSalary?: Prisma.SortOrder
@@ -649,11 +721,14 @@ export type TuitionPackageMaxOrderByAggregateInput = {
 export type TuitionPackageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tutorId?: Prisma.SortOrder
-  categoryId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
   requirementId?: Prisma.SortOrder
-  classLevel?: Prisma.SortOrder
+  levelCode?: Prisma.SortOrder
+  curriculum?: Prisma.SortOrder
+  academicGroup?: Prisma.SortOrder
+  isRetaker?: Prisma.SortOrder
+  levelNote?: Prisma.SortOrder
   timeOfDay?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   expectedSalary?: Prisma.SortOrder
@@ -667,10 +742,9 @@ export type TuitionPackageMinOrderByAggregateInput = {
 }
 
 export type TuitionPackageSumOrderByAggregateInput = {
-  categoryId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   areaId?: Prisma.SortOrder
-  classLevel?: Prisma.SortOrder
+  levelCode?: Prisma.SortOrder
   daysPerWeek?: Prisma.SortOrder
   expectedSalary?: Prisma.SortOrder
   studentCount?: Prisma.SortOrder
@@ -720,48 +794,6 @@ export type TuitionPackageUncheckedUpdateManyWithoutAreaNestedInput = {
   connect?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
   update?: Prisma.TuitionPackageUpdateWithWhereUniqueWithoutAreaInput | Prisma.TuitionPackageUpdateWithWhereUniqueWithoutAreaInput[]
   updateMany?: Prisma.TuitionPackageUpdateManyWithWhereWithoutAreaInput | Prisma.TuitionPackageUpdateManyWithWhereWithoutAreaInput[]
-  deleteMany?: Prisma.TuitionPackageScalarWhereInput | Prisma.TuitionPackageScalarWhereInput[]
-}
-
-export type TuitionPackageCreateNestedManyWithoutCategoryInput = {
-  create?: Prisma.XOR<Prisma.TuitionPackageCreateWithoutCategoryInput, Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput> | Prisma.TuitionPackageCreateWithoutCategoryInput[] | Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput | Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput[]
-  createMany?: Prisma.TuitionPackageCreateManyCategoryInputEnvelope
-  connect?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-}
-
-export type TuitionPackageUncheckedCreateNestedManyWithoutCategoryInput = {
-  create?: Prisma.XOR<Prisma.TuitionPackageCreateWithoutCategoryInput, Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput> | Prisma.TuitionPackageCreateWithoutCategoryInput[] | Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput | Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput[]
-  createMany?: Prisma.TuitionPackageCreateManyCategoryInputEnvelope
-  connect?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-}
-
-export type TuitionPackageUpdateManyWithoutCategoryNestedInput = {
-  create?: Prisma.XOR<Prisma.TuitionPackageCreateWithoutCategoryInput, Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput> | Prisma.TuitionPackageCreateWithoutCategoryInput[] | Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput | Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput[]
-  upsert?: Prisma.TuitionPackageUpsertWithWhereUniqueWithoutCategoryInput | Prisma.TuitionPackageUpsertWithWhereUniqueWithoutCategoryInput[]
-  createMany?: Prisma.TuitionPackageCreateManyCategoryInputEnvelope
-  set?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  disconnect?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  delete?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  connect?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  update?: Prisma.TuitionPackageUpdateWithWhereUniqueWithoutCategoryInput | Prisma.TuitionPackageUpdateWithWhereUniqueWithoutCategoryInput[]
-  updateMany?: Prisma.TuitionPackageUpdateManyWithWhereWithoutCategoryInput | Prisma.TuitionPackageUpdateManyWithWhereWithoutCategoryInput[]
-  deleteMany?: Prisma.TuitionPackageScalarWhereInput | Prisma.TuitionPackageScalarWhereInput[]
-}
-
-export type TuitionPackageUncheckedUpdateManyWithoutCategoryNestedInput = {
-  create?: Prisma.XOR<Prisma.TuitionPackageCreateWithoutCategoryInput, Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput> | Prisma.TuitionPackageCreateWithoutCategoryInput[] | Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput | Prisma.TuitionPackageCreateOrConnectWithoutCategoryInput[]
-  upsert?: Prisma.TuitionPackageUpsertWithWhereUniqueWithoutCategoryInput | Prisma.TuitionPackageUpsertWithWhereUniqueWithoutCategoryInput[]
-  createMany?: Prisma.TuitionPackageCreateManyCategoryInputEnvelope
-  set?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  disconnect?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  delete?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  connect?: Prisma.TuitionPackageWhereUniqueInput | Prisma.TuitionPackageWhereUniqueInput[]
-  update?: Prisma.TuitionPackageUpdateWithWhereUniqueWithoutCategoryInput | Prisma.TuitionPackageUpdateWithWhereUniqueWithoutCategoryInput[]
-  updateMany?: Prisma.TuitionPackageUpdateManyWithWhereWithoutCategoryInput | Prisma.TuitionPackageUpdateManyWithWhereWithoutCategoryInput[]
   deleteMany?: Prisma.TuitionPackageScalarWhereInput | Prisma.TuitionPackageScalarWhereInput[]
 }
 
@@ -891,6 +923,19 @@ export type TuitionPackageUncheckedUpdateManyWithoutRequirementNestedInput = {
   deleteMany?: Prisma.TuitionPackageScalarWhereInput | Prisma.TuitionPackageScalarWhereInput[]
 }
 
+export type TuitionPackageCreateadmissionTargetsInput = {
+  set: $Enums.AdmissionTarget[]
+}
+
+export type EnumCurriculumFieldUpdateOperationsInput = {
+  set?: $Enums.Curriculum
+}
+
+export type TuitionPackageUpdateadmissionTargetsInput = {
+  set?: $Enums.AdmissionTarget[]
+  push?: $Enums.AdmissionTarget | $Enums.AdmissionTarget[]
+}
+
 export type TuitionPackageCreateNestedOneWithoutApplicationsInput = {
   create?: Prisma.XOR<Prisma.TuitionPackageCreateWithoutApplicationsInput, Prisma.TuitionPackageUncheckedCreateWithoutApplicationsInput>
   connectOrCreate?: Prisma.TuitionPackageCreateOrConnectWithoutApplicationsInput
@@ -909,7 +954,12 @@ export type TuitionPackageUpdateOneWithoutApplicationsNestedInput = {
 
 export type TuitionPackageCreateWithoutAreaInput = {
   id?: string
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -921,7 +971,6 @@ export type TuitionPackageCreateWithoutAreaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutPackagesInput
-  category: Prisma.CategoryCreateNestedOneWithoutPackagesInput
   subject: Prisma.SubjectCreateNestedOneWithoutPackagesInput
   requirement?: Prisma.TutorRequirementCreateNestedOneWithoutPackagesInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutPackageInput
@@ -930,10 +979,14 @@ export type TuitionPackageCreateWithoutAreaInput = {
 export type TuitionPackageUncheckedCreateWithoutAreaInput = {
   id?: string
   tutorId: string
-  categoryId: number
   subjectId: number
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -979,11 +1032,15 @@ export type TuitionPackageScalarWhereInput = {
   NOT?: Prisma.TuitionPackageScalarWhereInput | Prisma.TuitionPackageScalarWhereInput[]
   id?: Prisma.UuidFilter<"TuitionPackage"> | string
   tutorId?: Prisma.UuidFilter<"TuitionPackage"> | string
-  categoryId?: Prisma.IntFilter<"TuitionPackage"> | number
   subjectId?: Prisma.IntFilter<"TuitionPackage"> | number
   areaId?: Prisma.IntNullableFilter<"TuitionPackage"> | number | null
   requirementId?: Prisma.UuidNullableFilter<"TuitionPackage"> | string | null
-  classLevel?: Prisma.IntFilter<"TuitionPackage"> | number
+  levelCode?: Prisma.IntFilter<"TuitionPackage"> | number
+  curriculum?: Prisma.EnumCurriculumFilter<"TuitionPackage"> | $Enums.Curriculum
+  academicGroup?: Prisma.EnumAcademicGroupNullableFilter<"TuitionPackage"> | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TuitionPackage">
+  isRetaker?: Prisma.BoolFilter<"TuitionPackage"> | boolean
+  levelNote?: Prisma.StringNullableFilter<"TuitionPackage"> | string | null
   timeOfDay?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
   daysPerWeek?: Prisma.IntFilter<"TuitionPackage"> | number
   expectedSalary?: Prisma.IntFilter<"TuitionPackage"> | number
@@ -996,75 +1053,14 @@ export type TuitionPackageScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"TuitionPackage"> | Date | string
 }
 
-export type TuitionPackageCreateWithoutCategoryInput = {
-  id?: string
-  classLevel: number
-  timeOfDay: Date | string
-  daysPerWeek: number
-  expectedSalary: number
-  studentCount?: number
-  availableFrom: Date | string
-  status?: $Enums.ListingStatus
-  moderationStatus?: $Enums.ModerationStatus
-  moderationNote?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  tutor: Prisma.TutorCreateNestedOneWithoutPackagesInput
-  subject: Prisma.SubjectCreateNestedOneWithoutPackagesInput
-  area?: Prisma.AreaCreateNestedOneWithoutPackagesInput
-  requirement?: Prisma.TutorRequirementCreateNestedOneWithoutPackagesInput
-  applications?: Prisma.ApplicationCreateNestedManyWithoutPackageInput
-}
-
-export type TuitionPackageUncheckedCreateWithoutCategoryInput = {
-  id?: string
-  tutorId: string
-  subjectId: number
-  areaId?: number | null
-  requirementId?: string | null
-  classLevel: number
-  timeOfDay: Date | string
-  daysPerWeek: number
-  expectedSalary: number
-  studentCount?: number
-  availableFrom: Date | string
-  status?: $Enums.ListingStatus
-  moderationStatus?: $Enums.ModerationStatus
-  moderationNote?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutPackageInput
-}
-
-export type TuitionPackageCreateOrConnectWithoutCategoryInput = {
-  where: Prisma.TuitionPackageWhereUniqueInput
-  create: Prisma.XOR<Prisma.TuitionPackageCreateWithoutCategoryInput, Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput>
-}
-
-export type TuitionPackageCreateManyCategoryInputEnvelope = {
-  data: Prisma.TuitionPackageCreateManyCategoryInput | Prisma.TuitionPackageCreateManyCategoryInput[]
-  skipDuplicates?: boolean
-}
-
-export type TuitionPackageUpsertWithWhereUniqueWithoutCategoryInput = {
-  where: Prisma.TuitionPackageWhereUniqueInput
-  update: Prisma.XOR<Prisma.TuitionPackageUpdateWithoutCategoryInput, Prisma.TuitionPackageUncheckedUpdateWithoutCategoryInput>
-  create: Prisma.XOR<Prisma.TuitionPackageCreateWithoutCategoryInput, Prisma.TuitionPackageUncheckedCreateWithoutCategoryInput>
-}
-
-export type TuitionPackageUpdateWithWhereUniqueWithoutCategoryInput = {
-  where: Prisma.TuitionPackageWhereUniqueInput
-  data: Prisma.XOR<Prisma.TuitionPackageUpdateWithoutCategoryInput, Prisma.TuitionPackageUncheckedUpdateWithoutCategoryInput>
-}
-
-export type TuitionPackageUpdateManyWithWhereWithoutCategoryInput = {
-  where: Prisma.TuitionPackageScalarWhereInput
-  data: Prisma.XOR<Prisma.TuitionPackageUpdateManyMutationInput, Prisma.TuitionPackageUncheckedUpdateManyWithoutCategoryInput>
-}
-
 export type TuitionPackageCreateWithoutSubjectInput = {
   id?: string
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1076,7 +1072,6 @@ export type TuitionPackageCreateWithoutSubjectInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutPackagesInput
-  category: Prisma.CategoryCreateNestedOneWithoutPackagesInput
   area?: Prisma.AreaCreateNestedOneWithoutPackagesInput
   requirement?: Prisma.TutorRequirementCreateNestedOneWithoutPackagesInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutPackageInput
@@ -1085,10 +1080,14 @@ export type TuitionPackageCreateWithoutSubjectInput = {
 export type TuitionPackageUncheckedCreateWithoutSubjectInput = {
   id?: string
   tutorId: string
-  categoryId: number
   areaId?: number | null
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1130,7 +1129,12 @@ export type TuitionPackageUpdateManyWithWhereWithoutSubjectInput = {
 
 export type TuitionPackageCreateWithoutTutorInput = {
   id?: string
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1141,7 +1145,6 @@ export type TuitionPackageCreateWithoutTutorInput = {
   moderationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  category: Prisma.CategoryCreateNestedOneWithoutPackagesInput
   subject: Prisma.SubjectCreateNestedOneWithoutPackagesInput
   area?: Prisma.AreaCreateNestedOneWithoutPackagesInput
   requirement?: Prisma.TutorRequirementCreateNestedOneWithoutPackagesInput
@@ -1150,11 +1153,15 @@ export type TuitionPackageCreateWithoutTutorInput = {
 
 export type TuitionPackageUncheckedCreateWithoutTutorInput = {
   id?: string
-  categoryId: number
   subjectId: number
   areaId?: number | null
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1196,7 +1203,12 @@ export type TuitionPackageUpdateManyWithWhereWithoutTutorInput = {
 
 export type TuitionPackageCreateWithoutRequirementInput = {
   id?: string
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1208,7 +1220,6 @@ export type TuitionPackageCreateWithoutRequirementInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutPackagesInput
-  category: Prisma.CategoryCreateNestedOneWithoutPackagesInput
   subject: Prisma.SubjectCreateNestedOneWithoutPackagesInput
   area?: Prisma.AreaCreateNestedOneWithoutPackagesInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutPackageInput
@@ -1217,10 +1228,14 @@ export type TuitionPackageCreateWithoutRequirementInput = {
 export type TuitionPackageUncheckedCreateWithoutRequirementInput = {
   id?: string
   tutorId: string
-  categoryId: number
   subjectId: number
   areaId?: number | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1262,7 +1277,12 @@ export type TuitionPackageUpdateManyWithWhereWithoutRequirementInput = {
 
 export type TuitionPackageCreateWithoutApplicationsInput = {
   id?: string
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1274,7 +1294,6 @@ export type TuitionPackageCreateWithoutApplicationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutPackagesInput
-  category: Prisma.CategoryCreateNestedOneWithoutPackagesInput
   subject: Prisma.SubjectCreateNestedOneWithoutPackagesInput
   area?: Prisma.AreaCreateNestedOneWithoutPackagesInput
   requirement?: Prisma.TutorRequirementCreateNestedOneWithoutPackagesInput
@@ -1283,11 +1302,15 @@ export type TuitionPackageCreateWithoutApplicationsInput = {
 export type TuitionPackageUncheckedCreateWithoutApplicationsInput = {
   id?: string
   tutorId: string
-  categoryId: number
   subjectId: number
   areaId?: number | null
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1318,7 +1341,12 @@ export type TuitionPackageUpdateToOneWithWhereWithoutApplicationsInput = {
 
 export type TuitionPackageUpdateWithoutApplicationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1330,7 +1358,6 @@ export type TuitionPackageUpdateWithoutApplicationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPackagesNestedInput
-  category?: Prisma.CategoryUpdateOneRequiredWithoutPackagesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutPackagesNestedInput
   area?: Prisma.AreaUpdateOneWithoutPackagesNestedInput
   requirement?: Prisma.TutorRequirementUpdateOneWithoutPackagesNestedInput
@@ -1339,11 +1366,15 @@ export type TuitionPackageUpdateWithoutApplicationsInput = {
 export type TuitionPackageUncheckedUpdateWithoutApplicationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1359,10 +1390,14 @@ export type TuitionPackageUncheckedUpdateWithoutApplicationsInput = {
 export type TuitionPackageCreateManyAreaInput = {
   id?: string
   tutorId: string
-  categoryId: number
   subjectId: number
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1377,7 +1412,12 @@ export type TuitionPackageCreateManyAreaInput = {
 
 export type TuitionPackageUpdateWithoutAreaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1389,7 +1429,6 @@ export type TuitionPackageUpdateWithoutAreaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPackagesNestedInput
-  category?: Prisma.CategoryUpdateOneRequiredWithoutPackagesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutPackagesNestedInput
   requirement?: Prisma.TutorRequirementUpdateOneWithoutPackagesNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutPackageNestedInput
@@ -1398,10 +1437,14 @@ export type TuitionPackageUpdateWithoutAreaInput = {
 export type TuitionPackageUncheckedUpdateWithoutAreaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1418,88 +1461,14 @@ export type TuitionPackageUncheckedUpdateWithoutAreaInput = {
 export type TuitionPackageUncheckedUpdateManyWithoutAreaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
-  timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
-  expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
-  studentCount?: Prisma.IntFieldUpdateOperationsInput | number
-  availableFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
-  moderationStatus?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
-  moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type TuitionPackageCreateManyCategoryInput = {
-  id?: string
-  tutorId: string
-  subjectId: number
-  areaId?: number | null
-  requirementId?: string | null
-  classLevel: number
-  timeOfDay: Date | string
-  daysPerWeek: number
-  expectedSalary: number
-  studentCount?: number
-  availableFrom: Date | string
-  status?: $Enums.ListingStatus
-  moderationStatus?: $Enums.ModerationStatus
-  moderationNote?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type TuitionPackageUpdateWithoutCategoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
-  timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
-  expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
-  studentCount?: Prisma.IntFieldUpdateOperationsInput | number
-  availableFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
-  moderationStatus?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
-  moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tutor?: Prisma.TutorUpdateOneRequiredWithoutPackagesNestedInput
-  subject?: Prisma.SubjectUpdateOneRequiredWithoutPackagesNestedInput
-  area?: Prisma.AreaUpdateOneWithoutPackagesNestedInput
-  requirement?: Prisma.TutorRequirementUpdateOneWithoutPackagesNestedInput
-  applications?: Prisma.ApplicationUpdateManyWithoutPackageNestedInput
-}
-
-export type TuitionPackageUncheckedUpdateWithoutCategoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  subjectId?: Prisma.IntFieldUpdateOperationsInput | number
-  areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
-  timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
-  expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
-  studentCount?: Prisma.IntFieldUpdateOperationsInput | number
-  availableFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
-  moderationStatus?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
-  moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutPackageNestedInput
-}
-
-export type TuitionPackageUncheckedUpdateManyWithoutCategoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  subjectId?: Prisma.IntFieldUpdateOperationsInput | number
-  areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1515,10 +1484,14 @@ export type TuitionPackageUncheckedUpdateManyWithoutCategoryInput = {
 export type TuitionPackageCreateManySubjectInput = {
   id?: string
   tutorId: string
-  categoryId: number
   areaId?: number | null
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1533,7 +1506,12 @@ export type TuitionPackageCreateManySubjectInput = {
 
 export type TuitionPackageUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1545,7 +1523,6 @@ export type TuitionPackageUpdateWithoutSubjectInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPackagesNestedInput
-  category?: Prisma.CategoryUpdateOneRequiredWithoutPackagesNestedInput
   area?: Prisma.AreaUpdateOneWithoutPackagesNestedInput
   requirement?: Prisma.TutorRequirementUpdateOneWithoutPackagesNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutPackageNestedInput
@@ -1554,10 +1531,14 @@ export type TuitionPackageUpdateWithoutSubjectInput = {
 export type TuitionPackageUncheckedUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1574,10 +1555,14 @@ export type TuitionPackageUncheckedUpdateWithoutSubjectInput = {
 export type TuitionPackageUncheckedUpdateManyWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1592,11 +1577,15 @@ export type TuitionPackageUncheckedUpdateManyWithoutSubjectInput = {
 
 export type TuitionPackageCreateManyTutorInput = {
   id?: string
-  categoryId: number
   subjectId: number
   areaId?: number | null
   requirementId?: string | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1611,7 +1600,12 @@ export type TuitionPackageCreateManyTutorInput = {
 
 export type TuitionPackageUpdateWithoutTutorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1622,7 +1616,6 @@ export type TuitionPackageUpdateWithoutTutorInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  category?: Prisma.CategoryUpdateOneRequiredWithoutPackagesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutPackagesNestedInput
   area?: Prisma.AreaUpdateOneWithoutPackagesNestedInput
   requirement?: Prisma.TutorRequirementUpdateOneWithoutPackagesNestedInput
@@ -1631,11 +1624,15 @@ export type TuitionPackageUpdateWithoutTutorInput = {
 
 export type TuitionPackageUncheckedUpdateWithoutTutorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1651,11 +1648,15 @@ export type TuitionPackageUncheckedUpdateWithoutTutorInput = {
 
 export type TuitionPackageUncheckedUpdateManyWithoutTutorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1671,10 +1672,14 @@ export type TuitionPackageUncheckedUpdateManyWithoutTutorInput = {
 export type TuitionPackageCreateManyRequirementInput = {
   id?: string
   tutorId: string
-  categoryId: number
   subjectId: number
   areaId?: number | null
-  classLevel: number
+  levelCode: number
+  curriculum: $Enums.Curriculum
+  academicGroup?: $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: boolean
+  levelNote?: string | null
   timeOfDay: Date | string
   daysPerWeek: number
   expectedSalary: number
@@ -1689,7 +1694,12 @@ export type TuitionPackageCreateManyRequirementInput = {
 
 export type TuitionPackageUpdateWithoutRequirementInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1701,7 +1711,6 @@ export type TuitionPackageUpdateWithoutRequirementInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPackagesNestedInput
-  category?: Prisma.CategoryUpdateOneRequiredWithoutPackagesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutPackagesNestedInput
   area?: Prisma.AreaUpdateOneWithoutPackagesNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutPackageNestedInput
@@ -1710,10 +1719,14 @@ export type TuitionPackageUpdateWithoutRequirementInput = {
 export type TuitionPackageUncheckedUpdateWithoutRequirementInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1730,10 +1743,14 @@ export type TuitionPackageUncheckedUpdateWithoutRequirementInput = {
 export type TuitionPackageUncheckedUpdateManyWithoutRequirementInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  categoryId?: Prisma.IntFieldUpdateOperationsInput | number
   subjectId?: Prisma.IntFieldUpdateOperationsInput | number
   areaId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  classLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  levelCode?: Prisma.IntFieldUpdateOperationsInput | number
+  curriculum?: Prisma.EnumCurriculumFieldUpdateOperationsInput | $Enums.Curriculum
+  academicGroup?: Prisma.NullableEnumAcademicGroupFieldUpdateOperationsInput | $Enums.AcademicGroup | null
+  admissionTargets?: Prisma.TuitionPackageUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
+  isRetaker?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  levelNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeOfDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   daysPerWeek?: Prisma.IntFieldUpdateOperationsInput | number
   expectedSalary?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1780,11 +1797,15 @@ export type TuitionPackageCountOutputTypeCountApplicationsArgs<ExtArgs extends r
 export type TuitionPackageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   tutorId?: boolean
-  categoryId?: boolean
   subjectId?: boolean
   areaId?: boolean
   requirementId?: boolean
-  classLevel?: boolean
+  levelCode?: boolean
+  curriculum?: boolean
+  academicGroup?: boolean
+  admissionTargets?: boolean
+  isRetaker?: boolean
+  levelNote?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
   expectedSalary?: boolean
@@ -1796,7 +1817,6 @@ export type TuitionPackageSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   updatedAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   area?: boolean | Prisma.TuitionPackage$areaArgs<ExtArgs>
   requirement?: boolean | Prisma.TuitionPackage$requirementArgs<ExtArgs>
@@ -1807,11 +1827,15 @@ export type TuitionPackageSelect<ExtArgs extends runtime.Types.Extensions.Intern
 export type TuitionPackageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   tutorId?: boolean
-  categoryId?: boolean
   subjectId?: boolean
   areaId?: boolean
   requirementId?: boolean
-  classLevel?: boolean
+  levelCode?: boolean
+  curriculum?: boolean
+  academicGroup?: boolean
+  admissionTargets?: boolean
+  isRetaker?: boolean
+  levelNote?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
   expectedSalary?: boolean
@@ -1823,7 +1847,6 @@ export type TuitionPackageSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   createdAt?: boolean
   updatedAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   area?: boolean | Prisma.TuitionPackage$areaArgs<ExtArgs>
   requirement?: boolean | Prisma.TuitionPackage$requirementArgs<ExtArgs>
@@ -1832,11 +1855,15 @@ export type TuitionPackageSelectCreateManyAndReturn<ExtArgs extends runtime.Type
 export type TuitionPackageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   tutorId?: boolean
-  categoryId?: boolean
   subjectId?: boolean
   areaId?: boolean
   requirementId?: boolean
-  classLevel?: boolean
+  levelCode?: boolean
+  curriculum?: boolean
+  academicGroup?: boolean
+  admissionTargets?: boolean
+  isRetaker?: boolean
+  levelNote?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
   expectedSalary?: boolean
@@ -1848,7 +1875,6 @@ export type TuitionPackageSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   createdAt?: boolean
   updatedAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   area?: boolean | Prisma.TuitionPackage$areaArgs<ExtArgs>
   requirement?: boolean | Prisma.TuitionPackage$requirementArgs<ExtArgs>
@@ -1857,11 +1883,15 @@ export type TuitionPackageSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
 export type TuitionPackageSelectScalar = {
   id?: boolean
   tutorId?: boolean
-  categoryId?: boolean
   subjectId?: boolean
   areaId?: boolean
   requirementId?: boolean
-  classLevel?: boolean
+  levelCode?: boolean
+  curriculum?: boolean
+  academicGroup?: boolean
+  admissionTargets?: boolean
+  isRetaker?: boolean
+  levelNote?: boolean
   timeOfDay?: boolean
   daysPerWeek?: boolean
   expectedSalary?: boolean
@@ -1874,10 +1904,9 @@ export type TuitionPackageSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TuitionPackageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "categoryId" | "subjectId" | "areaId" | "requirementId" | "classLevel" | "timeOfDay" | "daysPerWeek" | "expectedSalary" | "studentCount" | "availableFrom" | "status" | "moderationStatus" | "moderationNote" | "createdAt" | "updatedAt", ExtArgs["result"]["tuitionPackage"]>
+export type TuitionPackageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "subjectId" | "areaId" | "requirementId" | "levelCode" | "curriculum" | "academicGroup" | "admissionTargets" | "isRetaker" | "levelNote" | "timeOfDay" | "daysPerWeek" | "expectedSalary" | "studentCount" | "availableFrom" | "status" | "moderationStatus" | "moderationNote" | "createdAt" | "updatedAt", ExtArgs["result"]["tuitionPackage"]>
 export type TuitionPackageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   area?: boolean | Prisma.TuitionPackage$areaArgs<ExtArgs>
   requirement?: boolean | Prisma.TuitionPackage$requirementArgs<ExtArgs>
@@ -1886,14 +1915,12 @@ export type TuitionPackageInclude<ExtArgs extends runtime.Types.Extensions.Inter
 }
 export type TuitionPackageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   area?: boolean | Prisma.TuitionPackage$areaArgs<ExtArgs>
   requirement?: boolean | Prisma.TuitionPackage$requirementArgs<ExtArgs>
 }
 export type TuitionPackageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
-  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   area?: boolean | Prisma.TuitionPackage$areaArgs<ExtArgs>
   requirement?: boolean | Prisma.TuitionPackage$requirementArgs<ExtArgs>
@@ -1903,7 +1930,6 @@ export type $TuitionPackagePayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "TuitionPackage"
   objects: {
     tutor: Prisma.$TutorPayload<ExtArgs>
-    category: Prisma.$CategoryPayload<ExtArgs>
     subject: Prisma.$SubjectPayload<ExtArgs>
     area: Prisma.$AreaPayload<ExtArgs> | null
     requirement: Prisma.$TutorRequirementPayload<ExtArgs> | null
@@ -1912,11 +1938,15 @@ export type $TuitionPackagePayload<ExtArgs extends runtime.Types.Extensions.Inte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     tutorId: string
-    categoryId: number
     subjectId: number
     areaId: number | null
     requirementId: string | null
-    classLevel: number
+    levelCode: number
+    curriculum: $Enums.Curriculum
+    academicGroup: $Enums.AcademicGroup | null
+    admissionTargets: $Enums.AdmissionTarget[]
+    isRetaker: boolean
+    levelNote: string | null
     timeOfDay: Date
     daysPerWeek: number
     expectedSalary: number
@@ -2322,7 +2352,6 @@ readonly fields: TuitionPackageFieldRefs;
 export interface Prisma__TuitionPackageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tutor<T extends Prisma.TutorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorDefaultArgs<ExtArgs>>): Prisma.Prisma__TutorClient<runtime.Types.Result.GetResult<Prisma.$TutorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   subject<T extends Prisma.SubjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubjectDefaultArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   area<T extends Prisma.TuitionPackage$areaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TuitionPackage$areaArgs<ExtArgs>>): Prisma.Prisma__AreaClient<runtime.Types.Result.GetResult<Prisma.$AreaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   requirement<T extends Prisma.TuitionPackage$requirementArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TuitionPackage$requirementArgs<ExtArgs>>): Prisma.Prisma__TutorRequirementClient<runtime.Types.Result.GetResult<Prisma.$TutorRequirementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2358,11 +2387,15 @@ export interface Prisma__TuitionPackageClient<T, Null = never, ExtArgs extends r
 export interface TuitionPackageFieldRefs {
   readonly id: Prisma.FieldRef<"TuitionPackage", 'String'>
   readonly tutorId: Prisma.FieldRef<"TuitionPackage", 'String'>
-  readonly categoryId: Prisma.FieldRef<"TuitionPackage", 'Int'>
   readonly subjectId: Prisma.FieldRef<"TuitionPackage", 'Int'>
   readonly areaId: Prisma.FieldRef<"TuitionPackage", 'Int'>
   readonly requirementId: Prisma.FieldRef<"TuitionPackage", 'String'>
-  readonly classLevel: Prisma.FieldRef<"TuitionPackage", 'Int'>
+  readonly levelCode: Prisma.FieldRef<"TuitionPackage", 'Int'>
+  readonly curriculum: Prisma.FieldRef<"TuitionPackage", 'Curriculum'>
+  readonly academicGroup: Prisma.FieldRef<"TuitionPackage", 'AcademicGroup'>
+  readonly admissionTargets: Prisma.FieldRef<"TuitionPackage", 'AdmissionTarget[]'>
+  readonly isRetaker: Prisma.FieldRef<"TuitionPackage", 'Boolean'>
+  readonly levelNote: Prisma.FieldRef<"TuitionPackage", 'String'>
   readonly timeOfDay: Prisma.FieldRef<"TuitionPackage", 'DateTime'>
   readonly daysPerWeek: Prisma.FieldRef<"TuitionPackage", 'Int'>
   readonly expectedSalary: Prisma.FieldRef<"TuitionPackage", 'Int'>

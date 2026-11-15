@@ -4,7 +4,6 @@ import {
   createAccount,
   createApplication,
   createArea,
-  createCategory,
   createFileAsset,
   createRequirement,
   createSession,
@@ -396,7 +395,6 @@ describe("me routes", () => {
     it("tombstones numbers, closes listings and withdraws applications on both sides", async () => {
       const app = await createTestApp();
       const area = await createArea();
-      const category = await createCategory();
       const subject = await createSubject();
 
       const studentAccount = await createAccount({ role: "STUDENT" });
@@ -416,9 +414,9 @@ describe("me routes", () => {
       const pkg = await prisma.tuitionPackage.create({
         data: {
           tutorId: tutor.id,
-          categoryId: category.id,
+          curriculum: "BANGLA_MEDIUM",
           subjectId: subject.id,
-          classLevel: 10,
+          levelCode: 10,
           timeOfDay: new Date("2024-01-01T10:00:00Z"),
           daysPerWeek: 3,
           expectedSalary: 5000,
@@ -650,7 +648,6 @@ describe("DELETE /api/v1/me/hard-delete", () => {
     const app = await createTestApp();
 
     const area = await createArea();
-    const category = await createCategory();
     const subject = await createSubject();
 
     const studentAccount = await createAccount({
@@ -690,7 +687,6 @@ describe("DELETE /api/v1/me/hard-delete", () => {
 
     const requirement = await createRequirement({
       studentId: studentProfile.id,
-      categoryId: category.id,
       areaId: area.id,
       subjectId: subject.id,
     });

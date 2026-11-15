@@ -39,10 +39,18 @@ ok() { echo "ok   $1"; }
 warn() { echo "WARN: $1"; warnings=$((warnings + 1)); }
 step() { echo; echo "== $1"; }
 drop_scratch() { [ "$keep" = 1 ] && echo "keeping $SCRATCH_DB" || q "$LOCAL_PG/postgres" "DROP DATABASE IF EXISTS $SCRATCH_DB"; }
-# lost BEFORE AFTER: lists tables whose row count dropped or vanished (count files: table|n)
+# lost BEFORE AFTER [ALLOWFILE]: lists tables whose row count dropped or vanished (count files: table|n)
+# ALLOWFILE lists tables a migration declared as losing rows (-- rehearse-expect-loss: ...). Those print with
+# " (declared)" and do not fail.
 lost() {
-  awk -F'|' 'NR == FNR { want[$1] = $2; next } { got[$1] = $2 }
-    END { for (t in want) if (!(t in got) || got[t] + 0 < want[t] + 0) { print "  " t ": " want[t] " -> " (t in got ? got[t] : "missing"); bad = 1 } exit bad }' "$1" "$2"
+  local allow=""
+  if [ $# -ge 3 ]; then allow=$(tr '\n' ' ' < "$3"); fi
+  awk -F'|' -v allow="$allow" 'BEGIN { n = split(allow, a, " "); for (i = 1; i <= n; i++) ok[a[i]] = 1 }
+    NR == FNR { want[$1] = $2; next } { got[$1] = $2 }
+    END { for (t in want) if (!(t in got) || got[t] + 0 < want[t] + 0) {
+      if (t in ok) print "  " t ": " want[t] " -> " (t in got ? got[t] : "missing") " (declared)"
+      else { print "  " t ": " want[t] " -> " (t in got ? got[t] : "missing"); bad = 1 } }
+      exit bad }' "$1" "$2"
 }
 # scan FILE HITS REASON: prints a warning with the matching lines
 scan() {
@@ -158,8 +166,17 @@ ok "migrated in ${took}s"
 step "7. verify the copy"
 DATABASE_URL="$SCRATCH" npx prisma migrate status || fail "migrate status not clean on the copy"
 q "$SCRATCH" "$COUNTS" > "$work/after"
-lost "$work/restored" "$work/after" || fail "rows lost after migrate (see above)"
-ok "no table lost rows"
+# Tables that pending migrations declare as losing rows (-- rehearse-expect-loss: table ...)
+: > "$work/expected"
+for n in "${pending[@]}"; do
+  grep -h '^-- rehearse-expect-loss:' "prisma/migrations/$n/migration.sql" | sed 's/^-- rehearse-expect-loss://' | tr ' \t' '\n\n' | grep -v '^$' >> "$work/expected" || true
+done
+lost "$work/restored" "$work/after" "$work/expected" | tee "$work/loss" || fail "rows lost after migrate that no migration declared (see above)"
+if grep -q '(declared)' "$work/loss"; then
+  warn "row loss was declared by a migration (see above); check it is intended"
+else
+  ok "no table lost rows"
+fi
 
 step "8. re-check prod"
 check_failed "$PROD"

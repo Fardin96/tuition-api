@@ -1,5 +1,12 @@
 import crypto from "node:crypto";
-import type { GenderPref, ListingStatus, Role } from "../generated/prisma/enums.js";
+import type {
+  AcademicGroup,
+  AdmissionTarget,
+  Curriculum,
+  GenderPref,
+  ListingStatus,
+  Role,
+} from "../generated/prisma/enums.js";
 import { prisma } from "../lib/prisma.js";
 import { generateRefreshToken, hashToken, signAccessToken } from "../modules/auth/auth.service.js";
 import { buildApp } from "../server.js";
@@ -74,22 +81,17 @@ export async function createSubject(overrides: { name?: string } = {}) {
   });
 }
 
-export async function createCategory(overrides: { name?: string } = {}) {
-  return prisma.category.create({
-    data: {
-      name: overrides.name ?? `Category ${crypto.randomUUID()}`,
-      slug: `category-${crypto.randomUUID()}`,
-    },
-  });
-}
-
 export async function createRequirement(data: {
   studentId: string;
-  categoryId?: number;
   areaId?: number;
   subjectId?: number;
   subjectIds?: number[];
-  classLevel?: number;
+  levelCode?: number | null;
+  curriculum?: Curriculum | null;
+  academicGroup?: AcademicGroup | null;
+  admissionTargets?: AdmissionTarget[];
+  isRetaker?: boolean;
+  levelNote?: string | null;
   timeOfDay?: Date;
   daysPerWeek?: number;
   salary?: number;
@@ -103,7 +105,8 @@ export async function createRequirement(data: {
   const sIds = subjectIds ?? (subjectId ? [subjectId] : []);
   return prisma.tuitionRequirement.create({
     data: {
-      classLevel: 10,
+      levelCode: 10,
+      curriculum: "BANGLA_MEDIUM",
       timeOfDay: new Date("2024-01-01T10:00:00Z"),
       daysPerWeek: 3,
       salary: 5000,
@@ -340,6 +343,11 @@ export async function createTutorRequirement(
     isActive?: boolean;
     subjectIds?: number[];
     zoneIds?: string[];
+    levelMin?: number;
+    levelMax?: number;
+    curricula?: Curriculum[];
+    academicGroups?: AcademicGroup[];
+    admissionTargets?: AdmissionTarget[];
   } = {},
 ) {
   const requirement = await prisma.tutorRequirement.create({
@@ -348,8 +356,11 @@ export async function createTutorRequirement(
       name: overrides.name ?? "Evening Math",
       isDefault: overrides.isDefault ?? false,
       isActive: overrides.isActive ?? true,
-      classLevelMin: 6,
-      classLevelMax: 10,
+      levelMin: overrides.levelMin ?? 6,
+      levelMax: overrides.levelMax ?? 10,
+      curricula: overrides.curricula ?? ["BANGLA_MEDIUM", "ENGLISH_VERSION"],
+      academicGroups: overrides.academicGroups ?? [],
+      admissionTargets: overrides.admissionTargets ?? [],
       timeFrom: new Date("1970-01-01T10:00:00Z"),
       timeTo: new Date("1970-01-01T12:00:00Z"),
       availableFrom: new Date("2024-01-01"),
@@ -382,19 +393,19 @@ export async function createTuitionPackage(
   overrides: {
     requirementId?: string | null;
     status?: ListingStatus;
-    categoryId?: number;
     subjectId?: number;
+    levelCode?: number;
+    curriculum?: Curriculum;
   } = {},
 ) {
-  const categoryId = overrides.categoryId ?? (await createCategory()).id;
   const subjectId = overrides.subjectId ?? (await createSubject()).id;
   return prisma.tuitionPackage.create({
     data: {
       tutorId,
-      categoryId,
       subjectId,
       requirementId: overrides.requirementId,
-      classLevel: 10,
+      levelCode: overrides.levelCode ?? 10,
+      curriculum: overrides.curriculum ?? "BANGLA_MEDIUM",
       timeOfDay: new Date("2024-01-01T10:00:00Z"),
       daysPerWeek: 3,
       expectedSalary: 5000,

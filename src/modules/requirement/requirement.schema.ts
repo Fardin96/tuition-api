@@ -1,4 +1,14 @@
 import { z } from "zod";
+import {
+  ACADEMIC_GROUPS,
+  ADMISSION_TARGETS,
+  CURRICULA,
+  LEVEL_MAX,
+  LEVEL_MIN,
+  LEVEL_NOTE_MAX,
+  normalizeLevelNote,
+  validateStudentEducation,
+} from "../../lib/education.js";
 
 export const requirementIdParamSchema = z.object({ id: z.string().uuid() });
 export type RequirementIdParam = z.infer<typeof requirementIdParamSchema>;
@@ -14,42 +24,32 @@ export const TUITION_TYPES = [
 export type TuitionType = (typeof TUITION_TYPES)[number];
 export const tuitionTypeSchema = z.enum(TUITION_TYPES);
 
-export const CLASS_LEVELS: Record<number, string> = {
-  1: "Class 1",
-  2: "Class 2",
-  3: "Class 3",
-  4: "Class 4",
-  5: "Class 5",
-  6: "Class 6",
-  7: "Class 7",
-  8: "Class 8",
-  9: "Class 9",
-  10: "Class 10",
-  11: "HSC 1st year",
-  12: "HSC 2nd year",
-  13: "Admission prep",
-  14: "University year 1",
-  15: "University year 2",
-  16: "University year 3",
-  17: "University year 4",
-  18: "Masters 1st year",
-  19: "Masters 2nd year",
-  20: "Other",
-};
-export const classLevelSchema = z.coerce.number().int().min(1).max(20);
-
 // HH:MM -> stored as a time; we convert to a Date during persistence.
 export const timeOfDaySchema = z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/);
 
 // Drafts and edits may clear every subject; OPEN creation requires at least one.
 const subjectIdsSchema = z.array(z.coerce.number().int().positive());
 
+// Not coerced: "" or null must fail, not turn into level 0 (a valid level).
+const levelCodeSchema = z.number().int().min(LEVEL_MIN).max(LEVEL_MAX);
+
+// Normalized first; the result must still fit the stored limit.
+const levelNoteSchema = z
+  .string()
+  .nullable()
+  .transform(normalizeLevelNote)
+  .pipe(z.string().max(LEVEL_NOTE_MAX).nullable());
+
 // Base schema without defaults
 const baseRequirementSchema = z.object({
-  categoryId: z.coerce.number().int().positive(),
   areaId: z.coerce.number().int().positive(),
   subjectIds: subjectIdsSchema,
-  classLevel: classLevelSchema,
+  curriculum: z.enum(CURRICULA),
+  levelCode: levelCodeSchema,
+  academicGroup: z.enum(ACADEMIC_GROUPS).nullable(),
+  admissionTargets: z.array(z.enum(ADMISSION_TARGETS)),
+  isRetaker: z.boolean(),
+  levelNote: levelNoteSchema,
   timeOfDay: timeOfDaySchema,
   daysPerWeek: z.coerce.number().int().min(1).max(7),
   salary: z.coerce.number().int().positive(),
@@ -60,23 +60,58 @@ const baseRequirementSchema = z.object({
   tuitionType: tuitionTypeSchema,
 });
 
-const openRequirementSchema = baseRequirementSchema.extend({
-  subjectIds: subjectIdsSchema.min(1),
-  studentCount: z.coerce.number().int().min(1).default(1),
-  tutorGenderPref: tutorGenderPrefSchema.default("ANY"),
-  status: z.literal("OPEN").default("OPEN"),
-});
+// Runs the shared education rules on create. Missing optional fields count as empty.
+function checkEducation(
+  data: {
+    curriculum?: (typeof CURRICULA)[number];
+    levelCode?: number;
+    academicGroup?: (typeof ACADEMIC_GROUPS)[number] | null;
+    admissionTargets?: (typeof ADMISSION_TARGETS)[number][];
+    isRetaker?: boolean;
+    levelNote?: string | null;
+  },
+  ctx: z.RefinementCtx,
+) {
+  const issues = validateStudentEducation({
+    curriculum: data.curriculum ?? null,
+    levelCode: data.levelCode ?? null,
+    academicGroup: data.academicGroup ?? null,
+    admissionTargets: data.admissionTargets ?? [],
+    isRetaker: data.isRetaker ?? false,
+    levelNote: data.levelNote ?? null,
+  });
+  for (const issue of issues) {
+    ctx.addIssue({ code: "custom", path: [issue.path], message: issue.message });
+  }
+}
 
-const draftRequirementSchema = baseRequirementSchema.partial().extend({
-  studentCount: z.coerce.number().int().min(1).default(1),
-  tutorGenderPref: tutorGenderPrefSchema.default("ANY"),
-  status: z.literal("DRAFT"),
-});
+const openRequirementSchema = baseRequirementSchema
+  .extend({
+    subjectIds: subjectIdsSchema.min(1),
+    academicGroup: z.enum(ACADEMIC_GROUPS).nullable().optional(),
+    admissionTargets: z.array(z.enum(ADMISSION_TARGETS)).optional(),
+    isRetaker: z.boolean().optional(),
+    levelNote: levelNoteSchema.optional(),
+    studentCount: z.coerce.number().int().min(1).default(1),
+    tutorGenderPref: tutorGenderPrefSchema.default("ANY"),
+    status: z.literal("OPEN").default("OPEN"),
+  })
+  .superRefine(checkEducation);
+
+const draftRequirementSchema = baseRequirementSchema
+  .partial()
+  .extend({
+    studentCount: z.coerce.number().int().min(1).default(1),
+    tutorGenderPref: tutorGenderPrefSchema.default("ANY"),
+    status: z.literal("DRAFT"),
+  })
+  .superRefine(checkEducation);
 
 export const createRequirementSchema = z.union([openRequirementSchema, draftRequirementSchema]);
 
 export type CreateRequirementInput = z.infer<typeof createRequirementSchema>;
 
+// No superRefine here: the service validates the merged values against the stored row.
 export const updateRequirementSchema = baseRequirementSchema.partial().extend({
   status: z.enum(["DRAFT", "OPEN"]).optional(),
 });
@@ -85,10 +120,14 @@ export type UpdateRequirementInput = z.infer<typeof updateRequirementSchema>;
 export const requirementResponseSchema = z.object({
   id: z.string(),
   studentId: z.string(),
-  categoryId: z.number().nullable(),
   areaId: z.number().nullable(),
   subjectIds: z.array(z.number()),
-  classLevel: z.number().nullable(),
+  curriculum: z.string().nullable(),
+  levelCode: z.number().nullable(),
+  academicGroup: z.string().nullable(),
+  admissionTargets: z.array(z.string()),
+  isRetaker: z.boolean(),
+  levelNote: z.string().nullable(),
   timeOfDay: z.string().nullable(),
   daysPerWeek: z.number().nullable(),
   salary: z.number().nullable(),

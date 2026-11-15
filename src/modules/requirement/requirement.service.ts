@@ -1,4 +1,6 @@
 import type { TuitionRequirement } from "../../generated/prisma/client.js";
+import { validateStudentEducation } from "../../lib/education.js";
+import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import type { CreateRequirementInput, UpdateRequirementInput } from "./requirement.schema.js";
 
@@ -25,7 +27,7 @@ async function getStudentId(accountId: string) {
 
 function handleForeignKeyError(error: unknown): never {
   if ((error as { code?: string }).code === "P2003") {
-    const err = new Error("Invalid category, area, or subject ID");
+    const err = new Error("Invalid area or subject ID");
     Object.assign(err, { statusCode: 400 });
     throw err;
   }
@@ -137,6 +139,23 @@ export async function updateRequirement(
     throw err;
   }
 
+  // Education is checked on the merged row for every PATCH, not only when publishing.
+  // Nullable fields use !== undefined so an explicit null means "clear".
+  const education = {
+    curriculum: data.curriculum ?? existing.curriculum,
+    levelCode: data.levelCode ?? existing.levelCode,
+    academicGroup: data.academicGroup !== undefined ? data.academicGroup : existing.academicGroup,
+    admissionTargets: data.admissionTargets ?? existing.admissionTargets,
+    isRetaker: data.isRetaker ?? existing.isRetaker,
+    levelNote: data.levelNote !== undefined ? data.levelNote : existing.levelNote,
+  };
+  const educationIssues = validateStudentEducation(education);
+  if (educationIssues.length > 0) {
+    throw appError("InvalidRequirement", 400, educationIssues[0].message, {
+      fields: educationIssues.map((i) => i.path),
+    });
+  }
+
   const targetStatus = data.status ?? existing.status;
   if (targetStatus === "OPEN") {
     const candidateSubjects =
@@ -144,9 +163,9 @@ export async function updateRequirement(
         ? data.subjectIds
         : existing.subjects?.map((s) => s.subjectId) || [];
     const candidate = {
-      categoryId: data.categoryId ?? existing.categoryId,
+      curriculum: education.curriculum,
       areaId: data.areaId ?? existing.areaId,
-      classLevel: data.classLevel ?? existing.classLevel,
+      levelCode: education.levelCode,
       timeOfDay: data.timeOfDay !== undefined ? data.timeOfDay : existing.timeOfDay,
       daysPerWeek: data.daysPerWeek ?? existing.daysPerWeek,
       salary: data.salary ?? existing.salary,
@@ -155,10 +174,10 @@ export async function updateRequirement(
     };
 
     if (
-      candidate.categoryId == null ||
+      candidate.curriculum == null ||
       candidate.areaId == null ||
       candidateSubjects.length === 0 ||
-      candidate.classLevel == null ||
+      candidate.levelCode == null ||
       candidate.timeOfDay == null ||
       candidate.daysPerWeek == null ||
       candidate.salary == null ||

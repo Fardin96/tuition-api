@@ -27,16 +27,16 @@ export type AggregateTutorRequirement = {
 }
 
 export type TutorRequirementAvgAggregateOutputType = {
-  classLevelMin: number | null
-  classLevelMax: number | null
+  levelMin: number | null
+  levelMax: number | null
   availableDays: number | null
   minSalary: number | null
   maxStudents: number | null
 }
 
 export type TutorRequirementSumAggregateOutputType = {
-  classLevelMin: number | null
-  classLevelMax: number | null
+  levelMin: number | null
+  levelMax: number | null
   availableDays: number | null
   minSalary: number | null
   maxStudents: number | null
@@ -48,8 +48,8 @@ export type TutorRequirementMinAggregateOutputType = {
   name: string | null
   isDefault: boolean | null
   isActive: boolean | null
-  classLevelMin: number | null
-  classLevelMax: number | null
+  levelMin: number | null
+  levelMax: number | null
   timeFrom: Date | null
   timeTo: Date | null
   availableDays: number | null
@@ -67,8 +67,8 @@ export type TutorRequirementMaxAggregateOutputType = {
   name: string | null
   isDefault: boolean | null
   isActive: boolean | null
-  classLevelMin: number | null
-  classLevelMax: number | null
+  levelMin: number | null
+  levelMax: number | null
   timeFrom: Date | null
   timeTo: Date | null
   availableDays: number | null
@@ -86,8 +86,11 @@ export type TutorRequirementCountAggregateOutputType = {
   name: number
   isDefault: number
   isActive: number
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula: number
+  academicGroups: number
+  admissionTargets: number
   timeFrom: number
   timeTo: number
   availableDays: number
@@ -102,16 +105,16 @@ export type TutorRequirementCountAggregateOutputType = {
 
 
 export type TutorRequirementAvgAggregateInputType = {
-  classLevelMin?: true
-  classLevelMax?: true
+  levelMin?: true
+  levelMax?: true
   availableDays?: true
   minSalary?: true
   maxStudents?: true
 }
 
 export type TutorRequirementSumAggregateInputType = {
-  classLevelMin?: true
-  classLevelMax?: true
+  levelMin?: true
+  levelMax?: true
   availableDays?: true
   minSalary?: true
   maxStudents?: true
@@ -123,8 +126,8 @@ export type TutorRequirementMinAggregateInputType = {
   name?: true
   isDefault?: true
   isActive?: true
-  classLevelMin?: true
-  classLevelMax?: true
+  levelMin?: true
+  levelMax?: true
   timeFrom?: true
   timeTo?: true
   availableDays?: true
@@ -142,8 +145,8 @@ export type TutorRequirementMaxAggregateInputType = {
   name?: true
   isDefault?: true
   isActive?: true
-  classLevelMin?: true
-  classLevelMax?: true
+  levelMin?: true
+  levelMax?: true
   timeFrom?: true
   timeTo?: true
   availableDays?: true
@@ -161,8 +164,11 @@ export type TutorRequirementCountAggregateInputType = {
   name?: true
   isDefault?: true
   isActive?: true
-  classLevelMin?: true
-  classLevelMax?: true
+  levelMin?: true
+  levelMax?: true
+  curricula?: true
+  academicGroups?: true
+  admissionTargets?: true
   timeFrom?: true
   timeTo?: true
   availableDays?: true
@@ -267,8 +273,11 @@ export type TutorRequirementGroupByOutputType = {
   name: string
   isDefault: boolean
   isActive: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula: $Enums.Curriculum[]
+  academicGroups: $Enums.AcademicGroup[]
+  admissionTargets: $Enums.AdmissionTarget[]
   timeFrom: Date
   timeTo: Date
   availableDays: number
@@ -309,8 +318,11 @@ export type TutorRequirementWhereInput = {
   name?: Prisma.StringFilter<"TutorRequirement"> | string
   isDefault?: Prisma.BoolFilter<"TutorRequirement"> | boolean
   isActive?: Prisma.BoolFilter<"TutorRequirement"> | boolean
-  classLevelMin?: Prisma.IntFilter<"TutorRequirement"> | number
-  classLevelMax?: Prisma.IntFilter<"TutorRequirement"> | number
+  levelMin?: Prisma.IntFilter<"TutorRequirement"> | number
+  levelMax?: Prisma.IntFilter<"TutorRequirement"> | number
+  curricula?: Prisma.EnumCurriculumNullableListFilter<"TutorRequirement">
+  academicGroups?: Prisma.EnumAcademicGroupNullableListFilter<"TutorRequirement">
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TutorRequirement">
   timeFrom?: Prisma.DateTimeFilter<"TutorRequirement"> | Date | string
   timeTo?: Prisma.DateTimeFilter<"TutorRequirement"> | Date | string
   availableDays?: Prisma.IntFilter<"TutorRequirement"> | number
@@ -332,8 +344,11 @@ export type TutorRequirementOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  classLevelMin?: Prisma.SortOrder
-  classLevelMax?: Prisma.SortOrder
+  levelMin?: Prisma.SortOrder
+  levelMax?: Prisma.SortOrder
+  curricula?: Prisma.SortOrder
+  academicGroups?: Prisma.SortOrder
+  admissionTargets?: Prisma.SortOrder
   timeFrom?: Prisma.SortOrder
   timeTo?: Prisma.SortOrder
   availableDays?: Prisma.SortOrder
@@ -359,8 +374,11 @@ export type TutorRequirementWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"TutorRequirement"> | string
   isDefault?: Prisma.BoolFilter<"TutorRequirement"> | boolean
   isActive?: Prisma.BoolFilter<"TutorRequirement"> | boolean
-  classLevelMin?: Prisma.IntFilter<"TutorRequirement"> | number
-  classLevelMax?: Prisma.IntFilter<"TutorRequirement"> | number
+  levelMin?: Prisma.IntFilter<"TutorRequirement"> | number
+  levelMax?: Prisma.IntFilter<"TutorRequirement"> | number
+  curricula?: Prisma.EnumCurriculumNullableListFilter<"TutorRequirement">
+  academicGroups?: Prisma.EnumAcademicGroupNullableListFilter<"TutorRequirement">
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TutorRequirement">
   timeFrom?: Prisma.DateTimeFilter<"TutorRequirement"> | Date | string
   timeTo?: Prisma.DateTimeFilter<"TutorRequirement"> | Date | string
   availableDays?: Prisma.IntFilter<"TutorRequirement"> | number
@@ -382,8 +400,11 @@ export type TutorRequirementOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  classLevelMin?: Prisma.SortOrder
-  classLevelMax?: Prisma.SortOrder
+  levelMin?: Prisma.SortOrder
+  levelMax?: Prisma.SortOrder
+  curricula?: Prisma.SortOrder
+  academicGroups?: Prisma.SortOrder
+  admissionTargets?: Prisma.SortOrder
   timeFrom?: Prisma.SortOrder
   timeTo?: Prisma.SortOrder
   availableDays?: Prisma.SortOrder
@@ -409,8 +430,11 @@ export type TutorRequirementScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"TutorRequirement"> | string
   isDefault?: Prisma.BoolWithAggregatesFilter<"TutorRequirement"> | boolean
   isActive?: Prisma.BoolWithAggregatesFilter<"TutorRequirement"> | boolean
-  classLevelMin?: Prisma.IntWithAggregatesFilter<"TutorRequirement"> | number
-  classLevelMax?: Prisma.IntWithAggregatesFilter<"TutorRequirement"> | number
+  levelMin?: Prisma.IntWithAggregatesFilter<"TutorRequirement"> | number
+  levelMax?: Prisma.IntWithAggregatesFilter<"TutorRequirement"> | number
+  curricula?: Prisma.EnumCurriculumNullableListFilter<"TutorRequirement">
+  academicGroups?: Prisma.EnumAcademicGroupNullableListFilter<"TutorRequirement">
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TutorRequirement">
   timeFrom?: Prisma.DateTimeWithAggregatesFilter<"TutorRequirement"> | Date | string
   timeTo?: Prisma.DateTimeWithAggregatesFilter<"TutorRequirement"> | Date | string
   availableDays?: Prisma.IntWithAggregatesFilter<"TutorRequirement"> | number
@@ -427,8 +451,11 @@ export type TutorRequirementCreateInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -450,8 +477,11 @@ export type TutorRequirementUncheckedCreateInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -471,8 +501,11 @@ export type TutorRequirementUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -494,8 +527,11 @@ export type TutorRequirementUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -516,8 +552,11 @@ export type TutorRequirementCreateManyInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -534,8 +573,11 @@ export type TutorRequirementUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -553,8 +595,11 @@ export type TutorRequirementUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -576,6 +621,30 @@ export type TutorRequirementOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type EnumCurriculumNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel> | null
+  has?: $Enums.Curriculum | Prisma.EnumCurriculumFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
+export type EnumAcademicGroupNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.AcademicGroup[] | Prisma.ListEnumAcademicGroupFieldRefInput<$PrismaModel> | null
+  has?: $Enums.AcademicGroup | Prisma.EnumAcademicGroupFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.AcademicGroup[] | Prisma.ListEnumAcademicGroupFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.AcademicGroup[] | Prisma.ListEnumAcademicGroupFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
+export type EnumAdmissionTargetNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.AdmissionTarget[] | Prisma.ListEnumAdmissionTargetFieldRefInput<$PrismaModel> | null
+  has?: $Enums.AdmissionTarget | Prisma.EnumAdmissionTargetFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.AdmissionTarget[] | Prisma.ListEnumAdmissionTargetFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.AdmissionTarget[] | Prisma.ListEnumAdmissionTargetFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type TutorRequirementIdTutorIdCompoundUniqueInput = {
   id: string
   tutorId: string
@@ -587,8 +656,11 @@ export type TutorRequirementCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  classLevelMin?: Prisma.SortOrder
-  classLevelMax?: Prisma.SortOrder
+  levelMin?: Prisma.SortOrder
+  levelMax?: Prisma.SortOrder
+  curricula?: Prisma.SortOrder
+  academicGroups?: Prisma.SortOrder
+  admissionTargets?: Prisma.SortOrder
   timeFrom?: Prisma.SortOrder
   timeTo?: Prisma.SortOrder
   availableDays?: Prisma.SortOrder
@@ -601,8 +673,8 @@ export type TutorRequirementCountOrderByAggregateInput = {
 }
 
 export type TutorRequirementAvgOrderByAggregateInput = {
-  classLevelMin?: Prisma.SortOrder
-  classLevelMax?: Prisma.SortOrder
+  levelMin?: Prisma.SortOrder
+  levelMax?: Prisma.SortOrder
   availableDays?: Prisma.SortOrder
   minSalary?: Prisma.SortOrder
   maxStudents?: Prisma.SortOrder
@@ -614,8 +686,8 @@ export type TutorRequirementMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  classLevelMin?: Prisma.SortOrder
-  classLevelMax?: Prisma.SortOrder
+  levelMin?: Prisma.SortOrder
+  levelMax?: Prisma.SortOrder
   timeFrom?: Prisma.SortOrder
   timeTo?: Prisma.SortOrder
   availableDays?: Prisma.SortOrder
@@ -633,8 +705,8 @@ export type TutorRequirementMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  classLevelMin?: Prisma.SortOrder
-  classLevelMax?: Prisma.SortOrder
+  levelMin?: Prisma.SortOrder
+  levelMax?: Prisma.SortOrder
   timeFrom?: Prisma.SortOrder
   timeTo?: Prisma.SortOrder
   availableDays?: Prisma.SortOrder
@@ -647,8 +719,8 @@ export type TutorRequirementMinOrderByAggregateInput = {
 }
 
 export type TutorRequirementSumOrderByAggregateInput = {
-  classLevelMin?: Prisma.SortOrder
-  classLevelMax?: Prisma.SortOrder
+  levelMin?: Prisma.SortOrder
+  levelMax?: Prisma.SortOrder
   availableDays?: Prisma.SortOrder
   minSalary?: Prisma.SortOrder
   maxStudents?: Prisma.SortOrder
@@ -704,6 +776,33 @@ export type TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput = {
   update?: Prisma.TutorRequirementUpdateWithWhereUniqueWithoutTutorInput | Prisma.TutorRequirementUpdateWithWhereUniqueWithoutTutorInput[]
   updateMany?: Prisma.TutorRequirementUpdateManyWithWhereWithoutTutorInput | Prisma.TutorRequirementUpdateManyWithWhereWithoutTutorInput[]
   deleteMany?: Prisma.TutorRequirementScalarWhereInput | Prisma.TutorRequirementScalarWhereInput[]
+}
+
+export type TutorRequirementCreatecurriculaInput = {
+  set: $Enums.Curriculum[]
+}
+
+export type TutorRequirementCreateacademicGroupsInput = {
+  set: $Enums.AcademicGroup[]
+}
+
+export type TutorRequirementCreateadmissionTargetsInput = {
+  set: $Enums.AdmissionTarget[]
+}
+
+export type TutorRequirementUpdatecurriculaInput = {
+  set?: $Enums.Curriculum[]
+  push?: $Enums.Curriculum | $Enums.Curriculum[]
+}
+
+export type TutorRequirementUpdateacademicGroupsInput = {
+  set?: $Enums.AcademicGroup[]
+  push?: $Enums.AcademicGroup | $Enums.AcademicGroup[]
+}
+
+export type TutorRequirementUpdateadmissionTargetsInput = {
+  set?: $Enums.AdmissionTarget[]
+  push?: $Enums.AdmissionTarget | $Enums.AdmissionTarget[]
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -763,8 +862,11 @@ export type TutorRequirementCreateWithoutTutorInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -784,8 +886,11 @@ export type TutorRequirementUncheckedCreateWithoutTutorInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -835,8 +940,11 @@ export type TutorRequirementScalarWhereInput = {
   name?: Prisma.StringFilter<"TutorRequirement"> | string
   isDefault?: Prisma.BoolFilter<"TutorRequirement"> | boolean
   isActive?: Prisma.BoolFilter<"TutorRequirement"> | boolean
-  classLevelMin?: Prisma.IntFilter<"TutorRequirement"> | number
-  classLevelMax?: Prisma.IntFilter<"TutorRequirement"> | number
+  levelMin?: Prisma.IntFilter<"TutorRequirement"> | number
+  levelMax?: Prisma.IntFilter<"TutorRequirement"> | number
+  curricula?: Prisma.EnumCurriculumNullableListFilter<"TutorRequirement">
+  academicGroups?: Prisma.EnumAcademicGroupNullableListFilter<"TutorRequirement">
+  admissionTargets?: Prisma.EnumAdmissionTargetNullableListFilter<"TutorRequirement">
   timeFrom?: Prisma.DateTimeFilter<"TutorRequirement"> | Date | string
   timeTo?: Prisma.DateTimeFilter<"TutorRequirement"> | Date | string
   availableDays?: Prisma.IntFilter<"TutorRequirement"> | number
@@ -853,8 +961,11 @@ export type TutorRequirementCreateWithoutSubjectsInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -875,8 +986,11 @@ export type TutorRequirementUncheckedCreateWithoutSubjectsInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -911,8 +1025,11 @@ export type TutorRequirementUpdateWithoutSubjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -933,8 +1050,11 @@ export type TutorRequirementUncheckedUpdateWithoutSubjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -953,8 +1073,11 @@ export type TutorRequirementCreateWithoutZonesInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -975,8 +1098,11 @@ export type TutorRequirementUncheckedCreateWithoutZonesInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -1011,8 +1137,11 @@ export type TutorRequirementUpdateWithoutZonesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1033,8 +1162,11 @@ export type TutorRequirementUncheckedUpdateWithoutZonesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1053,8 +1185,11 @@ export type TutorRequirementCreateWithoutPackagesInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -1075,8 +1210,11 @@ export type TutorRequirementUncheckedCreateWithoutPackagesInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -1111,8 +1249,11 @@ export type TutorRequirementUpdateWithoutPackagesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1133,8 +1274,11 @@ export type TutorRequirementUncheckedUpdateWithoutPackagesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1153,8 +1297,11 @@ export type TutorRequirementCreateManyTutorInput = {
   name: string
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin: number
-  classLevelMax: number
+  levelMin: number
+  levelMax: number
+  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom: Date | string
   timeTo: Date | string
   availableDays?: number
@@ -1171,8 +1318,11 @@ export type TutorRequirementUpdateWithoutTutorInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1192,8 +1342,11 @@ export type TutorRequirementUncheckedUpdateWithoutTutorInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1213,8 +1366,11 @@ export type TutorRequirementUncheckedUpdateManyWithoutTutorInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  classLevelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  classLevelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
+  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
+  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
+  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
+  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
   timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   availableDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1281,8 +1437,11 @@ export type TutorRequirementSelect<ExtArgs extends runtime.Types.Extensions.Inte
   name?: boolean
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin?: boolean
-  classLevelMax?: boolean
+  levelMin?: boolean
+  levelMax?: boolean
+  curricula?: boolean
+  academicGroups?: boolean
+  admissionTargets?: boolean
   timeFrom?: boolean
   timeTo?: boolean
   availableDays?: boolean
@@ -1305,8 +1464,11 @@ export type TutorRequirementSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   name?: boolean
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin?: boolean
-  classLevelMax?: boolean
+  levelMin?: boolean
+  levelMax?: boolean
+  curricula?: boolean
+  academicGroups?: boolean
+  admissionTargets?: boolean
   timeFrom?: boolean
   timeTo?: boolean
   availableDays?: boolean
@@ -1325,8 +1487,11 @@ export type TutorRequirementSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   name?: boolean
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin?: boolean
-  classLevelMax?: boolean
+  levelMin?: boolean
+  levelMax?: boolean
+  curricula?: boolean
+  academicGroups?: boolean
+  admissionTargets?: boolean
   timeFrom?: boolean
   timeTo?: boolean
   availableDays?: boolean
@@ -1345,8 +1510,11 @@ export type TutorRequirementSelectScalar = {
   name?: boolean
   isDefault?: boolean
   isActive?: boolean
-  classLevelMin?: boolean
-  classLevelMax?: boolean
+  levelMin?: boolean
+  levelMax?: boolean
+  curricula?: boolean
+  academicGroups?: boolean
+  admissionTargets?: boolean
   timeFrom?: boolean
   timeTo?: boolean
   availableDays?: boolean
@@ -1358,7 +1526,7 @@ export type TutorRequirementSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TutorRequirementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "name" | "isDefault" | "isActive" | "classLevelMin" | "classLevelMax" | "timeFrom" | "timeTo" | "availableDays" | "minSalary" | "maxStudents" | "availableFrom" | "teachesOnline" | "createdAt" | "updatedAt", ExtArgs["result"]["tutorRequirement"]>
+export type TutorRequirementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "name" | "isDefault" | "isActive" | "levelMin" | "levelMax" | "curricula" | "academicGroups" | "admissionTargets" | "timeFrom" | "timeTo" | "availableDays" | "minSalary" | "maxStudents" | "availableFrom" | "teachesOnline" | "createdAt" | "updatedAt", ExtArgs["result"]["tutorRequirement"]>
 export type TutorRequirementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   subjects?: boolean | Prisma.TutorRequirement$subjectsArgs<ExtArgs>
@@ -1387,8 +1555,11 @@ export type $TutorRequirementPayload<ExtArgs extends runtime.Types.Extensions.In
     name: string
     isDefault: boolean
     isActive: boolean
-    classLevelMin: number
-    classLevelMax: number
+    levelMin: number
+    levelMax: number
+    curricula: $Enums.Curriculum[]
+    academicGroups: $Enums.AcademicGroup[]
+    admissionTargets: $Enums.AdmissionTarget[]
     timeFrom: Date
     timeTo: Date
     availableDays: number
@@ -1830,8 +2001,11 @@ export interface TutorRequirementFieldRefs {
   readonly name: Prisma.FieldRef<"TutorRequirement", 'String'>
   readonly isDefault: Prisma.FieldRef<"TutorRequirement", 'Boolean'>
   readonly isActive: Prisma.FieldRef<"TutorRequirement", 'Boolean'>
-  readonly classLevelMin: Prisma.FieldRef<"TutorRequirement", 'Int'>
-  readonly classLevelMax: Prisma.FieldRef<"TutorRequirement", 'Int'>
+  readonly levelMin: Prisma.FieldRef<"TutorRequirement", 'Int'>
+  readonly levelMax: Prisma.FieldRef<"TutorRequirement", 'Int'>
+  readonly curricula: Prisma.FieldRef<"TutorRequirement", 'Curriculum[]'>
+  readonly academicGroups: Prisma.FieldRef<"TutorRequirement", 'AcademicGroup[]'>
+  readonly admissionTargets: Prisma.FieldRef<"TutorRequirement", 'AdmissionTarget[]'>
   readonly timeFrom: Prisma.FieldRef<"TutorRequirement", 'DateTime'>
   readonly timeTo: Prisma.FieldRef<"TutorRequirement", 'DateTime'>
   readonly availableDays: Prisma.FieldRef<"TutorRequirement", 'Int'>

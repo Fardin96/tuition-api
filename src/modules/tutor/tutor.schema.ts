@@ -1,5 +1,13 @@
 import { z } from "zod";
 import { Gender } from "../../generated/prisma/enums.js";
+import {
+  ACADEMIC_GROUPS,
+  ADMISSION_TARGETS,
+  CURRICULA,
+  LEVEL_MAX,
+  LEVEL_MIN,
+  validateTutorCoverage,
+} from "../../lib/education.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
 export const tutorProfileSchema = z.object({
@@ -97,8 +105,11 @@ const zoneIdsSchema = z.array(z.string().uuid()).refine((v) => new Set(v).size =
 
 const tutorRequirementBaseSchema = z.object({
   name: z.string().trim().min(1).max(60),
-  classLevelMin: z.number().int().min(1).max(20),
-  classLevelMax: z.number().int().min(1).max(20),
+  levelMin: z.number().int().min(LEVEL_MIN).max(LEVEL_MAX),
+  levelMax: z.number().int().min(LEVEL_MIN).max(LEVEL_MAX),
+  curricula: z.array(z.enum(CURRICULA)).min(1),
+  academicGroups: z.array(z.enum(ACADEMIC_GROUPS)),
+  admissionTargets: z.array(z.enum(ADMISSION_TARGETS)),
   timeFrom: z.string().regex(hhmm),
   timeTo: z.string().regex(hhmm),
   availableDays: availableDaysSchema,
@@ -119,10 +130,16 @@ export const createTutorRequirementSchema = tutorRequirementBaseSchema
     maxStudents: maxStudentsSchema.default(1),
     teachesOnline: z.boolean().default(false),
     zoneIds: zoneIdsSchema.default([]),
+    academicGroups: z.array(z.enum(ACADEMIC_GROUPS)).default([]),
+    admissionTargets: z.array(z.enum(ADMISSION_TARGETS)).default([]),
   })
   .strict()
-  .refine((v) => v.classLevelMax >= v.classLevelMin, "classLevelMax must be >= classLevelMin")
-  .refine((v) => v.timeTo > v.timeFrom, "timeTo must be after timeFrom");
+  .refine((v) => v.timeTo > v.timeFrom, "timeTo must be after timeFrom")
+  .superRefine((v, ctx) => {
+    for (const issue of validateTutorCoverage(v)) {
+      ctx.addIssue({ code: "custom", path: [issue.path], message: issue.message });
+    }
+  });
 
 export type CreateTutorRequirementInput = z.infer<typeof createTutorRequirementSchema>;
 
@@ -138,8 +155,11 @@ export const tutorRequirementResponseSchema = z.object({
   name: z.string(),
   isDefault: z.boolean(),
   isActive: z.boolean(),
-  classLevelMin: z.number(),
-  classLevelMax: z.number(),
+  levelMin: z.number(),
+  levelMax: z.number(),
+  curricula: z.array(z.string()),
+  academicGroups: z.array(z.string()),
+  admissionTargets: z.array(z.string()),
   timeFrom: z.string(),
   timeTo: z.string(),
   availableDays: z.number(),

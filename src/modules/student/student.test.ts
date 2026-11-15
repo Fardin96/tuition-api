@@ -5,7 +5,6 @@ import {
   createAccount,
   createApplication,
   createArea,
-  createCategory,
   createRequirement,
   createStudentProfile,
   createSubject,
@@ -318,13 +317,11 @@ describe("student routes", () => {
       const studentAccount = await createAccount({ role: "STUDENT" });
       const tutorAccount = await createAccount({ role: "TUTOR" });
       const area = await createArea();
-      const category = await createCategory();
       const subject = await createSubject();
       const student = await createStudentProfile(studentAccount.id, area.id);
       const tutor = await createTutorProfile(tutorAccount.id);
       const requirement = await createRequirement({
         studentId: student.id,
-        categoryId: category.id,
         areaId: area.id,
         subjectId: subject.id,
       });
@@ -420,13 +417,11 @@ describe("student routes", () => {
       const studentAccount = await createAccount({ role: "STUDENT" });
       const tutorAccount = await createAccount({ role: "TUTOR" });
       const area = await createArea();
-      const category = await createCategory();
       const subject = await createSubject();
       const student = await createStudentProfile(studentAccount.id, area.id);
       const tutor = await createTutorProfile(tutorAccount.id);
       const requirement = await createRequirement({
         studentId: student.id,
-        categoryId: category.id,
         areaId: area.id,
         subjectId: subject.id,
       });

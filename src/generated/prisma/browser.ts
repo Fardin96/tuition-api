@@ -48,11 +48,6 @@ export type AccountBlock = Prisma.AccountBlockModel
  */
 export type Area = Prisma.AreaModel
 /**
- * Model Category
- * 
- */
-export type Category = Prisma.CategoryModel
-/**
  * Model Subject
  * 
  */

@@ -29,7 +29,7 @@ This file captures the essential, non-obvious guidance an agent needs to work in
 ## Prisma / DB (critical)
 
 - **PostGIS must be installed** before running migrations or seeds: `CREATE EXTENSION IF NOT EXISTS postgis;` on the target DB.
-- **`prisma/constraints.sql`** is the FINAL-STATE reference for CHECKs, triggers, and partial indexes that Prisma cannot model. It is not appended to any migration. Deployed databases get changes only via migrations, so every change to `constraints.sql` needs a migration carrying the same SQL (v6: `20261107000300_v6_constraints`, `20261107000400_v6_validate`, `20261107000500_v6_contact_unique`, `20261111000100_pr1_hardening`).
+- **`prisma/constraints.sql`** is the FINAL-STATE reference for CHECKs, triggers, and partial indexes that Prisma cannot model. It is not appended to any migration. Deployed databases get changes only via migrations, so every change to `constraints.sql` needs a migration carrying the same SQL (v6: `20261107000300_v6_constraints`, `20261107000400_v6_validate`, `20261107000500_v6_contact_unique`, `20261111000100_pr1_hardening`; PR B: `20261116000300_edu_constraints`, `20261116000400_edu_validate`).
 - Review generated SQL and **never accept a DROP INDEX** for: `tutor_name_trgm`, `notification_due_idx`, `tutor_location_geog_gist_idx`, `student_location_geog_gist_idx`, `tutor_zone_center_gix`, `dispute_raised_by_idx`, `tutor_requirement_one_default`, `zlr_one_pending_per_tutor`, `fee_payment_gateway_ref_uniq`. Prisma also proposes dropping DEFAULTs on location ids; ignore that.
 - The test setup (`src/tests/setup.ts`) runs `npx prisma migrate deploy` before each test suite. Tests use a real PostgreSQL DB with PostGIS.
 - Test DB: set `TEST_DATABASE_URL` in `.env` (format: `postgresql://user:password@localhost:5432/tuition_test?sslmode=disable`). Tests use `TEST_DATABASE_URL` when set, otherwise `DATABASE_URL`.
@@ -104,6 +104,7 @@ Required once auth/files/notifications are used:
 - **Location rows** carry `geog_source`. `PIN` never expires; the cron only touches `PLACES`. Geography and zone writes go through raw SQL, because Prisma cannot write `Unsupported` types.
 - **Contact numbers**: `phone_number` is required on student and tutor; `whatsapp_number` is optional (NULL allowed, cleared by PATCH `whatsappNumber: null`). Both are globally unique across student and tutor, enforced by trigger `contact_number_guard` and service `assertContactNumbersFree` (409 `PhoneInUse` / `WhatsappInUse`). The same account may reuse a number; `deleted:` tombstones are ignored. The services never copy one number into the other.
 - **Apply gate**: readiness comes from SQL `tutor_missing_requirements()`. Do not duplicate those checks in TypeScript.
+- **Education levels**: `src/lib/education.ts` is the single source for curricula, levels, labels and rules; `GET /lookups/education` serves it. Every rule the DB can enforce is also a CHECK; `src/lib/education.test.ts` has a parity test that inserts every curriculum x level x group combination and asserts TS and Postgres agree. Change both together.
 
 ## Schema v6
 

@@ -57,7 +57,6 @@ export const ModelName = {
   SuperAdminEmail: 'SuperAdminEmail',
   AccountBlock: 'AccountBlock',
   Area: 'Area',
-  Category: 'Category',
   Subject: 'Subject',
   FileAsset: 'FileAsset',
   Student: 'Student',
@@ -184,17 +183,6 @@ export const AreaScalarFieldEnum = {
 } as const
 
 export type AreaScalarFieldEnum = (typeof AreaScalarFieldEnum)[keyof typeof AreaScalarFieldEnum]
-
-
-export const CategoryScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  slug: 'slug',
-  sortOrder: 'sortOrder',
-  isActive: 'isActive'
-} as const
-
-export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
 
 
 export const SubjectScalarFieldEnum = {
@@ -368,8 +356,11 @@ export const TutorRequirementScalarFieldEnum = {
   name: 'name',
   isDefault: 'isDefault',
   isActive: 'isActive',
-  classLevelMin: 'classLevelMin',
-  classLevelMax: 'classLevelMax',
+  levelMin: 'levelMin',
+  levelMax: 'levelMax',
+  curricula: 'curricula',
+  academicGroups: 'academicGroups',
+  admissionTargets: 'admissionTargets',
   timeFrom: 'timeFrom',
   timeTo: 'timeTo',
   availableDays: 'availableDays',
@@ -435,9 +426,13 @@ export type ZoneLimitRequestScalarFieldEnum = (typeof ZoneLimitRequestScalarFiel
 export const TuitionRequirementScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
-  categoryId: 'categoryId',
   areaId: 'areaId',
-  classLevel: 'classLevel',
+  levelCode: 'levelCode',
+  curriculum: 'curriculum',
+  academicGroup: 'academicGroup',
+  admissionTargets: 'admissionTargets',
+  isRetaker: 'isRetaker',
+  levelNote: 'levelNote',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
   availableDays: 'availableDays',
@@ -466,11 +461,15 @@ export type RequirementSubjectScalarFieldEnum = (typeof RequirementSubjectScalar
 export const TuitionPackageScalarFieldEnum = {
   id: 'id',
   tutorId: 'tutorId',
-  categoryId: 'categoryId',
   subjectId: 'subjectId',
   areaId: 'areaId',
   requirementId: 'requirementId',
-  classLevel: 'classLevel',
+  levelCode: 'levelCode',
+  curriculum: 'curriculum',
+  academicGroup: 'academicGroup',
+  admissionTargets: 'admissionTargets',
+  isRetaker: 'isRetaker',
+  levelNote: 'levelNote',
   timeOfDay: 'timeOfDay',
   daysPerWeek: 'daysPerWeek',
   expectedSalary: 'expectedSalary',
