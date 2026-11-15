@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { notFound } from "../../lib/errors.js";
 import { requireRole } from "../../plugins/auth.js";
 import {
   type CreateRequirementInput,
@@ -69,7 +70,7 @@ export async function requirementRoutes(app: FastifyInstance) {
 
       const requirement = await getRequirementById(id, account.accountId);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+        throw notFound("Requirement not found");
       }
 
       return reply.send(requirement);
@@ -94,7 +95,7 @@ export async function requirementRoutes(app: FastifyInstance) {
 
       const requirement = await updateRequirement(id, account.accountId, body);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+        throw notFound("Requirement not found");
       }
 
       return reply.send(requirement);
@@ -117,7 +118,7 @@ export async function requirementRoutes(app: FastifyInstance) {
 
       const requirement = await closeRequirement(id, account.accountId);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+        throw notFound("Requirement not found");
       }
 
       return reply.send(requirement);
