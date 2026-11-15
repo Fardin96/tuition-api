@@ -17,6 +17,7 @@ import {
   createTutorRequirement,
   createTutorZone,
   getAuthHeaders,
+  setTutorLocation,
 } from "../../tests/helpers.js";
 
 function phone() {
@@ -112,6 +113,8 @@ describe("tutor routes", () => {
       const res = await app.inject({ method: "POST", url: "/api/v1/tutors/me", headers, payload });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("ProfileExists");
+      expect(JSON.parse(res.body).code).toBe("PROFILE_EXISTS");
     });
 
     it("rejects a WhatsApp number starting with the reserved deleted: prefix", async () => {
@@ -218,6 +221,7 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(404);
+      expect(JSON.parse(res.body).code).toBe("NOT_FOUND");
     });
 
     it("only touches the diff: kept rows are not rewritten", async () => {
@@ -251,6 +255,102 @@ describe("tutor routes", () => {
       expect(ids.sort()).toEqual([kept.id, added.id].sort());
       const [after] = await keptXmin();
       expect(after.xmin).toBe(before.xmin);
+    });
+
+    it("rejects an area outside the tutor's city (409)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      await setTutorLocation(tutor.id);
+      const dhaka = await createArea();
+      const ctg = await createArea({ district: "Chattogram", division: "Chattogram" });
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers: await getAuthHeaders(account),
+        payload: { areaIds: [dhaka.id, ctg.id] },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body)).toEqual({
+        error: "AreaOutsideCity",
+        code: "AREA_OUTSIDE_CITY",
+        message: "All areas must be within your city",
+        details: { invalidAreaIds: [ctg.id] },
+      });
+      expect(await prisma.tutorArea.count({ where: { tutorId: tutor.id } })).toBe(0);
+    });
+
+    it("accepts areas in the tutor's city", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      await setTutorLocation(tutor.id);
+      const dhaka = await createArea();
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers: await getAuthHeaders(account),
+        payload: { areaIds: [dhaka.id] },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).areas).toHaveLength(1);
+    });
+
+    it("skips the city check when the tutor has no saved location", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id);
+      const ctg = await createArea({ district: "Chattogram", division: "Chattogram" });
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers: await getAuthHeaders(account),
+        payload: { areaIds: [ctg.id] },
+      });
+
+      expect(res.statusCode).toBe(200);
+    });
+
+    it("rejects an unknown area id (409)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id);
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers: await getAuthHeaders(account),
+        payload: { areaIds: [2147483000] },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("AREA_OUTSIDE_CITY");
+      expect(JSON.parse(res.body).details.invalidAreaIds).toEqual([2147483000]);
+    });
+
+    it("rejects a non-positive area id with a ValidationError (400)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id);
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers: await getAuthHeaders(account),
+        payload: { areaIds: [-1] },
+      });
+
+      expect(res.statusCode).toBe(400);
+      const body = JSON.parse(res.body);
+      expect(body.error).toBe("ValidationError");
+      expect(body.code).toBe("VALIDATION_ERROR");
+      expect(body.issues[0].path).toEqual(["areaIds", 0]);
+      expect(typeof body.issues[0].message).toBe("string");
     });
   });
 
@@ -339,7 +439,8 @@ describe("tutor routes", () => {
       expect(res.statusCode).toBe(409);
       const body = JSON.parse(res.body);
       expect(body.error).toBe("RequirementLosesLastSubject");
-      expect(body.requirementIds).toEqual([requirement.id]);
+      expect(body.code).toBe("REQUIREMENT_LOSES_LAST_SUBJECT");
+      expect(body.details.requirementIds).toEqual([requirement.id]);
       expect(await prisma.tutorSubject.findMany({ where: { tutorId: tutor.id } })).toHaveLength(1);
       expect(
         await prisma.tutorRequirementSubject.findMany({ where: { requirementId: requirement.id } }),
@@ -385,6 +486,7 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(501);
       expect(JSON.parse(res.body).error).toBe("NotImplemented");
+      expect(JSON.parse(res.body).code).toBe("NOT_IMPLEMENTED");
     });
   });
 
@@ -580,6 +682,7 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(501);
       expect(JSON.parse(res.body).error).toBe("NotImplemented");
+      expect(JSON.parse(res.body).code).toBe("NOT_IMPLEMENTED");
     });
   });
 
@@ -649,6 +752,7 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(501);
       expect(JSON.parse(res.body).error).toBe("NotImplemented");
+      expect(JSON.parse(res.body).code).toBe("NOT_IMPLEMENTED");
     });
   });
 
@@ -716,6 +820,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("PhoneInUse");
+      expect(JSON.parse(res.body).code).toBe("PHONE_IN_USE");
       expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
     });
 
@@ -735,6 +841,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("WhatsappInUse");
+      expect(JSON.parse(res.body).code).toBe("WHATSAPP_IN_USE");
       expect(JSON.parse(res.body).message).toBe("This WhatsApp number is already in use.");
     });
 
@@ -754,6 +862,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("PhoneInUse");
+      expect(JSON.parse(res.body).code).toBe("PHONE_IN_USE");
       expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
     });
 
@@ -791,6 +901,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("PhoneInUse");
+      expect(JSON.parse(res.body).code).toBe("PHONE_IN_USE");
       expect(JSON.parse(res.body).message).toBe("This phone number is already in use.");
       const saved = await prisma.tutor.findUnique({ where: { accountId: account.id } });
       expect(saved?.phoneNumber).not.toBe(taken);
@@ -1049,6 +1161,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("RequirementLimitReached");
+      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_LIMIT_REACHED");
     });
 
     it("rejects a subject that is not on the tutor's profile (400)", async () => {
@@ -1064,6 +1178,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).error).toBe("InvalidSubjectOrZone");
+      expect(JSON.parse(res.body).code).toBe("INVALID_SUBJECT_OR_ZONE");
     });
 
     it("rejects another tutor's zone (400)", async () => {
@@ -1081,6 +1197,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).error).toBe("InvalidSubjectOrZone");
+      expect(JSON.parse(res.body).code).toBe("INVALID_SUBJECT_OR_ZONE");
     });
 
     it("returns 404 for another tutor's set", async () => {
@@ -1173,6 +1291,8 @@ describe("tutor routes", () => {
       const res = await app.inject({ method: "GET", url: `${base}?status=deleted`, headers });
 
       expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).error).toBe("ValidationError");
+      expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
     });
 
     it("moves a restored set from the archived list to the active list", async () => {
@@ -1239,6 +1359,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).error).toBe("InvalidRequirement");
+      expect(JSON.parse(res.body).code).toBe("INVALID_REQUIREMENT");
     });
 
     it("rejects an empty subjectIds list on PATCH (400)", async () => {
@@ -1254,6 +1376,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).error).toBe("ValidationError");
+      expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
     });
 
     it("applies subject and zone diffs on PATCH", async () => {
@@ -1321,6 +1445,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("RequirementArchived");
+      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_ARCHIVED");
     });
 
     it("refuses to archive the default set (409)", async () => {
@@ -1331,6 +1457,8 @@ describe("tutor routes", () => {
       const res = await app.inject({ method: "DELETE", url: `${base}/${set.id}`, headers });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("RequirementIsDefault");
+      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_IS_DEFAULT");
     });
 
     it("refuses to archive a set used by an OPEN package (409) and lists it", async () => {
@@ -1343,7 +1471,10 @@ describe("tutor routes", () => {
       const res = await app.inject({ method: "DELETE", url: `${base}/${set.id}`, headers });
 
       expect(res.statusCode).toBe(409);
-      expect(JSON.parse(res.body).packageIds).toContain(pkg.id);
+      expect(JSON.parse(res.body).error).toBe("RequirementInUse");
+      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_IN_USE");
+      expect(JSON.parse(res.body).details.packageIds).toContain(pkg.id);
+      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_IN_USE");
       const row = await prisma.tutorRequirement.findUniqueOrThrow({ where: { id: set.id } });
       expect(row.isActive).toBe(true);
     });
@@ -1397,6 +1528,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("RequirementLimitReached");
+      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_LIMIT_REACHED");
     });
 
     it("restoring an active set returns 200", async () => {
@@ -1451,6 +1584,8 @@ describe("tutor routes", () => {
 
       expect(accepted.statusCode).toBe(201);
       expect(rejected.statusCode).toBe(400);
+      expect(JSON.parse(rejected.body).error).toBe("ValidationError");
+      expect(JSON.parse(rejected.body).code).toBe("VALIDATION_ERROR");
     });
 
     it("PATCH with one field leaves the other fields and zones unchanged", async () => {
@@ -1503,6 +1638,8 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error).toBe("RequirementHasNoSubjects");
+      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_NO_SUBJECTS");
       const detail = await app.inject({ method: "GET", url: `${base}/${second.id}`, headers });
       expect(JSON.parse(detail.body).isActive).toBe(false);
     });

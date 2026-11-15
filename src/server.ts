@@ -5,8 +5,13 @@ import etag from "@fastify/etag";
 import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import Fastify from "fastify";
-import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import {
+  hasZodFastifySchemaValidationErrors,
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
 import { env } from "./config/env.js";
+import { type AppError, ERROR_CODES, errorCodeOf } from "./lib/errors.js";
 import { pool, startPoolStats } from "./lib/prisma.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
@@ -26,14 +31,29 @@ export async function buildApp() {
   app.setSerializerCompiler(serializerCompiler);
 
   app.setErrorHandler((error, _request, reply) => {
-    const err = error as Error & { statusCode?: number };
+    // @fastify/rate-limit throws a plain object, so do not assume an Error instance.
+    const err = error as Partial<AppError> & { message?: string };
     const status = err.statusCode ?? 500;
     app.log.error(err);
-    return reply.status(status).send({
-      error: err.name,
-      message:
-        env.NODE_ENV === "production" && status >= 500 ? "Internal server error" : err.message,
-    });
+    const masked = env.NODE_ENV === "production" && status >= 500;
+    const body: Record<string, unknown> = {
+      error: status === 429 ? "RateLimited" : (err.name ?? "Error"),
+      code: errorCodeOf(err),
+      message: masked ? "Internal server error" : (err.message ?? ""),
+    };
+    if (err.details && !masked) body.details = err.details;
+    if (hasZodFastifySchemaValidationErrors(error)) {
+      body.error = "ValidationError";
+      body.code = ERROR_CODES.ValidationError;
+      body.issues = error.validation.map((issue) => ({
+        path: issue.instancePath
+          .split("/")
+          .filter(Boolean)
+          .map((part) => (/^\d+$/.test(part) ? Number(part) : part)),
+        message: issue.message,
+      }));
+    }
+    return reply.status(status).send(body);
   });
 
   const productionOrigins = env.FRONTEND_URL

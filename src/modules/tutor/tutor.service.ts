@@ -1,5 +1,7 @@
 import type { Prisma, TutorRequirement } from "../../generated/prisma/client.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
+import { toDistrictCode } from "../../lib/districts.js";
+import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import {
   findOwnLocation,
@@ -81,11 +83,7 @@ export async function createTutorProfile(
   },
 ) {
   const existing = await prisma.tutor.findUnique({ where: { accountId } });
-  if (existing) {
-    const err = new Error("Tutor profile already exists");
-    Object.assign(err, { statusCode: 409 });
-    throw err;
-  }
+  if (existing) throw appError("ProfileExists", 409, "Tutor profile already exists");
 
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
@@ -142,10 +140,35 @@ export async function updateTutorProfile(
   return serializeTutor(tutor, await findOwnLocation("tutor_location", tutor.id));
 }
 
+// A tutor's city is the district of their saved address; areas in any other district are refused.
+async function assertAreasInTutorCity(tutorId: string, areaIds: number[]) {
+  if (areaIds.length === 0) return;
+  const areas = await prisma.area.findMany({
+    where: { id: { in: areaIds } },
+    select: { id: true, district: true },
+  });
+  const location = await prisma.tutorLocation.findUnique({
+    where: { tutorId },
+    select: { districtCode: true },
+  });
+  const valid = new Set(
+    areas
+      .filter((area) => !location || toDistrictCode(area.district) === location.districtCode)
+      .map((area) => area.id),
+  );
+  const invalidAreaIds = areaIds.filter((id) => !valid.has(id));
+  if (invalidAreaIds.length > 0) {
+    throw appError("AreaOutsideCity", 409, "All areas must be within your city", {
+      invalidAreaIds,
+    });
+  }
+}
+
 export async function replaceTutorAreas(accountId: string, areaIds: number[]) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
   const next = new Set(areaIds);
+  await assertAreasInTutorCity(tutor.id, [...next]);
 
   await prisma.$transaction(async (tx) => {
     const current = await tx.tutorArea.findMany({
@@ -192,12 +215,12 @@ export async function replaceTutorSubjects(accountId: string, subjectIds: number
       GROUP BY r.id
       HAVING bool_and(s.subject_id = ANY(${removed}::int[]))`;
     if (orphaned.length > 0) {
-      throw Object.assign(new Error("A requirement would be left with no subjects."), {
-        name: "RequirementLosesLastSubject",
-        statusCode: 409,
-        code: "REQUIREMENT_LOSES_LAST_SUBJECT",
-        requirementIds: orphaned.map((row) => row.id),
-      });
+      throw appError(
+        "RequirementLosesLastSubject",
+        409,
+        "A requirement would be left with no subjects.",
+        { requirementIds: orphaned.map((row) => row.id) },
+      );
     }
 
     await tx.tutorSubject.deleteMany({ where: { tutorId: tutor.id, subjectId: { in: removed } } });
@@ -345,33 +368,16 @@ const ymdOf = (d: Date) => d.toISOString().slice(0, 10);
 const toTime = (t: string) => new Date(`1970-01-01T${t}:00Z`);
 const toDay = (d: string) => new Date(`${d}T00:00:00Z`);
 
-function requirementError(
-  name: string,
-  statusCode: number,
-  code: string,
-  message: string,
-  extras: object = {},
-) {
-  return Object.assign(new Error(message), { name, statusCode, code, ...extras });
-}
-
 function limitError() {
-  return requirementError(
+  return appError(
     "RequirementLimitReached",
     409,
-    "REQUIREMENT_LIMIT_REACHED",
     `A tutor can have at most ${MAX_ACTIVE_REQUIREMENTS} active requirements`,
   );
 }
 
 function inUseError(packageIds: string[]) {
-  return requirementError(
-    "RequirementInUse",
-    409,
-    "REQUIREMENT_IN_USE",
-    "Requirement is used by open packages",
-    { packageIds },
-  );
+  return appError("RequirementInUse", 409, "Requirement is used by open packages", { packageIds });
 }
 
 function requirementData(values: RequirementValues) {
@@ -385,10 +391,9 @@ function requirementData(values: RequirementValues) {
 
 function mapRequirementFkError(error: unknown): never {
   if ((error as { code?: string }).code === "P2003") {
-    throw requirementError(
+    throw appError(
       "InvalidSubjectOrZone",
       400,
-      "INVALID_SUBJECT_OR_ZONE",
       "Subject or zone is not part of this tutor's profile",
     );
   }
@@ -554,12 +559,7 @@ export async function updateTutorRequirement(
     values.classLevelMax < values.classLevelMin ||
     values.timeTo <= values.timeFrom
   ) {
-    throw requirementError(
-      "InvalidRequirement",
-      400,
-      "INVALID_REQUIREMENT",
-      "Invalid requirement values",
-    );
+    throw appError("InvalidRequirement", 400, "Invalid requirement values");
   }
 
   try {
@@ -629,12 +629,7 @@ export async function setDefaultTutorRequirement(accountId: string, id: string) 
     });
     if (!row) return false;
     if (!row.isActive) {
-      throw requirementError(
-        "RequirementArchived",
-        409,
-        "REQUIREMENT_ARCHIVED",
-        "An archived requirement cannot be the default",
-      );
+      throw appError("RequirementArchived", 409, "An archived requirement cannot be the default");
     }
     if (!row.isDefault) {
       await tx.tutorRequirement.updateMany({
@@ -662,12 +657,7 @@ export async function archiveTutorRequirement(accountId: string, id: string) {
       if (!row) return false;
       if (!row.isActive) return true;
       if (row.isDefault) {
-        throw requirementError(
-          "RequirementIsDefault",
-          409,
-          "REQUIREMENT_IS_DEFAULT",
-          "The default requirement cannot be archived",
-        );
+        throw appError("RequirementIsDefault", 409, "The default requirement cannot be archived");
       }
       const packages = await tx.tuitionPackage.findMany({
         where: { requirementId: id, status: "OPEN" },
@@ -702,10 +692,9 @@ export async function restoreTutorRequirement(accountId: string, id: string) {
     if (row.isActive) return true;
     const subjectCount = await tx.tutorRequirementSubject.count({ where: { requirementId: id } });
     if (subjectCount === 0) {
-      throw requirementError(
+      throw appError(
         "RequirementHasNoSubjects",
         409,
-        "REQUIREMENT_NO_SUBJECTS",
         "Add at least one subject before restoring this requirement",
       );
     }

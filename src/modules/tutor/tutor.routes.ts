@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
+import { appError, notFound } from "../../lib/errors.js";
 import { requireRole } from "../../plugins/auth.js";
 import { publicCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
@@ -82,7 +83,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const body = request.body as UpdateTutorProfileInput;
       const profile = await updateTutorProfile(account.accountId, body);
       if (!profile) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+        throw notFound("Tutor profile not found");
       }
       return reply.send(profile);
     },
@@ -105,7 +106,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { areaIds } = request.body as TutorAreasInput;
       const areas = await replaceTutorAreas(account.accountId, areaIds);
       if (!areas) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+        throw notFound("Tutor profile not found");
       }
       return reply.send({ areas });
     },
@@ -128,29 +129,19 @@ export async function tutorRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
       const { subjectIds } = request.body as TutorSubjectsInput;
-      let subjects: Awaited<ReturnType<typeof replaceTutorSubjects>>;
-      try {
-        subjects = await replaceTutorSubjects(account.accountId, subjectIds);
-      } catch (err) {
-        const e = err as Error & { code?: string; requirementIds?: string[] };
-        if (e.code !== "REQUIREMENT_LOSES_LAST_SUBJECT") throw err;
-        return reply
-          .status(409)
-          .send({ error: e.name, message: e.message, requirementIds: e.requirementIds });
-      }
-      if (!subjects) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
-      }
+      const subjects = await replaceTutorSubjects(account.accountId, subjectIds);
+      if (!subjects) throw notFound("Tutor profile not found");
       return reply.send({ subjects });
     },
   );
 
   // Deferred: requires file upload / presigned URL flow.
-  app.post("/me/verifications", async (_request: FastifyRequest, reply: FastifyReply) => {
-    return reply.status(501).send({
-      error: "NotImplemented",
-      message: "File upload endpoint deferred until the storage module is implemented",
-    });
+  app.post("/me/verifications", async (_request: FastifyRequest, _reply: FastifyReply) => {
+    throw appError(
+      "NotImplemented",
+      501,
+      "File upload endpoint deferred until the storage module is implemented",
+    );
   });
 
   app.get(
@@ -177,7 +168,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const account = requireRole(request, "TUTOR");
       const verifications = await getTutorVerifications(account.accountId);
       if (!verifications) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+        throw notFound("Tutor profile not found");
       }
       return reply.send({
         verifications: verifications.map((v) => ({
@@ -276,7 +267,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { id } = request.params as TutorIdParam;
       const tutor = await getPublicTutorProfile(id);
       if (!tutor) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor not found" });
+        throw notFound("Tutor not found");
       }
       return reply.send({ tutor });
     },
@@ -338,18 +329,19 @@ export async function tutorRoutes(app: FastifyInstance) {
       const account = requireRole(request, "TUTOR");
       const credentials = await getTutorCredentials(account.accountId);
       if (!credentials) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+        throw notFound("Tutor profile not found");
       }
       return reply.send({ credentials });
     },
   );
 
   // Deferred: requires file upload / presigned URL flow.
-  app.post("/me/credentials", async (_request: FastifyRequest, reply: FastifyReply) => {
-    return reply.status(501).send({
-      error: "NotImplemented",
-      message: "File upload endpoint deferred until the storage module is implemented",
-    });
+  app.post("/me/credentials", async (_request: FastifyRequest, _reply: FastifyReply) => {
+    throw appError(
+      "NotImplemented",
+      501,
+      "File upload endpoint deferred until the storage module is implemented",
+    );
   });
 
   app.delete(
@@ -362,7 +354,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { id } = request.params as TutorIdParam;
       const deleted = await deleteTutorCredential(account.accountId, id);
       if (!deleted) {
-        return reply.status(404).send({ error: "NotFound", message: "Credential not found" });
+        throw notFound("Credential not found");
       }
       return reply.status(204).send();
     },
@@ -392,7 +384,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const account = requireRole(request, "TUTOR");
       const videos = await getTutorVideos(account.accountId);
       if (!videos) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+        throw notFound("Tutor profile not found");
       }
       return reply.send({
         videos: videos.map((v) => ({
@@ -404,11 +396,12 @@ export async function tutorRoutes(app: FastifyInstance) {
   );
 
   // Deferred: requires file upload / presigned URL flow.
-  app.post("/me/videos", async (_request: FastifyRequest, reply: FastifyReply) => {
-    return reply.status(501).send({
-      error: "NotImplemented",
-      message: "File upload endpoint deferred until the storage module is implemented",
-    });
+  app.post("/me/videos", async (_request: FastifyRequest, _reply: FastifyReply) => {
+    throw appError(
+      "NotImplemented",
+      501,
+      "File upload endpoint deferred until the storage module is implemented",
+    );
   });
 
   app.delete(
@@ -421,7 +414,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { id } = request.params as TutorIdParam;
       const deleted = await deleteTutorVideo(account.accountId, id);
       if (!deleted) {
-        return reply.status(404).send({ error: "NotFound", message: "Video not found" });
+        throw notFound("Video not found");
       }
       return reply.status(204).send();
     },
@@ -440,7 +433,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { status } = request.query as TutorRequirementListQuery;
       const requirements = await listTutorRequirements(account.accountId, status);
       if (!requirements) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+        throw notFound("Tutor profile not found");
       }
       reply.header("Cache-Control", "private, no-store");
       return reply.send({ requirements });
@@ -460,7 +453,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const body = request.body as CreateTutorRequirementInput;
       const requirement = await createTutorRequirement(account.accountId, body);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Tutor profile not found" });
+        throw notFound("Tutor profile not found");
       }
       reply.header("Cache-Control", "private, no-store");
       return reply.status(201).send(requirement);
@@ -480,7 +473,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { id } = request.params as { id: string };
       const requirement = await getTutorRequirement(account.accountId, id);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+        throw notFound("Requirement not found");
       }
       reply.header("Cache-Control", "private, no-store");
       return reply.send(requirement);
@@ -502,7 +495,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const body = request.body as UpdateTutorRequirementInput;
       const requirement = await updateTutorRequirement(account.accountId, id, body);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+        throw notFound("Requirement not found");
       }
       reply.header("Cache-Control", "private, no-store");
       return reply.send(requirement);
@@ -522,7 +515,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { id } = request.params as { id: string };
       const requirement = await setDefaultTutorRequirement(account.accountId, id);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+        throw notFound("Requirement not found");
       }
       reply.header("Cache-Control", "private, no-store");
       return reply.send(requirement);
@@ -540,19 +533,8 @@ export async function tutorRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
       const { id } = request.params as { id: string };
-      let requirement: Awaited<ReturnType<typeof archiveTutorRequirement>>;
-      try {
-        requirement = await archiveTutorRequirement(account.accountId, id);
-      } catch (err) {
-        const e = err as Error & { code?: string; packageIds?: string[] };
-        if (e.code !== "REQUIREMENT_IN_USE") throw err;
-        return reply
-          .status(409)
-          .send({ error: e.name, message: e.message, packageIds: e.packageIds });
-      }
-      if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
-      }
+      const requirement = await archiveTutorRequirement(account.accountId, id);
+      if (!requirement) throw notFound("Requirement not found");
       reply.header("Cache-Control", "private, no-store");
       return reply.send(requirement);
     },
@@ -571,7 +553,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const { id } = request.params as { id: string };
       const requirement = await restoreTutorRequirement(account.accountId, id);
       if (!requirement) {
-        return reply.status(404).send({ error: "NotFound", message: "Requirement not found" });
+        throw notFound("Requirement not found");
       }
       reply.header("Cache-Control", "private, no-store");
       return reply.send(requirement);
