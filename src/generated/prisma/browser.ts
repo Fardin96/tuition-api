@@ -178,6 +178,11 @@ export type FeePayment = Prisma.FeePaymentModel
  */
 export type NotificationLog = Prisma.NotificationLogModel
 /**
+ * Model AppNotification
+ * 
+ */
+export type AppNotification = Prisma.AppNotificationModel
+/**
  * Model BlogPost
  * 
  */

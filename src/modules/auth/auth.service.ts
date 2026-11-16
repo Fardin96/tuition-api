@@ -422,6 +422,7 @@ export async function hardDeleteAccount(accountId: string) {
     // Sessions and direct account-owned notifications.
     await tx.session.deleteMany({ where: { accountId } });
     await tx.notificationLog.deleteMany({ where: { recipientId: accountId } });
+    await tx.appNotification.deleteMany({ where: { recipientId: accountId } });
 
     // Account blocks, reports and disputes where this account is involved.
     await tx.accountBlock.deleteMany({

@@ -429,6 +429,7 @@ export const ModelName = {
   PlatformFee: 'PlatformFee',
   FeePayment: 'FeePayment',
   NotificationLog: 'NotificationLog',
+  AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
   SiteContent: 'SiteContent',
   PlatformSetting: 'PlatformSetting',
@@ -448,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2820,6 +2821,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AppNotification: {
+      payload: Prisma.$AppNotificationPayload<ExtArgs>
+      fields: Prisma.AppNotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AppNotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AppNotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.AppNotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AppNotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>
+        }
+        findMany: {
+          args: Prisma.AppNotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>[]
+        }
+        create: {
+          args: Prisma.AppNotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>
+        }
+        createMany: {
+          args: Prisma.AppNotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AppNotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.AppNotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>
+        }
+        update: {
+          args: Prisma.AppNotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AppNotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AppNotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AppNotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AppNotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AppNotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.AppNotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAppNotification>
+        }
+        groupBy: {
+          args: Prisma.AppNotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AppNotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AppNotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AppNotificationCountAggregateOutputType> | number
+        }
+      }
+    }
     BlogPost: {
       payload: Prisma.$BlogPostPayload<ExtArgs>
       fields: Prisma.BlogPostFieldRefs
@@ -3300,6 +3375,7 @@ export const TutorScalarFieldEnum = {
   studentIdNumber: 'studentIdNumber',
   gender: 'gender',
   parentsInfo: 'parentsInfo',
+  instituteName: 'instituteName',
   zoneLimit: 'zoneLimit',
   verificationStatus: 'verificationStatus',
   isListed: 'isListed',
@@ -3656,6 +3732,18 @@ export const NotificationLogScalarFieldEnum = {
 } as const
 
 export type NotificationLogScalarFieldEnum = (typeof NotificationLogScalarFieldEnum)[keyof typeof NotificationLogScalarFieldEnum]
+
+
+export const AppNotificationScalarFieldEnum = {
+  id: 'id',
+  recipientId: 'recipientId',
+  kind: 'kind',
+  applicationId: 'applicationId',
+  readAt: 'readAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AppNotificationScalarFieldEnum = (typeof AppNotificationScalarFieldEnum)[keyof typeof AppNotificationScalarFieldEnum]
 
 
 export const BlogPostScalarFieldEnum = {
@@ -4262,6 +4350,20 @@ export type ListEnumNotificationStatusFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'AppNotificationKind'
+ */
+export type EnumAppNotificationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppNotificationKind'>
+    
+
+
+/**
+ * Reference to a field of type 'AppNotificationKind[]'
+ */
+export type ListEnumAppNotificationKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppNotificationKind[]'>
+    
+
+
+/**
  * Reference to a field of type 'PostStatus'
  */
 export type EnumPostStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PostStatus'>
@@ -4485,6 +4587,7 @@ export type GlobalOmitConfig = {
   platformFee?: Prisma.PlatformFeeOmit
   feePayment?: Prisma.FeePaymentOmit
   notificationLog?: Prisma.NotificationLogOmit
+  appNotification?: Prisma.AppNotificationOmit
   blogPost?: Prisma.BlogPostOmit
   siteContent?: Prisma.SiteContentOmit
   platformSetting?: Prisma.PlatformSettingOmit

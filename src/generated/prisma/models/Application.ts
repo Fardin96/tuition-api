@@ -286,6 +286,7 @@ export type ApplicationWhereInput = {
   student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
   fees?: Prisma.PlatformFeeListRelationFilter
   notifications?: Prisma.NotificationLogListRelationFilter
+  alerts?: Prisma.AppNotificationListRelationFilter
   reports?: Prisma.ReportListRelationFilter
   disputes?: Prisma.DisputeListRelationFilter
 }
@@ -310,6 +311,7 @@ export type ApplicationOrderByWithRelationInput = {
   student?: Prisma.StudentOrderByWithRelationInput
   fees?: Prisma.PlatformFeeOrderByRelationAggregateInput
   notifications?: Prisma.NotificationLogOrderByRelationAggregateInput
+  alerts?: Prisma.AppNotificationOrderByRelationAggregateInput
   reports?: Prisma.ReportOrderByRelationAggregateInput
   disputes?: Prisma.DisputeOrderByRelationAggregateInput
 }
@@ -339,6 +341,7 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
   fees?: Prisma.PlatformFeeListRelationFilter
   notifications?: Prisma.NotificationLogListRelationFilter
+  alerts?: Prisma.AppNotificationListRelationFilter
   reports?: Prisma.ReportListRelationFilter
   disputes?: Prisma.DisputeListRelationFilter
 }, "id" | "tutorId_requirementId" | "studentId_packageId">
@@ -399,6 +402,7 @@ export type ApplicationCreateInput = {
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
@@ -419,6 +423,7 @@ export type ApplicationUncheckedCreateInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
@@ -439,6 +444,7 @@ export type ApplicationUpdateInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
@@ -459,6 +465,7 @@ export type ApplicationUncheckedUpdateInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
@@ -829,6 +836,20 @@ export type ApplicationUpdateOneWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutNotificationsInput, Prisma.ApplicationUpdateWithoutNotificationsInput>, Prisma.ApplicationUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type ApplicationCreateNestedOneWithoutAlertsInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutAlertsInput, Prisma.ApplicationUncheckedCreateWithoutAlertsInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutAlertsInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+}
+
+export type ApplicationUpdateOneRequiredWithoutAlertsNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutAlertsInput, Prisma.ApplicationUncheckedCreateWithoutAlertsInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutAlertsInput
+  upsert?: Prisma.ApplicationUpsertWithoutAlertsInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutAlertsInput, Prisma.ApplicationUpdateWithoutAlertsInput>, Prisma.ApplicationUncheckedUpdateWithoutAlertsInput>
+}
+
 export type ApplicationCreateWithoutStudentInput = {
   id?: string
   initiatedBy: $Enums.InitiatedBy
@@ -844,6 +865,7 @@ export type ApplicationCreateWithoutStudentInput = {
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
@@ -863,6 +885,7 @@ export type ApplicationUncheckedCreateWithoutStudentInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
@@ -927,6 +950,7 @@ export type ApplicationCreateWithoutTutorInput = {
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
@@ -946,6 +970,7 @@ export type ApplicationUncheckedCreateWithoutTutorInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
@@ -991,6 +1016,7 @@ export type ApplicationCreateWithoutRequirementInput = {
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
@@ -1010,6 +1036,7 @@ export type ApplicationUncheckedCreateWithoutRequirementInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
@@ -1055,6 +1082,7 @@ export type ApplicationCreateWithoutPackageInput = {
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
@@ -1074,6 +1102,7 @@ export type ApplicationUncheckedCreateWithoutPackageInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
@@ -1120,6 +1149,7 @@ export type ApplicationCreateWithoutReportsInput = {
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
 
@@ -1139,6 +1169,7 @@ export type ApplicationUncheckedCreateWithoutReportsInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
 
@@ -1174,6 +1205,7 @@ export type ApplicationUpdateWithoutReportsInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
 
@@ -1193,6 +1225,7 @@ export type ApplicationUncheckedUpdateWithoutReportsInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
@@ -1212,6 +1245,7 @@ export type ApplicationCreateWithoutDisputesInput = {
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
 }
 
@@ -1231,6 +1265,7 @@ export type ApplicationUncheckedCreateWithoutDisputesInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
 }
 
@@ -1266,6 +1301,7 @@ export type ApplicationUpdateWithoutDisputesInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
 }
 
@@ -1285,6 +1321,7 @@ export type ApplicationUncheckedUpdateWithoutDisputesInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
@@ -1303,6 +1340,7 @@ export type ApplicationCreateWithoutFeesInput = {
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
@@ -1322,6 +1360,7 @@ export type ApplicationUncheckedCreateWithoutFeesInput = {
   matchVersion?: number | null
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
@@ -1357,6 +1396,7 @@ export type ApplicationUpdateWithoutFeesInput = {
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
@@ -1376,6 +1416,7 @@ export type ApplicationUncheckedUpdateWithoutFeesInput = {
   matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
@@ -1395,6 +1436,7 @@ export type ApplicationCreateWithoutNotificationsInput = {
   tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
   student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
 }
@@ -1414,6 +1456,7 @@ export type ApplicationUncheckedCreateWithoutNotificationsInput = {
   matchVersion?: number | null
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutApplicationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
   disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
 }
@@ -1449,6 +1492,7 @@ export type ApplicationUpdateWithoutNotificationsInput = {
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
@@ -1468,6 +1512,103 @@ export type ApplicationUncheckedUpdateWithoutNotificationsInput = {
   matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
+  disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type ApplicationCreateWithoutAlertsInput = {
+  id?: string
+  initiatedBy: $Enums.InitiatedBy
+  status?: $Enums.ApplicationStatus
+  appliedAt?: Date | string
+  confirmedAt?: Date | string | null
+  endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutApplicationsInput
+  package?: Prisma.TuitionPackageCreateNestedOneWithoutApplicationsInput
+  tutor: Prisma.TutorCreateNestedOneWithoutApplicationsInput
+  student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
+  fees?: Prisma.PlatformFeeCreateNestedManyWithoutApplicationInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutApplicationInput
+  reports?: Prisma.ReportCreateNestedManyWithoutApplicationInput
+  disputes?: Prisma.DisputeCreateNestedManyWithoutApplicationInput
+}
+
+export type ApplicationUncheckedCreateWithoutAlertsInput = {
+  id?: string
+  requirementId?: string | null
+  packageId?: string | null
+  tutorId: string
+  studentId: string
+  initiatedBy: $Enums.InitiatedBy
+  status?: $Enums.ApplicationStatus
+  appliedAt?: Date | string
+  confirmedAt?: Date | string | null
+  endedAt?: Date | string | null
+  matchScore?: number | null
+  matchVersion?: number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutApplicationInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutApplicationInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutApplicationInput
+  disputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type ApplicationCreateOrConnectWithoutAlertsInput = {
+  where: Prisma.ApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutAlertsInput, Prisma.ApplicationUncheckedCreateWithoutAlertsInput>
+}
+
+export type ApplicationUpsertWithoutAlertsInput = {
+  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutAlertsInput, Prisma.ApplicationUncheckedUpdateWithoutAlertsInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutAlertsInput, Prisma.ApplicationUncheckedCreateWithoutAlertsInput>
+  where?: Prisma.ApplicationWhereInput
+}
+
+export type ApplicationUpdateToOneWithWhereWithoutAlertsInput = {
+  where?: Prisma.ApplicationWhereInput
+  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutAlertsInput, Prisma.ApplicationUncheckedUpdateWithoutAlertsInput>
+}
+
+export type ApplicationUpdateWithoutAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatedBy?: Prisma.EnumInitiatedByFieldUpdateOperationsInput | $Enums.InitiatedBy
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
+  appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  requirement?: Prisma.TuitionRequirementUpdateOneWithoutApplicationsNestedInput
+  package?: Prisma.TuitionPackageUpdateOneWithoutApplicationsNestedInput
+  tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
+  student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
+  fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
+  disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
+}
+
+export type ApplicationUncheckedUpdateWithoutAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  packageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tutorId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatedBy?: Prisma.EnumInitiatedByFieldUpdateOperationsInput | $Enums.InitiatedBy
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
+  appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  matchScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
@@ -1502,6 +1643,7 @@ export type ApplicationUpdateWithoutStudentInput = {
   tutor?: Prisma.TutorUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
@@ -1521,6 +1663,7 @@ export type ApplicationUncheckedUpdateWithoutStudentInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
@@ -1570,6 +1713,7 @@ export type ApplicationUpdateWithoutTutorInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
@@ -1589,6 +1733,7 @@ export type ApplicationUncheckedUpdateWithoutTutorInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
@@ -1638,6 +1783,7 @@ export type ApplicationUpdateWithoutRequirementInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
@@ -1657,6 +1803,7 @@ export type ApplicationUncheckedUpdateWithoutRequirementInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
@@ -1706,6 +1853,7 @@ export type ApplicationUpdateWithoutPackageInput = {
   student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   fees?: Prisma.PlatformFeeUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUpdateManyWithoutApplicationNestedInput
 }
@@ -1725,6 +1873,7 @@ export type ApplicationUncheckedUpdateWithoutPackageInput = {
   matchParts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutApplicationNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutApplicationNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutApplicationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutApplicationNestedInput
   disputes?: Prisma.DisputeUncheckedUpdateManyWithoutApplicationNestedInput
 }
@@ -1752,6 +1901,7 @@ export type ApplicationUncheckedUpdateManyWithoutPackageInput = {
 export type ApplicationCountOutputType = {
   fees: number
   notifications: number
+  alerts: number
   reports: number
   disputes: number
 }
@@ -1759,6 +1909,7 @@ export type ApplicationCountOutputType = {
 export type ApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fees?: boolean | ApplicationCountOutputTypeCountFeesArgs
   notifications?: boolean | ApplicationCountOutputTypeCountNotificationsArgs
+  alerts?: boolean | ApplicationCountOutputTypeCountAlertsArgs
   reports?: boolean | ApplicationCountOutputTypeCountReportsArgs
   disputes?: boolean | ApplicationCountOutputTypeCountDisputesArgs
 }
@@ -1785,6 +1936,13 @@ export type ApplicationCountOutputTypeCountFeesArgs<ExtArgs extends runtime.Type
  */
 export type ApplicationCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.NotificationLogWhereInput
+}
+
+/**
+ * ApplicationCountOutputType without action
+ */
+export type ApplicationCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AppNotificationWhereInput
 }
 
 /**
@@ -1822,6 +1980,7 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   fees?: boolean | Prisma.Application$feesArgs<ExtArgs>
   notifications?: boolean | Prisma.Application$notificationsArgs<ExtArgs>
+  alerts?: boolean | Prisma.Application$alertsArgs<ExtArgs>
   reports?: boolean | Prisma.Application$reportsArgs<ExtArgs>
   disputes?: boolean | Prisma.Application$disputesArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
@@ -1891,6 +2050,7 @@ export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.Internal
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   fees?: boolean | Prisma.Application$feesArgs<ExtArgs>
   notifications?: boolean | Prisma.Application$notificationsArgs<ExtArgs>
+  alerts?: boolean | Prisma.Application$alertsArgs<ExtArgs>
   reports?: boolean | Prisma.Application$reportsArgs<ExtArgs>
   disputes?: boolean | Prisma.Application$disputesArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
@@ -1917,6 +2077,7 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     student: Prisma.$StudentPayload<ExtArgs>
     fees: Prisma.$PlatformFeePayload<ExtArgs>[]
     notifications: Prisma.$NotificationLogPayload<ExtArgs>[]
+    alerts: Prisma.$AppNotificationPayload<ExtArgs>[]
     reports: Prisma.$ReportPayload<ExtArgs>[]
     disputes: Prisma.$DisputePayload<ExtArgs>[]
   }
@@ -2334,6 +2495,7 @@ export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runt
   student<T extends Prisma.StudentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudentDefaultArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   fees<T extends Prisma.Application$feesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$feesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformFeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Application$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  alerts<T extends Prisma.Application$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reports<T extends Prisma.Application$reportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   disputes<T extends Prisma.Application$disputesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$disputesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DisputePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2862,6 +3024,30 @@ export type Application$notificationsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.NotificationLogScalarFieldEnum | Prisma.NotificationLogScalarFieldEnum[]
+}
+
+/**
+ * Application.alerts
+ */
+export type Application$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AppNotification
+   */
+  select?: Prisma.AppNotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AppNotification
+   */
+  omit?: Prisma.AppNotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppNotificationInclude<ExtArgs> | null
+  where?: Prisma.AppNotificationWhereInput
+  orderBy?: Prisma.AppNotificationOrderByWithRelationInput | Prisma.AppNotificationOrderByWithRelationInput[]
+  cursor?: Prisma.AppNotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AppNotificationScalarFieldEnum | Prisma.AppNotificationScalarFieldEnum[]
 }
 
 /**

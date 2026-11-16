@@ -52,6 +52,7 @@ export type TutorMinAggregateOutputType = {
   studentIdNumber: string | null
   gender: $Enums.Gender | null
   parentsInfo: string | null
+  instituteName: string | null
   zoneLimit: number | null
   verificationStatus: $Enums.VerificationStatus | null
   isListed: boolean | null
@@ -75,6 +76,7 @@ export type TutorMaxAggregateOutputType = {
   studentIdNumber: string | null
   gender: $Enums.Gender | null
   parentsInfo: string | null
+  instituteName: string | null
   zoneLimit: number | null
   verificationStatus: $Enums.VerificationStatus | null
   isListed: boolean | null
@@ -98,6 +100,7 @@ export type TutorCountAggregateOutputType = {
   studentIdNumber: number
   gender: number
   parentsInfo: number
+  instituteName: number
   zoneLimit: number
   verificationStatus: number
   isListed: number
@@ -135,6 +138,7 @@ export type TutorMinAggregateInputType = {
   studentIdNumber?: true
   gender?: true
   parentsInfo?: true
+  instituteName?: true
   zoneLimit?: true
   verificationStatus?: true
   isListed?: true
@@ -158,6 +162,7 @@ export type TutorMaxAggregateInputType = {
   studentIdNumber?: true
   gender?: true
   parentsInfo?: true
+  instituteName?: true
   zoneLimit?: true
   verificationStatus?: true
   isListed?: true
@@ -181,6 +186,7 @@ export type TutorCountAggregateInputType = {
   studentIdNumber?: true
   gender?: true
   parentsInfo?: true
+  instituteName?: true
   zoneLimit?: true
   verificationStatus?: true
   isListed?: true
@@ -291,6 +297,7 @@ export type TutorGroupByOutputType = {
   studentIdNumber: string | null
   gender: $Enums.Gender
   parentsInfo: string | null
+  instituteName: string | null
   zoneLimit: number
   verificationStatus: $Enums.VerificationStatus
   isListed: boolean
@@ -337,6 +344,7 @@ export type TutorWhereInput = {
   studentIdNumber?: Prisma.StringNullableFilter<"Tutor"> | string | null
   gender?: Prisma.EnumGenderFilter<"Tutor"> | $Enums.Gender
   parentsInfo?: Prisma.StringNullableFilter<"Tutor"> | string | null
+  instituteName?: Prisma.StringNullableFilter<"Tutor"> | string | null
   zoneLimit?: Prisma.IntFilter<"Tutor"> | number
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Tutor"> | $Enums.VerificationStatus
   isListed?: Prisma.BoolFilter<"Tutor"> | boolean
@@ -374,6 +382,7 @@ export type TutorOrderByWithRelationInput = {
   studentIdNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrderInput | Prisma.SortOrder
+  instituteName?: Prisma.SortOrderInput | Prisma.SortOrder
   zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
@@ -415,6 +424,7 @@ export type TutorWhereUniqueInput = Prisma.AtLeast<{
   studentIdNumber?: Prisma.StringNullableFilter<"Tutor"> | string | null
   gender?: Prisma.EnumGenderFilter<"Tutor"> | $Enums.Gender
   parentsInfo?: Prisma.StringNullableFilter<"Tutor"> | string | null
+  instituteName?: Prisma.StringNullableFilter<"Tutor"> | string | null
   zoneLimit?: Prisma.IntFilter<"Tutor"> | number
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Tutor"> | $Enums.VerificationStatus
   isListed?: Prisma.BoolFilter<"Tutor"> | boolean
@@ -452,6 +462,7 @@ export type TutorOrderByWithAggregationInput = {
   studentIdNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrderInput | Prisma.SortOrder
+  instituteName?: Prisma.SortOrderInput | Prisma.SortOrder
   zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
@@ -483,6 +494,7 @@ export type TutorScalarWhereWithAggregatesInput = {
   studentIdNumber?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
   gender?: Prisma.EnumGenderWithAggregatesFilter<"Tutor"> | $Enums.Gender
   parentsInfo?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
+  instituteName?: Prisma.StringNullableWithAggregatesFilter<"Tutor"> | string | null
   zoneLimit?: Prisma.IntWithAggregatesFilter<"Tutor"> | number
   verificationStatus?: Prisma.EnumVerificationStatusWithAggregatesFilter<"Tutor"> | $Enums.VerificationStatus
   isListed?: Prisma.BoolWithAggregatesFilter<"Tutor"> | boolean
@@ -504,6 +516,7 @@ export type TutorCreateInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -541,6 +554,7 @@ export type TutorUncheckedCreateInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -575,6 +589,7 @@ export type TutorUpdateInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -612,6 +627,7 @@ export type TutorUncheckedUpdateInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -648,6 +664,7 @@ export type TutorCreateManyInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -669,6 +686,7 @@ export type TutorUpdateManyMutationInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -692,6 +710,7 @@ export type TutorUncheckedUpdateManyInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -725,6 +744,7 @@ export type TutorCountOrderByAggregateInput = {
   studentIdNumber?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrder
+  instituteName?: Prisma.SortOrder
   zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
@@ -754,6 +774,7 @@ export type TutorMaxOrderByAggregateInput = {
   studentIdNumber?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrder
+  instituteName?: Prisma.SortOrder
   zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
@@ -777,6 +798,7 @@ export type TutorMinOrderByAggregateInput = {
   studentIdNumber?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   parentsInfo?: Prisma.SortOrder
+  instituteName?: Prisma.SortOrder
   zoneLimit?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   isListed?: Prisma.SortOrder
@@ -1027,6 +1049,7 @@ export type TutorCreateWithoutAccountInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1061,6 +1084,7 @@ export type TutorUncheckedCreateWithoutAccountInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1111,6 +1135,7 @@ export type TutorUpdateWithoutAccountInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1145,6 +1170,7 @@ export type TutorUncheckedUpdateWithoutAccountInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1179,6 +1205,7 @@ export type TutorCreateWithoutLocationInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1215,6 +1242,7 @@ export type TutorUncheckedCreateWithoutLocationInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1264,6 +1292,7 @@ export type TutorUpdateWithoutLocationInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1300,6 +1329,7 @@ export type TutorUncheckedUpdateWithoutLocationInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1333,6 +1363,7 @@ export type TutorCreateWithoutAreasInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1369,6 +1400,7 @@ export type TutorUncheckedCreateWithoutAreasInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1418,6 +1450,7 @@ export type TutorUpdateWithoutAreasInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1454,6 +1487,7 @@ export type TutorUncheckedUpdateWithoutAreasInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1487,6 +1521,7 @@ export type TutorCreateWithoutSubjectsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1523,6 +1558,7 @@ export type TutorUncheckedCreateWithoutSubjectsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1572,6 +1608,7 @@ export type TutorUpdateWithoutSubjectsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1608,6 +1645,7 @@ export type TutorUncheckedUpdateWithoutSubjectsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1641,6 +1679,7 @@ export type TutorCreateWithoutVerificationsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1677,6 +1716,7 @@ export type TutorUncheckedCreateWithoutVerificationsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1726,6 +1766,7 @@ export type TutorUpdateWithoutVerificationsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1762,6 +1803,7 @@ export type TutorUncheckedUpdateWithoutVerificationsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1795,6 +1837,7 @@ export type TutorCreateWithoutCredentialsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1831,6 +1874,7 @@ export type TutorUncheckedCreateWithoutCredentialsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1880,6 +1924,7 @@ export type TutorUpdateWithoutCredentialsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1916,6 +1961,7 @@ export type TutorUncheckedUpdateWithoutCredentialsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1949,6 +1995,7 @@ export type TutorCreateWithoutVideosInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -1985,6 +2032,7 @@ export type TutorUncheckedCreateWithoutVideosInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2034,6 +2082,7 @@ export type TutorUpdateWithoutVideosInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2070,6 +2119,7 @@ export type TutorUncheckedUpdateWithoutVideosInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2103,6 +2153,7 @@ export type TutorCreateWithoutRequirementsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2139,6 +2190,7 @@ export type TutorUncheckedCreateWithoutRequirementsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2188,6 +2240,7 @@ export type TutorUpdateWithoutRequirementsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2224,6 +2277,7 @@ export type TutorUncheckedUpdateWithoutRequirementsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2257,6 +2311,7 @@ export type TutorCreateWithoutZonesInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2293,6 +2348,7 @@ export type TutorUncheckedCreateWithoutZonesInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2342,6 +2398,7 @@ export type TutorUpdateWithoutZonesInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2378,6 +2435,7 @@ export type TutorUncheckedUpdateWithoutZonesInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2411,6 +2469,7 @@ export type TutorCreateWithoutZoneLimitRequestsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2447,6 +2506,7 @@ export type TutorUncheckedCreateWithoutZoneLimitRequestsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2496,6 +2556,7 @@ export type TutorUpdateWithoutZoneLimitRequestsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2532,6 +2593,7 @@ export type TutorUncheckedUpdateWithoutZoneLimitRequestsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2565,6 +2627,7 @@ export type TutorCreateWithoutPackagesInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2601,6 +2664,7 @@ export type TutorUncheckedCreateWithoutPackagesInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2650,6 +2714,7 @@ export type TutorUpdateWithoutPackagesInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2686,6 +2751,7 @@ export type TutorUncheckedUpdateWithoutPackagesInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2719,6 +2785,7 @@ export type TutorCreateWithoutApplicationsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2755,6 +2822,7 @@ export type TutorUncheckedCreateWithoutApplicationsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2804,6 +2872,7 @@ export type TutorUpdateWithoutApplicationsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2840,6 +2909,7 @@ export type TutorUncheckedUpdateWithoutApplicationsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2873,6 +2943,7 @@ export type TutorCreateWithoutReviewsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2909,6 +2980,7 @@ export type TutorUncheckedCreateWithoutReviewsInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -2958,6 +3030,7 @@ export type TutorUpdateWithoutReviewsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2994,6 +3067,7 @@ export type TutorUncheckedUpdateWithoutReviewsInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3027,6 +3101,7 @@ export type TutorCreateWithoutFeesInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -3063,6 +3138,7 @@ export type TutorUncheckedCreateWithoutFeesInput = {
   studentIdNumber?: string | null
   gender: $Enums.Gender
   parentsInfo?: string | null
+  instituteName?: string | null
   zoneLimit?: number
   verificationStatus?: $Enums.VerificationStatus
   isListed?: boolean
@@ -3112,6 +3188,7 @@ export type TutorUpdateWithoutFeesInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3148,6 +3225,7 @@ export type TutorUncheckedUpdateWithoutFeesInput = {
   studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3313,6 +3391,7 @@ export type TutorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  instituteName?: boolean
   zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
@@ -3351,6 +3430,7 @@ export type TutorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  instituteName?: boolean
   zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
@@ -3375,6 +3455,7 @@ export type TutorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  instituteName?: boolean
   zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
@@ -3399,6 +3480,7 @@ export type TutorSelectScalar = {
   studentIdNumber?: boolean
   gender?: boolean
   parentsInfo?: boolean
+  instituteName?: boolean
   zoneLimit?: boolean
   verificationStatus?: boolean
   isListed?: boolean
@@ -3408,7 +3490,7 @@ export type TutorSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TutorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "gender" | "parentsInfo" | "zoneLimit" | "verificationStatus" | "isListed" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["tutor"]>
+export type TutorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "gender" | "parentsInfo" | "instituteName" | "zoneLimit" | "verificationStatus" | "isListed" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["tutor"]>
 export type TutorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   areas?: boolean | Prisma.Tutor$areasArgs<ExtArgs>
@@ -3465,6 +3547,7 @@ export type $TutorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     studentIdNumber: string | null
     gender: $Enums.Gender
     parentsInfo: string | null
+    instituteName: string | null
     zoneLimit: number
     verificationStatus: $Enums.VerificationStatus
     isListed: boolean
@@ -3922,6 +4005,7 @@ export interface TutorFieldRefs {
   readonly studentIdNumber: Prisma.FieldRef<"Tutor", 'String'>
   readonly gender: Prisma.FieldRef<"Tutor", 'Gender'>
   readonly parentsInfo: Prisma.FieldRef<"Tutor", 'String'>
+  readonly instituteName: Prisma.FieldRef<"Tutor", 'String'>
   readonly zoneLimit: Prisma.FieldRef<"Tutor", 'Int'>
   readonly verificationStatus: Prisma.FieldRef<"Tutor", 'VerificationStatus'>
   readonly isListed: Prisma.FieldRef<"Tutor", 'Boolean'>

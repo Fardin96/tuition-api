@@ -63,7 +63,7 @@ export async function requirementRoutes(app: FastifyInstance) {
           tag: "Requirements",
           summary: "Browse open requirements",
           description:
-            "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.",
+            "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. scope=set lists requirements that match one of the tutor's own active sets (setId, required) by curriculum, level, subject and area; the manual filters are ignored in that mode. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.",
           auth: ["TUTOR"],
           errors: [404],
           rateLimit: "300/min per account",

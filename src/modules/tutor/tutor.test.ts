@@ -16,6 +16,7 @@ import {
   createTutorRequirement,
   createTutorZone,
   getAuthHeaders,
+  setStudentLocation,
   setTutorLocation,
 } from "../../tests/helpers.js";
 
@@ -130,6 +131,83 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(400);
     });
+
+    it("saves the institute name trimmed and returns it", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload({ instituteName: "  University of Dhaka  " }),
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).instituteName).toBe("University of Dhaka");
+      const row = await prisma.tutor.findUnique({ where: { accountId: account.id } });
+      expect(row?.instituteName).toBe("University of Dhaka");
+    });
+
+    it("accepts a 120-character institute name", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload({ instituteName: "x".repeat(120) }),
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).instituteName).toHaveLength(120);
+    });
+
+    it("keeps the profile valid without an institute name (older web builds)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload(),
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).instituteName).toBeNull();
+    });
+
+    it("rejects an institute name over 120 characters (400)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload({ instituteName: "x".repeat(121) }),
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("rejects an empty or blank institute name (400)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const headers = await getAuthHeaders(account);
+
+      for (const instituteName of ["", "   "]) {
+        const res = await app.inject({
+          method: "POST",
+          url: "/api/v1/tutors/me",
+          headers,
+          payload: tutorPayload({ instituteName }),
+        });
+        expect(res.statusCode).toBe(400);
+      }
+    });
   });
 
   describe("PATCH /api/v1/tutors/me", () => {
@@ -184,6 +262,62 @@ describe("tutor routes", () => {
       });
 
       expect(res.statusCode).toBe(404);
+    });
+
+    it("updates the institute name trimmed", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id, { instituteName: "Old College" });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: { instituteName: "  BUET  " },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).instituteName).toBe("BUET");
+    });
+
+    it("rejects a blank or over-long institute name (400)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id);
+      const headers = await getAuthHeaders(account);
+
+      const blank = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/tutors/me",
+        headers,
+        payload: { instituteName: " " },
+      });
+      const tooLong = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/tutors/me",
+        headers,
+        payload: { instituteName: "x".repeat(121) },
+      });
+
+      expect(blank.statusCode).toBe(400);
+      expect(tooLong.statusCode).toBe(400);
+    });
+  });
+
+  describe("GET /api/v1/me", () => {
+    it("returns instituteName on the tutor profile", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id, { instituteName: "University of Dhaka" });
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/me",
+        headers: await getAuthHeaders(account),
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).account.tutor.instituteName).toBe("University of Dhaka");
     });
   });
 
@@ -512,6 +646,91 @@ describe("tutor routes", () => {
     });
   });
 
+  describe("GET /api/v1/tutors/nearby", () => {
+    it("returns instituteName, areas and subjects for each nearby tutor", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const studentAccount = await createAccount({ role: "STUDENT" });
+      const student = await createStudentProfile(studentAccount.id, area.id);
+      await setStudentLocation(student.id, { districtCode: "dhaka", lat: 23.73, lng: 90.4 });
+
+      const tutorAccount = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(tutorAccount.id, {
+        isListed: true,
+        instituteName: "University of Dhaka",
+      });
+      await setTutorLocation(tutor.id, { districtCode: "dhaka", lat: 23.735, lng: 90.405 });
+      const areaA = await createArea({ name: "Dhanmondi" });
+      const areaB = await createArea({ name: "Mohammadpur" });
+      const subject = await createSubject({ name: "Physics" });
+      await prisma.tutorArea.createMany({
+        data: [
+          { tutorId: tutor.id, areaId: areaA.id },
+          { tutorId: tutor.id, areaId: areaB.id },
+        ],
+      });
+      await prisma.tutorSubject.create({ data: { tutorId: tutor.id, subjectId: subject.id } });
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/tutors/nearby?radiusMeters=2000",
+        headers: await getAuthHeaders(studentAccount),
+      });
+
+      expect(res.statusCode).toBe(200);
+      const [card] = JSON.parse(res.body).tutors;
+      expect(card.id).toBe(tutor.id);
+      expect(card.instituteName).toBe("University of Dhaka");
+      expect(card.areas).toHaveLength(2);
+      expect(card.areas).toEqual(
+        expect.arrayContaining([
+          { id: areaA.id, name: "Dhanmondi" },
+          { id: areaB.id, name: "Mohammadpur" },
+        ]),
+      );
+      expect(card.subjects).toEqual([{ id: subject.id, name: "Physics" }]);
+      expect(card.distanceMeters).toBeLessThan(2000);
+    });
+
+    it("keeps distance order and gives each tutor only its own areas and subjects", async () => {
+      const app = await createTestApp();
+      const area = await createArea();
+      const studentAccount = await createAccount({ role: "STUDENT" });
+      const student = await createStudentProfile(studentAccount.id, area.id);
+      await setStudentLocation(student.id, { districtCode: "dhaka", lat: 23.73, lng: 90.4 });
+
+      const closeAccount = await createAccount({ role: "TUTOR" });
+      const closeTutor = await createTutorProfile(closeAccount.id, { isListed: true });
+      await setTutorLocation(closeTutor.id, { districtCode: "dhaka", lat: 23.735, lng: 90.405 });
+      const farAccount = await createAccount({ role: "TUTOR" });
+      const farTutor = await createTutorProfile(farAccount.id, {
+        isListed: true,
+        instituteName: "Far College",
+      });
+      await setTutorLocation(farTutor.id, { districtCode: "dhaka", lat: 23.74, lng: 90.41 });
+
+      const closeArea = await createArea({ name: "Close Area" });
+      const farArea = await createArea({ name: "Far Area" });
+      await prisma.tutorArea.create({ data: { tutorId: closeTutor.id, areaId: closeArea.id } });
+      await prisma.tutorArea.create({ data: { tutorId: farTutor.id, areaId: farArea.id } });
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/tutors/nearby?radiusMeters=5000",
+        headers: await getAuthHeaders(studentAccount),
+      });
+
+      expect(res.statusCode).toBe(200);
+      const tutors = JSON.parse(res.body).tutors;
+      expect(tutors.map((t: { id: string }) => t.id)).toEqual([closeTutor.id, farTutor.id]);
+      expect(tutors[0].instituteName).toBeNull();
+      expect(tutors[0].areas).toEqual([{ id: closeArea.id, name: "Close Area" }]);
+      expect(tutors[0].subjects).toEqual([]);
+      expect(tutors[1].instituteName).toBe("Far College");
+      expect(tutors[1].areas).toEqual([{ id: farArea.id, name: "Far Area" }]);
+    });
+  });
+
   describe("GET /api/v1/tutors", () => {
     it("lists only listed tutors", async () => {
       const app = await createTestApp();
@@ -526,6 +745,17 @@ describe("tutor routes", () => {
       const body = JSON.parse(res.body);
       expect(body.tutors).toHaveLength(1);
       expect(body.tutors[0].name).toBe("Listed Tutor");
+    });
+
+    it("returns instituteName in search results", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id, { isListed: true, instituteName: "BUET" });
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/tutors" });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).tutors[0].instituteName).toBe("BUET");
     });
 
     it("filters by area", async () => {
@@ -592,6 +822,20 @@ describe("tutor routes", () => {
       expect(body.tutor.subjects).toHaveLength(1);
       expect(body.tutor.credentials).toHaveLength(1);
       expect(body.tutor.videos).toHaveLength(1);
+    });
+
+    it("returns instituteName on the public profile", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id, {
+        isListed: true,
+        instituteName: "University of Dhaka",
+      });
+
+      const res = await app.inject({ method: "GET", url: `/api/v1/tutors/${tutor.id}` });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).tutor.instituteName).toBe("University of Dhaka");
     });
 
     it("returns 404 for unknown tutor", async () => {

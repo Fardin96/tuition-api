@@ -228,6 +228,7 @@ export type AccountWhereInput = {
   sessions?: Prisma.SessionListRelationFilter
   files?: Prisma.FileAssetListRelationFilter
   notifications?: Prisma.NotificationLogListRelationFilter
+  alerts?: Prisma.AppNotificationListRelationFilter
   auditEntries?: Prisma.AuditLogListRelationFilter
   blocks?: Prisma.AccountBlockListRelationFilter
   reportsMade?: Prisma.ReportListRelationFilter
@@ -253,6 +254,7 @@ export type AccountOrderByWithRelationInput = {
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   files?: Prisma.FileAssetOrderByRelationAggregateInput
   notifications?: Prisma.NotificationLogOrderByRelationAggregateInput
+  alerts?: Prisma.AppNotificationOrderByRelationAggregateInput
   auditEntries?: Prisma.AuditLogOrderByRelationAggregateInput
   blocks?: Prisma.AccountBlockOrderByRelationAggregateInput
   reportsMade?: Prisma.ReportOrderByRelationAggregateInput
@@ -282,6 +284,7 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   sessions?: Prisma.SessionListRelationFilter
   files?: Prisma.FileAssetListRelationFilter
   notifications?: Prisma.NotificationLogListRelationFilter
+  alerts?: Prisma.AppNotificationListRelationFilter
   auditEntries?: Prisma.AuditLogListRelationFilter
   blocks?: Prisma.AccountBlockListRelationFilter
   reportsMade?: Prisma.ReportListRelationFilter
@@ -339,6 +342,7 @@ export type AccountCreateInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -364,6 +368,7 @@ export type AccountUncheckedCreateInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -389,6 +394,7 @@ export type AccountUpdateInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -414,6 +420,7 @@ export type AccountUncheckedUpdateInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -693,6 +700,20 @@ export type AccountUpdateOneRequiredWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutNotificationsInput, Prisma.AccountUpdateWithoutNotificationsInput>, Prisma.AccountUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type AccountCreateNestedOneWithoutAlertsInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutAlertsInput, Prisma.AccountUncheckedCreateWithoutAlertsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutAlertsInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneRequiredWithoutAlertsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutAlertsInput, Prisma.AccountUncheckedCreateWithoutAlertsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutAlertsInput
+  upsert?: Prisma.AccountUpsertWithoutAlertsInput
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutAlertsInput, Prisma.AccountUpdateWithoutAlertsInput>, Prisma.AccountUncheckedUpdateWithoutAlertsInput>
+}
+
 export type AccountCreateNestedOneWithoutAuditEntriesInput = {
   create?: Prisma.XOR<Prisma.AccountCreateWithoutAuditEntriesInput, Prisma.AccountUncheckedCreateWithoutAuditEntriesInput>
   connectOrCreate?: Prisma.AccountCreateOrConnectWithoutAuditEntriesInput
@@ -725,6 +746,7 @@ export type AccountCreateWithoutSessionsInput = {
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -749,6 +771,7 @@ export type AccountUncheckedCreateWithoutSessionsInput = {
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -789,6 +812,7 @@ export type AccountUpdateWithoutSessionsInput = {
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -813,6 +837,7 @@ export type AccountUncheckedUpdateWithoutSessionsInput = {
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -837,6 +862,7 @@ export type AccountCreateWithoutAdminUserInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -861,6 +887,7 @@ export type AccountUncheckedCreateWithoutAdminUserInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -901,6 +928,7 @@ export type AccountUpdateWithoutAdminUserInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -925,6 +953,7 @@ export type AccountUncheckedUpdateWithoutAdminUserInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -950,6 +979,7 @@ export type AccountCreateWithoutBlocksInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
@@ -974,6 +1004,7 @@ export type AccountUncheckedCreateWithoutBlocksInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
@@ -1014,6 +1045,7 @@ export type AccountUpdateWithoutBlocksInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
@@ -1038,6 +1070,7 @@ export type AccountUncheckedUpdateWithoutBlocksInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
@@ -1061,6 +1094,7 @@ export type AccountCreateWithoutFilesInput = {
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -1085,6 +1119,7 @@ export type AccountUncheckedCreateWithoutFilesInput = {
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -1125,6 +1160,7 @@ export type AccountUpdateWithoutFilesInput = {
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -1149,6 +1185,7 @@ export type AccountUncheckedUpdateWithoutFilesInput = {
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -1173,6 +1210,7 @@ export type AccountCreateWithoutStudentInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -1197,6 +1235,7 @@ export type AccountUncheckedCreateWithoutStudentInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -1237,6 +1276,7 @@ export type AccountUpdateWithoutStudentInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -1261,6 +1301,7 @@ export type AccountUncheckedUpdateWithoutStudentInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -1285,6 +1326,7 @@ export type AccountCreateWithoutTutorInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -1309,6 +1351,7 @@ export type AccountUncheckedCreateWithoutTutorInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -1349,6 +1392,7 @@ export type AccountUpdateWithoutTutorInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -1373,6 +1417,7 @@ export type AccountUncheckedUpdateWithoutTutorInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -1398,6 +1443,7 @@ export type AccountCreateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
@@ -1422,6 +1468,7 @@ export type AccountUncheckedCreateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
@@ -1451,6 +1498,7 @@ export type AccountCreateWithoutReportsAgainstInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -1475,6 +1523,7 @@ export type AccountUncheckedCreateWithoutReportsAgainstInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -1515,6 +1564,7 @@ export type AccountUpdateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
@@ -1539,6 +1589,7 @@ export type AccountUncheckedUpdateWithoutReportsMadeInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
@@ -1574,6 +1625,7 @@ export type AccountUpdateWithoutReportsAgainstInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -1598,6 +1650,7 @@ export type AccountUncheckedUpdateWithoutReportsAgainstInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -1622,6 +1675,7 @@ export type AccountCreateWithoutDisputesRaisedInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -1646,6 +1700,7 @@ export type AccountUncheckedCreateWithoutDisputesRaisedInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -1675,6 +1730,7 @@ export type AccountCreateWithoutDisputesAgainstInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -1699,6 +1755,7 @@ export type AccountUncheckedCreateWithoutDisputesAgainstInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -1739,6 +1796,7 @@ export type AccountUpdateWithoutDisputesRaisedInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -1763,6 +1821,7 @@ export type AccountUncheckedUpdateWithoutDisputesRaisedInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -1798,6 +1857,7 @@ export type AccountUpdateWithoutDisputesAgainstInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -1822,6 +1882,7 @@ export type AccountUncheckedUpdateWithoutDisputesAgainstInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -1845,6 +1906,7 @@ export type AccountCreateWithoutNotificationsInput = {
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -1869,6 +1931,7 @@ export type AccountUncheckedCreateWithoutNotificationsInput = {
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -1909,6 +1972,7 @@ export type AccountUpdateWithoutNotificationsInput = {
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -1933,6 +1997,123 @@ export type AccountUncheckedUpdateWithoutNotificationsInput = {
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+}
+
+export type AccountCreateWithoutAlertsInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+}
+
+export type AccountUncheckedCreateWithoutAlertsInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+}
+
+export type AccountCreateOrConnectWithoutAlertsInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutAlertsInput, Prisma.AccountUncheckedCreateWithoutAlertsInput>
+}
+
+export type AccountUpsertWithoutAlertsInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutAlertsInput, Prisma.AccountUncheckedUpdateWithoutAlertsInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutAlertsInput, Prisma.AccountUncheckedCreateWithoutAlertsInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutAlertsInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutAlertsInput, Prisma.AccountUncheckedUpdateWithoutAlertsInput>
+}
+
+export type AccountUpdateWithoutAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -1958,6 +2139,7 @@ export type AccountCreateWithoutAuditEntriesInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
@@ -1982,6 +2164,7 @@ export type AccountUncheckedCreateWithoutAuditEntriesInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
@@ -2022,6 +2205,7 @@ export type AccountUpdateWithoutAuditEntriesInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
@@ -2046,6 +2230,7 @@ export type AccountUncheckedUpdateWithoutAuditEntriesInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
@@ -2062,6 +2247,7 @@ export type AccountCountOutputType = {
   sessions: number
   files: number
   notifications: number
+  alerts: number
   auditEntries: number
   blocks: number
   reportsMade: number
@@ -2074,6 +2260,7 @@ export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   sessions?: boolean | AccountCountOutputTypeCountSessionsArgs
   files?: boolean | AccountCountOutputTypeCountFilesArgs
   notifications?: boolean | AccountCountOutputTypeCountNotificationsArgs
+  alerts?: boolean | AccountCountOutputTypeCountAlertsArgs
   auditEntries?: boolean | AccountCountOutputTypeCountAuditEntriesArgs
   blocks?: boolean | AccountCountOutputTypeCountBlocksArgs
   reportsMade?: boolean | AccountCountOutputTypeCountReportsMadeArgs
@@ -2111,6 +2298,13 @@ export type AccountCountOutputTypeCountFilesArgs<ExtArgs extends runtime.Types.E
  */
 export type AccountCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.NotificationLogWhereInput
+}
+
+/**
+ * AccountCountOutputType without action
+ */
+export type AccountCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AppNotificationWhereInput
 }
 
 /**
@@ -2173,6 +2367,7 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   sessions?: boolean | Prisma.Account$sessionsArgs<ExtArgs>
   files?: boolean | Prisma.Account$filesArgs<ExtArgs>
   notifications?: boolean | Prisma.Account$notificationsArgs<ExtArgs>
+  alerts?: boolean | Prisma.Account$alertsArgs<ExtArgs>
   auditEntries?: boolean | Prisma.Account$auditEntriesArgs<ExtArgs>
   blocks?: boolean | Prisma.Account$blocksArgs<ExtArgs>
   reportsMade?: boolean | Prisma.Account$reportsMadeArgs<ExtArgs>
@@ -2229,6 +2424,7 @@ export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   sessions?: boolean | Prisma.Account$sessionsArgs<ExtArgs>
   files?: boolean | Prisma.Account$filesArgs<ExtArgs>
   notifications?: boolean | Prisma.Account$notificationsArgs<ExtArgs>
+  alerts?: boolean | Prisma.Account$alertsArgs<ExtArgs>
   auditEntries?: boolean | Prisma.Account$auditEntriesArgs<ExtArgs>
   blocks?: boolean | Prisma.Account$blocksArgs<ExtArgs>
   reportsMade?: boolean | Prisma.Account$reportsMadeArgs<ExtArgs>
@@ -2249,6 +2445,7 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     files: Prisma.$FileAssetPayload<ExtArgs>[]
     notifications: Prisma.$NotificationLogPayload<ExtArgs>[]
+    alerts: Prisma.$AppNotificationPayload<ExtArgs>[]
     auditEntries: Prisma.$AuditLogPayload<ExtArgs>[]
     blocks: Prisma.$AccountBlockPayload<ExtArgs>[]
     reportsMade: Prisma.$ReportPayload<ExtArgs>[]
@@ -2667,6 +2864,7 @@ export interface Prisma__AccountClient<T, Null = never, ExtArgs extends runtime.
   sessions<T extends Prisma.Account$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   files<T extends Prisma.Account$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FileAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Account$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  alerts<T extends Prisma.Account$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditEntries<T extends Prisma.Account$auditEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$auditEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   blocks<T extends Prisma.Account$blocksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$blocksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reportsMade<T extends Prisma.Account$reportsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$reportsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3231,6 +3429,30 @@ export type Account$notificationsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.NotificationLogScalarFieldEnum | Prisma.NotificationLogScalarFieldEnum[]
+}
+
+/**
+ * Account.alerts
+ */
+export type Account$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AppNotification
+   */
+  select?: Prisma.AppNotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AppNotification
+   */
+  omit?: Prisma.AppNotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppNotificationInclude<ExtArgs> | null
+  where?: Prisma.AppNotificationWhereInput
+  orderBy?: Prisma.AppNotificationOrderByWithRelationInput | Prisma.AppNotificationOrderByWithRelationInput[]
+  cursor?: Prisma.AppNotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AppNotificationScalarFieldEnum | Prisma.AppNotificationScalarFieldEnum[]
 }
 
 /**

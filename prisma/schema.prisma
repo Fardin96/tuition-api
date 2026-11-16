@@ -215,6 +215,19 @@ enum ZoneLimitRequestStatus {
   DENIED
 }
 
+// In-app alerts for the dashboard bell. Not delivered anywhere else.
+enum AppNotificationKind {
+  APPLICATION_RECEIVED
+  PACKAGE_REQUESTED
+  APPLICATION_ACCEPTED
+  APPLICATION_DECLINED
+  LISTING_FILLED // auto-declined because another applicant was accepted
+  APPLICATION_WITHDRAWN
+  APPLICATION_REOPENED
+  APPLICATION_CANCELLED
+  APPLICATION_COMPLETED
+}
+
 enum NotificationStatus {
   PENDING
   SENDING
@@ -287,6 +300,7 @@ model Account {
   sessions        Session[]
   files           FileAsset[]
   notifications   NotificationLog[]
+  alerts          AppNotification[]
   auditEntries    AuditLog[]
   blocks          AccountBlock[]
   reportsMade     Report[]          @relation("ReportReporter")
@@ -492,6 +506,7 @@ model Tutor {
   studentIdNumber    String?            @map("student_id_number") // required only when submitting verification (#32)
   gender             Gender
   parentsInfo        String?            @map("parents_info")
+  instituteName      String?            @map("institute_name") // university or college; 1-120 chars (API)
   zoneLimit          Int                @default(5) @map("zone_limit") @db.SmallInt
   // Denormalised current state, kept in step by trigger from tutor_verification (latest row).
   verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
@@ -870,6 +885,7 @@ model Application {
   student       Student             @relation(fields: [studentId], references: [id])
   fees          PlatformFee[]
   notifications NotificationLog[]
+  alerts        AppNotification[]
   reports       Report[]
   disputes      Dispute[]
 
@@ -1042,6 +1058,27 @@ model NotificationLog {
   @@index([applicationId])
   @@index([recipientId])
   @@map("notification_log")
+}
+
+// ───────────────────────── in-app alerts ─────────────────────────
+// One row per application event the other party should look at. Written in the
+// same transaction as the status change. Names are joined at read time, so a
+// rename shows everywhere. read_at null = unread.
+
+model AppNotification {
+  id            String              @id @default(uuid(7)) @db.Uuid
+  recipientId   String              @map("recipient_account_id") @db.Uuid
+  kind          AppNotificationKind
+  applicationId String              @map("application_id") @db.Uuid
+  readAt        DateTime?           @map("read_at") @db.Timestamptz(3)
+  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  recipient   Account     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, createdAt(sort: Desc)])
+  @@index([applicationId])
+  @@map("app_notification")
 }
 
 // ───────────────────────── CMS and audit ─────────────────────────

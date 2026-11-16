@@ -26,6 +26,7 @@ function toNumber(value: unknown) {
 export const tutorPublicSelect = {
   id: true,
   name: true,
+  instituteName: true,
   gender: true,
   ratingAvg: true,
   ratingCount: true,
@@ -42,6 +43,7 @@ function serializeTutor(
     id: string;
     accountId: string;
     name: string;
+    instituteName: string | null;
     address: string;
     emergencyContact: string | null;
     phoneNumber: string;
@@ -74,6 +76,7 @@ export async function createTutorProfile(
   accountId: string,
   data: {
     name: string;
+    instituteName?: string;
     address: string;
     emergencyContact: string;
     phoneNumber: string;
@@ -109,6 +112,7 @@ export async function updateTutorProfile(
   accountId: string,
   data: Partial<{
     name: string;
+    instituteName: string;
     address: string;
     emergencyContact: string;
     phoneNumber: string;
@@ -293,6 +297,29 @@ export async function getPublicTutorProfile(tutorId: string) {
     areas: tutor.areas.map((a) => a.area),
     subjects: tutor.subjects.map((s) => s.subject),
   };
+}
+
+// findNearbyTutors (location.service) returns only the distance-ordered core fields; this adds the card fields
+// with one query for the whole page. Tutors that disappeared since the first query are dropped.
+export async function addNearbyCardFields<T extends { id: string }>(tutors: T[]) {
+  if (tutors.length === 0) return [];
+  const rows = await prisma.tutor.findMany({
+    where: { id: { in: tutors.map((tutor) => tutor.id) } },
+    select: tutorPublicSelect,
+  });
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  return tutors.flatMap((tutor) => {
+    const row = byId.get(tutor.id);
+    if (!row) return [];
+    return [
+      {
+        ...tutor,
+        instituteName: row.instituteName,
+        areas: row.areas.map((a) => a.area),
+        subjects: row.subjects.map((s) => s.subject),
+      },
+    ];
+  });
 }
 
 export async function getTutorReviews(tutorId: string) {

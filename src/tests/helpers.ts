@@ -158,6 +158,7 @@ export async function createTutorProfile(
   accountId: string,
   overrides: {
     name?: string;
+    instituteName?: string | null;
     address?: string;
     emergencyContact?: string;
     whatsappNumber?: string;
@@ -172,6 +173,7 @@ export async function createTutorProfile(
     data: {
       accountId,
       name: overrides.name ?? "Test Tutor",
+      instituteName: overrides.instituteName ?? null,
       address: overrides.address ?? "456 Tutor Road",
       emergencyContact: overrides.emergencyContact ?? "+8801700000002",
       whatsappNumber: overrides.whatsappNumber ?? null,

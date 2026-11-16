@@ -9,6 +9,7 @@ import {
   createSubject,
   createTestApp,
   createTutorProfile,
+  createTutorRequirement,
   createTutorZone,
   getAuthHeaders,
   setStudentLocation,
@@ -21,6 +22,7 @@ const BASE = "/api/v1/requirements";
 const TUTOR_LAT = 23.8103;
 const TUTOR_LNG = 90.4125;
 const FAR = { lat: 23.95, lng: 90.4125 }; // about 16 km north, outside a 5 km zone
+const TUTOR_PIN = { lat: TUTOR_LAT, lng: TUTOR_LNG };
 
 async function createBrowsingTutor({ pin = true }: { pin?: boolean } = {}) {
   const account = await createAccount({ role: "TUTOR" });
@@ -302,5 +304,155 @@ describe("GET /requirements (tutor browse, #46)", () => {
     expect(idsOf(res.body)).not.toContain(closed.id);
     expect(idsOf(res.body)).not.toContain(draft.id);
     expect(idsOf(res.body)).not.toContain(blockedReq.id);
+  });
+});
+
+// A requirement whose student pins at `pin` (or has no pin when null).
+async function requirementAt(
+  pin: { lat: number; lng: number } | null,
+  data: {
+    subjectIds: number[];
+    levelCode?: number;
+    curriculum?: "BANGLA_MEDIUM" | "ENGLISH_VERSION";
+    areaId?: number;
+  },
+) {
+  const { student } = await createStudentAt({ pin, areaId: data.areaId });
+  return createRequirement({ studentId: student.id, ...data });
+}
+
+// A set of the tutor's own. The subjects must be on the tutor's profile first (composite FK).
+async function createSet(
+  tutorId: string,
+  subjectIds: number[],
+  overrides: Parameters<typeof createTutorRequirement>[1] = {},
+) {
+  await prisma.tutorSubject.createMany({
+    data: subjectIds.map((subjectId) => ({ tutorId, subjectId })),
+    skipDuplicates: true,
+  });
+  return createTutorRequirement(tutorId, { subjectIds, ...overrides });
+}
+
+describe("GET /requirements scope=set (tutor requirement sets)", () => {
+  it("lists only requirements the set covers by curriculum, level, subject and zone", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const english = await createSubject();
+    const set = await createSet(tutor.id, [math.id], {
+      isDefault: true,
+      zoneIds: [zoneId],
+      curricula: ["BANGLA_MEDIUM"],
+      levelMin: 6,
+      levelMax: 10,
+    });
+
+    const match = await requirementAt(TUTOR_PIN, {
+      subjectIds: [math.id],
+      levelCode: 8,
+      curriculum: "BANGLA_MEDIUM",
+    });
+    const wrongCurriculum = await requirementAt(TUTOR_PIN, {
+      subjectIds: [math.id],
+      levelCode: 8,
+      curriculum: "ENGLISH_VERSION",
+    });
+    const wrongLevel = await requirementAt(TUTOR_PIN, {
+      subjectIds: [math.id],
+      levelCode: 12,
+      curriculum: "BANGLA_MEDIUM",
+    });
+    const wrongSubject = await requirementAt(TUTOR_PIN, {
+      subjectIds: [english.id],
+      levelCode: 8,
+      curriculum: "BANGLA_MEDIUM",
+    });
+    const outsideZone = await requirementAt(FAR, {
+      subjectIds: [math.id],
+      levelCode: 8,
+      curriculum: "BANGLA_MEDIUM",
+    });
+
+    const res = await browse(headers, { scope: "set", setId: set.id });
+    expect(res.status).toBe(200);
+    expect(idsOf(res.body)).toEqual([match.id]);
+    for (const hidden of [wrongCurriculum, wrongLevel, wrongSubject, outsideZone]) {
+      expect(idsOf(res.body)).not.toContain(hidden.id);
+    }
+  });
+
+  it("ignores the manual filters in set mode", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const english = await createSubject();
+    const set = await createSet(tutor.id, [math.id], {
+      zoneIds: [zoneId],
+      curricula: ["BANGLA_MEDIUM"],
+      levelMin: 6,
+      levelMax: 10,
+    });
+    const match = await requirementAt(TUTOR_PIN, {
+      subjectIds: [math.id],
+      levelCode: 8,
+      curriculum: "BANGLA_MEDIUM",
+    });
+    const otherArea = await createArea();
+
+    const res = await browse(headers, {
+      scope: "set",
+      setId: set.id,
+      curriculum: "ENGLISH_VERSION",
+      levelCode: 12,
+      subjectId: english.id,
+      areaId: otherArea.id,
+    });
+    expect(idsOf(res.body)).toEqual([match.id]);
+  });
+
+  it("a set without zones uses the nearby rule: a tutor zone around the pin, or the tutor's area", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    await createTutorZone(tutor.id, { radiusM: 5000 });
+    const served = await createArea();
+    await prisma.tutorArea.create({ data: { tutorId: tutor.id, areaId: served.id } });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], { isDefault: true });
+
+    const inZone = await requirementAt(TUTOR_PIN, { subjectIds: [math.id] });
+    const inArea = await requirementAt(FAR, { subjectIds: [math.id], areaId: served.id });
+    const elsewhere = await requirementAt(FAR, { subjectIds: [math.id] });
+
+    const res = await browse(headers, { scope: "set", setId: set.id });
+    expect(idsOf(res.body)).toEqual(expect.arrayContaining([inZone.id, inArea.id]));
+    expect(idsOf(res.body)).not.toContain(elsewhere.id);
+  });
+
+  it("returns 404 for another tutor's set and for an archived set of your own", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const { tutor: rival } = await createBrowsingTutor();
+    const rivalSet = await createTutorRequirement(rival.id, { name: "Rival set" });
+    const archived = await createTutorRequirement(tutor.id, { isActive: false });
+
+    for (const setId of [rivalSet.id, archived.id]) {
+      const res = await browse(headers, { scope: "set", setId });
+      expect(res.status).toBe(404);
+      expect(res.body).toMatchObject({
+        code: "NOT_FOUND",
+        message: "Requirement set not found",
+      });
+    }
+  });
+
+  it("returns 400 for scope=set without setId, and ignores setId with another scope", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const set = await createTutorRequirement(tutor.id);
+
+    const missing = await browse(headers, { scope: "set" });
+    expect(missing.status).toBe(400);
+    expect(missing.body.code).toBe("VALIDATION_ERROR");
+
+    const ignored = await browse(headers, { scope: "all", setId: set.id });
+    expect(ignored.status).toBe(200);
   });
 });

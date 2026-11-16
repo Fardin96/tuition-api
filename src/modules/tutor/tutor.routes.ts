@@ -41,6 +41,7 @@ import {
   updateTutorRequirementSchema,
 } from "./tutor.schema.js";
 import {
+  addNearbyCardFields,
   archiveTutorRequirement,
   createTutorProfile,
   createTutorRequirement,
@@ -241,7 +242,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       const account = requireRole(request, "STUDENT");
       const query = request.query as TutorNearbyQuery;
       const tutors = await findNearbyTutors(account.accountId, query.radiusMeters);
-      return reply.send({ tutors });
+      return reply.send({ tutors: await addNearbyCardFields(tutors) });
     },
   );
 
@@ -274,6 +275,7 @@ export async function tutorRoutes(app: FastifyInstance) {
         tutors: tutors.map((t) => ({
           id: t.id,
           name: t.name,
+          instituteName: t.instituteName,
           gender: t.gender,
           ratingAvg: Number(t.ratingAvg),
           ratingCount: t.ratingCount,
