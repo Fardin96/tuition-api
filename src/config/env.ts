@@ -11,6 +11,9 @@ const schema = z.object({
 
   FRONTEND_URL: z.string().optional(),
 
+  // Serves Swagger UI at /docs. On by default outside production; set "true" to force it on.
+  API_DOCS: z.enum(["true", "false"]).optional(),
+
   GOOGLE_CLIENT_ID: z.string().optional(),
 
   ACCESS_TOKEN_SECRET: z.string().min(32).default("dev-secret-must-change-in-production-123"),

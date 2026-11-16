@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { accountRateLimit } from "../../lib/rate-limit.js";
+import { routeDocs } from "../../openapi/docs.js";
 import { requireAdmin } from "../../plugins/auth.js";
 import {
   type AdminZoneRequestListQuery,
@@ -25,6 +26,14 @@ export async function adminZoneRequestRoutes(app: FastifyInstance) {
     {
       config: accountRateLimit(300, "1 minute"),
       schema: {
+        ...routeDocs({
+          tag: "Admin",
+          summary: "List zone-limit requests",
+          description:
+            "Work queue, oldest first. status defaults to PENDING. Cursor-paginated (limit 1 to 100, default 25).",
+          auth: "admin",
+          rateLimit: "300/min per account",
+        }),
         querystring: adminZoneRequestListQuerySchema,
         response: { 200: adminZoneRequestListResponseSchema },
       },
@@ -42,6 +51,15 @@ export async function adminZoneRequestRoutes(app: FastifyInstance) {
     {
       config: accountRateLimit(60, "1 minute"),
       schema: {
+        ...routeDocs({
+          tag: "Admin",
+          summary: "Approve or deny a zone-limit request",
+          description:
+            "APPROVE raises the tutor's zone limit to approvedLimit (default: the requested limit). A grant never lowers an existing limit. 409 ZONE_REQUEST_DECIDED when the request is no longer PENDING.",
+          auth: "admin",
+          errors: [404, 409],
+          rateLimit: "60/min per account",
+        }),
         params: zoneIdParamSchema,
         body: decideZoneRequestSchema,
         response: { 200: adminZoneRequestResponseSchema },

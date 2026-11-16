@@ -1,13 +1,16 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { z } from "zod";
+import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { routeDocs } from "../../openapi/docs.js";
 import { requireAuth, requireRole } from "../../plugins/auth.js";
 import {
   type StudentIdParam,
   type StudentProfileInput,
   studentIdParamSchema,
   studentProfileSchema,
+  studentPublicProfileSchema,
   studentResponseSchema,
+  studentReviewListSchema,
   type UpdateStudentProfileInput,
   updateStudentProfileSchema,
 } from "./student.schema.js";
@@ -24,6 +27,14 @@ export async function studentRoutes(app: FastifyInstance) {
     "/me",
     {
       schema: {
+        ...routeDocs({
+          tag: "Students",
+          summary: "Create my student profile",
+          description:
+            "Creates the signed-in student's profile. 409 when a profile already exists or when a phone or WhatsApp number belongs to another account.",
+          auth: ["STUDENT"],
+          errors: [409],
+        }),
         body: studentProfileSchema,
         response: { 201: studentResponseSchema },
       },
@@ -40,6 +51,14 @@ export async function studentRoutes(app: FastifyInstance) {
     "/me",
     {
       schema: {
+        ...routeDocs({
+          tag: "Students",
+          summary: "Update my student profile",
+          description:
+            "Send any subset of the profile fields. whatsappNumber null clears it. 409 when a phone or WhatsApp number belongs to another account.",
+          auth: ["STUDENT"],
+          errors: [404, 409],
+        }),
         body: updateStudentProfileSchema,
         response: { 200: studentResponseSchema },
       },
@@ -48,35 +67,48 @@ export async function studentRoutes(app: FastifyInstance) {
       const account = requireRole(request, "STUDENT");
       const body = request.body as UpdateStudentProfileInput;
       const profile = await updateStudentProfile(account.accountId, body);
-      if (!profile) {
-        return reply.status(404).send({ error: "NotFound", message: "Student profile not found" });
-      }
+      if (!profile) throw notFound("Student profile not found");
       return reply.send(profile);
     },
   );
 
   // Deferred: requires file upload / presigned URL flow.
-  app.post("/me/verification", async (_request: FastifyRequest, reply: FastifyReply) => {
-    return reply.status(501).send({
-      error: "NotImplemented",
-      message: "File upload endpoint deferred until the storage module is implemented",
-    });
-  });
+  app.post(
+    "/me/verification",
+    {
+      schema: {
+        ...routeDocs({
+          tag: "Students",
+          summary: "Submit my ID for verification",
+          description: "Not built yet. Always answers 501 until the storage module lands.",
+          auth: ["STUDENT"],
+          deferred: true,
+        }),
+      },
+    },
+    async () => {
+      throw appError(
+        "NotImplemented",
+        501,
+        "File upload endpoint deferred until the storage module is implemented",
+      );
+    },
+  );
 
   app.get(
     "/:id",
     {
       schema: {
+        ...routeDocs({
+          tag: "Students",
+          summary: "Get a student's public profile",
+          description:
+            "Name, area and rating. Students cannot view other students (403). A tutor needs a shared application with the student (403 otherwise). Admins can view any student.",
+          auth: "any",
+          errors: [403, 404],
+        }),
         params: studentIdParamSchema,
-        response: {
-          200: z.object({
-            id: z.string(),
-            name: z.string(),
-            area: z.object({ id: z.number(), name: z.string() }),
-            ratingAvg: z.number(),
-            ratingCount: z.number(),
-          }),
-        },
+        response: { 200: studentPublicProfileSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -84,24 +116,18 @@ export async function studentRoutes(app: FastifyInstance) {
       const { id } = request.params as StudentIdParam;
 
       if (account.role === "STUDENT") {
-        return reply
-          .status(403)
-          .send({ error: "Forbidden", message: "Students cannot view other student profiles" });
+        throw appError("Forbidden", 403, "Students cannot view other student profiles");
       }
 
       if (account.role === "TUTOR") {
         const tutor = await prisma.tutor.findUnique({ where: { accountId: account.accountId } });
         if (!tutor || !(await hasSharedApplication(tutor.id, id))) {
-          return reply
-            .status(403)
-            .send({ error: "Forbidden", message: "No shared application with this student" });
+          throw appError("Forbidden", 403, "No shared application with this student");
         }
       }
 
       const profile = await getStudentById(id);
-      if (!profile) {
-        return reply.status(404).send({ error: "NotFound", message: "Student not found" });
-      }
+      if (!profile) throw notFound("Student not found");
       return reply.send(profile);
     },
   );
@@ -110,20 +136,15 @@ export async function studentRoutes(app: FastifyInstance) {
     "/:id/reviews",
     {
       schema: {
+        ...routeDocs({
+          tag: "Students",
+          summary: "List reviews of a student",
+          description:
+            "Visible reviews that tutors left for the student, newest first. Any signed-in account can read them.",
+          auth: "any",
+        }),
         params: studentIdParamSchema,
-        response: {
-          200: z.object({
-            reviews: z.array(
-              z.object({
-                id: z.string(),
-                rating: z.number(),
-                comment: z.string().nullable(),
-                createdAt: z.string(),
-                tutor: z.object({ id: z.string(), name: z.string() }),
-              }),
-            ),
-          }),
-        },
+        response: { 200: studentReviewListSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {

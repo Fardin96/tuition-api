@@ -29,6 +29,7 @@ fi
 
 yarn lint
 yarn typecheck
+yarn openapi:check
 yarn test:ci
 yarn build
 

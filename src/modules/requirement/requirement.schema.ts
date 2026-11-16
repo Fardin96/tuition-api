@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ListingStatus } from "../../generated/prisma/enums.js";
 import {
   ACADEMIC_GROUPS,
   ADMISSION_TARGETS,
@@ -107,40 +108,49 @@ const draftRequirementSchema = baseRequirementSchema
   })
   .superRefine(checkEducation);
 
-export const createRequirementSchema = z.union([openRequirementSchema, draftRequirementSchema]);
+export const createRequirementSchema = z
+  .union([openRequirementSchema, draftRequirementSchema])
+  .meta({ id: "CreateRequirement" });
 
 export type CreateRequirementInput = z.infer<typeof createRequirementSchema>;
 
 // No superRefine here: the service validates the merged values against the stored row.
-export const updateRequirementSchema = baseRequirementSchema.partial().extend({
-  status: z.enum(["DRAFT", "OPEN"]).optional(),
-});
+export const updateRequirementSchema = baseRequirementSchema
+  .partial()
+  .extend({
+    status: z.enum(["DRAFT", "OPEN"]).optional(),
+  })
+  .meta({ id: "UpdateRequirement" });
 export type UpdateRequirementInput = z.infer<typeof updateRequirementSchema>;
 
-export const requirementResponseSchema = z.object({
-  id: z.string(),
-  studentId: z.string(),
-  areaId: z.number().nullable(),
-  subjectIds: z.array(z.number()),
-  curriculum: z.string().nullable(),
-  levelCode: z.number().nullable(),
-  academicGroup: z.string().nullable(),
-  admissionTargets: z.array(z.string()),
-  isRetaker: z.boolean(),
-  levelNote: z.string().nullable(),
-  timeOfDay: z.string().nullable(),
-  daysPerWeek: z.number().nullable(),
-  salary: z.number().nullable(),
-  studentCount: z.number().nullable(),
-  hireByDate: z.string().nullable(),
-  tutorGenderPref: z.string(),
-  instituteName: z.string().nullable(),
-  tuitionType: z.string().nullable(),
-  status: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+export const requirementResponseSchema = z
+  .object({
+    id: z.string(),
+    studentId: z.string(),
+    areaId: z.number().nullable(),
+    subjectIds: z.array(z.number()),
+    curriculum: z.enum(CURRICULA).nullable(),
+    levelCode: z.number().nullable(),
+    academicGroup: z.enum(ACADEMIC_GROUPS).nullable(),
+    admissionTargets: z.array(z.enum(ADMISSION_TARGETS)),
+    isRetaker: z.boolean(),
+    levelNote: z.string().nullable(),
+    timeOfDay: z.string().nullable(),
+    daysPerWeek: z.number().nullable(),
+    salary: z.number().nullable(),
+    studentCount: z.number().nullable(),
+    hireByDate: z.string().nullable(),
+    tutorGenderPref: tutorGenderPrefSchema,
+    instituteName: z.string().nullable(),
+    tuitionType: tuitionTypeSchema.nullable(),
+    status: z.enum(ListingStatus),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .meta({ id: "Requirement" });
 
-export const requirementListResponseSchema = z.object({
-  requirements: z.array(requirementResponseSchema),
-});
+export const requirementListResponseSchema = z
+  .object({
+    requirements: z.array(requirementResponseSchema),
+  })
+  .meta({ id: "RequirementList" });
