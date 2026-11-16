@@ -119,6 +119,23 @@ A single DO App Platform job runs every Sunday at 03:00 UTC:
 
 No external API call is required. The job is declared as `weekly-location-expiry` in `.do/app.yaml`.
 
+## API docs (Swagger UI)
+
+The API serves a Swagger UI at `/docs` and the OpenAPI JSON at `/docs/json`.
+
+- Enabled by default outside production (when `NODE_ENV !== "production"`).
+- In production, set `API_DOCS=true` to enable it.
+- Run `yarn dev` and open `http://localhost:<PORT>/docs` (`PORT` from `.env`, default 3000).
+
+### Regenerating `openapi.json`
+
+The committed `openapi.json` at the repo root is the source of truth for the frontend's generated types.
+
+```bash
+yarn openapi:export   # writes openapi.json
+yarn openapi:check    # fails if the file is stale (runs in CI and pre-push)
+```
+
 ## Testing
 
 Tests use **Vitest** and hit a real PostgreSQL database.
@@ -144,7 +161,7 @@ Tests use **Vitest** and hit a real PostgreSQL database.
 
 ### Pre-push hook
 
-Husky is configured to run `lint`, `typecheck`, `test:ci`, and `build` before every push. The hook automatically loads `.env` if it exists, so setting `DATABASE_URL` or `TEST_DATABASE_URL` there is enough.
+Husky is configured to run `lint`, `typecheck`, `openapi:check`, `test:ci`, and `build` before every push. The hook automatically loads `.env` if it exists, so setting `DATABASE_URL` or `TEST_DATABASE_URL` there is enough.
 
 Skip the hook if needed:
 

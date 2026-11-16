@@ -24,6 +24,8 @@ This file captures the essential, non-obvious guidance an agent needs to work in
 | `yarn test` | Vitest (watch mode) |
 | `yarn test:ci` | Vitest (single run, no watch) |
 | `yarn cron:weekly-location-expiry` | Run weekly location-expiry cron (`tsx --env-file-if-exists=.env src/cron/weekly-location-expiry.ts`) |
+| `yarn openapi:export` | Write committed `openapi.json` at repo root from running app |
+| `yarn openapi:check` | Fail when `openapi.json` is stale (CI + pre-push) |
 | `yarn prepare` | Husky setup (`husky || true`) |
 
 ## Prisma / DB (critical)
@@ -42,7 +44,7 @@ This file captures the essential, non-obvious guidance an agent needs to work in
 
 ## Lint / Typecheck / Test order
 
-The pre-push hook and CI enforce: **`lint -> typecheck -> test:ci -> build`**. Always run in this order on a PR. Skipping any step may cause the hook or CI to fail. The pre-push hook also runs the migration rehearsal gate first when `prisma/migrations` changed.
+The pre-push hook and CI enforce: **`lint -> typecheck -> openapi:check -> test:ci -> build`**. Always run in this order on a PR. Skipping any step may cause the hook or CI to fail. The pre-push hook also runs the migration rehearsal gate first when `prisma/migrations` changed.
 
 ## Environment variables (from .env.example)
 
@@ -58,12 +60,16 @@ Required once auth/files/notifications are used:
 - `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`
 - `SUPER_ADMIN_EMAIL_1`, `SUPER_ADMIN_EMAIL_2`
 
+Optional:
+- `API_DOCS` — `true` | `false`. Enables Swagger UI at `/docs`. Default: on outside production, off in production.
+
 ## Project structure (high-level)
 
 - `src/config/env.ts` — Zod-validated env config (do not rename fields; the schema is the source of truth).
 - `src/lib/prisma.ts` — Prisma singleton with CA cert fallback (`ca-certificate.crt` at repo root).
 - `src/modules/` — route handlers by domain (auth, tutor, student, location, etc.).
 - `src/plugins/` — Fastify plugins (auth, health).
+- `src/openapi/` — Swagger/OpenAPI 3.1 plugin, docs, export, and contract tests.
 - `src/server.ts` — app entry point; registers all plugins and routes.
 - `src/seed/index.ts` — seeds areas, subjects, and super-admin emails.
 - `src/cron/weekly-location-expiry.ts` — weekly cron that soft-warns (≥21 days) and hard-expiries (≥28 days) tutor/student locations.
@@ -85,7 +91,7 @@ Required once auth/files/notifications are used:
 
 - Runs on push/PR to `main`.
 - Services: `postgis/postgis:16-3.4` Postgres container.
-- Steps: `yarn install` → `yarn db:generate` → `yarn typecheck` → `yarn test:ci` → `yarn build`.
+- Steps: `yarn install` → `yarn db:generate` → `yarn typecheck` → `yarn openapi:check` → `yarn test:ci` → `yarn build`.
 - All env vars (DATABASE_URL, TEST_DATABASE_URL, token secrets, GOOGLE_CLIENT_ID, SUPER_ADMIN_EMAIL_1/2) are set in the workflow UI.
 - If you add a new env var, add it to the CI config AND `.env.example`.
 
@@ -111,10 +117,20 @@ Required once auth/files/notifications are used:
 - **Admin routes** (`src/modules/admin/zone-requests.*`): guarded by `requireAdmin()` in `src/plugins/auth.ts` (role ADMIN AND admin_user.status ACTIVE; PENDING/REMOVED admins get 403; MFA not enforced). Decide endpoint runs in one transaction: locks request then tutor, writes audit_log (action zone_limit_request.decide) and notification_log outbox row (event ZONE_LIMIT_DECIDED, dedupe key zone_limit_decided:{id}).
 - **Rate limits**: per-route limits use `accountRateLimit(max, window, message?)` from `src/lib/rate-limit.ts` (key = account id, else IP; runs as route-level onRequest hook after global auth hook, so request.account is set). Zone and zone-request routes (#129-136) have per-route limits; other routes still only have the global 100/min limit. Zone limit requests also have a DB-backed daily cap (3/day) enforced in the table.
 
+## OpenAPI / Swagger
+
+- `@fastify/swagger` (OpenAPI 3.1) is registered in `buildApp` before all routes via `registerOpenApi(app)`; zod schemas are the source of truth (`fastify-type-provider-zod` jsonSchemaTransform).
+- Swagger UI at `/docs`, JSON at `/docs/json`. On by default outside production; off in production unless env `API_DOCS=true`.
+- Every route spreads `...routeDocs({ tag, summary, description?, auth, errors?, rateLimit?, noContent?, deferred? })` into its `schema`. `auth` is `"public" | "optional" | "any" | "admin" | role list`. Error responses (shared `ErrorResponse` component) and 204s are injected only into the document by the swagger transform; the runtime serializer never sees them. 400 is added when a route validates input, 401 for signed-in routes, 403 for role/admin routes, 501 for deferred, 429 and 500 everywhere.
+- Every route returning JSON must have a `response` zod schema. The zod serializer validates responses at runtime (strips undeclared fields, 500 on mismatch), so enum fields must use Prisma/education enums, `Date` objects use `z.date()`, un-converted Prisma `Decimal` uses `z.any().meta({ type: "string" })`.
+- Reusable schemas get `.meta({ id: "PascalName" })`; request bodies are named by action without a suffix because the generator appends `Input` (e.g. id `"CreateZone"` → component `"CreateZoneInput"`). Unreferenced components are pruned. Paths are documented without trailing slash.
+- `yarn openapi:export` writes the committed `openapi.json` at the repo root; `yarn openapi:check` fails when stale. CI runs openapi:check after typecheck; `.husky/pre-push` runs it too. `src/openapi/openapi.test.ts` fails if any route lacks tag/summary/auth/2xx schema (deferred 501 stubs exempt).
+- Response schemas double as an allowlist: `GET /me` deliberately leaves out `googleSub` and `mfaSecretEnc`. Throw catalogue errors (`appError`, `notFound`); never `reply.send({ error, message })`, which has no `code`.
+
 ## Schema v6
 
 - Plan and migration order: `.misc/MIGRATION_PLAN_v6.md` (pre-flight: `.misc/pre-flight.sql`, `.misc/v6-preflight.sh`). Launch steps: `before-launch-checklist.md`, section 12.
-- `endpoints.md` in this repo is listed in `.gitignore`, so its changes are not committed. The copy in `../tution-media/endpoints.md` is the other half and must stay in sync, except for its State column.
+- `endpoints.md` in this repo is listed in `.gitignore`, so its changes are not committed. The copy in `../tution-media/endpoints.md` is the other half and must stay in sync, except for its State column. The live, complete contract for implemented endpoints is `/docs` (Swagger UI) and `openapi.json` at the repo root.
 - Transitional: the phone fill triggers (`student_phone_fill_trg`, `tutor_phone_fill_trg`, function `phone_number_fill()`) are dropped by the contract migration after the feature release (R3).
 
 ## What to avoid (quick list)
