@@ -49,7 +49,9 @@ const transform: SwaggerTransform = (input) => {
   for (const status of [...statuses].sort((a, b) => a - b)) {
     response[String(status)] ??= { ...ERROR_REF, description: ERROR_DESCRIPTIONS[status] };
   }
-  return { ...result, schema: { ...rest, response } };
+  // A "/" route under a prefix is served with and without the trailing slash; document the bare one.
+  const url = result.url.length > 1 ? result.url.replace(/\/$/, "") : result.url;
+  return { url, schema: { ...rest, response } };
 };
 
 function collectRefs(value: unknown, into: Set<string>) {

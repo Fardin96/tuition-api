@@ -3912,7 +3912,7 @@
     }
   },
   "paths": {
-    "/api/v1/health/": {
+    "/api/v1/health": {
       "get": {
         "summary": "Liveness and database check",
         "tags": [
@@ -4433,7 +4433,7 @@
         }
       }
     },
-    "/api/v1/me/": {
+    "/api/v1/me": {
       "get": {
         "summary": "Get my account and profile",
         "tags": [
@@ -5695,7 +5695,7 @@
         }
       }
     },
-    "/api/v1/tutors/": {
+    "/api/v1/tutors": {
       "get": {
         "summary": "Search tutors",
         "tags": [
@@ -7773,7 +7773,7 @@
         }
       }
     },
-    "/api/v1/requirements/": {
+    "/api/v1/requirements": {
       "post": {
         "summary": "Create a requirement",
         "tags": [
@@ -8262,7 +8262,7 @@
         }
       }
     },
-    "/api/v1/videos/": {
+    "/api/v1/videos": {
       "get": {
         "summary": "List approved videos",
         "tags": [
@@ -8359,7 +8359,7 @@
         }
       }
     },
-    "/api/v1/admin/zone-limit-requests/": {
+    "/api/v1/admin/zone-limit-requests": {
       "get": {
         "summary": "List zone-limit requests",
         "tags": [
