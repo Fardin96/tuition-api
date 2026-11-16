@@ -79,6 +79,7 @@ Required once auth/files/notifications are used:
 - Factories in `src/tests/helpers.ts` (createAccount, createStudentProfile, createTutorProfile, etc.) are the canonical way to create test data.
 - `setTutorLocation` and `setStudentLocation` in `src/tests/helpers.ts` insert location rows with PostGIS `ST_SetSRID(ST_MakePoint(...))`.
 - To add a new test helper, add it to `src/tests/helpers.ts` — do not create parallel test data utilities.
+- New helpers: `createAdmin({status, adminRole})` creates an allowlisted active SUPER_ADMIN approver as needed (admin_user CHECKs require an approver for ACTIVE/REMOVED admins); `createZoneLimitRequest(tutorId, {...})` creates a zone limit request row.
 
 ## CI workflow (.github/workflows/ci.yml)
 
@@ -106,6 +107,9 @@ Required once auth/files/notifications are used:
 - **Apply gate**: readiness comes from SQL `tutor_missing_requirements()`. Do not duplicate those checks in TypeScript.
 - **Education levels**: `src/lib/education.ts` is the single source for curricula, levels, labels and rules; `GET /lookups/education` serves it. Every rule the DB can enforce is also a CHECK; `src/lib/education.test.ts` has a parity test that inserts every curriculum x level x group combination and asserts TS and Postgres agree. Change both together.
 - **Requirement-set subjects**: a set's subjects must be on the profile (composite FK). `syncProfileSubjects: true` adds missing ones in the same transaction. Set create/edit and PUT /tutors/me/subjects all lock the tutor row first (`lockTutor`).
+- **Zones** (`src/modules/zone/`): centers written via raw SQL with geog_source PIN; never expire (weekly cron skips tutor_zone). Quota enforced by trigger `tutor_zone_quota_trg` -> 409 ZONE_LIMIT_REACHED.
+- **Admin routes** (`src/modules/admin/zone-requests.*`): guarded by `requireAdmin()` in `src/plugins/auth.ts` (role ADMIN AND admin_user.status ACTIVE; PENDING/REMOVED admins get 403; MFA not enforced). Decide endpoint runs in one transaction: locks request then tutor, writes audit_log (action zone_limit_request.decide) and notification_log outbox row (event ZONE_LIMIT_DECIDED, dedupe key zone_limit_decided:{id}).
+- **Rate limits**: per-route limits use `accountRateLimit(max, window, message?)` from `src/lib/rate-limit.ts` (key = account id, else IP; runs as route-level onRequest hook after global auth hook, so request.account is set). Zone and zone-request routes (#129-136) have per-route limits; other routes still only have the global 100/min limit. Zone limit requests also have a DB-backed daily cap (3/day) enforced in the table.
 
 ## Schema v6
 

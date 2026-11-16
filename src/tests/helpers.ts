@@ -415,3 +415,77 @@ export async function createTuitionPackage(
     },
   });
 }
+
+// admin_user CHECKs: an ACTIVE or REMOVED ADMIN needs an approving (and removing) super admin, and
+// only allowlisted emails (super_admin_email, slots 1 and 2) can be SUPER_ADMIN.
+async function createSuperAdminAccount() {
+  const used = await prisma.superAdminEmail.findMany({ select: { slot: true } });
+  const slot = [1, 2].find((n) => !used.some((row) => row.slot === n));
+  if (!slot) throw new Error("Both super admin slots are taken");
+  const email = `super-${crypto.randomUUID()}@example.com`;
+  await prisma.superAdminEmail.create({ data: { slot, email } });
+  const account = await createAccount({ role: "ADMIN", email });
+  await prisma.adminUser.create({
+    data: {
+      accountId: account.id,
+      name: "Test Super Admin",
+      adminRole: "SUPER_ADMIN",
+      status: "ACTIVE",
+    },
+  });
+  return account;
+}
+
+export async function createAdmin(
+  overrides: {
+    status?: "PENDING" | "ACTIVE" | "REMOVED";
+    adminRole?: "ADMIN" | "SUPER_ADMIN";
+  } = {},
+) {
+  if (overrides.adminRole === "SUPER_ADMIN") return createSuperAdminAccount();
+
+  const status = overrides.status ?? "ACTIVE";
+  const existing = await prisma.adminUser.findFirst({
+    where: { adminRole: "SUPER_ADMIN", status: "ACTIVE" },
+    select: { accountId: true },
+  });
+  const approverId = existing?.accountId ?? (await createSuperAdminAccount()).id;
+  const now = new Date();
+  const account = await createAccount({ role: "ADMIN" });
+  await prisma.adminUser.create({
+    data: {
+      accountId: account.id,
+      name: "Test Admin",
+      adminRole: "ADMIN",
+      status,
+      ...(status !== "PENDING" ? { approvedById: approverId, approvedAt: now } : {}),
+      ...(status === "REMOVED" ? { removedById: approverId, removedAt: now } : {}),
+    },
+  });
+  return account;
+}
+
+export async function createZoneLimitRequest(
+  tutorId: string,
+  overrides: {
+    requestedLimit?: number;
+    reason?: string;
+    status?: "PENDING" | "APPROVED" | "DENIED";
+    decidedById?: string;
+    createdAt?: Date;
+  } = {},
+) {
+  const status = overrides.status ?? "PENDING";
+  const decided = status !== "PENDING";
+  return prisma.zoneLimitRequest.create({
+    data: {
+      tutorId,
+      requestedLimit: overrides.requestedLimit ?? 10,
+      reason: overrides.reason ?? "I teach across several neighbourhoods",
+      status,
+      decidedById: decided ? overrides.decidedById : null,
+      decidedAt: decided ? new Date() : null,
+      ...(overrides.createdAt ? { createdAt: overrides.createdAt } : {}),
+    },
+  });
+}

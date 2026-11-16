@@ -13,12 +13,14 @@ import {
 import { env } from "./config/env.js";
 import { type AppError, ERROR_CODES, errorCodeOf } from "./lib/errors.js";
 import { pool, startPoolStats } from "./lib/prisma.js";
+import { adminZoneRequestRoutes } from "./modules/admin/zone-requests.routes.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
 import { lookupRoutes } from "./modules/lookups/lookups.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
 import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
+import { zoneRoutes } from "./modules/zone/zone.routes.js";
 import { healthRoutes } from "./plugins/health.js";
 
 export async function buildApp() {
@@ -93,9 +95,11 @@ export async function buildApp() {
   await app.register(meRoutes, { prefix: "/api/v1/me" });
   await app.register(studentRoutes, { prefix: "/api/v1/students" });
   await app.register(tutorRoutes, { prefix: "/api/v1/tutors" });
+  await app.register(zoneRoutes, { prefix: "/api/v1/tutors/me" });
   await app.register(requirementRoutes, { prefix: "/api/v1/requirements" });
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
   await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
+  await app.register(adminZoneRequestRoutes, { prefix: "/api/v1/admin/zone-limit-requests" });
 
   return app;
 }

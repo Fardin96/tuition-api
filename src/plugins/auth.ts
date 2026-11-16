@@ -1,4 +1,5 @@
 import type { FastifyRequest } from "fastify";
+import { prisma } from "../lib/prisma.js";
 import type { AuthContext } from "../modules/auth/auth.schema.js";
 
 declare module "fastify" {
@@ -20,4 +21,18 @@ export function requireRole(request: FastifyRequest, ...roles: AuthContext["role
     throw Object.assign(new Error("Forbidden"), { statusCode: 403 });
   }
   return account;
+}
+
+// Admin routes need an ACTIVE admin_user row, not just the ADMIN role in the token:
+// a PENDING or REMOVED admin keeps a valid token until it expires.
+export async function requireAdmin(request: FastifyRequest) {
+  const account = requireRole(request, "ADMIN");
+  const admin = await prisma.adminUser.findUnique({
+    where: { accountId: account.accountId },
+    select: { status: true, adminRole: true },
+  });
+  if (admin?.status !== "ACTIVE") {
+    throw Object.assign(new Error("Forbidden"), { statusCode: 403 });
+  }
+  return { ...account, adminRole: admin.adminRole };
 }

@@ -19,6 +19,9 @@ export const ERROR_CODES = {
   InvalidRequirement: "INVALID_REQUIREMENT",
   InvalidSubjectOrZone: "INVALID_SUBJECT_OR_ZONE",
   AreaOutsideCity: "AREA_OUTSIDE_CITY",
+  ZoneLimitReached: "ZONE_LIMIT_REACHED",
+  ZoneRequestPending: "ZONE_REQUEST_PENDING",
+  ZoneRequestDecided: "ZONE_REQUEST_DECIDED",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;
