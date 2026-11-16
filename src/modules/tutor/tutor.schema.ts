@@ -15,9 +15,12 @@ import {
 } from "../../lib/education.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
+const instituteNameSchema = z.string().trim().min(1).max(120);
+
 export const tutorProfileSchema = z
   .object({
     name: z.string().min(1).max(200),
+    instituteName: instituteNameSchema.optional(),
     address: z.string().min(1).max(500),
     emergencyContact: z.string().min(1).max(50),
     phoneNumber: z
@@ -88,6 +91,7 @@ export const tutorResponseSchema = z
     id: z.string(),
     accountId: z.string(),
     name: z.string(),
+    instituteName: z.string().nullable(),
     address: z.string(),
     emergencyContact: z.string().nullable(),
     phoneNumber: z.string(),
@@ -140,10 +144,13 @@ export const tutorNearbyResultSchema = z
   .object({
     id: z.string(),
     name: z.string(),
+    instituteName: z.string().nullable(),
     gender: z.nativeEnum(Gender),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     distanceMeters: z.number(),
+    areas: z.array(z.object({ id: z.number(), name: z.string() })),
+    subjects: z.array(z.object({ id: z.number(), name: z.string() })),
   })
   .meta({ id: "TutorNearbyResult" });
 
@@ -157,6 +164,7 @@ export const tutorSearchResultSchema = z
   .object({
     id: z.string(),
     name: z.string(),
+    instituteName: z.string().nullable(),
     gender: z.nativeEnum(Gender),
     ratingAvg: z.number(),
     ratingCount: z.number(),
@@ -225,6 +233,7 @@ export const tutorPublicProfileSchema = z
   .object({
     id: z.string(),
     name: z.string(),
+    instituteName: z.string().nullable(),
     gender: z.nativeEnum(Gender),
     ratingAvg: z.number(),
     ratingCount: z.number(),

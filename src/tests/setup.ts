@@ -32,6 +32,7 @@ beforeEach(async () => {
       fee_payment,
       platform_fee,
       notification_log,
+      app_notification,
       application,
       review,
       tuition_requirement,

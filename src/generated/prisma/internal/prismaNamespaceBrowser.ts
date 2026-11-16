@@ -83,6 +83,7 @@ export const ModelName = {
   PlatformFee: 'PlatformFee',
   FeePayment: 'FeePayment',
   NotificationLog: 'NotificationLog',
+  AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
   SiteContent: 'SiteContent',
   PlatformSetting: 'PlatformSetting',
@@ -250,6 +251,7 @@ export const TutorScalarFieldEnum = {
   studentIdNumber: 'studentIdNumber',
   gender: 'gender',
   parentsInfo: 'parentsInfo',
+  instituteName: 'instituteName',
   zoneLimit: 'zoneLimit',
   verificationStatus: 'verificationStatus',
   isListed: 'isListed',
@@ -606,6 +608,18 @@ export const NotificationLogScalarFieldEnum = {
 } as const
 
 export type NotificationLogScalarFieldEnum = (typeof NotificationLogScalarFieldEnum)[keyof typeof NotificationLogScalarFieldEnum]
+
+
+export const AppNotificationScalarFieldEnum = {
+  id: 'id',
+  recipientId: 'recipientId',
+  kind: 'kind',
+  applicationId: 'applicationId',
+  readAt: 'readAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AppNotificationScalarFieldEnum = (typeof AppNotificationScalarFieldEnum)[keyof typeof AppNotificationScalarFieldEnum]
 
 
 export const BlogPostScalarFieldEnum = {

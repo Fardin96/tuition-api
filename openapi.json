@@ -112,6 +112,66 @@
         ],
         "additionalProperties": false
       },
+      "AppNotification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "APPLICATION_RECEIVED",
+              "PACKAGE_REQUESTED",
+              "APPLICATION_ACCEPTED",
+              "APPLICATION_DECLINED",
+              "LISTING_FILLED",
+              "APPLICATION_WITHDRAWN",
+              "APPLICATION_REOPENED",
+              "APPLICATION_CANCELLED",
+              "APPLICATION_COMPLETED"
+            ]
+          },
+          "applicationId": {
+            "type": "string"
+          },
+          "listingKind": {
+            "type": "string",
+            "enum": [
+              "REQUIREMENT",
+              "PACKAGE"
+            ]
+          },
+          "counterpartName": {
+            "type": "string"
+          },
+          "readAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "applicationId",
+          "listingKind",
+          "counterpartName",
+          "readAt",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
       "Application": {
         "type": "object",
         "properties": {
@@ -313,6 +373,26 @@
                 "type": "null"
               }
             ]
+          },
+          "tutorProfile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationTutorProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tutorSet": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationTutorSet"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -327,7 +407,9 @@
           "target",
           "allowedActions",
           "counterpartContact",
-          "fee"
+          "fee",
+          "tutorProfile",
+          "tutorSet"
         ],
         "additionalProperties": false
       },
@@ -543,6 +625,12 @@
               "OTHER"
             ]
           },
+          "instituteName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "ratingAvg": {
             "type": "number"
           },
@@ -554,8 +642,251 @@
           "id",
           "name",
           "gender",
+          "instituteName",
           "ratingAvg",
           "ratingCount"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationTutorProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ]
+          },
+          "instituteName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ratingAvg": {
+            "type": "number"
+          },
+          "ratingCount": {
+            "type": "number"
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "NOT_SUBMITTED",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "areas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "credentials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "examLabel": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "examLabel",
+                "result"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "gender",
+          "instituteName",
+          "ratingAvg",
+          "ratingCount",
+          "verificationStatus",
+          "areas",
+          "subjects",
+          "credentials"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationTutorSet": {
+        "type": "object",
+        "properties": {
+          "matchedBy": {
+            "type": "string",
+            "enum": [
+              "MATCH",
+              "DEFAULT",
+              "PACKAGE"
+            ]
+          },
+          "set": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "isDefault": {
+                "type": "boolean"
+              },
+              "levelMin": {
+                "type": "number"
+              },
+              "levelMax": {
+                "type": "number"
+              },
+              "curricula": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "BANGLA_MEDIUM",
+                    "ENGLISH_VERSION",
+                    "EM_CAMBRIDGE",
+                    "EM_EDEXCEL",
+                    "EM_IB",
+                    "EM_AMERICAN",
+                    "MADRASAH"
+                  ]
+                }
+              },
+              "academicGroups": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "SCIENCE",
+                    "BUSINESS",
+                    "HUMANITIES",
+                    "MUJABBID"
+                  ]
+                }
+              },
+              "admissionTargets": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "ENGINEERING",
+                    "MEDICAL",
+                    "VARSITY_SCIENCE",
+                    "VARSITY_HUMANITIES",
+                    "VARSITY_BUSINESS",
+                    "AGRICULTURE",
+                    "IBA_BUP",
+                    "PRIVATE_UNI",
+                    "ABROAD_TESTS",
+                    "ISSB"
+                  ]
+                }
+              },
+              "subjectIds": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "timeFrom": {
+                "type": "string"
+              },
+              "timeTo": {
+                "type": "string"
+              },
+              "availableDays": {
+                "type": "number"
+              },
+              "minSalary": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "maxStudents": {
+                "type": "number"
+              },
+              "teachesOnline": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "isDefault",
+              "levelMin",
+              "levelMax",
+              "curricula",
+              "academicGroups",
+              "admissionTargets",
+              "subjectIds",
+              "timeFrom",
+              "timeTo",
+              "availableDays",
+              "minSalary",
+              "maxStudents",
+              "teachesOnline"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "matchedBy",
+          "set"
         ],
         "additionalProperties": false
       },
@@ -1177,6 +1508,11 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200
+          },
+          "instituteName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
           },
           "address": {
             "type": "string",
@@ -2275,6 +2611,12 @@
           "name": {
             "type": "string"
           },
+          "instituteName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "address": {
             "type": "string"
           },
@@ -2422,6 +2764,7 @@
           "accountId",
           "role",
           "name",
+          "instituteName",
           "address",
           "emergencyContact",
           "whatsappNumber",
@@ -2465,6 +2808,34 @@
         "required": [
           "id",
           "status"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationPage": {
+        "type": "object",
+        "properties": {
+          "notifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppNotification"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unreadCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "notifications",
+          "nextCursor",
+          "unreadCount"
         ],
         "additionalProperties": false
       },
@@ -3276,6 +3647,12 @@
           "name": {
             "type": "string"
           },
+          "instituteName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "address": {
             "type": "string"
           },
@@ -3400,6 +3777,7 @@
           "id",
           "accountId",
           "name",
+          "instituteName",
           "address",
           "emergencyContact",
           "phoneNumber",
@@ -3534,6 +3912,12 @@
           "name": {
             "type": "string"
           },
+          "instituteName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "gender": {
             "type": "string",
             "enum": [
@@ -3550,15 +3934,56 @@
           },
           "distanceMeters": {
             "type": "number"
+          },
+          "areas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
           "id",
           "name",
+          "instituteName",
           "gender",
           "ratingAvg",
           "ratingCount",
-          "distanceMeters"
+          "distanceMeters",
+          "areas",
+          "subjects"
         ],
         "additionalProperties": false
       },
@@ -3570,6 +3995,12 @@
           },
           "name": {
             "type": "string"
+          },
+          "instituteName": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "gender": {
             "type": "string",
@@ -3703,6 +4134,7 @@
         "required": [
           "id",
           "name",
+          "instituteName",
           "gender",
           "ratingAvg",
           "ratingCount",
@@ -4037,6 +4469,12 @@
           "name": {
             "type": "string"
           },
+          "instituteName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "gender": {
             "type": "string",
             "enum": [
@@ -4093,6 +4531,7 @@
         "required": [
           "id",
           "name",
+          "instituteName",
           "gender",
           "ratingAvg",
           "ratingCount",
@@ -4282,6 +4721,20 @@
         },
         "required": [
           "videos"
+        ],
+        "additionalProperties": false
+      },
+      "UnreadCount": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "count"
         ],
         "additionalProperties": false
       },
@@ -4505,6 +4958,11 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200
+          },
+          "instituteName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
           },
           "address": {
             "type": "string",
@@ -8972,7 +9430,7 @@
         "tags": [
           "Requirements"
         ],
-        "description": "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
+        "description": "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. scope=set lists requirements that match one of the tutor's own active sets (setId, required) by curriculum, level, subject and area; the manual filters are ignored in that mode. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
         "parameters": [
           {
             "schema": {
@@ -8980,11 +9438,22 @@
               "type": "string",
               "enum": [
                 "nearby",
-                "all"
+                "all",
+                "set"
               ]
             },
             "in": "query",
             "name": "scope",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "setId",
             "required": false
           },
           {
@@ -11135,6 +11604,286 @@
         }
       }
     },
+    "/api/v1/notifications": {
+      "get": {
+        "summary": "List my notifications",
+        "tags": [
+          "Notifications"
+        ],
+        "description": "In-app alerts about my applications, newest first, keyset cursor. unreadCount counts all unread alerts, not just this page. Admins get an empty list.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/unread-count": {
+      "get": {
+        "summary": "Count my unread notifications",
+        "tags": [
+          "Notifications"
+        ],
+        "description": "Polled by the dashboard bell.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 300/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCount"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "post": {
+        "summary": "Mark one notification as read",
+        "tags": [
+          "Notifications"
+        ],
+        "description": "Replies 204 with no body. Calling it again on a read alert is fine. Another account's alert is 404.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 120/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "post": {
+        "summary": "Mark all my notifications as read",
+        "tags": [
+          "Notifications"
+        ],
+        "description": "Replies 204 with no body.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 60/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/videos": {
       "get": {
         "summary": "List approved videos",
@@ -11507,6 +12256,10 @@
     {
       "name": "Applications",
       "description": "Tutor applications to requirements and student requests for packages."
+    },
+    {
+      "name": "Notifications",
+      "description": "In-app alerts for the dashboard bell."
     },
     {
       "name": "Videos",

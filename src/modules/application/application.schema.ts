@@ -5,8 +5,9 @@ import {
   Gender,
   InitiatedBy,
   ListingStatus,
+  VerificationStatus,
 } from "../../generated/prisma/enums.js";
-import { ACADEMIC_GROUPS, CURRICULA } from "../../lib/education.js";
+import { ACADEMIC_GROUPS, ADMISSION_TARGETS, CURRICULA } from "../../lib/education.js";
 
 export const APPLICATION_ACTIONS = [
   "confirm",
@@ -38,10 +39,57 @@ export const applicationTutorSchema = z
     id: z.string(),
     name: z.string(),
     gender: z.nativeEnum(Gender),
+    instituteName: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
   })
   .meta({ id: "ApplicationTutor" });
+
+// The tutor's details for the student (and admins) on an application.
+// No phone, address, student ID or files.
+export const applicationTutorProfileSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    gender: z.nativeEnum(Gender),
+    instituteName: z.string().nullable(),
+    ratingAvg: z.number(),
+    ratingCount: z.number(),
+    verificationStatus: z.nativeEnum(VerificationStatus),
+    areas: z.array(z.object({ id: z.number(), name: z.string() })),
+    subjects: z.array(z.object({ id: z.number(), name: z.string() })),
+    credentials: z.array(z.object({ id: z.string(), examLabel: z.string(), result: z.string() })),
+  })
+  .meta({ id: "ApplicationTutorProfile" });
+export type ApplicationTutorProfile = z.infer<typeof applicationTutorProfileSchema>;
+
+// The tutor set behind an application. MATCH: a set that covers the requirement. DEFAULT: no set
+// covers it, so the tutor's default set is shown. PACKAGE: the package's own set.
+export const applicationTutorSetSchema = z
+  .object({
+    matchedBy: z.enum(["MATCH", "DEFAULT", "PACKAGE"]),
+    set: z.object({
+      id: z.string(),
+      name: z.string(),
+      isDefault: z.boolean(),
+      levelMin: z.number(),
+      levelMax: z.number(),
+      curricula: z.array(z.enum(CURRICULA)),
+      academicGroups: z.array(z.enum(ACADEMIC_GROUPS)),
+      admissionTargets: z.array(z.enum(ADMISSION_TARGETS)),
+      subjectIds: z.array(z.number()),
+      /** "HH:MM" */
+      timeFrom: z.string(),
+      /** "HH:MM" */
+      timeTo: z.string(),
+      availableDays: z.number(),
+      minSalary: z.number().nullable(),
+      maxStudents: z.number(),
+      teachesOnline: z.boolean(),
+    }),
+  })
+  .meta({ id: "ApplicationTutorSet" });
+export type ApplicationTutorSet = z.infer<typeof applicationTutorSetSchema>;
 
 export const applicationStudentSchema = z
   .object({
@@ -114,6 +162,11 @@ export const applicationDetailSchema = applicationSchema
     counterpartContact: applicationContactSchema.nullable(),
     /** The placement fee. Only the tutor (and admins) see it; null for students or when none exists. */
     fee: applicationFeeSchema.nullable(),
+    /** The tutor's details. Only the student (and admins); null for the tutor. */
+    tutorProfile: applicationTutorProfileSchema.nullable(),
+    /** The tutor's set for this application. Only the student (and admins). Null for the tutor,
+     *  or when the tutor has no set. */
+    tutorSet: applicationTutorSetSchema.nullable(),
   })
   .meta({ id: "ApplicationDetail" });
 export type ApplicationDetailResponse = z.infer<typeof applicationDetailSchema>;

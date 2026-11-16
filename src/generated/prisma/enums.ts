@@ -260,6 +260,21 @@ export const ZoneLimitRequestStatus = {
 export type ZoneLimitRequestStatus = (typeof ZoneLimitRequestStatus)[keyof typeof ZoneLimitRequestStatus]
 
 
+export const AppNotificationKind = {
+  APPLICATION_RECEIVED: 'APPLICATION_RECEIVED',
+  PACKAGE_REQUESTED: 'PACKAGE_REQUESTED',
+  APPLICATION_ACCEPTED: 'APPLICATION_ACCEPTED',
+  APPLICATION_DECLINED: 'APPLICATION_DECLINED',
+  LISTING_FILLED: 'LISTING_FILLED',
+  APPLICATION_WITHDRAWN: 'APPLICATION_WITHDRAWN',
+  APPLICATION_REOPENED: 'APPLICATION_REOPENED',
+  APPLICATION_CANCELLED: 'APPLICATION_CANCELLED',
+  APPLICATION_COMPLETED: 'APPLICATION_COMPLETED'
+} as const
+
+export type AppNotificationKind = (typeof AppNotificationKind)[keyof typeof AppNotificationKind]
+
+
 export const NotificationStatus = {
   PENDING: 'PENDING',
   SENDING: 'SENDING',

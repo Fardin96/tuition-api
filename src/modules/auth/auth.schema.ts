@@ -132,6 +132,7 @@ const meTutorSchema = z
     accountId: z.string().uuid(),
     role: roleSchema,
     name: z.string(),
+    instituteName: z.string().nullable(),
     address: z.string(),
     emergencyContact: z.string().nullable(),
     whatsappNumber: z.string().nullable(),

@@ -14,6 +14,7 @@ export const TAGS = [
     name: "Applications",
     description: "Tutor applications to requirements and student requests for packages.",
   },
+  { name: "Notifications", description: "In-app alerts for the dashboard bell." },
   { name: "Videos", description: "Public tutor videos." },
   { name: "Lookups", description: "Seeded reference data." },
   { name: "Admin", description: "Admin queues. Needs an ACTIVE admin_user row." },

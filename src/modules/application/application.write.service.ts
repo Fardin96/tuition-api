@@ -1,6 +1,7 @@
 import { Prisma } from "../../generated/prisma/client.js";
 import type {
   ApplicationStatus,
+  AppNotificationKind,
   InitiatedBy,
   ListingStatus,
   ModerationStatus,
@@ -166,6 +167,27 @@ async function enqueue(tx: Db, input: OutboxInput) {
   });
 }
 
+// In-app alert for the dashboard bell. Written in the same transaction as the status change.
+async function alert(
+  tx: Db,
+  recipientId: string,
+  kind: AppNotificationKind,
+  applicationId: string,
+) {
+  await tx.appNotification.create({ data: { recipientId, kind, applicationId } });
+}
+
+// Alerts the other party of the caller, who is always a party to the application here.
+async function alertCounterpart(
+  tx: Db,
+  app: AppRow,
+  side: Side,
+  kind: AppNotificationKind,
+): Promise<void> {
+  const parties = await loadParties(tx, app.tutorId, app.studentId);
+  await alert(tx, accountOf(otherSide(side), parties), kind, app.id);
+}
+
 // The caller's side of the application, or null when the caller is not a party.
 async function callerSide(tx: Db, account: AuthContext, app: AppRow): Promise<Side | null> {
   if (account.role === "TUTOR") {
@@ -241,6 +263,7 @@ export async function applyToRequirement(
         templateName: "application_received",
         dedupeKey: `application_received:${created.id}:${created.appliedAt.getTime()}`,
       });
+      await alert(tx, parties.studentAccountId, "APPLICATION_RECEIVED", created.id);
       return created.id;
     });
   } catch (error) {
@@ -316,6 +339,7 @@ export async function requestPackage(account: AuthContext, packageId: string): P
         templateName: "application_received",
         dedupeKey: `application_received:${created.id}:${created.appliedAt.getTime()}`,
       });
+      await alert(tx, parties.tutorAccountId, "PACKAGE_REQUESTED", created.id);
       return created.id;
     });
   } catch (error) {
@@ -374,10 +398,28 @@ export async function transitionApplication(
           where: { id: app.id },
           data: { status: "CONFIRMED", confirmedAt: new Date() },
         });
-        await tx.application.updateMany({
+        // Every other pending application on this listing is auto-rejected. Their applicants
+        // are the tutor (requirement) or the student (package).
+        const pending = await tx.application.findMany({
           where: { ...targetWhere(app), status: "PENDING", id: { not: app.id } },
-          data: { status: "REJECTED" },
+          select: {
+            id: true,
+            tutor: { select: { accountId: true } },
+            student: { select: { accountId: true } },
+          },
         });
+        if (pending.length > 0) {
+          await tx.application.updateMany({
+            where: { id: { in: pending.map((row) => row.id) } },
+            data: { status: "REJECTED" },
+          });
+          const filled: Prisma.AppNotificationCreateManyInput[] = pending.map((row) => ({
+            recipientId: app.requirementId ? row.tutor.accountId : row.student.accountId,
+            kind: "LISTING_FILLED",
+            applicationId: row.id,
+          }));
+          await tx.appNotification.createMany({ data: filled });
+        }
 
         const [setting] = await tx.$queryRaw<{ pct: Prisma.Decimal | null }[]>`
           SELECT (value #>> '{}')::numeric AS pct
@@ -409,15 +451,18 @@ export async function transitionApplication(
           templateName: "application_confirmed",
           dedupeKey: `application_confirmed:${app.id}`,
         });
+        await alert(tx, accountOf(otherSide(side), parties), "APPLICATION_ACCEPTED", app.id);
         return;
       }
 
       case "reject":
         await tx.application.update({ where: { id: app.id }, data: { status: "REJECTED" } });
+        await alertCounterpart(tx, app, side, "APPLICATION_DECLINED");
         return;
 
       case "withdraw":
         await tx.application.update({ where: { id: app.id }, data: { status: "WITHDRAWN" } });
+        await alertCounterpart(tx, app, side, "APPLICATION_WITHDRAWN");
         return;
 
       case "reopen": {
@@ -435,6 +480,7 @@ export async function transitionApplication(
           templateName: "application_received",
           dedupeKey: `application_received:${app.id}:${reopened.appliedAt.getTime()}`,
         });
+        await alert(tx, accountOf(otherSide(side), parties), "APPLICATION_REOPENED", app.id);
         return;
       }
 
@@ -451,6 +497,7 @@ export async function transitionApplication(
             AND status = 'DUE'::"FeeStatus"
             AND amount_paid = 0
         `;
+        await alertCounterpart(tx, app, side, "APPLICATION_CANCELLED");
         return;
 
       case "complete":
@@ -458,6 +505,7 @@ export async function transitionApplication(
           where: { id: app.id },
           data: { status: "COMPLETED", endedAt: new Date() },
         });
+        await alertCounterpart(tx, app, side, "APPLICATION_COMPLETED");
         return;
     }
   });

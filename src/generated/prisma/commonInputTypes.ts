@@ -895,6 +895,23 @@ export type EnumNotificationStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumNotificationStatusFilter<$PrismaModel>
 }
 
+export type EnumAppNotificationKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppNotificationKind | Prisma.EnumAppNotificationKindFieldRefInput<$PrismaModel>
+  in?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppNotificationKindFilter<$PrismaModel> | $Enums.AppNotificationKind
+}
+
+export type EnumAppNotificationKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppNotificationKind | Prisma.EnumAppNotificationKindFieldRefInput<$PrismaModel>
+  in?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppNotificationKindWithAggregatesFilter<$PrismaModel> | $Enums.AppNotificationKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAppNotificationKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAppNotificationKindFilter<$PrismaModel>
+}
+
 export type EnumPostStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.PostStatus | Prisma.EnumPostStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PostStatus[] | Prisma.ListEnumPostStatusFieldRefInput<$PrismaModel>
@@ -1773,6 +1790,23 @@ export type NestedEnumNotificationStatusWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumNotificationStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumNotificationStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumAppNotificationKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppNotificationKind | Prisma.EnumAppNotificationKindFieldRefInput<$PrismaModel>
+  in?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppNotificationKindFilter<$PrismaModel> | $Enums.AppNotificationKind
+}
+
+export type NestedEnumAppNotificationKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AppNotificationKind | Prisma.EnumAppNotificationKindFieldRefInput<$PrismaModel>
+  in?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AppNotificationKind[] | Prisma.ListEnumAppNotificationKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAppNotificationKindWithAggregatesFilter<$PrismaModel> | $Enums.AppNotificationKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAppNotificationKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAppNotificationKindFilter<$PrismaModel>
 }
 
 export type NestedEnumPostStatusFilter<$PrismaModel = never> = {

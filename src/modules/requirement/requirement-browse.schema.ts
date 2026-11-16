@@ -1,17 +1,27 @@
 import { z } from "zod";
 import { ACADEMIC_GROUPS, ADMISSION_TARGETS, CURRICULA } from "../../lib/education.js";
-import { browseScopeSchema, myApplicationSchema } from "../package/package.schema.js";
+import { myApplicationSchema } from "../package/package.schema.js";
 import { tutorGenderPrefSchema } from "./requirement.schema.js";
 
-export const requirementBrowseQuerySchema = z.object({
-  scope: browseScopeSchema.default("nearby"),
-  curriculum: z.enum(CURRICULA).optional(),
-  levelCode: z.coerce.number().int().min(-4).max(13).optional(),
-  subjectId: z.coerce.number().int().positive().optional(),
-  areaId: z.coerce.number().int().positive().optional(),
-  cursor: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(50).optional(),
-});
+// Requirement-only: packages keep the shared browseScopeSchema (nearby | all).
+export const requirementBrowseScopeSchema = z.enum(["nearby", "all", "set"]);
+
+export const requirementBrowseQuerySchema = z
+  .object({
+    scope: requirementBrowseScopeSchema.default("nearby"),
+    // The tutor's own active requirement set. Only read when scope=set.
+    setId: z.string().uuid().optional(),
+    curriculum: z.enum(CURRICULA).optional(),
+    levelCode: z.coerce.number().int().min(-4).max(13).optional(),
+    subjectId: z.coerce.number().int().positive().optional(),
+    areaId: z.coerce.number().int().positive().optional(),
+    cursor: z.string().optional(),
+    limit: z.coerce.number().int().min(1).max(50).optional(),
+  })
+  .refine((q) => q.scope !== "set" || q.setId !== undefined, {
+    message: "setId is required when scope is set",
+    path: ["setId"],
+  });
 export type RequirementBrowseQuery = z.infer<typeof requirementBrowseQuerySchema>;
 
 // What a tutor sees of an OPEN requirement: no student name, contact or coordinates.

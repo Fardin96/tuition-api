@@ -18,6 +18,7 @@ import { applicationRoutes } from "./modules/application/application.routes.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
 import { lookupRoutes } from "./modules/lookups/lookups.routes.js";
+import { notificationRoutes } from "./modules/notification/notification.routes.js";
 import { packageRoutes } from "./modules/package/package.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
@@ -105,6 +106,7 @@ export async function buildApp() {
   await app.register(packageRoutes, { prefix: "/api/v1/packages" });
   // Full paths: /requirements/:id/applications, /packages/:id/applications and /applications/*.
   await app.register(applicationRoutes, { prefix: "/api/v1" });
+  await app.register(notificationRoutes, { prefix: "/api/v1/notifications" });
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
   await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
   await app.register(adminZoneRequestRoutes, { prefix: "/api/v1/admin/zone-limit-requests" });
