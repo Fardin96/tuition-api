@@ -9,6 +9,11 @@ export const TAGS = [
   { name: "Tutor requirements", description: "A tutor's requirement sets." },
   { name: "Tutor zones", description: "A tutor's teaching zones and zone-limit requests." },
   { name: "Requirements", description: "Student tuition requirements." },
+  { name: "Packages", description: "Tutor tuition packages." },
+  {
+    name: "Applications",
+    description: "Tutor applications to requirements and student requests for packages.",
+  },
   { name: "Videos", description: "Public tutor videos." },
   { name: "Lookups", description: "Seeded reference data." },
   { name: "Admin", description: "Admin queues. Needs an ACTIVE admin_user row." },

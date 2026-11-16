@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { notFound } from "../../lib/errors.js";
+import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
 import {
@@ -19,6 +20,12 @@ import {
   getRequirementsForStudent,
   updateRequirement,
 } from "./requirement.service.js";
+import {
+  browseRequirementPageSchema,
+  type RequirementBrowseQuery,
+  requirementBrowseQuerySchema,
+} from "./requirement-browse.schema.js";
+import { browseRequirements } from "./requirement-browse.service.js";
 
 export async function requirementRoutes(app: FastifyInstance) {
   app.post(
@@ -44,6 +51,35 @@ export async function requirementRoutes(app: FastifyInstance) {
       const body = request.body as CreateRequirementInput;
       const requirement = await createRequirement(account.accountId, body);
       return reply.status(201).send(requirement);
+    },
+  );
+
+  app.get(
+    "/",
+    {
+      config: accountRateLimit(300, "1 minute"),
+      schema: {
+        ...routeDocs({
+          tag: "Requirements",
+          summary: "Browse open requirements",
+          description:
+            "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.",
+          auth: ["TUTOR"],
+          errors: [404],
+          rateLimit: "300/min per account",
+        }),
+        querystring: requirementBrowseQuerySchema,
+        response: {
+          200: browseRequirementPageSchema,
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const query = request.query as RequirementBrowseQuery;
+      const page = await browseRequirements(account.accountId, query);
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send(page);
     },
   );
 
