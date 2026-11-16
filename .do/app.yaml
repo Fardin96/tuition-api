@@ -160,3 +160,33 @@ jobs:
       - key: DATABASE_CA_CERT
         value: <database-ca-cert-pem-content>
         type: SECRET
+
+  # Placement-fee reminders: one PAYMENT_REMINDER outbox row per unpaid fee per
+  # Dhaka day, from the due date until 21 days after confirmation. 03:00 UTC is
+  # 09:00 in Dhaka.
+  - name: fee-reminders
+    kind: SCHEDULED
+    source_dir: /
+    github:
+      repo: fardin96/tuition-api
+      branch: main
+      deploy_on_push: true
+    build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
+    run_command: node dist/cron/fee-reminders.js
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    schedule:
+      cron: "0 3 * * *"
+      time_zone: UTC
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: <paste-direct-db-url-here>
+        type: SECRET
+      - key: DATABASE_POOL_URL
+        value: <paste-pool-url-here>?&pgbouncer=true&connection_limit=5
+        type: SECRET
+      - key: DATABASE_CA_CERT
+        value: <database-ca-cert-pem-content>
+        type: SECRET

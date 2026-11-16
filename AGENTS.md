@@ -8,8 +8,9 @@ This file captures the essential, non-obvious guidance an agent needs to work in
 |---------|---------|
 | `yarn install` | Install dependencies |
 | `yarn dev` | Start dev server with watch (tsx watch --env-file=.env src/server.ts) |
-| `yarn build` | Build production bundle to `dist/` (tsup src/server.ts src/cron/weekly-location-expiry.ts) |
+| `yarn build` | Build production bundle to `dist/` (tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts) |
 | `yarn start` | Run production bundle (node dist/server.js) |
+| `yarn cron:fee-reminders` | Run fee-reminder cron manually (`tsx --env-file-if-exists=.env src/cron/fee-reminders.ts`) |
 | `yarn db:migrate:create` | Create new empty migration (`prisma migrate dev --create-only`) |
 | `yarn db:migrate` | Apply migrations in dev (`prisma migrate dev`) |
 | `bash scripts/migrate.sh` | Apply migrations in production (pre-deploy job) |
@@ -73,6 +74,7 @@ Optional:
 - `src/server.ts` — app entry point; registers all plugins and routes.
 - `src/seed/index.ts` — seeds areas, subjects, and super-admin emails.
 - `src/cron/weekly-location-expiry.ts` — weekly cron that soft-warns (≥21 days) and hard-expiries (≥28 days) tutor/student locations.
+- `src/cron/fee-reminders.ts` — daily cron that enqueues PAYMENT_REMINDER outbox rows for unpaid placement fees.
 - `dist/` — production build output.
 - `prisma/migrations/` — generated migrations; `prisma/constraints.sql` is the hand-edited final-state reference (see Prisma / DB).
 
@@ -116,6 +118,9 @@ Optional:
 - **Zones** (`src/modules/zone/`): centers written via raw SQL with geog_source PIN; never expire (weekly cron skips tutor_zone). Quota enforced by trigger `tutor_zone_quota_trg` -> 409 ZONE_LIMIT_REACHED.
 - **Admin routes** (`src/modules/admin/zone-requests.*`): guarded by `requireAdmin()` in `src/plugins/auth.ts` (role ADMIN AND admin_user.status ACTIVE; PENDING/REMOVED admins get 403; MFA not enforced). Decide endpoint runs in one transaction: locks request then tutor, writes audit_log (action zone_limit_request.decide) and notification_log outbox row (event ZONE_LIMIT_DECIDED, dedupe key zone_limit_decided:{id}).
 - **Rate limits**: per-route limits use `accountRateLimit(max, window, message?)` from `src/lib/rate-limit.ts` (key = account id, else IP; runs as route-level onRequest hook after global auth hook, so request.account is set). Zone and zone-request routes (#129-136) have per-route limits; other routes still only have the global 100/min limit. Zone limit requests also have a DB-backed daily cap (3/day) enforced in the table.
+- **Applications** (`src/modules/application/`): read/write services split. Every transition in one transaction that locks the application row FOR UPDATE and, for confirm/reopen, the listing row. `allowedActions` computed server-side by `computeAllowedActions`. Confirm auto-rejects other PENDING applications on the same listing and the listing stays OPEN but is "closed" for new applications while it has a CONFIRMED/COMPLETED one → 409 APPLICATION_CLOSED. Placement fee = commission_percent × monthly salary, due 7 days after confirmation, skipped when the setting is missing/0 or salary is null. Cancel voids an unpaid DUE fee. Counterpart contact only after CONFIRMED. Outbox rows and their dedupe keys: `application_received:{applicationId}:{appliedAt.getTime()}`, `application_confirmed:{applicationId}`, `payment_reminder:{feeId}:{YYYY-MM-DD Dhaka date}`. No matching score is computed yet (match_* columns stay null). Test files: `application.test.ts`, `requirement-browse.test.ts`, `package.test.ts`.
+- **Browse** (`src/modules/requirement/requirement-browse.*.ts`, `src/modules/package/package.routes.ts`): GET /requirements nearby rule via tutor zones + tutor_area fallback, distance rounded to 0.5 km, no coordinates/contact in responses. GET /packages and /packages/:id read-only — package create/edit/close are not built yet.
+- **Fees cron** (`src/cron/fee-reminders.ts`): daily PAYMENT_REMINDER outbox rows from the due date until 21 days after confirmation; "Unpaid" is derived, never stored; payment stays possible.
 
 ## OpenAPI / Swagger
 

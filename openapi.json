@@ -112,6 +112,661 @@
         ],
         "additionalProperties": false
       },
+      "Application": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "initiatedBy": {
+            "type": "string",
+            "enum": [
+              "TUTOR",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "COMPLETED",
+              "REJECTED",
+              "WITHDRAWN",
+              "CANCELLED",
+              "EXPIRED"
+            ]
+          },
+          "appliedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confirmedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tutor": {
+            "$ref": "#/components/schemas/ApplicationTutor"
+          },
+          "student": {
+            "$ref": "#/components/schemas/ApplicationStudent"
+          },
+          "target": {
+            "$ref": "#/components/schemas/ApplicationTarget"
+          },
+          "allowedActions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "confirm",
+                "reject",
+                "withdraw",
+                "reopen",
+                "cancel",
+                "complete"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "initiatedBy",
+          "status",
+          "appliedAt",
+          "confirmedAt",
+          "endedAt",
+          "tutor",
+          "student",
+          "target",
+          "allowedActions"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationContact": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          },
+          "whatsappNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "phoneNumber",
+          "whatsappNumber"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "initiatedBy": {
+            "type": "string",
+            "enum": [
+              "TUTOR",
+              "STUDENT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "COMPLETED",
+              "REJECTED",
+              "WITHDRAWN",
+              "CANCELLED",
+              "EXPIRED"
+            ]
+          },
+          "appliedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confirmedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tutor": {
+            "$ref": "#/components/schemas/ApplicationTutor"
+          },
+          "student": {
+            "$ref": "#/components/schemas/ApplicationStudent"
+          },
+          "target": {
+            "$ref": "#/components/schemas/ApplicationTarget"
+          },
+          "allowedActions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "confirm",
+                "reject",
+                "withdraw",
+                "reopen",
+                "cancel",
+                "complete"
+              ]
+            }
+          },
+          "counterpartContact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationContact"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fee": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationFee"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "initiatedBy",
+          "status",
+          "appliedAt",
+          "confirmedAt",
+          "endedAt",
+          "tutor",
+          "student",
+          "target",
+          "allowedActions",
+          "counterpartContact",
+          "fee"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationFee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amountDue": {
+            "type": "string"
+          },
+          "amountPaid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DUE",
+              "PARTIAL",
+              "PAID",
+              "WAIVED",
+              "VOID"
+            ]
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "unpaid": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "amountDue",
+          "amountPaid",
+          "status",
+          "dueDate",
+          "unpaid"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationPage": {
+        "type": "object",
+        "properties": {
+          "applications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Application"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "applications",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationStudent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "areaId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "areaId"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationTarget": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "REQUIREMENT",
+              "PACKAGE"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "FILLED",
+              "CLOSED",
+              "EXPIRED"
+            ]
+          },
+          "closed": {
+            "type": "boolean"
+          },
+          "areaId": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "subjectIds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "curriculum": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "BANGLA_MEDIUM",
+                  "ENGLISH_VERSION",
+                  "EM_CAMBRIDGE",
+                  "EM_EDEXCEL",
+                  "EM_IB",
+                  "EM_AMERICAN",
+                  "MADRASAH"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "levelCode": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "academicGroup": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SCIENCE",
+                  "BUSINESS",
+                  "HUMANITIES",
+                  "MUJABBID"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "salary": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "daysPerWeek": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "timeOfDay": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "status",
+          "closed",
+          "areaId",
+          "subjectIds",
+          "curriculum",
+          "levelCode",
+          "academicGroup",
+          "salary",
+          "daysPerWeek",
+          "timeOfDay"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationTutor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ]
+          },
+          "ratingAvg": {
+            "type": "number"
+          },
+          "ratingCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "gender",
+          "ratingAvg",
+          "ratingCount"
+        ],
+        "additionalProperties": false
+      },
+      "BrowseRequirement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "areaId": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "subjectIds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "curriculum": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "BANGLA_MEDIUM",
+                  "ENGLISH_VERSION",
+                  "EM_CAMBRIDGE",
+                  "EM_EDEXCEL",
+                  "EM_IB",
+                  "EM_AMERICAN",
+                  "MADRASAH"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "levelCode": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "academicGroup": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SCIENCE",
+                  "BUSINESS",
+                  "HUMANITIES",
+                  "MUJABBID"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "admissionTargets": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ENGINEERING",
+                "MEDICAL",
+                "VARSITY_SCIENCE",
+                "VARSITY_HUMANITIES",
+                "VARSITY_BUSINESS",
+                "AGRICULTURE",
+                "IBA_BUP",
+                "PRIVATE_UNI",
+                "ABROAD_TESTS",
+                "ISSB"
+              ]
+            }
+          },
+          "isRetaker": {
+            "type": "boolean"
+          },
+          "levelNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "timeOfDay": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "daysPerWeek": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "availableDays": {
+            "type": "number"
+          },
+          "salary": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "studentCount": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "hireByDate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tutorGenderPref": {
+            "type": "string",
+            "enum": [
+              "ANY",
+              "MALE",
+              "FEMALE"
+            ]
+          },
+          "tuitionType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "distanceKm": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "closed": {
+            "type": "boolean"
+          },
+          "myApplication": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MyApplication"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "areaId",
+          "subjectIds",
+          "curriculum",
+          "levelCode",
+          "academicGroup",
+          "admissionTargets",
+          "isRetaker",
+          "levelNote",
+          "timeOfDay",
+          "daysPerWeek",
+          "availableDays",
+          "salary",
+          "studentCount",
+          "hireByDate",
+          "tutorGenderPref",
+          "tuitionType",
+          "createdAt",
+          "distanceKm",
+          "closed",
+          "myApplication"
+        ],
+        "additionalProperties": false
+      },
+      "BrowseRequirementPage": {
+        "type": "object",
+        "properties": {
+          "requirements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrowseRequirement"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "noServiceArea": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "requirements",
+          "nextCursor",
+          "noServiceArea"
+        ],
+        "additionalProperties": false
+      },
       "ConsentInput": {
         "type": "object",
         "properties": {
@@ -1050,7 +1705,12 @@
           "AREA_OUTSIDE_CITY",
           "ZONE_LIMIT_REACHED",
           "ZONE_REQUEST_PENDING",
-          "ZONE_REQUEST_DECIDED"
+          "ZONE_REQUEST_DECIDED",
+          "PROFILE_INCOMPLETE",
+          "ALREADY_APPLIED",
+          "APPLICATION_CLOSED",
+          "LISTING_NOT_OPEN",
+          "INVALID_APPLICATION_STATE"
         ],
         "description": "Machine-readable error code. Match on this."
       },
@@ -1780,6 +2440,238 @@
           "updatedAt",
           "location",
           "needsReaddress"
+        ],
+        "additionalProperties": false
+      },
+      "MyApplication": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "COMPLETED",
+              "REJECTED",
+              "WITHDRAWN",
+              "CANCELLED",
+              "EXPIRED"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Package": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tutor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "gender": {
+                "type": "string",
+                "enum": [
+                  "MALE",
+                  "FEMALE",
+                  "OTHER"
+                ]
+              },
+              "ratingAvg": {
+                "type": "number"
+              },
+              "ratingCount": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "gender",
+              "ratingAvg",
+              "ratingCount"
+            ],
+            "additionalProperties": false
+          },
+          "subjectId": {
+            "type": "number"
+          },
+          "areaId": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "curriculum": {
+            "type": "string",
+            "enum": [
+              "BANGLA_MEDIUM",
+              "ENGLISH_VERSION",
+              "EM_CAMBRIDGE",
+              "EM_EDEXCEL",
+              "EM_IB",
+              "EM_AMERICAN",
+              "MADRASAH"
+            ]
+          },
+          "levelCode": {
+            "type": "number"
+          },
+          "academicGroup": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SCIENCE",
+                  "BUSINESS",
+                  "HUMANITIES",
+                  "MUJABBID"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "admissionTargets": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ENGINEERING",
+                "MEDICAL",
+                "VARSITY_SCIENCE",
+                "VARSITY_HUMANITIES",
+                "VARSITY_BUSINESS",
+                "AGRICULTURE",
+                "IBA_BUP",
+                "PRIVATE_UNI",
+                "ABROAD_TESTS",
+                "ISSB"
+              ]
+            }
+          },
+          "isRetaker": {
+            "type": "boolean"
+          },
+          "levelNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "timeOfDay": {
+            "type": "string"
+          },
+          "daysPerWeek": {
+            "type": "number"
+          },
+          "expectedSalary": {
+            "type": "number"
+          },
+          "studentCount": {
+            "type": "number"
+          },
+          "availableFrom": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "FILLED",
+              "CLOSED",
+              "EXPIRED"
+            ]
+          },
+          "moderationStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closed": {
+            "type": "boolean"
+          },
+          "myApplication": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MyApplication"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "tutor",
+          "subjectId",
+          "areaId",
+          "curriculum",
+          "levelCode",
+          "academicGroup",
+          "admissionTargets",
+          "isRetaker",
+          "levelNote",
+          "timeOfDay",
+          "daysPerWeek",
+          "expectedSalary",
+          "studentCount",
+          "availableFrom",
+          "status",
+          "moderationStatus",
+          "createdAt",
+          "closed",
+          "myApplication"
+        ],
+        "additionalProperties": false
+      },
+      "PackagePage": {
+        "type": "object",
+        "properties": {
+          "packages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Package"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "locationMissing": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "packages",
+          "nextCursor",
+          "locationMissing"
         ],
         "additionalProperties": false
       },
@@ -8074,6 +8966,172 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "Browse open requirements",
+        "tags": [
+          "Requirements"
+        ],
+        "description": "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "nearby",
+              "type": "string",
+              "enum": [
+                "nearby",
+                "all"
+              ]
+            },
+            "in": "query",
+            "name": "scope",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "BANGLA_MEDIUM",
+                "ENGLISH_VERSION",
+                "EM_CAMBRIDGE",
+                "EM_EDEXCEL",
+                "EM_IB",
+                "EM_AMERICAN",
+                "MADRASAH"
+              ]
+            },
+            "in": "query",
+            "name": "curriculum",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": -4,
+              "maximum": 13
+            },
+            "in": "query",
+            "name": "levelCode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "areaId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowseRequirementPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/requirements/mine": {
@@ -8391,6 +9449,1615 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Requirement"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/packages": {
+      "get": {
+        "summary": "Browse tuition packages",
+        "tags": [
+          "Packages"
+        ],
+        "description": "Student browse (#52). Packages are APPROVED, OPEN, from listed tutors. scope=nearby keeps online packages plus packages whose tutor has a zone covering the student pin. Without a usable pin, nearby falls back to online packages and the student's area, and locationMissing is true. scope=all skips the location match. Filters: curriculum, levelCode, subjectId. Newest first, keyset cursor.\n\n**Who:** STUDENT.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "nearby",
+              "type": "string",
+              "enum": [
+                "nearby",
+                "all"
+              ]
+            },
+            "in": "query",
+            "name": "scope",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "BANGLA_MEDIUM",
+                "ENGLISH_VERSION",
+                "EM_CAMBRIDGE",
+                "EM_EDEXCEL",
+                "EM_IB",
+                "EM_AMERICAN",
+                "MADRASAH"
+              ]
+            },
+            "in": "query",
+            "name": "curriculum",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": -4,
+              "maximum": 13
+            },
+            "in": "query",
+            "name": "levelCode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "subjectId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackagePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/packages/{id}": {
+      "get": {
+        "summary": "Get one package",
+        "tags": [
+          "Packages"
+        ],
+        "description": "Package detail (#54). STUDENT sees APPROVED packages only. TUTOR sees its own packages in any state. ADMIN (ACTIVE admin_user) sees any package. myApplication is set only for the calling student.\n\n**Who:** STUDENT, TUTOR, ADMIN.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT, TUTOR, ADMIN",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/requirements/{id}/applications": {
+      "post": {
+        "summary": "Apply to a requirement",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#57. A tutor applies to an open requirement. Fails with 403 PROFILE_INCOMPLETE until the profile passes the apply gate, 409 ALREADY_APPLIED for a repeat, and 409 APPLICATION_CLOSED once the tuition has a confirmed application.\n\n**Who:** TUTOR.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List applications to my requirement",
+        "tags": [
+          "Applications"
+        ],
+        "description": "Applications from tutors to one of the student's requirements. Newest first.\n\n**Who:** STUDENT.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "COMPLETED",
+                "REJECTED",
+                "WITHDRAWN",
+                "CANCELLED",
+                "EXPIRED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/packages/{id}/applications": {
+      "post": {
+        "summary": "Request a package",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#58. A student asks to take an approved, open package from a listed tutor. Fails with 409 ALREADY_APPLIED for a repeat and 409 APPLICATION_CLOSED once the package has a confirmed application.\n\n**Who:** STUDENT.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List requests for my package",
+        "tags": [
+          "Applications"
+        ],
+        "description": "Student requests for one of the tutor's packages. Newest first.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "COMPLETED",
+                "REJECTED",
+                "WITHDRAWN",
+                "CANCELLED",
+                "EXPIRED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications": {
+      "get": {
+        "summary": "List my applications",
+        "tags": [
+          "Applications"
+        ],
+        "description": "Newest first, cursor-paginated. Filter by status.\n\n**Who:** TUTOR, STUDENT.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "COMPLETED",
+                "REJECTED",
+                "WITHDRAWN",
+                "CANCELLED",
+                "EXPIRED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR, STUDENT",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}": {
+      "get": {
+        "summary": "Get an application",
+        "tags": [
+          "Applications"
+        ],
+        "description": "Visible to the tutor and student on the application, and to active admins. Admins get no allowedActions. Contact numbers appear only once CONFIRMED or COMPLETED, and the fee only for the tutor and admins.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/confirm": {
+      "post": {
+        "summary": "Confirm an application",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#63. The counterparty accepts. Other pending applications on the same listing are rejected, and a placement fee is created when a commission rate is set.\n\n**Who:** TUTOR, STUDENT.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR, STUDENT",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/reject": {
+      "post": {
+        "summary": "Reject an application",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#64. The counterparty declines a pending application.\n\n**Who:** TUTOR, STUDENT.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR, STUDENT",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/withdraw": {
+      "post": {
+        "summary": "Withdraw an application",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#65. The initiator withdraws a pending application.\n\n**Who:** TUTOR, STUDENT.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR, STUDENT",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/reopen": {
+      "post": {
+        "summary": "Reopen an application",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#66. The initiator sends a withdrawn, rejected or expired application again. The listing must still be open and not closed. A tutor reopening re-checks profile completeness (403 PROFILE_INCOMPLETE).\n\n**Who:** TUTOR, STUDENT.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR, STUDENT",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/cancel": {
+      "post": {
+        "summary": "Cancel a placement",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#67. Either party ends a confirmed placement. The unpaid placement fee is voided.\n\n**Who:** TUTOR, STUDENT.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR, STUDENT",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/complete": {
+      "post": {
+        "summary": "Complete a placement",
+        "tags": [
+          "Applications"
+        ],
+        "description": "#68. Either party marks a confirmed placement as finished.\n\n**Who:** TUTOR, STUDENT.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR, STUDENT",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
                 }
               }
             }
@@ -8832,6 +11499,14 @@
     {
       "name": "Requirements",
       "description": "Student tuition requirements."
+    },
+    {
+      "name": "Packages",
+      "description": "Tutor tuition packages."
+    },
+    {
+      "name": "Applications",
+      "description": "Tutor applications to requirements and student requests for packages."
     },
     {
       "name": "Videos",

@@ -72,7 +72,7 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
 | Script                             | Purpose                                                                  |
 | ---------------------------------- | ------------------------------------------------------------------------ |
 | `yarn dev`                         | Start dev server with watch                                              |
-| `yarn build`                       | Build production bundle to`dist/`                                        |
+| `yarn build`                       | Build production bundle to `dist/` (tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts) |
 | `yarn start`                       | Run production bundle (env vars injected by host)                        |
 | `yarn db:migrate:create`           | Create a new empty migration                                             |
 | `yarn db:migrate`                  | Apply migrations in dev                                                  |
@@ -87,6 +87,7 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
 | `yarn test`                        | Vitest (watch)                                                           |
 | `yarn test:ci`                     | Vitest (single run)                                                      |
 | `yarn cron:weekly-location-expiry` | Run the weekly location-expiry cron manually                             |
+| `yarn cron:fee-reminders`          | Run the daily fee-reminder cron manually                                 |
 
 ## Deploy to DigitalOcean App Platform
 
@@ -118,6 +119,17 @@ A single DO App Platform job runs every Sunday at 03:00 UTC:
 - Hard expiry at **28 days**: nulls `geog` and keeps `needs_readdress = true`, hiding the tutor/student from geo search.
 
 No external API call is required. The job is declared as `weekly-location-expiry` in `.do/app.yaml`.
+
+### Daily fee-reminder cron
+
+A daily DO App Platform job runs each day and enqueues PAYMENT_REMINDER outbox rows for tutors with unpaid PLACEMENT fees:
+
+- Runs from the fee's due_date (confirmedAt + 7 days in Asia/Dhaka) until confirmedAt + 21 days.
+- One row per fee per Asia/Dhaka day while fee status is DUE or PARTIAL.
+- Dedupe key `payment_reminder:{feeId}:{YYYY-MM-DD Dhaka date}` makes re-runs idempotent.
+- After confirmedAt + 21 days, reminders stop and the fee reads as "Unpaid" (derived in the API, never stored); payment is still accepted.
+
+The job is declared as `fee-reminders` in `.do/app.yaml`.
 
 ## API docs (Swagger UI)
 

@@ -22,6 +22,11 @@ export const ERROR_CODES = {
   ZoneLimitReached: "ZONE_LIMIT_REACHED",
   ZoneRequestPending: "ZONE_REQUEST_PENDING",
   ZoneRequestDecided: "ZONE_REQUEST_DECIDED",
+  ProfileIncomplete: "PROFILE_INCOMPLETE",
+  AlreadyApplied: "ALREADY_APPLIED",
+  ApplicationClosed: "APPLICATION_CLOSED",
+  ListingNotOpen: "LISTING_NOT_OPEN",
+  InvalidApplicationState: "INVALID_APPLICATION_STATE",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;
