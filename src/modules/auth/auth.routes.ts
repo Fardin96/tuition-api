@@ -7,6 +7,7 @@ import {
   consentResultSchema,
   consentSchema,
   googleAuthSchema,
+  logoutSchema,
   meSchema,
   refreshSchema,
   sessionListSchema,
@@ -138,10 +139,11 @@ export async function authRoutes(app: FastifyInstance) {
           auth: "public",
           noContent: true,
         }),
+        body: logoutSchema,
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const body = request.body as { refreshToken?: string } | undefined;
+      const body = request.body as z.infer<typeof logoutSchema>;
       const refreshToken = body?.refreshToken;
       if (refreshToken) {
         await revokeSessionByToken(refreshToken);

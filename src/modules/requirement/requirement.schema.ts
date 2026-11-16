@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ListingStatus } from "../../generated/prisma/enums.js";
 import {
   ACADEMIC_GROUPS,
   ADMISSION_TARGETS,
@@ -128,10 +129,10 @@ export const requirementResponseSchema = z
     studentId: z.string(),
     areaId: z.number().nullable(),
     subjectIds: z.array(z.number()),
-    curriculum: z.string().nullable(),
+    curriculum: z.enum(CURRICULA).nullable(),
     levelCode: z.number().nullable(),
-    academicGroup: z.string().nullable(),
-    admissionTargets: z.array(z.string()),
+    academicGroup: z.enum(ACADEMIC_GROUPS).nullable(),
+    admissionTargets: z.array(z.enum(ADMISSION_TARGETS)),
     isRetaker: z.boolean(),
     levelNote: z.string().nullable(),
     timeOfDay: z.string().nullable(),
@@ -139,10 +140,10 @@ export const requirementResponseSchema = z
     salary: z.number().nullable(),
     studentCount: z.number().nullable(),
     hireByDate: z.string().nullable(),
-    tutorGenderPref: z.string(),
+    tutorGenderPref: tutorGenderPrefSchema,
     instituteName: z.string().nullable(),
-    tuitionType: z.string().nullable(),
-    status: z.string(),
+    tuitionType: tuitionTypeSchema.nullable(),
+    status: z.enum(ListingStatus),
     createdAt: z.string(),
     updatedAt: z.string(),
   })

@@ -22,6 +22,14 @@ export const refreshSchema = z
 
 export type RefreshInput = z.infer<typeof refreshSchema>;
 
+// Body is optional. Fastify hands a body-less POST over as null, so nullish, not optional.
+export const logoutSchema = z
+  .object({
+    refreshToken: z.string().min(1).optional(),
+  })
+  .meta({ id: "Logout" })
+  .nullish();
+
 export const consentSchema = z
   .object({
     version: z.string().min(1),
@@ -36,9 +44,9 @@ export const tokenResponseSchema = z
     refreshToken: z.string(),
     account: z.object({
       id: z.string(),
-      role: z.string(),
+      role: roleSchema,
       email: z.string(),
-      status: z.string(),
+      status: z.enum(["ACTIVE", "BLOCKED", "DELETED"]),
     }),
   })
   .meta({ id: "TokenResponse" });
@@ -72,7 +80,9 @@ export const sessionListSchema = z
 // GET /me sends Prisma rows as they are (Date objects, Decimal ratings), so the dates are z.date()
 // and the Decimal fields are z.any(). The zod serializer strips anything not listed here, which
 // keeps googleSub and the encrypted MFA secret off the wire.
-const decimalSchema = z.any().meta({ description: "Decimal, serialized as a string" });
+const decimalSchema = z
+  .any()
+  .meta({ type: "string", description: "Decimal, serialized as a string" });
 
 const ownLocationSchema = z
   .object({

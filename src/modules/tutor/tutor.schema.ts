@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { Gender } from "../../generated/prisma/enums.js";
+import {
+  FileStatus,
+  Gender,
+  ModerationStatus,
+  VerificationStatus,
+} from "../../generated/prisma/enums.js";
 import {
   ACADEMIC_GROUPS,
   ADMISSION_TARGETS,
@@ -88,10 +93,10 @@ export const tutorResponseSchema = z
     phoneNumber: z.string(),
     whatsappNumber: z.string().nullable(),
     studentIdNumber: z.string().nullable(),
-    gender: z.string(),
+    gender: z.nativeEnum(Gender),
     parentsInfo: z.string().nullable().optional(),
     whatsappVerifiedAt: z.string().nullable().optional(),
-    verificationStatus: z.string(),
+    verificationStatus: z.nativeEnum(VerificationStatus),
     isListed: z.boolean(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
@@ -117,11 +122,11 @@ export const tutorSubjectsResponseSchema = z
 export const tutorVerificationResponseSchema = z
   .object({
     id: z.string(),
-    status: z.string(),
+    status: z.nativeEnum(VerificationStatus),
     submittedAt: z.string(),
     decidedAt: z.string().nullable(),
     note: z.string().nullable(),
-    file: z.object({ id: z.string(), status: z.string() }),
+    file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
   })
   .meta({ id: "TutorVerification" });
 
@@ -135,7 +140,7 @@ export const tutorNearbyResultSchema = z
   .object({
     id: z.string(),
     name: z.string(),
-    gender: z.string(),
+    gender: z.nativeEnum(Gender),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     distanceMeters: z.number(),
@@ -152,7 +157,7 @@ export const tutorSearchResultSchema = z
   .object({
     id: z.string(),
     name: z.string(),
-    gender: z.string(),
+    gender: z.nativeEnum(Gender),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),
@@ -171,7 +176,7 @@ export const tutorCredentialResponseSchema = z
     id: z.string(),
     examLabel: z.string(),
     result: z.string(),
-    file: z.object({ id: z.string(), status: z.string() }),
+    file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
   })
   .meta({ id: "TutorCredential" });
 
@@ -185,10 +190,10 @@ export const tutorVideoResponseSchema = z
   .object({
     id: z.string(),
     title: z.string(),
-    status: z.string(),
+    status: z.nativeEnum(ModerationStatus),
     sortOrder: z.number(),
     createdAt: z.string(),
-    file: z.object({ id: z.string(), status: z.string() }),
+    file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
   })
   .meta({ id: "TutorVideo" });
 
@@ -205,7 +210,7 @@ export const tutorPublicVideoResponseSchema = z
     sortOrder: z.number(),
     createdAt: z.string(),
     tutor: z.object({ id: z.string(), name: z.string() }),
-    file: z.object({ id: z.string(), status: z.string() }),
+    file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
   })
   .meta({ id: "TutorPublicVideo" });
 
@@ -220,10 +225,10 @@ export const tutorPublicProfileSchema = z
   .object({
     id: z.string(),
     name: z.string(),
-    gender: z.string(),
+    gender: z.nativeEnum(Gender),
     ratingAvg: z.number(),
     ratingCount: z.number(),
-    verificationStatus: z.string(),
+    verificationStatus: z.nativeEnum(VerificationStatus),
     isListed: z.boolean(),
     needsReaddress: z.boolean(),
     createdAt: z.string(),
@@ -237,7 +242,7 @@ export const tutorPublicProfileSchema = z
         title: z.string(),
         sortOrder: z.number(),
         createdAt: z.string(),
-        file: z.object({ id: z.string(), status: z.string() }),
+        file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
       }),
     ),
   })
@@ -340,9 +345,9 @@ export const tutorRequirementResponseSchema = z
     isActive: z.boolean(),
     levelMin: z.number(),
     levelMax: z.number(),
-    curricula: z.array(z.string()),
-    academicGroups: z.array(z.string()),
-    admissionTargets: z.array(z.string()),
+    curricula: z.array(z.enum(CURRICULA)),
+    academicGroups: z.array(z.enum(ACADEMIC_GROUPS)),
+    admissionTargets: z.array(z.enum(ADMISSION_TARGETS)),
     timeFrom: z.string(),
     timeTo: z.string(),
     availableDays: z.number(),

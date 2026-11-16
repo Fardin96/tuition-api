@@ -1164,6 +1164,15 @@
         ],
         "additionalProperties": false
       },
+      "LogoutInput": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
       "Me": {
         "type": "object",
         "properties": {
@@ -1492,6 +1501,7 @@
             ]
           },
           "ratingAvg": {
+            "type": "string",
             "description": "Decimal, serialized as a string"
           },
           "ratingCount": {
@@ -1681,6 +1691,7 @@
             "type": "boolean"
           },
           "ratingAvg": {
+            "type": "string",
             "description": "Decimal, serialized as a string"
           },
           "ratingCount": {
@@ -1840,9 +1851,22 @@
             }
           },
           "curriculum": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "BANGLA_MEDIUM",
+                  "ENGLISH_VERSION",
+                  "EM_CAMBRIDGE",
+                  "EM_EDEXCEL",
+                  "EM_IB",
+                  "EM_AMERICAN",
+                  "MADRASAH"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "levelCode": {
@@ -1852,15 +1876,37 @@
             ]
           },
           "academicGroup": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SCIENCE",
+                  "BUSINESS",
+                  "HUMANITIES",
+                  "MUJABBID"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "admissionTargets": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "ENGINEERING",
+                "MEDICAL",
+                "VARSITY_SCIENCE",
+                "VARSITY_HUMANITIES",
+                "VARSITY_BUSINESS",
+                "AGRICULTURE",
+                "IBA_BUP",
+                "PRIVATE_UNI",
+                "ABROAD_TESTS",
+                "ISSB"
+              ]
             }
           },
           "isRetaker": {
@@ -1903,7 +1949,12 @@
             ]
           },
           "tutorGenderPref": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "ANY",
+              "MALE",
+              "FEMALE"
+            ]
           },
           "instituteName": {
             "type": [
@@ -1912,13 +1963,30 @@
             ]
           },
           "tuitionType": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "Home Tutoring Solo",
+                  "Home Tutoring Group",
+                  "Online",
+                  "Group Coaching"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "FILLED",
+              "CLOSED",
+              "EXPIRED"
+            ]
           },
           "createdAt": {
             "type": "string"
@@ -2065,7 +2133,13 @@
             ]
           },
           "verificationStatus": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "NOT_SUBMITTED",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
           },
           "ratingAvg": {
             "type": "number"
@@ -2263,13 +2337,23 @@
                 "type": "string"
               },
               "role": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "STUDENT",
+                  "TUTOR",
+                  "ADMIN"
+                ]
               },
               "email": {
                 "type": "string"
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "BLOCKED",
+                  "DELETED"
+                ]
               }
             },
             "required": [
@@ -2325,7 +2409,12 @@
             ]
           },
           "gender": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ]
           },
           "parentsInfo": {
             "type": [
@@ -2340,7 +2429,13 @@
             ]
           },
           "verificationStatus": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "NOT_SUBMITTED",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
           },
           "isListed": {
             "type": "boolean"
@@ -2485,7 +2580,12 @@
                 "type": "string"
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "PENDING_UPLOAD",
+                  "UPLOADED",
+                  "DELETED"
+                ]
               }
             },
             "required": [
@@ -2543,7 +2643,12 @@
             "type": "string"
           },
           "gender": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ]
           },
           "ratingAvg": {
             "type": "number"
@@ -2575,7 +2680,12 @@
             "type": "string"
           },
           "gender": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ]
           },
           "ratingAvg": {
             "type": "number"
@@ -2584,7 +2694,13 @@
             "type": "number"
           },
           "verificationStatus": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "NOT_SUBMITTED",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
           },
           "isListed": {
             "type": "boolean"
@@ -2666,7 +2782,12 @@
                       "type": "string"
                     },
                     "status": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "PENDING_UPLOAD",
+                        "UPLOADED",
+                        "DELETED"
+                      ]
                     }
                   },
                   "required": [
@@ -2755,7 +2876,12 @@
                 "type": "string"
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "PENDING_UPLOAD",
+                  "UPLOADED",
+                  "DELETED"
+                ]
               }
             },
             "required": [
@@ -2816,19 +2942,46 @@
           "curricula": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "BANGLA_MEDIUM",
+                "ENGLISH_VERSION",
+                "EM_CAMBRIDGE",
+                "EM_EDEXCEL",
+                "EM_IB",
+                "EM_AMERICAN",
+                "MADRASAH"
+              ]
             }
           },
           "academicGroups": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "SCIENCE",
+                "BUSINESS",
+                "HUMANITIES",
+                "MUJABBID"
+              ]
             }
           },
           "admissionTargets": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "ENGINEERING",
+                "MEDICAL",
+                "VARSITY_SCIENCE",
+                "VARSITY_HUMANITIES",
+                "VARSITY_BUSINESS",
+                "AGRICULTURE",
+                "IBA_BUP",
+                "PRIVATE_UNI",
+                "ABROAD_TESTS",
+                "ISSB"
+              ]
             }
           },
           "timeFrom": {
@@ -2993,7 +3146,12 @@
             "type": "string"
           },
           "gender": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ]
           },
           "ratingAvg": {
             "type": "number"
@@ -3095,7 +3253,13 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "NOT_SUBMITTED",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
           },
           "submittedAt": {
             "type": "string"
@@ -3119,7 +3283,12 @@
                 "type": "string"
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "PENDING_UPLOAD",
+                  "UPLOADED",
+                  "DELETED"
+                ]
               }
             },
             "required": [
@@ -3164,7 +3333,12 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
           },
           "sortOrder": {
             "type": "number"
@@ -3179,7 +3353,12 @@
                 "type": "string"
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "PENDING_UPLOAD",
+                  "UPLOADED",
+                  "DELETED"
+                ]
               }
             },
             "required": [
@@ -4128,11 +4307,38 @@
           "Auth"
         ],
         "description": "Revokes the session for the refresh token in the body, if one is sent. No access token needed. Always 204.\n\n**Who:** Public.\n\n**Rate limit:** global 100/min.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/LogoutInput"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "security": [],
         "x-roles": "Public",
         "responses": {
           "204": {
             "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "429": {
             "description": "Rate limit hit",

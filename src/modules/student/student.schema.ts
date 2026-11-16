@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VerificationStatus } from "../../generated/prisma/enums.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
 export const studentProfileSchema = z
@@ -48,7 +49,7 @@ export const studentResponseSchema = z
     whatsappNumber: z.string().nullable(),
     studentIdNumber: z.string(),
     whatsappVerifiedAt: z.string().nullable().optional(),
-    verificationStatus: z.string(),
+    verificationStatus: z.nativeEnum(VerificationStatus),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     location: ownLocationResponseSchema,
