@@ -45,6 +45,9 @@ jobs:
       - name: Type check
         run: yarn typecheck
 
+      - name: OpenAPI spec is up to date
+        run: yarn openapi:check
+
       - name: Run tests
         env:
           DATABASE_URL: postgresql://tuition:tuition@localhost:5432/tuition_test?sslmode=disable

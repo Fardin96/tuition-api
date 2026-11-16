@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { z } from "zod";
 import { appError, notFound } from "../../lib/errors.js";
+import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
 import { publicCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
@@ -14,17 +14,27 @@ import {
   type TutorRequirementListQuery,
   type TutorSearchQuery,
   type TutorSubjectsInput,
+  tutorAreasResponseSchema,
   tutorAreasSchema,
+  tutorCredentialListResponseSchema,
   tutorIdParamSchema,
+  tutorNearbyListResponseSchema,
   tutorNearbyQuerySchema,
   tutorProfileSchema,
+  tutorPublicProfileResponseSchema,
+  tutorPublicVideoListResponseSchema,
   tutorRequirementIdParamSchema,
   tutorRequirementListQuerySchema,
   tutorRequirementListResponseSchema,
   tutorRequirementResponseSchema,
   tutorResponseSchema,
+  tutorReviewListResponseSchema,
+  tutorSearchListResponseSchema,
   tutorSearchQuerySchema,
+  tutorSubjectsResponseSchema,
   tutorSubjectsSchema,
+  tutorVerificationListResponseSchema,
+  tutorVideoListResponseSchema,
   type UpdateTutorProfileInput,
   type UpdateTutorRequirementInput,
   updateTutorProfileSchema,
@@ -58,6 +68,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Create my tutor profile",
+          description:
+            "Creates the tutor profile for the signed-in account. Fails with 409 PROFILE_EXISTS when a profile already exists, and with 409 PHONE_IN_USE or 409 WHATSAPP_IN_USE when a number belongs to another account.",
+          auth: ["TUTOR"],
+          errors: [409],
+        }),
         body: tutorProfileSchema,
         response: { 201: tutorResponseSchema },
       },
@@ -74,6 +92,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Update my tutor profile",
+          description:
+            "Send at least one field. Fails with 409 PHONE_IN_USE or 409 WHATSAPP_IN_USE when a number belongs to another account. A changed WhatsApp number clears whatsappVerifiedAt.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+        }),
         body: updateTutorProfileSchema,
         response: { 200: tutorResponseSchema },
       },
@@ -93,12 +119,16 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/areas",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Replace my areas",
+          description:
+            "Replaces the tutor's areas with areaIds. Every area must be in the tutor's city, the district of the saved address. Otherwise 409 AREA_OUTSIDE_CITY is returned with details.invalidAreaIds and nothing is written.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+        }),
         body: tutorAreasSchema,
-        response: {
-          200: z.object({
-            areas: z.array(z.object({ area: z.object({ id: z.number(), name: z.string() }) })),
-          }),
-        },
+        response: { 200: tutorAreasResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -116,14 +146,16 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/subjects",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Replace my subjects",
+          description:
+            "Replaces the tutor's subjects with subjectIds. Fails with 409 REQUIREMENT_LOSES_LAST_SUBJECT (details.requirementIds) when an active requirement set would be left with no subjects. Archived sets silently lose the subject.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+        }),
         body: tutorSubjectsSchema,
-        response: {
-          200: z.object({
-            subjects: z.array(
-              z.object({ subject: z.object({ id: z.number(), name: z.string() }) }),
-            ),
-          }),
-        },
+        response: { 200: tutorSubjectsResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -136,32 +168,42 @@ export async function tutorRoutes(app: FastifyInstance) {
   );
 
   // Deferred: requires file upload / presigned URL flow.
-  app.post("/me/verifications", async (_request: FastifyRequest, _reply: FastifyReply) => {
-    throw appError(
-      "NotImplemented",
-      501,
-      "File upload endpoint deferred until the storage module is implemented",
-    );
-  });
+  app.post(
+    "/me/verifications",
+    {
+      schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Submit a verification",
+          description:
+            "Not built yet: answers 501 until the storage module lands. Planned: the tutor uploads an ID file for review.",
+          auth: ["TUTOR"],
+          deferred: true,
+        }),
+      },
+    },
+    async (_request: FastifyRequest, _reply: FastifyReply) => {
+      throw appError(
+        "NotImplemented",
+        501,
+        "File upload endpoint deferred until the storage module is implemented",
+      );
+    },
+  );
 
   app.get(
     "/me/verifications",
     {
       schema: {
-        response: {
-          200: z.object({
-            verifications: z.array(
-              z.object({
-                id: z.string(),
-                status: z.string(),
-                submittedAt: z.string(),
-                decidedAt: z.string().nullable(),
-                note: z.string().nullable(),
-                file: z.object({ id: z.string(), status: z.string() }),
-              }),
-            ),
-          }),
-        },
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "List my verification submissions",
+          description:
+            "Submission history, newest first. Only one submission is PENDING at a time.",
+          auth: ["TUTOR"],
+          errors: [404],
+        }),
+        response: { 200: tutorVerificationListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -184,21 +226,15 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/nearby",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Find tutors near me",
+          description:
+            "Tutors in the student's district within radiusMeters of the student's pin, nearest first. Tutors whose location needs readdressing are left out. Returns an empty list when the student has no saved location.",
+          auth: ["STUDENT"],
+        }),
         querystring: tutorNearbyQuerySchema,
-        response: {
-          200: z.object({
-            tutors: z.array(
-              z.object({
-                id: z.string(),
-                name: z.string(),
-                gender: z.string(),
-                ratingAvg: z.number(),
-                ratingCount: z.number(),
-                distanceMeters: z.number(),
-              }),
-            ),
-          }),
-        },
+        response: { 200: tutorNearbyListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -213,22 +249,15 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Search tutors",
+          description:
+            "Listed tutors only (isListed), highest rating first. Filters: area, subject, gender, rating (minimum), name (contains, case-insensitive).",
+          auth: "optional",
+        }),
         querystring: tutorSearchQuerySchema,
-        response: {
-          200: z.object({
-            tutors: z.array(
-              z.object({
-                id: z.string(),
-                name: z.string(),
-                gender: z.string(),
-                ratingAvg: z.number(),
-                ratingCount: z.number(),
-                areas: z.array(z.object({ id: z.number(), name: z.string() })),
-                subjects: z.array(z.object({ id: z.number(), name: z.string() })),
-              }),
-            ),
-          }),
-        },
+        response: { 200: tutorSearchListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -259,7 +288,16 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/:id",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Get a tutor's public profile",
+          description:
+            "Name, gender, rating, areas, subjects, credentials and approved videos. Contact details and address are never included.",
+          auth: "optional",
+          errors: [404],
+        }),
         params: tutorIdParamSchema,
+        response: { 200: tutorPublicProfileResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -269,7 +307,15 @@ export async function tutorRoutes(app: FastifyInstance) {
       if (!tutor) {
         throw notFound("Tutor not found");
       }
-      return reply.send({ tutor });
+      return reply.send({
+        tutor: {
+          ...tutor,
+          videos: tutor.videos.map((v) => ({
+            ...v,
+            createdAt: v.createdAt.toISOString(),
+          })),
+        },
+      });
     },
   );
 
@@ -277,20 +323,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/:id/reviews",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "List a tutor's reviews",
+          description: "Visible reviews written by students, newest first.",
+          auth: "optional",
+        }),
         params: tutorIdParamSchema,
-        response: {
-          200: z.object({
-            reviews: z.array(
-              z.object({
-                id: z.string(),
-                rating: z.number(),
-                comment: z.string().nullable(),
-                createdAt: z.string(),
-                student: z.object({ id: z.string(), name: z.string() }),
-              }),
-            ),
-          }),
-        },
+        response: { 200: tutorReviewListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -311,18 +351,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/credentials",
     {
       schema: {
-        response: {
-          200: z.object({
-            credentials: z.array(
-              z.object({
-                id: z.string(),
-                examLabel: z.string(),
-                result: z.string(),
-                file: z.object({ id: z.string(), status: z.string() }),
-              }),
-            ),
-          }),
-        },
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "List my credentials",
+          description: "Credentials ordered by exam label.",
+          auth: ["TUTOR"],
+          errors: [404],
+        }),
+        response: { 200: tutorCredentialListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -336,18 +372,43 @@ export async function tutorRoutes(app: FastifyInstance) {
   );
 
   // Deferred: requires file upload / presigned URL flow.
-  app.post("/me/credentials", async (_request: FastifyRequest, _reply: FastifyReply) => {
-    throw appError(
-      "NotImplemented",
-      501,
-      "File upload endpoint deferred until the storage module is implemented",
-    );
-  });
+  app.post(
+    "/me/credentials",
+    {
+      schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Add a credential",
+          description:
+            "Not built yet: answers 501 until the storage module lands. Planned: the tutor uploads a certificate file.",
+          auth: ["TUTOR"],
+          deferred: true,
+        }),
+      },
+    },
+    async (_request: FastifyRequest, _reply: FastifyReply) => {
+      throw appError(
+        "NotImplemented",
+        501,
+        "File upload endpoint deferred until the storage module is implemented",
+      );
+    },
+  );
 
   app.delete(
     "/me/credentials/:id",
     {
-      schema: { params: tutorIdParamSchema },
+      schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Remove a credential",
+          description: "Removes one of your credentials. Replies 204 with no body.",
+          auth: ["TUTOR"],
+          errors: [404],
+          noContent: true,
+        }),
+        params: tutorIdParamSchema,
+      },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
@@ -364,20 +425,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/videos",
     {
       schema: {
-        response: {
-          200: z.object({
-            videos: z.array(
-              z.object({
-                id: z.string(),
-                title: z.string(),
-                status: z.string(),
-                sortOrder: z.number(),
-                createdAt: z.string(),
-                file: z.object({ id: z.string(), status: z.string() }),
-              }),
-            ),
-          }),
-        },
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "List my videos",
+          description: "Your own videos in any moderation state, in display order.",
+          auth: ["TUTOR"],
+          errors: [404],
+        }),
+        response: { 200: tutorVideoListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -396,18 +451,43 @@ export async function tutorRoutes(app: FastifyInstance) {
   );
 
   // Deferred: requires file upload / presigned URL flow.
-  app.post("/me/videos", async (_request: FastifyRequest, _reply: FastifyReply) => {
-    throw appError(
-      "NotImplemented",
-      501,
-      "File upload endpoint deferred until the storage module is implemented",
-    );
-  });
+  app.post(
+    "/me/videos",
+    {
+      schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Add a video",
+          description:
+            "Not built yet: answers 501 until the storage module lands. Planned: the video is added as PENDING for moderation.",
+          auth: ["TUTOR"],
+          deferred: true,
+        }),
+      },
+    },
+    async (_request: FastifyRequest, _reply: FastifyReply) => {
+      throw appError(
+        "NotImplemented",
+        501,
+        "File upload endpoint deferred until the storage module is implemented",
+      );
+    },
+  );
 
   app.delete(
     "/me/videos/:id",
     {
-      schema: { params: tutorIdParamSchema },
+      schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Remove a video",
+          description: "Removes one of your videos. Replies 204 with no body.",
+          auth: ["TUTOR"],
+          errors: [404],
+          noContent: true,
+        }),
+        params: tutorIdParamSchema,
+      },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
@@ -424,6 +504,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutor requirements",
+          summary: "List my requirement sets",
+          description:
+            "status=active (default) lists active sets, archived lists archived sets (newest first, capped at 50), all lists both. mappedPackageCount counts OPEN packages, plus packages with no set chosen on the default set.",
+          auth: ["TUTOR"],
+          errors: [404],
+        }),
         querystring: tutorRequirementListQuerySchema,
         response: { 200: tutorRequirementListResponseSchema },
       },
@@ -444,6 +532,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutor requirements",
+          summary: "Create a requirement set",
+          description:
+            "The first set becomes the default. syncProfileSubjects adds missing subjects to the profile in the same transaction. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile or a subject fails the foreign key check, and 400 VALIDATION_ERROR for an unknown subject.",
+          auth: ["TUTOR"],
+          errors: [400, 404, 409],
+        }),
         body: createTutorRequirementSchema,
         response: { 201: tutorRequirementResponseSchema },
       },
@@ -464,6 +560,13 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements/:id",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutor requirements",
+          summary: "Get a requirement set",
+          description: "Returns the set whether it is active or archived.",
+          auth: ["TUTOR"],
+          errors: [404],
+        }),
         params: tutorRequirementIdParamSchema,
         response: { 200: tutorRequirementResponseSchema },
       },
@@ -484,6 +587,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements/:id",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutor requirements",
+          summary: "Update a requirement set",
+          description:
+            "Send at least one field. Allowed on archived sets. Values are checked against the stored set: 400 INVALID_REQUIREMENT (details.fields) for an invalid combination, 400 VALIDATION_ERROR for an unknown subject, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile. Subjects and zones are diff-applied.",
+          auth: ["TUTOR"],
+          errors: [400, 404],
+        }),
         params: tutorRequirementIdParamSchema,
         body: updateTutorRequirementSchema,
         response: { 200: tutorRequirementResponseSchema },
@@ -506,6 +617,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements/:id/default",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutor requirements",
+          summary: "Make a requirement set the default",
+          description:
+            "Unsets the previous default. Fails with 409 REQUIREMENT_ARCHIVED for an archived set.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+        }),
         params: tutorRequirementIdParamSchema,
         response: { 200: tutorRequirementResponseSchema },
       },
@@ -526,6 +645,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements/:id",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutor requirements",
+          summary: "Archive a requirement set",
+          description:
+            "Sets isActive to false. Fails with 409 REQUIREMENT_IS_DEFAULT for the default set, and with 409 REQUIREMENT_IN_USE (details.packageIds) when OPEN packages use it. An archived set is returned unchanged.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+        }),
         params: tutorRequirementIdParamSchema,
         response: { 200: tutorRequirementResponseSchema },
       },
@@ -544,6 +671,14 @@ export async function tutorRoutes(app: FastifyInstance) {
     "/me/requirements/:id/restore",
     {
       schema: {
+        ...routeDocs({
+          tag: "Tutor requirements",
+          summary: "Restore an archived requirement set",
+          description:
+            "Sets isActive to true. A restored set never becomes the default. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, and with 409 REQUIREMENT_NO_SUBJECTS when the set has no subjects. An active set is returned unchanged.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+        }),
         params: tutorRequirementIdParamSchema,
         response: { 200: tutorRequirementResponseSchema },
       },
@@ -566,20 +701,13 @@ export async function publicVideoRoutes(app: FastifyInstance) {
     "/",
     {
       schema: {
-        response: {
-          200: z.object({
-            videos: z.array(
-              z.object({
-                id: z.string(),
-                title: z.string(),
-                sortOrder: z.number(),
-                createdAt: z.string(),
-                tutor: z.object({ id: z.string(), name: z.string() }),
-                file: z.object({ id: z.string(), status: z.string() }),
-              }),
-            ),
-          }),
-        },
+        ...routeDocs({
+          tag: "Videos",
+          summary: "List approved videos",
+          description: "Approved videos from all tutors, in display order.",
+          auth: "optional",
+        }),
+        response: { 200: tutorPublicVideoListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {

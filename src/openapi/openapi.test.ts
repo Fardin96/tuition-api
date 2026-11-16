@@ -6,6 +6,7 @@ type Operation = {
   summary?: string;
   security?: unknown[];
   "x-roles"?: string;
+  "x-deferred"?: boolean;
   responses: Record<string, { description: string; content?: unknown }>;
 };
 
@@ -36,7 +37,8 @@ describe("OpenAPI document", () => {
         if (!op.summary) problems.push(`${name}: no summary`);
         if (!op.security || !op["x-roles"]) problems.push(`${name}: no auth (use routeDocs)`);
         const success = Object.entries(op.responses).filter(([status]) => status.startsWith("2"));
-        if (success.length === 0) problems.push(`${name}: no 2xx response`);
+        // Deferred stubs only answer 501 until their feature ships.
+        if (success.length === 0 && !op["x-deferred"]) problems.push(`${name}: no 2xx response`);
         for (const [status, response] of success) {
           if (response.description === "Default Response") {
             problems.push(`${name}: ${status} has no response schema`);

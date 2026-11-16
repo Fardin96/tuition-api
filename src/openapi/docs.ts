@@ -27,14 +27,17 @@ export type Tag = (typeof TAGS)[number]["name"];
 export type RouteAuth = "public" | "optional" | "any" | "admin" | readonly AuthContext["role"][];
 
 /** Error statuses a route can return beyond the ones derived from `auth` and its schema. */
-export type DocErrorStatus = 400 | 404 | 409 | 501 | 503;
+export type DocErrorStatus = 400 | 401 | 403 | 404 | 409 | 501 | 503;
 
 export type RouteDocsOptions = {
   tag: Tag;
   summary: string;
   description?: string;
   auth: RouteAuth;
-  /** Extra error statuses. 400 (when the route validates input), 401, 403, 429 and 500 are added for you. */
+  /**
+   * Extra error statuses. Added for you: 400 when the route validates input, 401 for signed-in
+   * routes, 403 for role and admin routes, 501 for deferred routes, and 429 and 500 everywhere.
+   */
   errors?: readonly DocErrorStatus[];
   /** Per-route limit, for example "20/min per account". Routes without one share the global 100/min. */
   rateLimit?: string;

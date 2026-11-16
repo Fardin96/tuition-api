@@ -10,31 +10,35 @@ import {
 } from "../../lib/education.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
-export const tutorProfileSchema = z.object({
-  name: z.string().min(1).max(200),
-  address: z.string().min(1).max(500),
-  emergencyContact: z.string().min(1).max(50),
-  phoneNumber: z
-    .string()
-    .min(1)
-    .max(20)
-    .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
-  whatsappNumber: z
-    .string()
-    .min(1)
-    .max(20)
-    .refine((v) => !v.startsWith("deleted:"), "Invalid number")
-    .nullable()
-    .optional(),
-  studentIdNumber: z.string().min(1).max(100),
-  gender: z.nativeEnum(Gender),
-  parentsInfo: z.string().max(1000).optional(),
-  location: locationSchema.optional(),
-});
+export const tutorProfileSchema = z
+  .object({
+    name: z.string().min(1).max(200),
+    address: z.string().min(1).max(500),
+    emergencyContact: z.string().min(1).max(50),
+    phoneNumber: z
+      .string()
+      .min(1)
+      .max(20)
+      .refine((v) => !v.startsWith("deleted:"), "Invalid number"),
+    whatsappNumber: z
+      .string()
+      .min(1)
+      .max(20)
+      .refine((v) => !v.startsWith("deleted:"), "Invalid number")
+      .nullable()
+      .optional(),
+    studentIdNumber: z.string().min(1).max(100),
+    gender: z.nativeEnum(Gender),
+    parentsInfo: z.string().max(1000).optional(),
+    location: locationSchema.optional(),
+  })
+  .meta({ id: "CreateTutorProfile" });
 
 export type TutorProfileInput = z.infer<typeof tutorProfileSchema>;
 
-export const updateTutorProfileSchema = tutorProfileSchema.partial();
+export const updateTutorProfileSchema = tutorProfileSchema
+  .partial()
+  .meta({ id: "UpdateTutorProfile" });
 
 export type UpdateTutorProfileInput = z.infer<typeof updateTutorProfileSchema>;
 
@@ -42,17 +46,21 @@ export const tutorNearbyQuerySchema = z.object({
   radiusMeters: z.coerce.number().int().min(100).max(50000).default(5000),
 });
 
-export const tutorAreasSchema = z.object({
-  areaIds: z.array(z.coerce.number().int().positive()).max(50),
-});
+export const tutorAreasSchema = z
+  .object({
+    areaIds: z.array(z.coerce.number().int().positive()).max(50),
+  })
+  .meta({ id: "ReplaceTutorAreas" });
 
 export type TutorAreasInput = z.infer<typeof tutorAreasSchema>;
 
 export const MAX_PROFILE_SUBJECTS = 50;
 
-export const tutorSubjectsSchema = z.object({
-  subjectIds: z.array(z.coerce.number().int().positive()).max(MAX_PROFILE_SUBJECTS),
-});
+export const tutorSubjectsSchema = z
+  .object({
+    subjectIds: z.array(z.coerce.number().int().positive()).max(MAX_PROFILE_SUBJECTS),
+  })
+  .meta({ id: "ReplaceTutorSubjects" });
 
 export type TutorSubjectsInput = z.infer<typeof tutorSubjectsSchema>;
 
@@ -70,27 +78,192 @@ export const tutorSearchQuerySchema = z.object({
 
 export type TutorSearchQuery = z.infer<typeof tutorSearchQuerySchema>;
 
-export const tutorResponseSchema = z.object({
-  id: z.string(),
-  accountId: z.string(),
-  name: z.string(),
-  address: z.string(),
-  emergencyContact: z.string(),
-  phoneNumber: z.string(),
-  whatsappNumber: z.string().nullable(),
-  studentIdNumber: z.string(),
-  gender: z.string(),
-  parentsInfo: z.string().nullable().optional(),
-  whatsappVerifiedAt: z.string().nullable().optional(),
-  verificationStatus: z.string(),
-  isListed: z.boolean(),
-  ratingAvg: z.number(),
-  ratingCount: z.number(),
-  needsReaddress: z.boolean().optional(),
-  location: ownLocationResponseSchema,
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+export const tutorResponseSchema = z
+  .object({
+    id: z.string(),
+    accountId: z.string(),
+    name: z.string(),
+    address: z.string(),
+    emergencyContact: z.string().nullable(),
+    phoneNumber: z.string(),
+    whatsappNumber: z.string().nullable(),
+    studentIdNumber: z.string().nullable(),
+    gender: z.string(),
+    parentsInfo: z.string().nullable().optional(),
+    whatsappVerifiedAt: z.string().nullable().optional(),
+    verificationStatus: z.string(),
+    isListed: z.boolean(),
+    ratingAvg: z.number(),
+    ratingCount: z.number(),
+    needsReaddress: z.boolean().optional(),
+    location: ownLocationResponseSchema,
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .meta({ id: "Tutor" });
+
+export const tutorAreasResponseSchema = z
+  .object({
+    areas: z.array(z.object({ area: z.object({ id: z.number(), name: z.string() }) })),
+  })
+  .meta({ id: "TutorAreas" });
+
+export const tutorSubjectsResponseSchema = z
+  .object({
+    subjects: z.array(z.object({ subject: z.object({ id: z.number(), name: z.string() }) })),
+  })
+  .meta({ id: "TutorSubjects" });
+
+export const tutorVerificationResponseSchema = z
+  .object({
+    id: z.string(),
+    status: z.string(),
+    submittedAt: z.string(),
+    decidedAt: z.string().nullable(),
+    note: z.string().nullable(),
+    file: z.object({ id: z.string(), status: z.string() }),
+  })
+  .meta({ id: "TutorVerification" });
+
+export const tutorVerificationListResponseSchema = z
+  .object({
+    verifications: z.array(tutorVerificationResponseSchema),
+  })
+  .meta({ id: "TutorVerificationList" });
+
+export const tutorNearbyResultSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    gender: z.string(),
+    ratingAvg: z.number(),
+    ratingCount: z.number(),
+    distanceMeters: z.number(),
+  })
+  .meta({ id: "TutorNearbyResult" });
+
+export const tutorNearbyListResponseSchema = z
+  .object({
+    tutors: z.array(tutorNearbyResultSchema),
+  })
+  .meta({ id: "TutorNearbyList" });
+
+export const tutorSearchResultSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    gender: z.string(),
+    ratingAvg: z.number(),
+    ratingCount: z.number(),
+    areas: z.array(z.object({ id: z.number(), name: z.string() })),
+    subjects: z.array(z.object({ id: z.number(), name: z.string() })),
+  })
+  .meta({ id: "TutorSearchResult" });
+
+export const tutorSearchListResponseSchema = z
+  .object({
+    tutors: z.array(tutorSearchResultSchema),
+  })
+  .meta({ id: "TutorSearchList" });
+
+export const tutorCredentialResponseSchema = z
+  .object({
+    id: z.string(),
+    examLabel: z.string(),
+    result: z.string(),
+    file: z.object({ id: z.string(), status: z.string() }),
+  })
+  .meta({ id: "TutorCredential" });
+
+export const tutorCredentialListResponseSchema = z
+  .object({
+    credentials: z.array(tutorCredentialResponseSchema),
+  })
+  .meta({ id: "TutorCredentialList" });
+
+export const tutorVideoResponseSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    status: z.string(),
+    sortOrder: z.number(),
+    createdAt: z.string(),
+    file: z.object({ id: z.string(), status: z.string() }),
+  })
+  .meta({ id: "TutorVideo" });
+
+export const tutorVideoListResponseSchema = z
+  .object({
+    videos: z.array(tutorVideoResponseSchema),
+  })
+  .meta({ id: "TutorVideoList" });
+
+export const tutorPublicVideoResponseSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    sortOrder: z.number(),
+    createdAt: z.string(),
+    tutor: z.object({ id: z.string(), name: z.string() }),
+    file: z.object({ id: z.string(), status: z.string() }),
+  })
+  .meta({ id: "TutorPublicVideo" });
+
+export const tutorPublicVideoListResponseSchema = z
+  .object({
+    videos: z.array(tutorPublicVideoResponseSchema),
+  })
+  .meta({ id: "TutorPublicVideoList" });
+
+// The profile's videos are the approved ones only; the route converts createdAt to a string.
+export const tutorPublicProfileSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    gender: z.string(),
+    ratingAvg: z.number(),
+    ratingCount: z.number(),
+    verificationStatus: z.string(),
+    isListed: z.boolean(),
+    needsReaddress: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    areas: z.array(z.object({ id: z.number(), name: z.string() })),
+    subjects: z.array(z.object({ id: z.number(), name: z.string() })),
+    credentials: z.array(tutorCredentialResponseSchema),
+    videos: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        sortOrder: z.number(),
+        createdAt: z.string(),
+        file: z.object({ id: z.string(), status: z.string() }),
+      }),
+    ),
+  })
+  .meta({ id: "TutorPublicProfile" });
+
+export const tutorPublicProfileResponseSchema = z
+  .object({
+    tutor: tutorPublicProfileSchema,
+  })
+  .meta({ id: "TutorPublicProfileResult" });
+
+export const tutorReviewResponseSchema = z
+  .object({
+    id: z.string(),
+    rating: z.number(),
+    comment: z.string().nullable(),
+    createdAt: z.string(),
+    student: z.object({ id: z.string(), name: z.string() }),
+  })
+  .meta({ id: "TutorReview" });
+
+export const tutorReviewListResponseSchema = z
+  .object({
+    reviews: z.array(tutorReviewResponseSchema),
+  })
+  .meta({ id: "TutorReviewList" });
 
 export type TutorNearbyQuery = z.infer<typeof tutorNearbyQuerySchema>;
 
@@ -143,7 +316,8 @@ export const createTutorRequirementSchema = tutorRequirementBaseSchema
     for (const issue of validateTutorCoverage(v)) {
       ctx.addIssue({ code: "custom", path: [issue.path], message: issue.message });
     }
-  });
+  })
+  .meta({ id: "CreateTutorRequirement" });
 
 export type CreateTutorRequirementInput = z.infer<typeof createTutorRequirementSchema>;
 
@@ -153,31 +327,34 @@ export const updateTutorRequirementSchema = tutorRequirementBaseSchema
   .refine(
     (v) => Object.keys(v).some((key) => key !== "syncProfileSubjects"),
     "At least one field is required",
-  );
+  )
+  .meta({ id: "UpdateTutorRequirement" });
 
 export type UpdateTutorRequirementInput = z.infer<typeof updateTutorRequirementSchema>;
 
-export const tutorRequirementResponseSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string(),
-  isDefault: z.boolean(),
-  isActive: z.boolean(),
-  levelMin: z.number(),
-  levelMax: z.number(),
-  curricula: z.array(z.string()),
-  academicGroups: z.array(z.string()),
-  admissionTargets: z.array(z.string()),
-  timeFrom: z.string(),
-  timeTo: z.string(),
-  availableDays: z.number(),
-  minSalary: z.number().nullable(),
-  maxStudents: z.number(),
-  availableFrom: z.string(),
-  teachesOnline: z.boolean(),
-  subjectIds: z.array(z.number()),
-  zoneIds: z.array(z.string()),
-  mappedPackageCount: z.number(),
-});
+export const tutorRequirementResponseSchema = z
+  .object({
+    id: z.string().uuid(),
+    name: z.string(),
+    isDefault: z.boolean(),
+    isActive: z.boolean(),
+    levelMin: z.number(),
+    levelMax: z.number(),
+    curricula: z.array(z.string()),
+    academicGroups: z.array(z.string()),
+    admissionTargets: z.array(z.string()),
+    timeFrom: z.string(),
+    timeTo: z.string(),
+    availableDays: z.number(),
+    minSalary: z.number().nullable(),
+    maxStudents: z.number(),
+    availableFrom: z.string(),
+    teachesOnline: z.boolean(),
+    subjectIds: z.array(z.number()),
+    zoneIds: z.array(z.string()),
+    mappedPackageCount: z.number(),
+  })
+  .meta({ id: "TutorRequirement" });
 
 export type TutorRequirementResponse = z.infer<typeof tutorRequirementResponseSchema>;
 
@@ -187,6 +364,8 @@ export const tutorRequirementListQuerySchema = z.object({
 
 export type TutorRequirementListQuery = z.infer<typeof tutorRequirementListQuerySchema>;
 
-export const tutorRequirementListResponseSchema = z.object({
-  requirements: z.array(tutorRequirementResponseSchema),
-});
+export const tutorRequirementListResponseSchema = z
+  .object({
+    requirements: z.array(tutorRequirementResponseSchema),
+  })
+  .meta({ id: "TutorRequirementList" });
