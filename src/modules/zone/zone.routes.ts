@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { notFound } from "../../lib/errors.js";
 import { accountRateLimit } from "../../lib/rate-limit.js";
+import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
 import {
   type CreateZoneInput,
@@ -35,7 +36,18 @@ export async function zoneRoutes(app: FastifyInstance) {
     "/zones",
     {
       config: accountRateLimit(300, "1 minute"),
-      schema: { response: { 200: zoneListResponseSchema } },
+      schema: {
+        ...routeDocs({
+          tag: "Tutor zones",
+          summary: "List my zones",
+          description:
+            "Zones, the zone limit, how many are used and the pending limit request, if any.",
+          auth: ["TUTOR"],
+          errors: [404],
+          rateLimit: "300/min per account",
+        }),
+        response: { 200: zoneListResponseSchema },
+      },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
@@ -50,7 +62,19 @@ export async function zoneRoutes(app: FastifyInstance) {
     "/zones",
     {
       config: accountRateLimit(20, "1 minute"),
-      schema: { body: createZoneSchema, response: { 201: zoneResponseSchema } },
+      schema: {
+        ...routeDocs({
+          tag: "Tutor zones",
+          summary: "Create a zone",
+          description:
+            "Fails with 409 ZONE_LIMIT_REACHED when the tutor already has zone_limit zones.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+          rateLimit: "20/min per account",
+        }),
+        body: createZoneSchema,
+        response: { 201: zoneResponseSchema },
+      },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const account = requireRole(request, "TUTOR");
@@ -67,6 +91,14 @@ export async function zoneRoutes(app: FastifyInstance) {
     {
       config: accountRateLimit(20, "1 minute"),
       schema: {
+        ...routeDocs({
+          tag: "Tutor zones",
+          summary: "Update a zone",
+          description: "Send at least one field. lat and lng must be sent together.",
+          auth: ["TUTOR"],
+          errors: [404],
+          rateLimit: "20/min per account",
+        }),
         params: zoneIdParamSchema,
         body: updateZoneSchema,
         response: { 200: zoneResponseSchema },
@@ -88,6 +120,15 @@ export async function zoneRoutes(app: FastifyInstance) {
     {
       config: accountRateLimit(20, "1 minute"),
       schema: {
+        ...routeDocs({
+          tag: "Tutor zones",
+          summary: "Delete a zone",
+          description:
+            "Returns the requirement sets that used the zone and how many zones each has left.",
+          auth: ["TUTOR"],
+          errors: [404],
+          rateLimit: "20/min per account",
+        }),
         params: zoneIdParamSchema,
         response: { 200: zoneDeleteResponseSchema },
       },
@@ -107,6 +148,15 @@ export async function zoneRoutes(app: FastifyInstance) {
     {
       config: accountRateLimit(60, "1 minute"),
       schema: {
+        ...routeDocs({
+          tag: "Tutor zones",
+          summary: "Ask for a higher zone limit",
+          description:
+            "One pending request per tutor (409 ZONE_REQUEST_PENDING) and at most 3 per day.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+          rateLimit: "60/min per account",
+        }),
         body: createZoneLimitRequestSchema,
         response: { 201: zoneLimitRequestResponseSchema },
       },
@@ -126,6 +176,14 @@ export async function zoneRoutes(app: FastifyInstance) {
     {
       config: accountRateLimit(300, "1 minute"),
       schema: {
+        ...routeDocs({
+          tag: "Tutor zones",
+          summary: "List my zone-limit requests",
+          description: "Newest first, cursor-paginated.",
+          auth: ["TUTOR"],
+          errors: [404],
+          rateLimit: "300/min per account",
+        }),
         querystring: zoneLimitRequestListQuerySchema,
         response: { 200: zoneLimitRequestListResponseSchema },
       },

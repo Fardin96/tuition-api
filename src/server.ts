@@ -21,6 +21,7 @@ import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
 import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
 import { zoneRoutes } from "./modules/zone/zone.routes.js";
+import { registerOpenApi } from "./openapi/plugin.js";
 import { healthRoutes } from "./plugins/health.js";
 
 export async function buildApp() {
@@ -89,6 +90,8 @@ export async function buildApp() {
       // Leave request.account undefined; routes enforce auth explicitly.
     }
   });
+
+  await registerOpenApi(app);
 
   await app.register(healthRoutes, { prefix: "/api/v1/health" });
   await app.register(authRoutes, { prefix: "/api/v1/auth" });

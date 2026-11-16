@@ -22,7 +22,8 @@ export const createZoneSchema = z
     placeId: placeIdSchema.optional(),
     addressText: addressTextSchema.optional(),
   })
-  .strict();
+  .strict()
+  .meta({ id: "CreateZone" });
 export type CreateZoneInput = z.infer<typeof createZoneSchema>;
 
 export const updateZoneSchema = z
@@ -40,63 +41,73 @@ export const updateZoneSchema = z
   .refine((v) => (v.lat === undefined) === (v.lng === undefined), {
     message: "lat and lng must be sent together",
     path: ["lat"],
-  });
+  })
+  .meta({ id: "UpdateZone" });
 export type UpdateZoneInput = z.infer<typeof updateZoneSchema>;
 
-export const zoneResponseSchema = z.object({
-  id: z.string().uuid(),
-  label: z.string(),
-  lat: z.number(),
-  lng: z.number(),
-  radiusM: z.number(),
-  placeId: z.string().nullable(),
-  addressText: z.string().nullable(),
-  requirementIds: z.array(z.string().uuid()),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+export const zoneResponseSchema = z
+  .object({
+    id: z.string().uuid(),
+    label: z.string(),
+    lat: z.number(),
+    lng: z.number(),
+    radiusM: z.number(),
+    placeId: z.string().nullable(),
+    addressText: z.string().nullable(),
+    requirementIds: z.array(z.string().uuid()),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .meta({ id: "Zone" });
 export type ZoneResponse = z.infer<typeof zoneResponseSchema>;
 
 const zoneRequestStatusSchema = z.enum(["PENDING", "APPROVED", "DENIED"]);
 
-export const zoneLimitRequestResponseSchema = z.object({
-  id: z.string().uuid(),
-  requestedLimit: z.number(),
-  reason: z.string(),
-  status: zoneRequestStatusSchema,
-  decisionNote: z.string().nullable(),
-  decidedAt: z.string().nullable(),
-  createdAt: z.string(),
-});
+export const zoneLimitRequestResponseSchema = z
+  .object({
+    id: z.string().uuid(),
+    requestedLimit: z.number(),
+    reason: z.string(),
+    status: zoneRequestStatusSchema,
+    decisionNote: z.string().nullable(),
+    decidedAt: z.string().nullable(),
+    createdAt: z.string(),
+  })
+  .meta({ id: "ZoneLimitRequest" });
 export type ZoneLimitRequestResponse = z.infer<typeof zoneLimitRequestResponseSchema>;
 
-export const zoneListResponseSchema = z.object({
-  zones: z.array(zoneResponseSchema),
-  limit: z.number(),
-  used: z.number(),
-  pendingRequest: zoneLimitRequestResponseSchema.nullable(),
-});
+export const zoneListResponseSchema = z
+  .object({
+    zones: z.array(zoneResponseSchema),
+    limit: z.number(),
+    used: z.number(),
+    pendingRequest: zoneLimitRequestResponseSchema.nullable(),
+  })
+  .meta({ id: "ZoneList" });
 
-export const zoneDeleteResponseSchema = z.object({
-  id: z.string().uuid(),
-  affectedRequirements: z.array(
-    z.object({
-      id: z.string().uuid(),
-      name: z.string(),
-      isDefault: z.boolean(),
-      isActive: z.boolean(),
-      teachesOnline: z.boolean(),
-      remainingZoneCount: z.number(),
-    }),
-  ),
-});
+export const zoneDeleteResponseSchema = z
+  .object({
+    id: z.string().uuid(),
+    affectedRequirements: z.array(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string(),
+        isDefault: z.boolean(),
+        isActive: z.boolean(),
+        teachesOnline: z.boolean(),
+        remainingZoneCount: z.number(),
+      }),
+    ),
+  })
+  .meta({ id: "ZoneDeleteResult" });
 
 export const createZoneLimitRequestSchema = z
   .object({
     requestedLimit: z.number().int().min(6).max(ZONE_LIMIT_MAX),
     reason: z.string().trim().min(10).max(500),
   })
-  .strict();
+  .strict()
+  .meta({ id: "CreateZoneLimitRequest" });
 export type CreateZoneLimitRequestInput = z.infer<typeof createZoneLimitRequestSchema>;
 
 export const zoneLimitRequestListQuerySchema = z.object({
@@ -105,10 +116,12 @@ export const zoneLimitRequestListQuerySchema = z.object({
 });
 export type ZoneLimitRequestListQuery = z.infer<typeof zoneLimitRequestListQuerySchema>;
 
-export const zoneLimitRequestListResponseSchema = z.object({
-  requests: z.array(zoneLimitRequestResponseSchema),
-  nextCursor: z.string().nullable(),
-});
+export const zoneLimitRequestListResponseSchema = z
+  .object({
+    requests: z.array(zoneLimitRequestResponseSchema),
+    nextCursor: z.string().nullable(),
+  })
+  .meta({ id: "ZoneLimitRequestPage" });
 
 // Admin queue (#135, #136)
 
@@ -119,20 +132,24 @@ export const adminZoneRequestListQuerySchema = z.object({
 });
 export type AdminZoneRequestListQuery = z.infer<typeof adminZoneRequestListQuerySchema>;
 
-export const adminZoneRequestResponseSchema = zoneLimitRequestResponseSchema.extend({
-  tutor: z.object({
-    id: z.string().uuid(),
-    name: z.string(),
-    zoneLimit: z.number(),
-    zonesUsed: z.number(),
-  }),
-});
+export const adminZoneRequestResponseSchema = zoneLimitRequestResponseSchema
+  .extend({
+    tutor: z.object({
+      id: z.string().uuid(),
+      name: z.string(),
+      zoneLimit: z.number(),
+      zonesUsed: z.number(),
+    }),
+  })
+  .meta({ id: "AdminZoneRequest" });
 export type AdminZoneRequestResponse = z.infer<typeof adminZoneRequestResponseSchema>;
 
-export const adminZoneRequestListResponseSchema = z.object({
-  requests: z.array(adminZoneRequestResponseSchema),
-  nextCursor: z.string().nullable(),
-});
+export const adminZoneRequestListResponseSchema = z
+  .object({
+    requests: z.array(adminZoneRequestResponseSchema),
+    nextCursor: z.string().nullable(),
+  })
+  .meta({ id: "AdminZoneRequestPage" });
 
 export const decideZoneRequestSchema = z
   .object({
@@ -144,5 +161,6 @@ export const decideZoneRequestSchema = z
   .refine((v) => v.decision === "APPROVE" || v.approvedLimit === undefined, {
     message: "approvedLimit is only allowed with APPROVE",
     path: ["approvedLimit"],
-  });
+  })
+  .meta({ id: "DecideZoneRequest" });
 export type DecideZoneRequestInput = z.infer<typeof decideZoneRequestSchema>;
