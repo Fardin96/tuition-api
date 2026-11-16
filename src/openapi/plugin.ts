@@ -20,7 +20,7 @@ const ERROR_DESCRIPTIONS: Record<number, string> = {
 
 const SUCCESS_DESCRIPTIONS: Record<string, string> = { "200": "OK", "201": "Created" };
 
-const ERROR_REF ={ $ref: "#/components/schemas/ErrorResponse" };
+const ERROR_REF = { $ref: "#/components/schemas/ErrorResponse" };
 
 type DocSchema = Record<string, unknown> & { response?: Record<string, unknown> };
 
