@@ -100,7 +100,7 @@ function issuePaths(body: { issues?: { path: (string | number)[] }[] }) {
 }
 
 describe("POST /packages (tutor create, #51)", () => {
-  it("creates an APPROVED, OPEN, online package from a full body", async () => {
+  it("creates a PENDING (awaiting admin review), OPEN, online package from a full body", async () => {
     const tutor = await createReadyTutor();
 
     const res = await send("POST", `${BASE}`, tutor.actor.headers, packageBody(tutor.subjectId));
@@ -125,7 +125,7 @@ describe("POST /packages (tutor create, #51)", () => {
       availableFrom: "2026-12-01",
       teachesOnline: true,
       zoneCount: 0,
-      moderationStatus: "APPROVED",
+      moderationStatus: "PENDING",
       status: "OPEN",
       closed: false,
       myApplication: null,
@@ -160,7 +160,7 @@ describe("POST /packages (tutor create, #51)", () => {
     expect(zones.map((z) => z.zoneId).sort()).toEqual([zoneA, zoneB].sort());
   });
 
-  it("makes the new package visible to a student in GET /packages?scope=all", async () => {
+  it("hides the new package from students until an admin approves it", async () => {
     const tutor = await createReadyTutor();
     const created = await send(
       "POST",
@@ -171,10 +171,16 @@ describe("POST /packages (tutor create, #51)", () => {
     expect(created.status).toBe(201);
     const student = await createStudent();
 
-    const res = await send("GET", `${BASE}?scope=all`, student.actor.headers);
+    const before = await send("GET", `${BASE}?scope=all`, student.actor.headers);
+    expect(before.status).toBe(200);
+    expect(idsOf(before.body)).not.toContain(created.body.id);
 
-    expect(res.status).toBe(200);
-    expect(idsOf(res.body)).toContain(created.body.id);
+    await prisma.tuitionPackage.update({
+      where: { id: created.body.id },
+      data: { moderationStatus: "APPROVED" },
+    });
+    const after = await send("GET", `${BASE}?scope=all`, student.actor.headers);
+    expect(idsOf(after.body)).toContain(created.body.id);
   });
 
   it("returns 400 when the package has no zone and does not teach online", async () => {

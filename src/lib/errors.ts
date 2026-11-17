@@ -26,6 +26,11 @@ export const ERROR_CODES = {
   ApplicationClosed: "APPLICATION_CLOSED",
   ListingNotOpen: "LISTING_NOT_OPEN",
   InvalidApplicationState: "INVALID_APPLICATION_STATE",
+  InvalidAdminState: "INVALID_ADMIN_STATE",
+  InvalidAccountState: "INVALID_ACCOUNT_STATE",
+  InvalidFeeState: "INVALID_FEE_STATE",
+  PackageAlreadyModerated: "PACKAGE_ALREADY_MODERATED",
+  SubjectExists: "SUBJECT_EXISTS",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

@@ -13,11 +13,20 @@ import {
 import { env } from "./config/env.js";
 import { type AppError, ERROR_CODES, errorCodeOf } from "./lib/errors.js";
 import { pool, startPoolStats } from "./lib/prisma.js";
+import { adminAccountRoutes } from "./modules/admin/accounts.routes.js";
+import { adminTeamRoutes } from "./modules/admin/admins.routes.js";
+import { adminApplicationRoutes } from "./modules/admin/applications.routes.js";
+import { adminAuditLogRoutes } from "./modules/admin/audit-logs.routes.js";
+import { adminFeeRoutes } from "./modules/admin/fees.routes.js";
+import { adminPackageRoutes } from "./modules/admin/packages.routes.js";
+import { adminSettingRoutes } from "./modules/admin/settings.routes.js";
+import { adminSubjectRoutes } from "./modules/admin/subjects.routes.js";
 import { adminZoneRequestRoutes } from "./modules/admin/zone-requests.routes.js";
 import { applicationRoutes } from "./modules/application/application.routes.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
 import { lookupRoutes } from "./modules/lookups/lookups.routes.js";
+import { subjectRoutes } from "./modules/lookups/subjects.routes.js";
 import { notificationRoutes } from "./modules/notification/notification.routes.js";
 import { packageRoutes } from "./modules/package/package.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
@@ -110,7 +119,17 @@ export async function buildApp() {
   await app.register(notificationRoutes, { prefix: "/api/v1/notifications" });
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
   await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
+  await app.register(subjectRoutes, { prefix: "/api/v1/subjects" });
   await app.register(adminZoneRequestRoutes, { prefix: "/api/v1/admin/zone-limit-requests" });
+  await app.register(adminTeamRoutes, { prefix: "/api/v1/admin/admins" });
+  await app.register(adminAccountRoutes, { prefix: "/api/v1/admin/accounts" });
+  await app.register(adminApplicationRoutes, { prefix: "/api/v1/admin/applications" });
+  // Full paths: /admin/fees/* and /admin/payments/:id/reverse.
+  await app.register(adminFeeRoutes, { prefix: "/api/v1/admin" });
+  await app.register(adminPackageRoutes, { prefix: "/api/v1/admin/packages" });
+  await app.register(adminSubjectRoutes, { prefix: "/api/v1/admin/subjects" });
+  await app.register(adminSettingRoutes, { prefix: "/api/v1/admin/settings" });
+  await app.register(adminAuditLogRoutes, { prefix: "/api/v1/admin/audit-logs" });
 
   return app;
 }
