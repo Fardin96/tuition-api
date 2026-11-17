@@ -408,12 +408,13 @@ model AccountBlock {
 
 // ───────────────────────── lookups ─────────────────────────
 
-// Seeded once: division > district > area.
+// Division > district > area. Seeded, then edited by admins; inactive areas leave GET /areas.
 model Area {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   division String
   district String
   name     String
+  isActive Boolean @default(true) @map("is_active")
 
   students     Student[]
   tutorAreas   TutorArea[]

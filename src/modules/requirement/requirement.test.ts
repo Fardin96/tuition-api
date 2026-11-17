@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { prisma } from "../../lib/prisma.js";
 import {
   createAccount,
   createArea,
@@ -462,6 +463,93 @@ describe("requirement module", () => {
 
     expect(response.statusCode).toBe(400);
     expect(response.json().message).toBe("Invalid area or subject ID");
+  });
+
+  it("should not allow creating with an inactive area", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const inactive = await createArea({ isActive: false });
+    const subject = await createSubject();
+    await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers: authHeaders,
+      payload: {
+        areaId: inactive.id,
+        subjectIds: [subject.id],
+        curriculum: "BANGLA_MEDIUM",
+        levelCode: 10,
+        timeOfDay: "10:00",
+        daysPerWeek: 3,
+        salary: 5000,
+        hireByDate: "2024-12-31",
+        tuitionType: "Home Tutoring Solo",
+      },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().message).toBe("Invalid area or subject ID");
+  });
+
+  it("should not allow editing to an inactive area", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const inactive = await createArea({ isActive: false });
+    const subject = await createSubject();
+    const studentProfile = await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const requirement = await createRequirement({
+      studentId: studentProfile.id,
+      areaId: area.id,
+      subjectId: subject.id,
+    });
+
+    const response = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+      payload: {
+        areaId: inactive.id,
+      },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().message).toBe("Invalid area or subject ID");
+  });
+
+  it("should allow editing other fields when the saved area was deactivated", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const subject = await createSubject();
+    const studentProfile = await createStudentProfile(account.id, area.id);
+    const authHeaders = await getAuthHeaders(account);
+
+    const requirement = await createRequirement({
+      studentId: studentProfile.id,
+      areaId: area.id,
+      subjectId: subject.id,
+    });
+    await prisma.area.update({ where: { id: area.id }, data: { isActive: false } });
+
+    const response = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers: authHeaders,
+      payload: {
+        salary: 6000,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().salary).toBe(6000);
+    expect(response.json().areaId).toBe(area.id);
   });
 
   it("should reject requirement creation with invalid tuitionType", async () => {

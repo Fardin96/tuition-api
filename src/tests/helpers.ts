@@ -61,13 +61,14 @@ export async function getAuthHeaders(account: { id: string; role: Role; email: s
 }
 
 export async function createArea(
-  overrides: { name?: string; district?: string; division?: string } = {},
+  overrides: { name?: string; district?: string; division?: string; isActive?: boolean } = {},
 ) {
   return prisma.area.create({
     data: {
       division: overrides.division ?? "Dhaka",
       district: overrides.district ?? "Dhaka",
       name: overrides.name ?? `Area ${crypto.randomUUID()}`,
+      isActive: overrides.isActive ?? true,
     },
   });
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DISTRICT_CODES, toDistrictCode } from "./districts.js";
+import { DISTRICT_CODES, DISTRICTS, DIVISIONS, toDistrictCode } from "./districts.js";
 
 describe("toDistrictCode", () => {
   it("has the 64 districts of Bangladesh", () => {
@@ -19,5 +19,15 @@ describe("toDistrictCode", () => {
     expect(toDistrictCode("")).toBeNull();
     expect(toDistrictCode("Atlantis")).toBeNull();
     expect(toDistrictCode("District")).toBeNull();
+  });
+});
+
+describe("DISTRICTS", () => {
+  it("covers every district code exactly once and round-trips each name", () => {
+    expect(Object.keys(DISTRICTS).sort()).toEqual([...DISTRICT_CODES].sort());
+    for (const [code, district] of Object.entries(DISTRICTS)) {
+      expect(toDistrictCode(district.name)).toBe(code);
+      expect(DIVISIONS).toContain(district.division);
+    }
   });
 });

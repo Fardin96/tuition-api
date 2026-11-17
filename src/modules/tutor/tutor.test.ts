@@ -466,6 +466,54 @@ describe("tutor routes", () => {
       expect(JSON.parse(res.body).details.invalidAreaIds).toEqual([2147483000]);
     });
 
+    it("rejects an inactive area the tutor does not have yet (409)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const inactive = await createArea({ isActive: false });
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers: await getAuthHeaders(account),
+        payload: { areaIds: [inactive.id] },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("AREA_OUTSIDE_CITY");
+      expect(JSON.parse(res.body).details.invalidAreaIds).toEqual([inactive.id]);
+      expect(await prisma.tutorArea.count({ where: { tutorId: tutor.id } })).toBe(0);
+    });
+
+    it("keeps an area that became inactive while the tutor already had it", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(account.id);
+      const headers = await getAuthHeaders(account);
+      const area = await createArea();
+      const added = await createArea();
+
+      const first = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers,
+        payload: { areaIds: [area.id] },
+      });
+      expect(first.statusCode).toBe(200);
+      await prisma.area.update({ where: { id: area.id }, data: { isActive: false } });
+
+      const res = await app.inject({
+        method: "PUT",
+        url: "/api/v1/tutors/me/areas",
+        headers,
+        payload: { areaIds: [area.id, added.id] },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const ids = JSON.parse(res.body).areas.map((a: { area: { id: number } }) => a.area.id);
+      expect(ids.sort()).toEqual([area.id, added.id].sort());
+    });
+
     it("rejects a non-positive area id with a ValidationError (400)", async () => {
       const app = await createTestApp();
       const account = await createAccount({ role: "TUTOR" });

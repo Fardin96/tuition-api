@@ -31,6 +31,7 @@ export const ERROR_CODES = {
   InvalidFeeState: "INVALID_FEE_STATE",
   PackageAlreadyModerated: "PACKAGE_ALREADY_MODERATED",
   SubjectExists: "SUBJECT_EXISTS",
+  AreaExists: "AREA_EXISTS",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

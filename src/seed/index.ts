@@ -17,8 +17,8 @@ async function main() {
 
   console.log(`Seeded ${SUPER_ADMINS.length} super-admin email(s)`);
 
-  // shortcut: placeholder lookups with fixed ids, mirrored in tution-media/lib/profile.ts
-  // (AREAS, SUBJECTS). Curricula and levels are code, not seed data (src/lib/education.ts). Replace areas when Google Places is integrated; keep both lists in step until then.
+  // shortcut: placeholder lookups with fixed ids. The web reads them from GET /areas and GET /subjects,
+  // and admins edit them under /admin/areas and /admin/subjects. Curricula and levels are code, not seed data (src/lib/education.ts).
   for (const [i, name] of AREAS.entries()) {
     await prisma.area.upsert({
       where: { id: i + 1 },

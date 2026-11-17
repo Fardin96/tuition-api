@@ -182,7 +182,8 @@ export const AreaScalarFieldEnum = {
   id: 'id',
   division: 'division',
   district: 'district',
-  name: 'name'
+  name: 'name',
+  isActive: 'isActive'
 } as const
 
 export type AreaScalarFieldEnum = (typeof AreaScalarFieldEnum)[keyof typeof AreaScalarFieldEnum]

@@ -1,4 +1,6 @@
+import { unusableAreaIds } from "../../lib/areas.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
+import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import {
   findOwnLocation,
@@ -61,6 +63,11 @@ export async function createStudentProfile(
     throw err;
   }
 
+  const unusable = await unusableAreaIds(prisma, [data.areaId]);
+  if (unusable.length > 0) {
+    throw appError("ValidationError", 400, "Unknown area", { areaIds: [data.areaId] });
+  }
+
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
 
@@ -93,6 +100,14 @@ export async function updateStudentProfile(
 ) {
   const existing = await prisma.student.findUnique({ where: { accountId } });
   if (!existing) return null;
+
+  // An area the student already has may be inactive; only a newly chosen one is checked.
+  if (data.areaId !== undefined && data.areaId !== existing.areaId) {
+    const unusable = await unusableAreaIds(prisma, [data.areaId]);
+    if (unusable.length > 0) {
+      throw appError("ValidationError", 400, "Unknown area", { areaIds: [data.areaId] });
+    }
+  }
 
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
