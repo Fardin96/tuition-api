@@ -568,6 +568,7 @@ ALTER TABLE tutor_requirement
   ),
   ADD CONSTRAINT tr_time_window CHECK (time_to > time_from),
   ADD CONSTRAINT tr_days_valid  CHECK (available_days BETWEEN 1 AND 127),
+  ADD CONSTRAINT tr_days_per_week_range CHECK (days_per_week BETWEEN 1 AND 7),
   ADD CONSTRAINT tr_salary_pos  CHECK (min_salary IS NULL OR min_salary > 0),
   ADD CONSTRAINT tr_students    CHECK (max_students >= 1),
   ADD CONSTRAINT tr_default_active CHECK (NOT is_default OR is_active);

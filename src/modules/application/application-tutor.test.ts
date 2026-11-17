@@ -101,6 +101,7 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
         timeFrom: "10:00",
         timeTo: "12:00",
         availableDays: 127,
+        daysPerWeek: null,
         minSalary: null,
         maxStudents: 1,
         teachesOnline: true,

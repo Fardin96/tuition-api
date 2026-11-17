@@ -851,6 +851,12 @@
               "availableDays": {
                 "type": "number"
               },
+              "daysPerWeek": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
               "minSalary": {
                 "type": [
                   "number",
@@ -877,6 +883,7 @@
               "timeFrom",
               "timeTo",
               "availableDays",
+              "daysPerWeek",
               "minSalary",
               "maxStudents",
               "teachesOnline"
@@ -1220,6 +1227,12 @@
                 "minimum": 1,
                 "maximum": 7
               },
+              "availableDays": {
+                "default": 127,
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 127
+              },
               "salary": {
                 "type": "integer",
                 "exclusiveMinimum": 0,
@@ -1360,6 +1373,11 @@
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 7
+              },
+              "availableDays": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 127
               },
               "salary": {
                 "type": "integer",
@@ -1683,6 +1701,18 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 127
+          },
+          "daysPerWeek": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "minSalary": {
             "anyOf": [
@@ -3193,6 +3223,9 @@
               "null"
             ]
           },
+          "availableDays": {
+            "type": "number"
+          },
           "salary": {
             "type": [
               "number",
@@ -3271,6 +3304,7 @@
           "levelNote",
           "timeOfDay",
           "daysPerWeek",
+          "availableDays",
           "salary",
           "studentCount",
           "hireByDate",
@@ -4317,6 +4351,12 @@
           "availableDays": {
             "type": "number"
           },
+          "daysPerWeek": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
           "minSalary": {
             "type": [
               "number",
@@ -4361,6 +4401,7 @@
           "timeFrom",
           "timeTo",
           "availableDays",
+          "daysPerWeek",
           "minSalary",
           "maxStudents",
           "availableFrom",
@@ -4823,6 +4864,11 @@
             "minimum": 1,
             "maximum": 7
           },
+          "availableDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 127
+          },
           "salary": {
             "type": "integer",
             "exclusiveMinimum": 0,
@@ -5122,6 +5168,18 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 127
+          },
+          "daysPerWeek": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "minSalary": {
             "anyOf": [
@@ -6356,74 +6414,6 @@
         }
       }
     },
-    "/api/v1/students/me/verification": {
-      "post": {
-        "summary": "Submit my ID for verification",
-        "tags": [
-          "Students"
-        ],
-        "description": "Not built yet. Always answers 501 until the storage module lands.\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "x-deferred": true,
-        "x-roles": "STUDENT",
-        "responses": {
-          "401": {
-            "description": "Missing, invalid or expired access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The account's role cannot call this route",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit hit",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected error. In production the message is masked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Not implemented yet",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/students/{id}": {
       "get": {
         "summary": "Get a student's public profile",
@@ -7019,72 +7009,6 @@
       }
     },
     "/api/v1/tutors/me/verifications": {
-      "post": {
-        "summary": "Submit a verification",
-        "tags": [
-          "Tutors"
-        ],
-        "description": "Not built yet: answers 501 until the storage module lands. Planned: the tutor uploads an ID file for review.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "x-deferred": true,
-        "x-roles": "TUTOR",
-        "responses": {
-          "401": {
-            "description": "Missing, invalid or expired access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The account's role cannot call this route",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit hit",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected error. In production the message is masked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Not implemented yet",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
       "get": {
         "summary": "List my verification submissions",
         "tags": [
@@ -7587,72 +7511,6 @@
             }
           }
         }
-      },
-      "post": {
-        "summary": "Add a credential",
-        "tags": [
-          "Tutors"
-        ],
-        "description": "Not built yet: answers 501 until the storage module lands. Planned: the tutor uploads a certificate file.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "x-deferred": true,
-        "x-roles": "TUTOR",
-        "responses": {
-          "401": {
-            "description": "Missing, invalid or expired access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The account's role cannot call this route",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit hit",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected error. In production the message is masked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Not implemented yet",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/api/v1/tutors/me/credentials/{id}": {
@@ -7813,72 +7671,6 @@
           },
           "500": {
             "description": "Unexpected error. In production the message is masked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Add a video",
-        "tags": [
-          "Tutors"
-        ],
-        "description": "Not built yet: answers 501 until the storage module lands. Planned: the video is added as PENDING for moderation.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "x-deferred": true,
-        "x-roles": "TUTOR",
-        "responses": {
-          "401": {
-            "description": "Missing, invalid or expired access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The account's role cannot call this route",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit hit",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected error. In production the message is masked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Not implemented yet",
             "content": {
               "application/json": {
                 "schema": {

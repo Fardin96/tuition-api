@@ -1,5 +1,6 @@
 import type { Prisma, TutorRequirement } from "../../generated/prisma/client.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
+import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import { toDistrictCode } from "../../lib/districts.js";
 import { validateTutorCoverage } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
@@ -509,6 +510,7 @@ function serializeTutorRequirement(row: TutorRequirementRow, counts: Map<string 
     timeFrom: hhmmOf(row.timeFrom),
     timeTo: hhmmOf(row.timeTo),
     availableDays: row.availableDays,
+    daysPerWeek: row.daysPerWeek,
     minSalary: row.minSalary,
     maxStudents: row.maxStudents,
     availableFrom: ymdOf(row.availableFrom),
@@ -626,6 +628,7 @@ export async function updateTutorRequirement(
     timeFrom: hhmmOf(existing.timeFrom),
     timeTo: hhmmOf(existing.timeTo),
     availableDays: existing.availableDays,
+    daysPerWeek: existing.daysPerWeek,
     minSalary: existing.minSalary,
     maxStudents: existing.maxStudents,
     availableFrom: ymdOf(existing.availableFrom),
@@ -641,6 +644,11 @@ export async function updateTutorRequirement(
   if (values.timeTo <= values.timeFrom) {
     throw appError("InvalidRequirement", 400, "timeTo must be after timeFrom", {
       fields: ["timeTo"],
+    });
+  }
+  if (!daysPerWeekFits(values.daysPerWeek, values.availableDays)) {
+    throw appError("InvalidRequirement", 400, DAYS_PER_WEEK_MESSAGE, {
+      fields: ["daysPerWeek"],
     });
   }
 

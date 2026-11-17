@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ListingStatus } from "../../generated/prisma/enums.js";
+import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import {
   ACADEMIC_GROUPS,
   ADMISSION_TARGETS,
@@ -41,6 +42,9 @@ const levelNoteSchema = z
   .transform(normalizeLevelNote)
   .pipe(z.string().max(LEVEL_NOTE_MAX).nullable());
 
+// Weekday bitmask: bit0 = Saturday ... bit6 = Friday. Must pick at least one day.
+const availableDaysSchema = z.number().int().min(1).max(127);
+
 // Base schema without defaults
 const baseRequirementSchema = z.object({
   areaId: z.coerce.number().int().positive(),
@@ -53,6 +57,7 @@ const baseRequirementSchema = z.object({
   levelNote: levelNoteSchema,
   timeOfDay: timeOfDaySchema,
   daysPerWeek: z.coerce.number().int().min(1).max(7),
+  availableDays: availableDaysSchema,
   salary: z.coerce.number().int().positive(),
   studentCount: z.coerce.number().int().min(1),
   hireByDate: z.string().date(),
@@ -86,9 +91,23 @@ function checkEducation(
   }
 }
 
+// Days in the request must fit the count: daysPerWeek cannot exceed the available days.
+function checkDaysPerWeek(
+  data: { daysPerWeek?: number | null; availableDays?: number },
+  ctx: z.RefinementCtx,
+) {
+  if (data.daysPerWeek != null && data.availableDays != null) {
+    if (!daysPerWeekFits(data.daysPerWeek, data.availableDays)) {
+      ctx.addIssue({ code: "custom", path: ["daysPerWeek"], message: DAYS_PER_WEEK_MESSAGE });
+    }
+  }
+}
+
 const openRequirementSchema = baseRequirementSchema
   .extend({
     subjectIds: subjectIdsSchema.min(1),
+    // Older clients omit availableDays; the column default (every day) applies.
+    availableDays: availableDaysSchema.default(127),
     academicGroup: z.enum(ACADEMIC_GROUPS).nullable().optional(),
     admissionTargets: z.array(z.enum(ADMISSION_TARGETS)).optional(),
     isRetaker: z.boolean().optional(),
@@ -97,7 +116,8 @@ const openRequirementSchema = baseRequirementSchema
     tutorGenderPref: tutorGenderPrefSchema.default("ANY"),
     status: z.literal("OPEN").default("OPEN"),
   })
-  .superRefine(checkEducation);
+  .superRefine(checkEducation)
+  .superRefine(checkDaysPerWeek);
 
 const draftRequirementSchema = baseRequirementSchema
   .partial()
@@ -106,7 +126,8 @@ const draftRequirementSchema = baseRequirementSchema
     tutorGenderPref: tutorGenderPrefSchema.default("ANY"),
     status: z.literal("DRAFT"),
   })
-  .superRefine(checkEducation);
+  .superRefine(checkEducation)
+  .superRefine(checkDaysPerWeek);
 
 export const createRequirementSchema = z
   .union([openRequirementSchema, draftRequirementSchema])
@@ -137,6 +158,7 @@ export const requirementResponseSchema = z
     levelNote: z.string().nullable(),
     timeOfDay: z.string().nullable(),
     daysPerWeek: z.number().nullable(),
+    availableDays: z.number(),
     salary: z.number().nullable(),
     studentCount: z.number().nullable(),
     hireByDate: z.string().nullable(),
