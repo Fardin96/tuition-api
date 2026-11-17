@@ -250,6 +250,7 @@ export type TutorZoneWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"TutorZone"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   requirements?: Prisma.TutorRequirementZoneListRelationFilter
+  packages?: Prisma.PackageZoneListRelationFilter
 }
 
 export type TutorZoneOrderByWithRelationInput = {
@@ -264,6 +265,7 @@ export type TutorZoneOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   tutor?: Prisma.TutorOrderByWithRelationInput
   requirements?: Prisma.TutorRequirementZoneOrderByRelationAggregateInput
+  packages?: Prisma.PackageZoneOrderByRelationAggregateInput
 }
 
 export type TutorZoneWhereUniqueInput = Prisma.AtLeast<{
@@ -282,6 +284,7 @@ export type TutorZoneWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"TutorZone"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   requirements?: Prisma.TutorRequirementZoneListRelationFilter
+  packages?: Prisma.PackageZoneListRelationFilter
 }, "id" | "id_tutorId">
 
 export type TutorZoneOrderByWithAggregationInput = {
@@ -327,6 +330,7 @@ export type TutorZoneCreateInput = {
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutZonesInput
   requirements?: Prisma.TutorRequirementZoneCreateNestedManyWithoutZoneInput
+  packages?: Prisma.PackageZoneCreateNestedManyWithoutZoneInput
 }
 
 export type TutorZoneUncheckedCreateInput = {
@@ -340,6 +344,7 @@ export type TutorZoneUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   requirements?: Prisma.TutorRequirementZoneUncheckedCreateNestedManyWithoutZoneInput
+  packages?: Prisma.PackageZoneUncheckedCreateNestedManyWithoutZoneInput
 }
 
 export type TutorZoneUpdateInput = {
@@ -353,6 +358,7 @@ export type TutorZoneUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutZonesNestedInput
   requirements?: Prisma.TutorRequirementZoneUpdateManyWithoutZoneNestedInput
+  packages?: Prisma.PackageZoneUpdateManyWithoutZoneNestedInput
 }
 
 export type TutorZoneUncheckedUpdateInput = {
@@ -366,6 +372,7 @@ export type TutorZoneUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requirements?: Prisma.TutorRequirementZoneUncheckedUpdateManyWithoutZoneNestedInput
+  packages?: Prisma.PackageZoneUncheckedUpdateManyWithoutZoneNestedInput
 }
 
 export type TutorZoneCreateManyInput = {
@@ -523,6 +530,20 @@ export type TutorZoneUpdateOneRequiredWithoutRequirementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TutorZoneUpdateToOneWithWhereWithoutRequirementsInput, Prisma.TutorZoneUpdateWithoutRequirementsInput>, Prisma.TutorZoneUncheckedUpdateWithoutRequirementsInput>
 }
 
+export type TutorZoneCreateNestedOneWithoutPackagesInput = {
+  create?: Prisma.XOR<Prisma.TutorZoneCreateWithoutPackagesInput, Prisma.TutorZoneUncheckedCreateWithoutPackagesInput>
+  connectOrCreate?: Prisma.TutorZoneCreateOrConnectWithoutPackagesInput
+  connect?: Prisma.TutorZoneWhereUniqueInput
+}
+
+export type TutorZoneUpdateOneRequiredWithoutPackagesNestedInput = {
+  create?: Prisma.XOR<Prisma.TutorZoneCreateWithoutPackagesInput, Prisma.TutorZoneUncheckedCreateWithoutPackagesInput>
+  connectOrCreate?: Prisma.TutorZoneCreateOrConnectWithoutPackagesInput
+  upsert?: Prisma.TutorZoneUpsertWithoutPackagesInput
+  connect?: Prisma.TutorZoneWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TutorZoneUpdateToOneWithWhereWithoutPackagesInput, Prisma.TutorZoneUpdateWithoutPackagesInput>, Prisma.TutorZoneUncheckedUpdateWithoutPackagesInput>
+}
+
 export type TutorZoneCreateWithoutTutorInput = {
   id?: string
   label: string
@@ -533,6 +554,7 @@ export type TutorZoneCreateWithoutTutorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   requirements?: Prisma.TutorRequirementZoneCreateNestedManyWithoutZoneInput
+  packages?: Prisma.PackageZoneCreateNestedManyWithoutZoneInput
 }
 
 export type TutorZoneUncheckedCreateWithoutTutorInput = {
@@ -545,6 +567,7 @@ export type TutorZoneUncheckedCreateWithoutTutorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   requirements?: Prisma.TutorRequirementZoneUncheckedCreateNestedManyWithoutZoneInput
+  packages?: Prisma.PackageZoneUncheckedCreateNestedManyWithoutZoneInput
 }
 
 export type TutorZoneCreateOrConnectWithoutTutorInput = {
@@ -598,6 +621,7 @@ export type TutorZoneCreateWithoutRequirementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutZonesInput
+  packages?: Prisma.PackageZoneCreateNestedManyWithoutZoneInput
 }
 
 export type TutorZoneUncheckedCreateWithoutRequirementsInput = {
@@ -610,6 +634,7 @@ export type TutorZoneUncheckedCreateWithoutRequirementsInput = {
   geogSource?: $Enums.GeogSource
   createdAt?: Date | string
   updatedAt?: Date | string
+  packages?: Prisma.PackageZoneUncheckedCreateNestedManyWithoutZoneInput
 }
 
 export type TutorZoneCreateOrConnectWithoutRequirementsInput = {
@@ -638,6 +663,7 @@ export type TutorZoneUpdateWithoutRequirementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutZonesNestedInput
+  packages?: Prisma.PackageZoneUpdateManyWithoutZoneNestedInput
 }
 
 export type TutorZoneUncheckedUpdateWithoutRequirementsInput = {
@@ -650,6 +676,75 @@ export type TutorZoneUncheckedUpdateWithoutRequirementsInput = {
   geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  packages?: Prisma.PackageZoneUncheckedUpdateManyWithoutZoneNestedInput
+}
+
+export type TutorZoneCreateWithoutPackagesInput = {
+  id?: string
+  label: string
+  radiusM: number
+  placeId?: string | null
+  addressText?: string | null
+  geogSource?: $Enums.GeogSource
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tutor: Prisma.TutorCreateNestedOneWithoutZonesInput
+  requirements?: Prisma.TutorRequirementZoneCreateNestedManyWithoutZoneInput
+}
+
+export type TutorZoneUncheckedCreateWithoutPackagesInput = {
+  id?: string
+  tutorId: string
+  label: string
+  radiusM: number
+  placeId?: string | null
+  addressText?: string | null
+  geogSource?: $Enums.GeogSource
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  requirements?: Prisma.TutorRequirementZoneUncheckedCreateNestedManyWithoutZoneInput
+}
+
+export type TutorZoneCreateOrConnectWithoutPackagesInput = {
+  where: Prisma.TutorZoneWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutorZoneCreateWithoutPackagesInput, Prisma.TutorZoneUncheckedCreateWithoutPackagesInput>
+}
+
+export type TutorZoneUpsertWithoutPackagesInput = {
+  update: Prisma.XOR<Prisma.TutorZoneUpdateWithoutPackagesInput, Prisma.TutorZoneUncheckedUpdateWithoutPackagesInput>
+  create: Prisma.XOR<Prisma.TutorZoneCreateWithoutPackagesInput, Prisma.TutorZoneUncheckedCreateWithoutPackagesInput>
+  where?: Prisma.TutorZoneWhereInput
+}
+
+export type TutorZoneUpdateToOneWithWhereWithoutPackagesInput = {
+  where?: Prisma.TutorZoneWhereInput
+  data: Prisma.XOR<Prisma.TutorZoneUpdateWithoutPackagesInput, Prisma.TutorZoneUncheckedUpdateWithoutPackagesInput>
+}
+
+export type TutorZoneUpdateWithoutPackagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  radiusM?: Prisma.IntFieldUpdateOperationsInput | number
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tutor?: Prisma.TutorUpdateOneRequiredWithoutZonesNestedInput
+  requirements?: Prisma.TutorRequirementZoneUpdateManyWithoutZoneNestedInput
+}
+
+export type TutorZoneUncheckedUpdateWithoutPackagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tutorId?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  radiusM?: Prisma.IntFieldUpdateOperationsInput | number
+  placeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  geogSource?: Prisma.EnumGeogSourceFieldUpdateOperationsInput | $Enums.GeogSource
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requirements?: Prisma.TutorRequirementZoneUncheckedUpdateManyWithoutZoneNestedInput
 }
 
 export type TutorZoneCreateManyTutorInput = {
@@ -673,6 +768,7 @@ export type TutorZoneUpdateWithoutTutorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requirements?: Prisma.TutorRequirementZoneUpdateManyWithoutZoneNestedInput
+  packages?: Prisma.PackageZoneUpdateManyWithoutZoneNestedInput
 }
 
 export type TutorZoneUncheckedUpdateWithoutTutorInput = {
@@ -685,6 +781,7 @@ export type TutorZoneUncheckedUpdateWithoutTutorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requirements?: Prisma.TutorRequirementZoneUncheckedUpdateManyWithoutZoneNestedInput
+  packages?: Prisma.PackageZoneUncheckedUpdateManyWithoutZoneNestedInput
 }
 
 export type TutorZoneUncheckedUpdateManyWithoutTutorInput = {
@@ -705,10 +802,12 @@ export type TutorZoneUncheckedUpdateManyWithoutTutorInput = {
 
 export type TutorZoneCountOutputType = {
   requirements: number
+  packages: number
 }
 
 export type TutorZoneCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   requirements?: boolean | TutorZoneCountOutputTypeCountRequirementsArgs
+  packages?: boolean | TutorZoneCountOutputTypeCountPackagesArgs
 }
 
 /**
@@ -728,6 +827,13 @@ export type TutorZoneCountOutputTypeCountRequirementsArgs<ExtArgs extends runtim
   where?: Prisma.TutorRequirementZoneWhereInput
 }
 
+/**
+ * TutorZoneCountOutputType without action
+ */
+export type TutorZoneCountOutputTypeCountPackagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PackageZoneWhereInput
+}
+
 
 export type TutorZoneSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -741,6 +847,7 @@ export type TutorZoneSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   updatedAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   requirements?: boolean | Prisma.TutorZone$requirementsArgs<ExtArgs>
+  packages?: boolean | Prisma.TutorZone$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.TutorZoneCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tutorZone"]>
 
@@ -786,6 +893,7 @@ export type TutorZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type TutorZoneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   requirements?: boolean | Prisma.TutorZone$requirementsArgs<ExtArgs>
+  packages?: boolean | Prisma.TutorZone$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.TutorZoneCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TutorZoneIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -800,6 +908,7 @@ export type $TutorZonePayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     tutor: Prisma.$TutorPayload<ExtArgs>
     requirements: Prisma.$TutorRequirementZonePayload<ExtArgs>[]
+    packages: Prisma.$PackageZonePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1207,6 +1316,7 @@ export interface Prisma__TutorZoneClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tutor<T extends Prisma.TutorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorDefaultArgs<ExtArgs>>): Prisma.Prisma__TutorClient<runtime.Types.Result.GetResult<Prisma.$TutorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   requirements<T extends Prisma.TutorZone$requirementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorZone$requirementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorRequirementZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  packages<T extends Prisma.TutorZone$packagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorZone$packagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PackageZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1667,6 +1777,30 @@ export type TutorZone$requirementsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.TutorRequirementZoneScalarFieldEnum | Prisma.TutorRequirementZoneScalarFieldEnum[]
+}
+
+/**
+ * TutorZone.packages
+ */
+export type TutorZone$packagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PackageZone
+   */
+  select?: Prisma.PackageZoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PackageZone
+   */
+  omit?: Prisma.PackageZoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PackageZoneInclude<ExtArgs> | null
+  where?: Prisma.PackageZoneWhereInput
+  orderBy?: Prisma.PackageZoneOrderByWithRelationInput | Prisma.PackageZoneOrderByWithRelationInput[]
+  cursor?: Prisma.PackageZoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PackageZoneScalarFieldEnum | Prisma.PackageZoneScalarFieldEnum[]
 }
 
 /**

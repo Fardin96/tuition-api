@@ -215,19 +215,29 @@ export async function replaceTutorSubjects(accountId: string, subjectIds: number
     const removed = [...currentIds].filter((id) => !next.has(id));
     const added = [...next].filter((id) => !currentIds.has(id));
 
-    // The composite FK cascades removed subjects into tutor_requirement_subject; refuse if that empties an active set.
-    const orphaned = await tx.$queryRaw<{ id: string }[]>`
+    // The composite FKs cascade removed subjects into tutor_requirement_subject and package_subject.
+    // Refuse when that would leave an active set or an OPEN package with no subjects.
+    const orphanedSets = await tx.$queryRaw<{ id: string }[]>`
       SELECT r.id FROM tutor_requirement r
       JOIN tutor_requirement_subject s ON s.requirement_id = r.id
       WHERE r.tutor_id = ${tutor.id}::uuid AND r.is_active
       GROUP BY r.id
       HAVING bool_and(s.subject_id = ANY(${removed}::int[]))`;
-    if (orphaned.length > 0) {
+    const orphanedPackages = await tx.$queryRaw<{ id: string }[]>`
+      SELECT p.id FROM tuition_package p
+      JOIN package_subject s ON s.package_id = p.id
+      WHERE p.tutor_id = ${tutor.id}::uuid AND p.status = 'OPEN'
+      GROUP BY p.id
+      HAVING bool_and(s.subject_id = ANY(${removed}::int[]))`;
+    if (orphanedSets.length > 0 || orphanedPackages.length > 0) {
       throw appError(
         "RequirementLosesLastSubject",
         409,
-        "A requirement would be left with no subjects.",
-        { requirementIds: orphaned.map((row) => row.id) },
+        "A requirement set or package would be left with no subjects.",
+        {
+          requirementIds: orphanedSets.map((row) => row.id),
+          packageIds: orphanedPackages.map((row) => row.id),
+        },
       );
     }
 
@@ -410,10 +420,6 @@ function limitError() {
   );
 }
 
-function inUseError(packageIds: string[]) {
-  return appError("RequirementInUse", 409, "Requirement is used by open packages", { packageIds });
-}
-
 function requirementData(values: RequirementValues) {
   return {
     ...values,
@@ -434,21 +440,12 @@ function mapRequirementFkError(error: unknown): never {
   throw error;
 }
 
-// The archive trigger raises restrict_violation (SQLSTATE 23001) when open packages still use the set.
-function isArchiveBlocked(error: unknown) {
-  const { message = "", meta } = error as {
-    message?: string;
-    meta?: { database_error_code?: string };
-  };
-  return meta?.database_error_code === "23001" || message.includes("mapped to open packages");
-}
-
 async function lockTutor(tx: Prisma.TransactionClient, tutorId: string) {
   await tx.$queryRaw`SELECT id FROM tutor WHERE id = ${tutorId}::uuid FOR UPDATE`;
 }
 
 // Runs inside the caller's transaction, after lockTutor. With `sync`, subjects missing from the profile are added to it.
-async function prepareSetSubjects(
+export async function prepareSetSubjects(
   tx: Prisma.TransactionClient,
   tutorId: string,
   subjectIds: number[],
@@ -486,17 +483,7 @@ async function prepareSetSubjects(
   });
 }
 
-// One grouped query. Key null = OPEN packages without a requirement (they belong to the default set).
-async function mappedPackageCounts(tutorId: string) {
-  const rows = await prisma.$queryRaw<{ requirementId: string | null; count: number }[]>`
-    SELECT requirement_id AS "requirementId", count(*)::int AS count
-    FROM tuition_package
-    WHERE tutor_id = ${tutorId}::uuid AND status = 'OPEN'
-    GROUP BY requirement_id`;
-  return new Map<string | null, number>(rows.map((row) => [row.requirementId, row.count]));
-}
-
-function serializeTutorRequirement(row: TutorRequirementRow, counts: Map<string | null, number>) {
+function serializeTutorRequirement(row: TutorRequirementRow) {
   return {
     id: row.id,
     name: row.name,
@@ -517,7 +504,6 @@ function serializeTutorRequirement(row: TutorRequirementRow, counts: Map<string 
     teachesOnline: row.teachesOnline,
     subjectIds: row.subjects.map((s) => s.subjectId),
     zoneIds: row.zones.map((z) => z.zoneId),
-    mappedPackageCount: (counts.get(row.id) ?? 0) + (row.isDefault ? (counts.get(null) ?? 0) : 0),
   };
 }
 
@@ -527,7 +513,7 @@ async function findSerializedRequirement(tutorId: string, id: string) {
     include: requirementInclude,
   });
   if (!row) return null;
-  return serializeTutorRequirement(row, await mappedPackageCounts(tutorId));
+  return serializeTutorRequirement(row);
 }
 
 export async function listTutorRequirements(
@@ -556,8 +542,7 @@ export async function listTutorRequirements(
           take: 50,
         });
   const rows = [...activeRows, ...archivedRows];
-  const counts = await mappedPackageCounts(tutor.id);
-  return rows.map((row) => serializeTutorRequirement(row, counts));
+  return rows.map((row) => serializeTutorRequirement(row));
 }
 
 export async function getTutorRequirement(accountId: string, id: string) {
@@ -739,35 +724,21 @@ export async function archiveTutorRequirement(accountId: string, id: string) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
 
-  try {
-    const found = await prisma.$transaction(async (tx) => {
-      await lockTutor(tx, tutor.id);
-      const row = await tx.tutorRequirement.findFirst({
-        where: { id, tutorId: tutor.id },
-        select: { isActive: true, isDefault: true },
-      });
-      if (!row) return false;
-      if (!row.isActive) return true;
-      if (row.isDefault) {
-        throw appError("RequirementIsDefault", 409, "The default requirement cannot be archived");
-      }
-      const packages = await tx.tuitionPackage.findMany({
-        where: { requirementId: id, status: "OPEN" },
-        select: { id: true },
-      });
-      if (packages.length > 0) throw inUseError(packages.map((p) => p.id));
-      await tx.tutorRequirement.update({ where: { id }, data: { isActive: false } });
-      return true;
+  const found = await prisma.$transaction(async (tx) => {
+    await lockTutor(tx, tutor.id);
+    const row = await tx.tutorRequirement.findFirst({
+      where: { id, tutorId: tutor.id },
+      select: { isActive: true, isDefault: true },
     });
-    return found ? findSerializedRequirement(tutor.id, id) : null;
-  } catch (error) {
-    if (!isArchiveBlocked(error)) throw error;
-    const packages = await prisma.tuitionPackage.findMany({
-      where: { requirementId: id, status: "OPEN" },
-      select: { id: true },
-    });
-    throw inUseError(packages.map((p) => p.id));
-  }
+    if (!row) return false;
+    if (!row.isActive) return true;
+    if (row.isDefault) {
+      throw appError("RequirementIsDefault", 409, "The default requirement cannot be archived");
+    }
+    await tx.tutorRequirement.update({ where: { id }, data: { isActive: false } });
+    return true;
+  });
+  return found ? findSerializedRequirement(tutor.id, id) : null;
 }
 
 export async function restoreTutorRequirement(accountId: string, id: string) {

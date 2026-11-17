@@ -90,6 +90,12 @@ enum ListingStatus {
   EXPIRED
 }
 
+// What part of the curriculum a package promises to finish.
+enum PackageCoverage {
+  FULL_CURRICULUM
+  PARTIAL
+}
+
 enum ModerationStatus {
   PENDING
   APPROVED
@@ -226,6 +232,8 @@ enum AppNotificationKind {
   APPLICATION_REOPENED
   APPLICATION_CANCELLED
   APPLICATION_COMPLETED
+  PACKAGE_UPDATED // the tutor edited a package the student has a pending or confirmed request on
+  PACKAGE_CLOSED // the tutor closed a package; pending requests expired
 }
 
 enum NotificationStatus {
@@ -410,7 +418,6 @@ model Area {
   students     Student[]
   tutorAreas   TutorArea[]
   requirements TuitionRequirement[]
-  packages     TuitionPackage[]
 
   @@unique([district, name])
   @@map("area")
@@ -425,7 +432,6 @@ model Subject {
   isActive            Boolean              @default(true) @map("is_active")
   tutorSubjects       TutorSubject[]
   requirementSubjects RequirementSubject[]
-  packages            TuitionPackage[]
 
   @@map("subject")
 }
@@ -600,6 +606,7 @@ model TutorSubject {
   subject Subject @relation(fields: [subjectId], references: [id])
 
   requirementSubjects TutorRequirementSubject[]
+  packageSubjects     PackageSubject[]
 
   @@id([tutorId, subjectId])
   @@index([subjectId, tutorId])
@@ -686,7 +693,6 @@ model TutorRequirement {
   tutor    Tutor                     @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   subjects TutorRequirementSubject[]
   zones    TutorRequirementZone[]
-  packages TuitionPackage[]
 
   @@unique([id, tutorId]) // target of the composite FKs below
   @@index([tutorId, isActive])
@@ -725,6 +731,7 @@ model TutorZone {
 
   tutor        Tutor                  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
   requirements TutorRequirementZone[]
+  packages     PackageZone[]
 
   @@unique([id, tutorId])
   @@index([tutorId])
@@ -818,36 +825,68 @@ model RequirementSubject {
 model TuitionPackage {
   id               String            @id @default(uuid(7)) @db.Uuid
   tutorId          String            @map("tutor_id") @db.Uuid
-  subjectId        Int               @map("subject_id")
-  areaId           Int?              @map("area_id") // null = online / anywhere
-  requirementId    String?           @map("requirement_id") @db.Uuid // null = tutor's default requirement
-  levelCode        Int               @map("level_code") @db.SmallInt // same rules as TuitionRequirement
-  curriculum       Curriculum
-  academicGroup    AcademicGroup?    @map("academic_group")
-  admissionTargets AdmissionTarget[] @default([]) @map("admission_targets")
-  isRetaker        Boolean           @default(false) @map("is_retaker")
-  levelNote        String?           @map("level_note")
-  timeOfDay        DateTime          @map("time_of_day") @db.Time(0)
-  daysPerWeek      Int               @map("days_per_week") @db.SmallInt
-  expectedSalary   Int               @map("expected_salary")
-  studentCount     Int               @default(1) @map("student_count") @db.SmallInt
+  // The offer: what the tutor will finish, how long it takes and what it costs in total.
+  title            String            @db.VarChar(80)
+  description      String            @db.VarChar(600)
+  coverage         PackageCoverage
+  durationWeeks    Int               @map("duration_weeks") @db.SmallInt // 1..104
+  price            Int // BDT for the whole package; the placement fee is a percentage of it
+  // Who and when, same fields and rules as a TutorRequirement set.
+  levelMin         Int               @map("level_min") @db.SmallInt // -4..13, age order
+  levelMax         Int               @map("level_max") @db.SmallInt
+  curricula        Curriculum[] // at least one
+  academicGroups   AcademicGroup[]   @default([]) @map("academic_groups") // empty = any group
+  admissionTargets AdmissionTarget[] @default([]) @map("admission_targets") // empty = any target
+  timeFrom         DateTime          @map("time_from") @db.Time(0)
+  timeTo           DateTime          @map("time_to") @db.Time(0)
+  availableDays    Int               @default(127) @map("available_days") @db.SmallInt // bit0=Sat ... bit6=Fri
+  daysPerWeek      Int?              @map("days_per_week") @db.SmallInt // 1..7; null = any number of the available days
+  maxStudents      Int               @default(1) @map("max_students") @db.SmallInt
   availableFrom    DateTime          @map("available_from") @db.Date
+  teachesOnline    Boolean           @default(false) @map("teaches_online")
   status           ListingStatus     @default(OPEN)
   moderationStatus ModerationStatus  @default(PENDING) @map("moderation_status")
   moderationNote   String?           @map("moderation_note")
   createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  tutor        Tutor             @relation(fields: [tutorId], references: [id])
-  subject      Subject           @relation(fields: [subjectId], references: [id])
-  area         Area?             @relation(fields: [areaId], references: [id], onDelete: Restrict) // never turn a package "online" by deleting an area
-  requirement  TutorRequirement? @relation(fields: [requirementId], references: [id], onDelete: Restrict)
+  tutor        Tutor            @relation(fields: [tutorId], references: [id])
+  subjects     PackageSubject[]
+  zones        PackageZone[]
   applications Application[]
 
+  @@unique([id, tutorId]) // target of the composite FKs below
   @@index([tutorId, createdAt(sort: Desc)])
-  @@index([status, moderationStatus, curriculum, levelCode, subjectId, areaId, createdAt(sort: Desc)])
-  @@index([requirementId])
+  @@index([status, moderationStatus, createdAt(sort: Desc)])
   @@map("tuition_package")
+}
+
+// Subjects of a package. The composite FK to tutor_subject keeps them a subset of profile subjects.
+model PackageSubject {
+  packageId String @map("package_id") @db.Uuid
+  tutorId   String @map("tutor_id") @db.Uuid
+  subjectId Int    @map("subject_id")
+
+  package      TuitionPackage @relation(fields: [packageId, tutorId], references: [id, tutorId], onDelete: Cascade)
+  tutorSubject TutorSubject   @relation(fields: [tutorId, subjectId], references: [tutorId, subjectId], onDelete: Cascade)
+
+  @@id([packageId, subjectId])
+  @@index([subjectId, packageId])
+  @@map("package_subject")
+}
+
+// Zones a package is taught in. Same composite-FK pattern as tutor_requirement_zone.
+model PackageZone {
+  packageId String @map("package_id") @db.Uuid
+  zoneId    String @map("zone_id") @db.Uuid
+  tutorId   String @map("tutor_id") @db.Uuid
+
+  package TuitionPackage @relation(fields: [packageId, tutorId], references: [id, tutorId], onDelete: Cascade)
+  zone    TutorZone      @relation(fields: [zoneId, tutorId], references: [id, tutorId], onDelete: Cascade)
+
+  @@id([packageId, zoneId])
+  @@index([zoneId])
+  @@map("package_zone")
 }
 
 // ───────────────────────── matching ─────────────────────────

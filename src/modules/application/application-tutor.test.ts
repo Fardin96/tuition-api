@@ -229,19 +229,12 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
     expect(res.body.tutorProfile).not.toBeNull();
   });
 
-  it("gives the package's own set (PACKAGE) on a package application", async () => {
+  it("gives no tutor set on a package application; the target carries the package offer", async () => {
     const area = await createArea();
     const math = await createSubject();
     const { tutor } = await createTutor([math.id], area.id);
     await createTutorRequirement(tutor.id, { isDefault: true, subjectIds: [math.id] });
-    const packageSet = await createTutorRequirement(tutor.id, {
-      name: "Package set",
-      subjectIds: [math.id],
-    });
-    const pkg = await createTuitionPackage(tutor.id, {
-      requirementId: packageSet.id,
-      subjectId: math.id,
-    });
+    const pkg = await createTuitionPackage(tutor.id, { subjectIds: [math.id], price: 18000 });
     const { student, headers: studentHeaders } = await createStudent();
     const application = await createApplication({
       packageId: pkg.id,
@@ -251,7 +244,18 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
     });
 
     const res = await getDetail(studentHeaders, application.id);
-    expect(res.body.tutorSet).toMatchObject({ matchedBy: "PACKAGE", set: { id: packageSet.id } });
+    expect(res.body.tutorSet).toBeNull();
+    expect(res.body.tutorProfile).not.toBeNull();
+    expect(res.body.target).toMatchObject({
+      kind: "PACKAGE",
+      id: pkg.id,
+      subjectIds: [math.id],
+      price: 18000,
+      salary: null,
+      title: pkg.title,
+      durationWeeks: pkg.durationWeeks,
+      timeOfDay: "10:00",
+    });
   });
 
   it("hides the tutor profile and set from the tutor side", async () => {

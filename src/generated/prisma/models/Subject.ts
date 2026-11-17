@@ -222,7 +222,6 @@ export type SubjectWhereInput = {
   isActive?: Prisma.BoolFilter<"Subject"> | boolean
   tutorSubjects?: Prisma.TutorSubjectListRelationFilter
   requirementSubjects?: Prisma.RequirementSubjectListRelationFilter
-  packages?: Prisma.TuitionPackageListRelationFilter
 }
 
 export type SubjectOrderByWithRelationInput = {
@@ -233,7 +232,6 @@ export type SubjectOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   tutorSubjects?: Prisma.TutorSubjectOrderByRelationAggregateInput
   requirementSubjects?: Prisma.RequirementSubjectOrderByRelationAggregateInput
-  packages?: Prisma.TuitionPackageOrderByRelationAggregateInput
 }
 
 export type SubjectWhereUniqueInput = Prisma.AtLeast<{
@@ -247,7 +245,6 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Subject"> | boolean
   tutorSubjects?: Prisma.TutorSubjectListRelationFilter
   requirementSubjects?: Prisma.RequirementSubjectListRelationFilter
-  packages?: Prisma.TuitionPackageListRelationFilter
 }, "id" | "name" | "slug">
 
 export type SubjectOrderByWithAggregationInput = {
@@ -281,7 +278,6 @@ export type SubjectCreateInput = {
   isActive?: boolean
   tutorSubjects?: Prisma.TutorSubjectCreateNestedManyWithoutSubjectInput
   requirementSubjects?: Prisma.RequirementSubjectCreateNestedManyWithoutSubjectInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateInput = {
@@ -292,7 +288,6 @@ export type SubjectUncheckedCreateInput = {
   isActive?: boolean
   tutorSubjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutSubjectInput
   requirementSubjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutSubjectInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUpdateInput = {
@@ -302,7 +297,6 @@ export type SubjectUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutorSubjects?: Prisma.TutorSubjectUpdateManyWithoutSubjectNestedInput
   requirementSubjects?: Prisma.RequirementSubjectUpdateManyWithoutSubjectNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateInput = {
@@ -313,7 +307,6 @@ export type SubjectUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutorSubjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   requirementSubjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutSubjectNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateManyInput = {
@@ -406,27 +399,12 @@ export type SubjectUpdateOneRequiredWithoutRequirementSubjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutRequirementSubjectsInput, Prisma.SubjectUpdateWithoutRequirementSubjectsInput>, Prisma.SubjectUncheckedUpdateWithoutRequirementSubjectsInput>
 }
 
-export type SubjectCreateNestedOneWithoutPackagesInput = {
-  create?: Prisma.XOR<Prisma.SubjectCreateWithoutPackagesInput, Prisma.SubjectUncheckedCreateWithoutPackagesInput>
-  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutPackagesInput
-  connect?: Prisma.SubjectWhereUniqueInput
-}
-
-export type SubjectUpdateOneRequiredWithoutPackagesNestedInput = {
-  create?: Prisma.XOR<Prisma.SubjectCreateWithoutPackagesInput, Prisma.SubjectUncheckedCreateWithoutPackagesInput>
-  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutPackagesInput
-  upsert?: Prisma.SubjectUpsertWithoutPackagesInput
-  connect?: Prisma.SubjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutPackagesInput, Prisma.SubjectUpdateWithoutPackagesInput>, Prisma.SubjectUncheckedUpdateWithoutPackagesInput>
-}
-
 export type SubjectCreateWithoutTutorSubjectsInput = {
   name: string
   slug: string
   sortOrder?: number
   isActive?: boolean
   requirementSubjects?: Prisma.RequirementSubjectCreateNestedManyWithoutSubjectInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutTutorSubjectsInput = {
@@ -436,7 +414,6 @@ export type SubjectUncheckedCreateWithoutTutorSubjectsInput = {
   sortOrder?: number
   isActive?: boolean
   requirementSubjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutSubjectInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutTutorSubjectsInput = {
@@ -461,7 +438,6 @@ export type SubjectUpdateWithoutTutorSubjectsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requirementSubjects?: Prisma.RequirementSubjectUpdateManyWithoutSubjectNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutTutorSubjectsInput = {
@@ -471,7 +447,6 @@ export type SubjectUncheckedUpdateWithoutTutorSubjectsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requirementSubjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutSubjectNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutRequirementSubjectsInput = {
@@ -480,7 +455,6 @@ export type SubjectCreateWithoutRequirementSubjectsInput = {
   sortOrder?: number
   isActive?: boolean
   tutorSubjects?: Prisma.TutorSubjectCreateNestedManyWithoutSubjectInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutRequirementSubjectsInput = {
@@ -490,7 +464,6 @@ export type SubjectUncheckedCreateWithoutRequirementSubjectsInput = {
   sortOrder?: number
   isActive?: boolean
   tutorSubjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutSubjectInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutRequirementSubjectsInput = {
@@ -515,7 +488,6 @@ export type SubjectUpdateWithoutRequirementSubjectsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutorSubjects?: Prisma.TutorSubjectUpdateManyWithoutSubjectNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutRequirementSubjectsInput = {
@@ -525,61 +497,6 @@ export type SubjectUncheckedUpdateWithoutRequirementSubjectsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutorSubjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutSubjectNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutSubjectNestedInput
-}
-
-export type SubjectCreateWithoutPackagesInput = {
-  name: string
-  slug: string
-  sortOrder?: number
-  isActive?: boolean
-  tutorSubjects?: Prisma.TutorSubjectCreateNestedManyWithoutSubjectInput
-  requirementSubjects?: Prisma.RequirementSubjectCreateNestedManyWithoutSubjectInput
-}
-
-export type SubjectUncheckedCreateWithoutPackagesInput = {
-  id?: number
-  name: string
-  slug: string
-  sortOrder?: number
-  isActive?: boolean
-  tutorSubjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutSubjectInput
-  requirementSubjects?: Prisma.RequirementSubjectUncheckedCreateNestedManyWithoutSubjectInput
-}
-
-export type SubjectCreateOrConnectWithoutPackagesInput = {
-  where: Prisma.SubjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.SubjectCreateWithoutPackagesInput, Prisma.SubjectUncheckedCreateWithoutPackagesInput>
-}
-
-export type SubjectUpsertWithoutPackagesInput = {
-  update: Prisma.XOR<Prisma.SubjectUpdateWithoutPackagesInput, Prisma.SubjectUncheckedUpdateWithoutPackagesInput>
-  create: Prisma.XOR<Prisma.SubjectCreateWithoutPackagesInput, Prisma.SubjectUncheckedCreateWithoutPackagesInput>
-  where?: Prisma.SubjectWhereInput
-}
-
-export type SubjectUpdateToOneWithWhereWithoutPackagesInput = {
-  where?: Prisma.SubjectWhereInput
-  data: Prisma.XOR<Prisma.SubjectUpdateWithoutPackagesInput, Prisma.SubjectUncheckedUpdateWithoutPackagesInput>
-}
-
-export type SubjectUpdateWithoutPackagesInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  tutorSubjects?: Prisma.TutorSubjectUpdateManyWithoutSubjectNestedInput
-  requirementSubjects?: Prisma.RequirementSubjectUpdateManyWithoutSubjectNestedInput
-}
-
-export type SubjectUncheckedUpdateWithoutPackagesInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  tutorSubjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutSubjectNestedInput
-  requirementSubjects?: Prisma.RequirementSubjectUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 
@@ -590,13 +507,11 @@ export type SubjectUncheckedUpdateWithoutPackagesInput = {
 export type SubjectCountOutputType = {
   tutorSubjects: number
   requirementSubjects: number
-  packages: number
 }
 
 export type SubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutorSubjects?: boolean | SubjectCountOutputTypeCountTutorSubjectsArgs
   requirementSubjects?: boolean | SubjectCountOutputTypeCountRequirementSubjectsArgs
-  packages?: boolean | SubjectCountOutputTypeCountPackagesArgs
 }
 
 /**
@@ -623,13 +538,6 @@ export type SubjectCountOutputTypeCountRequirementSubjectsArgs<ExtArgs extends r
   where?: Prisma.RequirementSubjectWhereInput
 }
 
-/**
- * SubjectCountOutputType without action
- */
-export type SubjectCountOutputTypeCountPackagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TuitionPackageWhereInput
-}
-
 
 export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -639,7 +547,6 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   isActive?: boolean
   tutorSubjects?: boolean | Prisma.Subject$tutorSubjectsArgs<ExtArgs>
   requirementSubjects?: boolean | Prisma.Subject$requirementSubjectsArgs<ExtArgs>
-  packages?: boolean | Prisma.Subject$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.SubjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subject"]>
 
@@ -671,7 +578,6 @@ export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutorSubjects?: boolean | Prisma.Subject$tutorSubjectsArgs<ExtArgs>
   requirementSubjects?: boolean | Prisma.Subject$requirementSubjectsArgs<ExtArgs>
-  packages?: boolean | Prisma.Subject$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.SubjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SubjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -682,7 +588,6 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     tutorSubjects: Prisma.$TutorSubjectPayload<ExtArgs>[]
     requirementSubjects: Prisma.$RequirementSubjectPayload<ExtArgs>[]
-    packages: Prisma.$TuitionPackagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1086,7 +991,6 @@ export interface Prisma__SubjectClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tutorSubjects<T extends Prisma.Subject$tutorSubjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$tutorSubjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   requirementSubjects<T extends Prisma.Subject$requirementSubjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$requirementSubjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RequirementSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  packages<T extends Prisma.Subject$packagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$packagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TuitionPackagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1559,30 +1463,6 @@ export type Subject$requirementSubjectsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.RequirementSubjectScalarFieldEnum | Prisma.RequirementSubjectScalarFieldEnum[]
-}
-
-/**
- * Subject.packages
- */
-export type Subject$packagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the TuitionPackage
-   */
-  select?: Prisma.TuitionPackageSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the TuitionPackage
-   */
-  omit?: Prisma.TuitionPackageOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.TuitionPackageInclude<ExtArgs> | null
-  where?: Prisma.TuitionPackageWhereInput
-  orderBy?: Prisma.TuitionPackageOrderByWithRelationInput | Prisma.TuitionPackageOrderByWithRelationInput[]
-  cursor?: Prisma.TuitionPackageWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.TuitionPackageScalarFieldEnum | Prisma.TuitionPackageScalarFieldEnum[]
 }
 
 /**

@@ -124,7 +124,7 @@ export async function zoneRoutes(app: FastifyInstance) {
           tag: "Tutor zones",
           summary: "Delete a zone",
           description:
-            "Returns the requirement sets that used the zone and how many zones each has left.",
+            "Returns the requirement sets and OPEN packages that used the zone (affectedRequirements, affectedPackages) and how many zones each has left. A package left with no zone and not online stays open but no longer shows in nearby browse.",
           auth: ["TUTOR"],
           errors: [404],
           rateLimit: "20/min per account",

@@ -94,6 +94,8 @@ async function isClosed(tx: Db, where: Prisma.ApplicationWhereInput): Promise<bo
 }
 
 // Locks the listing row when the action decides something about it (confirm, reopen).
+// `salary` is the money the placement fee is based on: a requirement's monthly salary, or a
+// package's total price.
 async function loadTarget(tx: Db, app: AppRow, lock: boolean): Promise<TargetRow> {
   const forUpdate = lock ? Prisma.sql`FOR UPDATE` : Prisma.empty;
   const [row] = app.requirementId
@@ -103,7 +105,7 @@ async function loadTarget(tx: Db, app: AppRow, lock: boolean): Promise<TargetRow
         WHERE id = ${app.requirementId}::uuid ${forUpdate}
       `
     : await tx.$queryRaw<TargetRow[]>`
-        SELECT status, expected_salary AS salary, moderation_status AS "moderationStatus"
+        SELECT status, price AS salary, moderation_status AS "moderationStatus"
         FROM tuition_package
         WHERE id = ${app.packageId}::uuid ${forUpdate}
       `;
@@ -421,6 +423,9 @@ export async function transitionApplication(
           await tx.appNotification.createMany({ data: filled });
         }
 
+        // Placement fee = commission_percent of target.salary: the monthly salary for a
+        // requirement, the TOTAL package price for a package. Skipped when there is no commission
+        // or no amount (salary null).
         const [setting] = await tx.$queryRaw<{ pct: Prisma.Decimal | null }[]>`
           SELECT (value #>> '{}')::numeric AS pct
           FROM platform_setting

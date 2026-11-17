@@ -29,6 +29,7 @@ type ZoneRow = {
 };
 
 type LinkRow = { zoneId: string; requirementId: string };
+type PackageLinkRow = { zoneId: string; packageId: string };
 
 type LimitRequestRow = {
   id: string;
@@ -59,7 +60,8 @@ async function findTutor(accountId: string) {
   });
 }
 
-// Loads zones for one tutor (optionally one zone) with their requirement links, ordered created_at, id.
+// Loads zones for one tutor (optionally one zone) with their requirement and OPEN package links,
+// ordered created_at, id.
 async function loadZones(db: Db, tutorId: string, zoneId?: string): Promise<ZoneResponse[]> {
   const onlyZone = zoneId ? Prisma.sql`AND z.id = ${zoneId}::uuid` : Prisma.empty;
   const rows = await db.$queryRaw<ZoneRow[]>`
@@ -80,11 +82,24 @@ async function loadZones(db: Db, tutorId: string, zoneId?: string): Promise<Zone
     WHERE tutor_id = ${tutorId}::uuid
     ORDER BY requirement_id ASC
   `;
+  const packageLinks = await db.$queryRaw<PackageLinkRow[]>`
+    SELECT pz.zone_id AS "zoneId", pz.package_id AS "packageId"
+    FROM package_zone pz
+    JOIN tuition_package p ON p.id = pz.package_id
+    WHERE pz.tutor_id = ${tutorId}::uuid AND p.status = 'OPEN'
+    ORDER BY pz.package_id ASC
+  `;
   const byZone = new Map<string, string[]>();
   for (const link of links) {
     const list = byZone.get(link.zoneId) ?? [];
     list.push(link.requirementId);
     byZone.set(link.zoneId, list);
+  }
+  const packagesByZone = new Map<string, string[]>();
+  for (const link of packageLinks) {
+    const list = packagesByZone.get(link.zoneId) ?? [];
+    list.push(link.packageId);
+    packagesByZone.set(link.zoneId, list);
   }
 
   return rows.map((row) => ({
@@ -96,6 +111,7 @@ async function loadZones(db: Db, tutorId: string, zoneId?: string): Promise<Zone
     placeId: row.placeId,
     addressText: row.addressText,
     requirementIds: byZone.get(row.id) ?? [],
+    packageIds: packagesByZone.get(row.id) ?? [],
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   }));
@@ -220,6 +236,17 @@ export async function deleteZone(accountId: string, zoneId: string) {
       WHERE trz.zone_id = ${zoneId}::uuid
     `;
 
+    // Read before the delete: the package links go with the zone.
+    const affectedPackages = await tx.$queryRaw<
+      { id: string; title: string; teachesOnline: boolean }[]
+    >`
+      SELECT p.id, p.title, p.teaches_online AS "teachesOnline"
+      FROM package_zone pz
+      JOIN tuition_package p ON p.id = pz.package_id
+      WHERE pz.zone_id = ${zoneId}::uuid AND p.status = 'OPEN'
+      ORDER BY p.id ASC
+    `;
+
     // Links are removed by ON DELETE CASCADE from tutor_zone.
     await tx.$executeRaw`
       DELETE FROM tutor_zone WHERE id = ${zoneId}::uuid AND tutor_id = ${tutor.id}::uuid
@@ -235,7 +262,18 @@ export async function deleteZone(accountId: string, zoneId: string) {
       affectedRequirements.push({ ...requirement, remainingZoneCount: count });
     }
 
-    return { id: zoneId, affectedRequirements };
+    const affectedPackageRows: Array<
+      (typeof affectedPackages)[number] & { remainingZoneCount: number }
+    > = [];
+    for (const pkg of affectedPackages) {
+      const [{ count }] = await tx.$queryRaw<{ count: number }[]>`
+        SELECT count(*)::int AS count FROM package_zone
+        WHERE package_id = ${pkg.id}::uuid
+      `;
+      affectedPackageRows.push({ ...pkg, remainingZoneCount: count });
+    }
+
+    return { id: zoneId, affectedRequirements, affectedPackages: affectedPackageRows };
   });
 }
 

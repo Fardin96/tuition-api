@@ -390,30 +390,48 @@ export async function createTutorRequirement(
   return requirement;
 }
 
+// Defaults: one new subject (added to the tutor's profile), levels 6-10, Bangla medium, online.
+// Subjects passed in are added to the profile too, since package_subject points at tutor_subject.
 export async function createTuitionPackage(
   tutorId: string,
   overrides: {
-    requirementId?: string | null;
     status?: ListingStatus;
-    subjectId?: number;
-    levelCode?: number;
-    curriculum?: Curriculum;
+    title?: string;
+    price?: number;
+    subjectIds?: number[];
+    zoneIds?: string[];
+    teachesOnline?: boolean;
+    levelMin?: number;
+    levelMax?: number;
+    curricula?: Curriculum[];
   } = {},
 ) {
-  const subjectId = overrides.subjectId ?? (await createSubject()).id;
+  const subjectIds = overrides.subjectIds ?? [(await createSubject()).id];
+  await prisma.tutorSubject.createMany({
+    data: subjectIds.map((subjectId) => ({ tutorId, subjectId })),
+    skipDuplicates: true,
+  });
+  const zoneIds = overrides.zoneIds ?? [];
   return prisma.tuitionPackage.create({
     data: {
       tutorId,
-      subjectId,
-      requirementId: overrides.requirementId,
-      levelCode: overrides.levelCode ?? 10,
-      curriculum: overrides.curriculum ?? "BANGLA_MEDIUM",
-      timeOfDay: new Date("2024-01-01T10:00:00Z"),
+      title: overrides.title ?? "SSC Math Booster",
+      description: "Full syllabus revision with weekly tests.",
+      coverage: "FULL_CURRICULUM",
+      durationWeeks: 12,
+      price: overrides.price ?? 15000,
+      levelMin: overrides.levelMin ?? 6,
+      levelMax: overrides.levelMax ?? 10,
+      curricula: overrides.curricula ?? ["BANGLA_MEDIUM"],
+      timeFrom: new Date("1970-01-01T10:00:00Z"),
+      timeTo: new Date("1970-01-01T12:00:00Z"),
       daysPerWeek: 3,
-      expectedSalary: 5000,
       availableFrom: new Date("2024-01-01"),
+      teachesOnline: overrides.teachesOnline ?? zoneIds.length === 0,
       status: overrides.status ?? "OPEN",
       moderationStatus: "APPROVED",
+      subjects: { create: subjectIds.map((subjectId) => ({ subjectId })) },
+      zones: { create: zoneIds.map((zoneId) => ({ zoneId })) },
     },
   });
 }

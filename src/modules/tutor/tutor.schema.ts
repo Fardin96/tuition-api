@@ -374,7 +374,6 @@ export const tutorRequirementResponseSchema = z
     teachesOnline: z.boolean(),
     subjectIds: z.array(z.number()),
     zoneIds: z.array(z.string()),
-    mappedPackageCount: z.number(),
   })
   .meta({ id: "TutorRequirement" });
 

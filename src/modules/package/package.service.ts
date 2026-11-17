@@ -1,10 +1,26 @@
 import { Prisma } from "../../generated/prisma/client.js";
-import { ApplicationStatus } from "../../generated/prisma/enums.js";
+import {
+  ApplicationStatus,
+  type AppNotificationKind,
+  type ListingStatus,
+} from "../../generated/prisma/enums.js";
 import { type Cursor, decodeCursor, encodeCursor } from "../../lib/cursor.js";
-import { appError, notFound } from "../../lib/errors.js";
+import { appError, notFound, validationIssuesError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import type { AuthContext } from "../auth/auth.schema.js";
-import type { PackageBrowseQuery, PackagePageResponse, PackageResponse } from "./package.schema.js";
+import { prepareSetSubjects } from "../tutor/tutor.service.js";
+import {
+  type CreatePackageInput,
+  type MyPackageListResponse,
+  type PackageBrowseQuery,
+  type PackagePageResponse,
+  type PackageResponse,
+  type PackageRules,
+  packageRuleIssues,
+  type UpdatePackageInput,
+} from "./package.schema.js";
+
+type Db = Prisma.TransactionClient;
 
 const DEFAULT_LIMIT = 20;
 const CLOSING_STATUSES = [ApplicationStatus.CONFIRMED, ApplicationStatus.COMPLETED];
@@ -20,9 +36,20 @@ const tutorCardSelect = {
   isListed: true,
 } as const;
 
-type PackageRow = Prisma.TuitionPackageGetPayload<{
-  include: { tutor: { select: typeof tutorCardSelect } };
-}>;
+// Zones are read for the count and for the tutor's own list. Students only ever see zoneCount.
+const packageInclude = {
+  tutor: { select: tutorCardSelect },
+  subjects: { select: { subjectId: true }, orderBy: { subjectId: "asc" } },
+  zones: { select: { zoneId: true }, orderBy: { zoneId: "asc" } },
+} as const;
+
+type PackageRow = Prisma.TuitionPackageGetPayload<{ include: typeof packageInclude }>;
+
+// Times are Time columns and the day is a Date. Only the HH:MM and YYYY-MM-DD parts matter.
+const clockOf = (d: Date) => d.toISOString().slice(11, 16);
+const dayOf = (d: Date) => d.toISOString().slice(0, 10);
+const toClock = (hhmm: string) => new Date(`1970-01-01T${hhmm}:00Z`);
+const toDay = (ymd: string) => new Date(`${ymd}T00:00:00Z`);
 
 function toPackageResponse(
   pkg: PackageRow,
@@ -38,19 +65,25 @@ function toPackageResponse(
       ratingAvg: Number(pkg.tutor.ratingAvg),
       ratingCount: pkg.tutor.ratingCount,
     },
-    subjectId: pkg.subjectId,
-    areaId: pkg.areaId,
-    curriculum: pkg.curriculum,
-    levelCode: pkg.levelCode,
-    academicGroup: pkg.academicGroup,
+    title: pkg.title,
+    description: pkg.description,
+    coverage: pkg.coverage,
+    durationWeeks: pkg.durationWeeks,
+    price: pkg.price,
+    subjectIds: pkg.subjects.map((row) => row.subjectId),
+    levelMin: pkg.levelMin,
+    levelMax: pkg.levelMax,
+    curricula: pkg.curricula,
+    academicGroups: pkg.academicGroups,
     admissionTargets: pkg.admissionTargets,
-    isRetaker: pkg.isRetaker,
-    levelNote: pkg.levelNote,
-    timeOfDay: pkg.timeOfDay.toISOString().slice(11, 16),
+    timeFrom: clockOf(pkg.timeFrom),
+    timeTo: clockOf(pkg.timeTo),
+    availableDays: pkg.availableDays,
     daysPerWeek: pkg.daysPerWeek,
-    expectedSalary: pkg.expectedSalary,
-    studentCount: pkg.studentCount,
-    availableFrom: pkg.availableFrom.toISOString().slice(0, 10),
+    maxStudents: pkg.maxStudents,
+    availableFrom: dayOf(pkg.availableFrom),
+    teachesOnline: pkg.teachesOnline,
+    zoneCount: pkg.zones.length,
     status: pkg.status,
     moderationStatus: pkg.moderationStatus,
     createdAt: pkg.createdAt,
@@ -64,13 +97,17 @@ function browseFilters(query: PackageBrowseQuery, nearby: Prisma.Sql, cursor: Cu
   return {
     nearby,
     curriculum: query.curriculum
-      ? Prisma.sql`AND p.curriculum::text = ${query.curriculum}`
+      ? Prisma.sql`AND ${query.curriculum}::"Curriculum" = ANY(p.curricula)`
       : Prisma.empty,
     levelCode:
       query.levelCode !== undefined
-        ? Prisma.sql`AND p.level_code = ${query.levelCode}`
+        ? Prisma.sql`AND ${query.levelCode} BETWEEN p.level_min AND p.level_max`
         : Prisma.empty,
-    subjectId: query.subjectId ? Prisma.sql`AND p.subject_id = ${query.subjectId}` : Prisma.empty,
+    subjectId: query.subjectId
+      ? Prisma.sql`AND EXISTS (
+          SELECT 1 FROM package_subject ps
+          WHERE ps.package_id = p.id AND ps.subject_id = ${query.subjectId})`
+      : Prisma.empty,
     keyset: cursor
       ? Prisma.sql`AND (p.created_at, p.id) < (${cursor.createdAt}, ${cursor.id}::uuid)`
       : Prisma.empty,
@@ -83,7 +120,7 @@ export async function browsePackages(
 ): Promise<PackagePageResponse> {
   const student = await prisma.student.findUnique({
     where: { accountId },
-    select: { id: true, areaId: true },
+    select: { id: true },
   });
   if (!student) throw notFound("Student profile not found");
 
@@ -95,16 +132,17 @@ export async function browsePackages(
   const hasPin = pinRows[0]?.usable === true;
   const locationMissing = query.scope === "nearby" && !hasPin;
 
-  // Pin path: online packages, or packages whose tutor has a zone covering the student pin.
-  // No-pin path: online packages, or packages in the student's own area.
+  // Pin path: online packages, or packages with one of their own zones covering the student pin.
+  // No-pin path: online packages only. The package's zones are its own, not every zone of the tutor.
   let nearby = Prisma.empty;
   if (query.scope === "nearby") {
     nearby = hasPin
-      ? Prisma.sql`AND (p.area_id IS NULL OR (sl.geog IS NOT NULL AND NOT sl.needs_readdress AND EXISTS (
-            SELECT 1 FROM tutor_zone z
-            WHERE z.tutor_id = p.tutor_id
-              AND ST_DWithin(sl.geog, z.center, z.radius_m))))`
-      : Prisma.sql`AND (p.area_id IS NULL OR p.area_id = ${student.areaId})`;
+      ? Prisma.sql`AND (p.teaches_online OR EXISTS (
+            SELECT 1 FROM package_zone pz
+            JOIN tutor_zone z ON z.id = pz.zone_id
+            WHERE pz.package_id = p.id
+              AND ST_DWithin(sl.geog, z.center, z.radius_m)))`
+      : Prisma.sql`AND p.teaches_online`;
   }
 
   const limit = query.limit ?? DEFAULT_LIMIT;
@@ -136,7 +174,7 @@ export async function browsePackages(
     ids.length
       ? prisma.tuitionPackage.findMany({
           where: { id: { in: ids } },
-          include: { tutor: { select: tutorCardSelect } },
+          include: packageInclude,
         })
       : Promise.resolve([] as PackageRow[]),
     ids.length
@@ -197,7 +235,7 @@ export async function getPackageForCaller(
 
   const pkg = await prisma.tuitionPackage.findUnique({
     where: { id },
-    include: { tutor: { select: tutorCardSelect } },
+    include: packageInclude,
   });
   if (!pkg) throw notFound("Package not found");
 
@@ -230,4 +268,270 @@ export async function getPackageForCaller(
   ]);
 
   return toPackageResponse(pkg, closedRow !== null, myApplication);
+}
+
+async function findTutorId(accountId: string): Promise<string> {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
+  if (!tutor) throw notFound("Tutor profile not found");
+  return tutor.id;
+}
+
+// Same lock as the requirement sets take before they change subjects.
+async function lockTutorRow(db: Db, tutorId: string) {
+  await db.$queryRaw`SELECT id FROM tutor WHERE id = ${tutorId}::uuid FOR UPDATE`;
+}
+
+// Every subject must be on the tutor's profile and every zone must be one of the tutor's own.
+// Lists are already checked for duplicates by zod.
+async function assertPackageRefs(
+  db: Db,
+  tutorId: string,
+  refs: { subjectIds?: number[]; zoneIds?: string[] },
+) {
+  if (refs.subjectIds) {
+    const owned = await db.tutorSubject.findMany({
+      where: { tutorId, subjectId: { in: refs.subjectIds } },
+      select: { subjectId: true },
+    });
+    if (owned.length !== refs.subjectIds.length) {
+      throw appError("InvalidRequirement", 400, "Pick subjects from your profile", {
+        fields: ["subjectIds"],
+      });
+    }
+  }
+  if (refs.zoneIds) {
+    const owned = await db.tutorZone.findMany({
+      where: { tutorId, id: { in: refs.zoneIds } },
+      select: { id: true },
+    });
+    if (owned.length !== refs.zoneIds.length) {
+      throw appError("InvalidRequirement", 400, "Pick zones from your teaching zones", {
+        fields: ["zoneIds"],
+      });
+    }
+  }
+}
+
+// Locks the package row for the rest of the transaction. Missing and foreign packages both give 404.
+async function lockOwnedPackage(db: Db, id: string, tutorId: string): Promise<ListingStatus> {
+  const [row] = await db.$queryRaw<{ tutorId: string; status: ListingStatus }[]>`
+    SELECT tutor_id AS "tutorId", status FROM tuition_package WHERE id = ${id}::uuid FOR UPDATE
+  `;
+  if (!row || row.tutorId !== tutorId) throw notFound("Package not found");
+  return row.status;
+}
+
+// One in-app alert per application. Written in the same transaction as the package change.
+async function alertStudents(
+  db: Db,
+  applications: { id: string; student: { accountId: string } }[],
+  kind: AppNotificationKind,
+) {
+  if (applications.length === 0) return;
+  await db.appNotification.createMany({
+    data: applications.map((a) => ({
+      recipientId: a.student.accountId,
+      kind,
+      applicationId: a.id,
+    })),
+  });
+}
+
+export async function createPackage(
+  account: AuthContext,
+  input: CreatePackageInput,
+): Promise<PackageResponse> {
+  const tutorId = await findTutorId(account.accountId);
+
+  // Readiness comes from SQL tutor_missing_requirements(); never duplicate those checks here.
+  // A package carries its own subjects and zones, so the default requirement set does not count.
+  const [readiness] = await prisma.$queryRaw<{ missing: string[] }[]>`
+    SELECT tutor_missing_requirements(${tutorId}::uuid) AS missing
+  `;
+  const missing = (readiness?.missing ?? []).filter((key) => key !== "default_requirement");
+  if (missing.length > 0) {
+    throw appError("ProfileIncomplete", 403, "Complete your profile before creating a package", {
+      missing,
+    });
+  }
+
+  const { subjectIds, zoneIds, syncProfileSubjects, timeFrom, timeTo, availableFrom, ...values } =
+    input;
+
+  const pkg = await prisma.$transaction(async (tx) => {
+    await lockTutorRow(tx, tutorId);
+    await prepareSetSubjects(tx, tutorId, subjectIds, syncProfileSubjects === true);
+    await assertPackageRefs(tx, tutorId, { subjectIds, zoneIds });
+
+    return tx.tuitionPackage.create({
+      data: {
+        ...values,
+        tutorId,
+        timeFrom: toClock(timeFrom),
+        timeTo: toClock(timeTo),
+        availableFrom: toDay(availableFrom),
+        status: "OPEN",
+        // Admin moderation is skipped for now, so packages go live on create.
+        moderationStatus: "APPROVED",
+        subjects: { create: subjectIds.map((subjectId) => ({ subjectId })) },
+        zones: { create: zoneIds.map((zoneId) => ({ zoneId })) },
+      },
+      include: packageInclude,
+    });
+  });
+  return toPackageResponse(pkg, false, null);
+}
+
+export async function listMyPackages(account: AuthContext): Promise<MyPackageListResponse> {
+  const tutorId = await findTutorId(account.accountId);
+
+  const packages = await prisma.tuitionPackage.findMany({
+    where: { tutorId },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 100,
+    include: packageInclude,
+  });
+
+  // One grouped count for the whole list, instead of a query per package.
+  const counts = await prisma.application.groupBy({
+    by: ["packageId", "status"],
+    where: { packageId: { in: packages.map((p) => p.id) } },
+    _count: { _all: true },
+  });
+
+  const tally = new Map<
+    string,
+    { requestCount: number; pendingRequestCount: number; closed: boolean }
+  >();
+  for (const row of counts) {
+    if (!row.packageId) continue;
+    const t = tally.get(row.packageId) ?? {
+      requestCount: 0,
+      pendingRequestCount: 0,
+      closed: false,
+    };
+    t.requestCount += row._count._all;
+    if (row.status === "PENDING") t.pendingRequestCount += row._count._all;
+    if (CLOSING_STATUSES.some((s) => s === row.status)) t.closed = true;
+    tally.set(row.packageId, t);
+  }
+
+  return {
+    packages: packages.map((pkg) => {
+      const t = tally.get(pkg.id);
+      return {
+        ...toPackageResponse(pkg, t?.closed ?? false, null),
+        zoneIds: pkg.zones.map((row) => row.zoneId),
+        moderationNote: pkg.moderationNote,
+        updatedAt: pkg.updatedAt,
+        pendingRequestCount: t?.pendingRequestCount ?? 0,
+        requestCount: t?.requestCount ?? 0,
+      };
+    }),
+  };
+}
+
+export async function updatePackage(
+  account: AuthContext,
+  id: string,
+  input: UpdatePackageInput,
+): Promise<PackageResponse> {
+  const tutorId = await findTutorId(account.accountId);
+  const { subjectIds, zoneIds, syncProfileSubjects, timeFrom, timeTo, availableFrom, ...values } =
+    input;
+
+  await prisma.$transaction(async (tx) => {
+    // Tutor row first, then the package, so this never waits on a subject change in the other order.
+    await lockTutorRow(tx, tutorId);
+    const status = await lockOwnedPackage(tx, id, tutorId);
+    if (status !== "OPEN") {
+      throw appError("ListingNotOpen", 409, "Only open packages can be edited");
+    }
+
+    const existing = await tx.tuitionPackage.findUniqueOrThrow({
+      where: { id },
+      include: packageInclude,
+    });
+
+    // The shared rules run on the merged values. An absent key keeps the stored value; null daysPerWeek clears it.
+    const merged: PackageRules = {
+      levelMin: values.levelMin ?? existing.levelMin,
+      levelMax: values.levelMax ?? existing.levelMax,
+      curricula: values.curricula ?? existing.curricula,
+      academicGroups: values.academicGroups ?? existing.academicGroups,
+      admissionTargets: values.admissionTargets ?? existing.admissionTargets,
+      timeFrom: timeFrom ?? clockOf(existing.timeFrom),
+      timeTo: timeTo ?? clockOf(existing.timeTo),
+      availableDays: values.availableDays ?? existing.availableDays,
+      daysPerWeek: values.daysPerWeek !== undefined ? values.daysPerWeek : existing.daysPerWeek,
+      teachesOnline: values.teachesOnline ?? existing.teachesOnline,
+      zoneIds: zoneIds ?? existing.zones.map((row) => row.zoneId),
+    };
+    const issues = packageRuleIssues(merged);
+    if (issues.length > 0) throw validationIssuesError("Invalid package", issues);
+
+    if (subjectIds !== undefined) {
+      await prepareSetSubjects(tx, tutorId, subjectIds, syncProfileSubjects === true);
+    }
+    await assertPackageRefs(tx, tutorId, { subjectIds, zoneIds });
+
+    if (subjectIds !== undefined) {
+      await tx.packageSubject.deleteMany({ where: { packageId: id } });
+      await tx.packageSubject.createMany({
+        data: subjectIds.map((subjectId) => ({ packageId: id, tutorId, subjectId })),
+      });
+    }
+    if (zoneIds !== undefined) {
+      await tx.packageZone.deleteMany({ where: { packageId: id } });
+      await tx.packageZone.createMany({
+        data: zoneIds.map((zoneId) => ({ packageId: id, tutorId, zoneId })),
+      });
+    }
+
+    // Edits stay live and moderationStatus is not reset. Admin notice and revert are planned (endpoints.md #55).
+    await tx.tuitionPackage.update({
+      where: { id },
+      data: {
+        ...values,
+        ...(timeFrom !== undefined && { timeFrom: toClock(timeFrom) }),
+        ...(timeTo !== undefined && { timeTo: toClock(timeTo) }),
+        ...(availableFrom !== undefined && { availableFrom: toDay(availableFrom) }),
+      },
+    });
+
+    const applications = await tx.application.findMany({
+      where: { packageId: id, status: { in: ["PENDING", "CONFIRMED"] } },
+      select: { id: true, student: { select: { accountId: true } } },
+    });
+    await alertStudents(tx, applications, "PACKAGE_UPDATED");
+  });
+
+  return getPackageForCaller(id, account);
+}
+
+export async function closePackage(account: AuthContext, id: string): Promise<PackageResponse> {
+  const tutorId = await findTutorId(account.accountId);
+
+  await prisma.$transaction(async (tx) => {
+    const status = await lockOwnedPackage(tx, id, tutorId);
+    if (status !== "OPEN") {
+      throw appError("ListingNotOpen", 409, "This package is already closed");
+    }
+    await tx.tuitionPackage.update({ where: { id }, data: { status: "CLOSED" } });
+
+    // Confirmed placements are not touched. Only requests still waiting for the tutor expire.
+    const pending = await tx.application.findMany({
+      where: { packageId: id, status: "PENDING" },
+      select: { id: true, student: { select: { accountId: true } } },
+    });
+    if (pending.length > 0) {
+      await tx.application.updateMany({
+        where: { id: { in: pending.map((a) => a.id) } },
+        data: { status: "EXPIRED" },
+      });
+    }
+    await alertStudents(tx, pending, "PACKAGE_CLOSED");
+  });
+
+  return getPackageForCaller(id, account);
 }

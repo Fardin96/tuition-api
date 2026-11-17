@@ -97,7 +97,15 @@ describe("POST /requirements/:id/applications (apply, #57)", () => {
       allowedActions: ["withdraw"],
       tutor: { id: tutor.id },
       student: { id: student.id },
-      target: { kind: "REQUIREMENT", id: requirement.id, status: "OPEN", closed: false },
+      target: {
+        kind: "REQUIREMENT",
+        id: requirement.id,
+        status: "OPEN",
+        closed: false,
+        title: null,
+        price: null,
+        durationWeeks: null,
+      },
     });
 
     const rows = await notificationsFor(body.id);
@@ -281,7 +289,19 @@ describe("POST /packages/:id/applications (request package, #58)", () => {
       allowedActions: ["withdraw"],
       student: { id: student.id },
       tutor: { id: tutor.id },
-      target: { kind: "PACKAGE", id: pkg.id, closed: false },
+      target: {
+        kind: "PACKAGE",
+        id: pkg.id,
+        closed: false,
+        title: pkg.title,
+        price: pkg.price,
+        durationWeeks: pkg.durationWeeks,
+        salary: null,
+        areaId: null,
+        curriculum: null,
+        levelCode: null,
+        academicGroup: null,
+      },
     });
 
     const rows = await notificationsFor(body.id);
@@ -406,6 +426,34 @@ describe("confirm (#63)", () => {
     expect(Number(fees[0].amountDue)).toBe(500);
     expect(Number(fees[0].amountPaid)).toBe(0);
     expect(fees[0].dueDate.toISOString().slice(0, 10)).toBe(dhakaDatePlus(7));
+  });
+
+  it("a package's placement fee is commission x the TOTAL package price", async () => {
+    const app = await createTestApp();
+    await setCommission(10);
+    const { tutor, actor: tutorActor } = await createPlainTutor();
+    await prisma.tutor.update({ where: { id: tutor.id }, data: { isListed: true } });
+    const pkg = await createTuitionPackage(tutor.id, { price: 15000 });
+    const { student } = await createStudent();
+    const application = await createApplication({
+      packageId: pkg.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+    });
+
+    // A student-initiated application is confirmed by the tutor.
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/applications/${application.id}/confirm`,
+      headers: tutorActor.headers,
+    });
+    expect(res.statusCode).toBe(200);
+
+    const fees = await prisma.platformFee.findMany({ where: { applicationId: application.id } });
+    expect(fees).toHaveLength(1);
+    expect(fees[0]).toMatchObject({ feeType: "PLACEMENT", status: "DUE" });
+    expect(Number(fees[0].amountDue)).toBe(1500);
   });
 
   it("creates no fee when the commission setting is absent", async () => {

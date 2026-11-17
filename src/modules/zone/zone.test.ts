@@ -4,6 +4,7 @@ import {
   createAccount,
   createAdmin,
   createTestApp,
+  createTuitionPackage,
   createTutorProfile,
   createTutorRequirement,
   createTutorZone,
@@ -115,6 +116,23 @@ describe("zone routes", () => {
       expect(zones.map((z: { id: string }) => z.id)).toEqual([older, newer]);
       expect(zones[0].requirementIds).toEqual([]);
       expect(zones[1].requirementIds).toEqual([requirement.id]);
+    });
+
+    it("lists the OPEN package ids per zone, ascending, and leaves out CLOSED packages", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const zoneA = await createTutorZone(tutor.id, { label: "A" });
+      const zoneB = await createTutorZone(tutor.id, { label: "B", lat: 23.7 });
+      const first = await createTuitionPackage(tutor.id, { zoneIds: [zoneA] });
+      const second = await createTuitionPackage(tutor.id, { zoneIds: [zoneA] });
+      await createTuitionPackage(tutor.id, { zoneIds: [zoneA], status: "CLOSED" });
+
+      const res = await app.inject({ method: "GET", url: `${BASE}/zones`, headers });
+
+      const zones: { id: string; packageIds: string[] }[] = JSON.parse(res.body).zones;
+      const byId = Object.fromEntries(zones.map((z) => [z.id, z]));
+      expect(byId[zoneA].packageIds).toEqual([first.id, second.id].sort());
+      expect(byId[zoneB].packageIds).toEqual([]);
     });
 
     it("rejects a radius below 1000 m", async () => {
@@ -335,6 +353,65 @@ describe("zone routes", () => {
         SELECT id FROM tutor_zone WHERE id = ${shared}::uuid
       `;
       expect(zoneGone).toHaveLength(0);
+    });
+
+    it("reports the OPEN packages that used the zone, with the zones each has left", async () => {
+      const app = await createTestApp();
+      const { tutor, headers } = await setupTutor();
+      const shared = await createTutorZone(tutor.id, { label: "Shared" });
+      const kept = await createTutorZone(tutor.id, { label: "Kept", lat: 23.7 });
+      const both = await createTuitionPackage(tutor.id, {
+        title: "Both zones",
+        zoneIds: [shared, kept],
+      });
+      const onlyShared = await createTuitionPackage(tutor.id, {
+        title: "Only shared",
+        zoneIds: [shared],
+        teachesOnline: false,
+      });
+      const onlineShared = await createTuitionPackage(tutor.id, {
+        title: "Online too",
+        zoneIds: [shared],
+        teachesOnline: true,
+      });
+      await createTuitionPackage(tutor.id, {
+        title: "Closed",
+        zoneIds: [shared],
+        status: "CLOSED",
+      });
+
+      const res = await app.inject({
+        method: "DELETE",
+        url: `${BASE}/zones/${shared}`,
+        headers,
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body);
+      expect(body.affectedPackages).toHaveLength(3);
+      const byId = Object.fromEntries(body.affectedPackages.map((p: { id: string }) => [p.id, p]));
+      expect(byId[both.id]).toEqual({
+        id: both.id,
+        title: "Both zones",
+        teachesOnline: false,
+        remainingZoneCount: 1,
+      });
+      expect(byId[onlyShared.id]).toEqual({
+        id: onlyShared.id,
+        title: "Only shared",
+        teachesOnline: false,
+        remainingZoneCount: 0,
+      });
+      expect(byId[onlineShared.id]).toMatchObject({
+        title: "Online too",
+        teachesOnline: true,
+        remainingZoneCount: 0,
+      });
+
+      // The package stays OPEN; only its zone link is gone.
+      const pkg = await prisma.tuitionPackage.findUniqueOrThrow({ where: { id: onlyShared.id } });
+      expect(pkg.status).toBe("OPEN");
+      expect(await prisma.packageZone.count({ where: { packageId: onlyShared.id } })).toBe(0);
     });
 
     it("returns 404 for another tutor's zone", async () => {

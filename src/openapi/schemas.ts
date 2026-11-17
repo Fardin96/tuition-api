@@ -17,7 +17,7 @@ export const errorIssueSchema = z
 
 export const errorResponseSchema = z
   .object({
-    error: z.string().meta({ description: "Error name, for example RequirementInUse." }),
+    error: z.string().meta({ description: "Error name, for example RequirementIsDefault." }),
     code: errorCodeSchema,
     message: z.string().meta({ description: "Human-readable message." }),
     details: z

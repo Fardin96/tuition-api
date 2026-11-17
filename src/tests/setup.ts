@@ -53,6 +53,8 @@ beforeEach(async () => {
       student,
       file_asset,
       tuition_package,
+      package_subject,
+      package_zone,
       subject,
       area,
       blog_post,

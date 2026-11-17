@@ -83,6 +83,14 @@ export const ListingStatus = {
 export type ListingStatus = (typeof ListingStatus)[keyof typeof ListingStatus]
 
 
+export const PackageCoverage = {
+  FULL_CURRICULUM: 'FULL_CURRICULUM',
+  PARTIAL: 'PARTIAL'
+} as const
+
+export type PackageCoverage = (typeof PackageCoverage)[keyof typeof PackageCoverage]
+
+
 export const ModerationStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
@@ -269,7 +277,9 @@ export const AppNotificationKind = {
   APPLICATION_WITHDRAWN: 'APPLICATION_WITHDRAWN',
   APPLICATION_REOPENED: 'APPLICATION_REOPENED',
   APPLICATION_CANCELLED: 'APPLICATION_CANCELLED',
-  APPLICATION_COMPLETED: 'APPLICATION_COMPLETED'
+  APPLICATION_COMPLETED: 'APPLICATION_COMPLETED',
+  PACKAGE_UPDATED: 'PACKAGE_UPDATED',
+  PACKAGE_CLOSED: 'PACKAGE_CLOSED'
 } as const
 
 export type AppNotificationKind = (typeof AppNotificationKind)[keyof typeof AppNotificationKind]

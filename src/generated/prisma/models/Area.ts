@@ -211,7 +211,6 @@ export type AreaWhereInput = {
   students?: Prisma.StudentListRelationFilter
   tutorAreas?: Prisma.TutorAreaListRelationFilter
   requirements?: Prisma.TuitionRequirementListRelationFilter
-  packages?: Prisma.TuitionPackageListRelationFilter
 }
 
 export type AreaOrderByWithRelationInput = {
@@ -222,7 +221,6 @@ export type AreaOrderByWithRelationInput = {
   students?: Prisma.StudentOrderByRelationAggregateInput
   tutorAreas?: Prisma.TutorAreaOrderByRelationAggregateInput
   requirements?: Prisma.TuitionRequirementOrderByRelationAggregateInput
-  packages?: Prisma.TuitionPackageOrderByRelationAggregateInput
 }
 
 export type AreaWhereUniqueInput = Prisma.AtLeast<{
@@ -237,7 +235,6 @@ export type AreaWhereUniqueInput = Prisma.AtLeast<{
   students?: Prisma.StudentListRelationFilter
   tutorAreas?: Prisma.TutorAreaListRelationFilter
   requirements?: Prisma.TuitionRequirementListRelationFilter
-  packages?: Prisma.TuitionPackageListRelationFilter
 }, "id" | "district_name">
 
 export type AreaOrderByWithAggregationInput = {
@@ -269,7 +266,6 @@ export type AreaCreateInput = {
   students?: Prisma.StudentCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutAreaInput
 }
 
 export type AreaUncheckedCreateInput = {
@@ -280,7 +276,6 @@ export type AreaUncheckedCreateInput = {
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutAreaInput
 }
 
 export type AreaUpdateInput = {
@@ -290,7 +285,6 @@ export type AreaUpdateInput = {
   students?: Prisma.StudentUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutAreaNestedInput
 }
 
 export type AreaUncheckedUpdateInput = {
@@ -301,7 +295,6 @@ export type AreaUncheckedUpdateInput = {
   students?: Prisma.StudentUncheckedUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUncheckedUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutAreaNestedInput
 }
 
 export type AreaCreateManyInput = {
@@ -412,29 +405,12 @@ export type AreaUpdateOneWithoutRequirementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AreaUpdateToOneWithWhereWithoutRequirementsInput, Prisma.AreaUpdateWithoutRequirementsInput>, Prisma.AreaUncheckedUpdateWithoutRequirementsInput>
 }
 
-export type AreaCreateNestedOneWithoutPackagesInput = {
-  create?: Prisma.XOR<Prisma.AreaCreateWithoutPackagesInput, Prisma.AreaUncheckedCreateWithoutPackagesInput>
-  connectOrCreate?: Prisma.AreaCreateOrConnectWithoutPackagesInput
-  connect?: Prisma.AreaWhereUniqueInput
-}
-
-export type AreaUpdateOneWithoutPackagesNestedInput = {
-  create?: Prisma.XOR<Prisma.AreaCreateWithoutPackagesInput, Prisma.AreaUncheckedCreateWithoutPackagesInput>
-  connectOrCreate?: Prisma.AreaCreateOrConnectWithoutPackagesInput
-  upsert?: Prisma.AreaUpsertWithoutPackagesInput
-  disconnect?: Prisma.AreaWhereInput | boolean
-  delete?: Prisma.AreaWhereInput | boolean
-  connect?: Prisma.AreaWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AreaUpdateToOneWithWhereWithoutPackagesInput, Prisma.AreaUpdateWithoutPackagesInput>, Prisma.AreaUncheckedUpdateWithoutPackagesInput>
-}
-
 export type AreaCreateWithoutStudentsInput = {
   division: string
   district: string
   name: string
   tutorAreas?: Prisma.TutorAreaCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutAreaInput
 }
 
 export type AreaUncheckedCreateWithoutStudentsInput = {
@@ -444,7 +420,6 @@ export type AreaUncheckedCreateWithoutStudentsInput = {
   name: string
   tutorAreas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutAreaInput
 }
 
 export type AreaCreateOrConnectWithoutStudentsInput = {
@@ -469,7 +444,6 @@ export type AreaUpdateWithoutStudentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   tutorAreas?: Prisma.TutorAreaUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutAreaNestedInput
 }
 
 export type AreaUncheckedUpdateWithoutStudentsInput = {
@@ -479,7 +453,6 @@ export type AreaUncheckedUpdateWithoutStudentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   tutorAreas?: Prisma.TutorAreaUncheckedUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutAreaNestedInput
 }
 
 export type AreaCreateWithoutTutorAreasInput = {
@@ -488,7 +461,6 @@ export type AreaCreateWithoutTutorAreasInput = {
   name: string
   students?: Prisma.StudentCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutAreaInput
 }
 
 export type AreaUncheckedCreateWithoutTutorAreasInput = {
@@ -498,7 +470,6 @@ export type AreaUncheckedCreateWithoutTutorAreasInput = {
   name: string
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutAreaInput
 }
 
 export type AreaCreateOrConnectWithoutTutorAreasInput = {
@@ -523,7 +494,6 @@ export type AreaUpdateWithoutTutorAreasInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   students?: Prisma.StudentUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutAreaNestedInput
 }
 
 export type AreaUncheckedUpdateWithoutTutorAreasInput = {
@@ -533,7 +503,6 @@ export type AreaUncheckedUpdateWithoutTutorAreasInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   students?: Prisma.StudentUncheckedUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutAreaNestedInput
 }
 
 export type AreaCreateWithoutRequirementsInput = {
@@ -542,7 +511,6 @@ export type AreaCreateWithoutRequirementsInput = {
   name: string
   students?: Prisma.StudentCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutAreaInput
 }
 
 export type AreaUncheckedCreateWithoutRequirementsInput = {
@@ -552,7 +520,6 @@ export type AreaUncheckedCreateWithoutRequirementsInput = {
   name: string
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutAreaInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutAreaInput
 }
 
 export type AreaCreateOrConnectWithoutRequirementsInput = {
@@ -577,7 +544,6 @@ export type AreaUpdateWithoutRequirementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   students?: Prisma.StudentUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutAreaNestedInput
 }
 
 export type AreaUncheckedUpdateWithoutRequirementsInput = {
@@ -587,61 +553,6 @@ export type AreaUncheckedUpdateWithoutRequirementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   students?: Prisma.StudentUncheckedUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUncheckedUpdateManyWithoutAreaNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutAreaNestedInput
-}
-
-export type AreaCreateWithoutPackagesInput = {
-  division: string
-  district: string
-  name: string
-  students?: Prisma.StudentCreateNestedManyWithoutAreaInput
-  tutorAreas?: Prisma.TutorAreaCreateNestedManyWithoutAreaInput
-  requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutAreaInput
-}
-
-export type AreaUncheckedCreateWithoutPackagesInput = {
-  id?: number
-  division: string
-  district: string
-  name: string
-  students?: Prisma.StudentUncheckedCreateNestedManyWithoutAreaInput
-  tutorAreas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutAreaInput
-  requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutAreaInput
-}
-
-export type AreaCreateOrConnectWithoutPackagesInput = {
-  where: Prisma.AreaWhereUniqueInput
-  create: Prisma.XOR<Prisma.AreaCreateWithoutPackagesInput, Prisma.AreaUncheckedCreateWithoutPackagesInput>
-}
-
-export type AreaUpsertWithoutPackagesInput = {
-  update: Prisma.XOR<Prisma.AreaUpdateWithoutPackagesInput, Prisma.AreaUncheckedUpdateWithoutPackagesInput>
-  create: Prisma.XOR<Prisma.AreaCreateWithoutPackagesInput, Prisma.AreaUncheckedCreateWithoutPackagesInput>
-  where?: Prisma.AreaWhereInput
-}
-
-export type AreaUpdateToOneWithWhereWithoutPackagesInput = {
-  where?: Prisma.AreaWhereInput
-  data: Prisma.XOR<Prisma.AreaUpdateWithoutPackagesInput, Prisma.AreaUncheckedUpdateWithoutPackagesInput>
-}
-
-export type AreaUpdateWithoutPackagesInput = {
-  division?: Prisma.StringFieldUpdateOperationsInput | string
-  district?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  students?: Prisma.StudentUpdateManyWithoutAreaNestedInput
-  tutorAreas?: Prisma.TutorAreaUpdateManyWithoutAreaNestedInput
-  requirements?: Prisma.TuitionRequirementUpdateManyWithoutAreaNestedInput
-}
-
-export type AreaUncheckedUpdateWithoutPackagesInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  division?: Prisma.StringFieldUpdateOperationsInput | string
-  district?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  students?: Prisma.StudentUncheckedUpdateManyWithoutAreaNestedInput
-  tutorAreas?: Prisma.TutorAreaUncheckedUpdateManyWithoutAreaNestedInput
-  requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutAreaNestedInput
 }
 
 
@@ -653,14 +564,12 @@ export type AreaCountOutputType = {
   students: number
   tutorAreas: number
   requirements: number
-  packages: number
 }
 
 export type AreaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   students?: boolean | AreaCountOutputTypeCountStudentsArgs
   tutorAreas?: boolean | AreaCountOutputTypeCountTutorAreasArgs
   requirements?: boolean | AreaCountOutputTypeCountRequirementsArgs
-  packages?: boolean | AreaCountOutputTypeCountPackagesArgs
 }
 
 /**
@@ -694,13 +603,6 @@ export type AreaCountOutputTypeCountRequirementsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.TuitionRequirementWhereInput
 }
 
-/**
- * AreaCountOutputType without action
- */
-export type AreaCountOutputTypeCountPackagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TuitionPackageWhereInput
-}
-
 
 export type AreaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -710,7 +612,6 @@ export type AreaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   students?: boolean | Prisma.Area$studentsArgs<ExtArgs>
   tutorAreas?: boolean | Prisma.Area$tutorAreasArgs<ExtArgs>
   requirements?: boolean | Prisma.Area$requirementsArgs<ExtArgs>
-  packages?: boolean | Prisma.Area$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.AreaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["area"]>
 
@@ -740,7 +641,6 @@ export type AreaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   students?: boolean | Prisma.Area$studentsArgs<ExtArgs>
   tutorAreas?: boolean | Prisma.Area$tutorAreasArgs<ExtArgs>
   requirements?: boolean | Prisma.Area$requirementsArgs<ExtArgs>
-  packages?: boolean | Prisma.Area$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.AreaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AreaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -752,7 +652,6 @@ export type $AreaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     students: Prisma.$StudentPayload<ExtArgs>[]
     tutorAreas: Prisma.$TutorAreaPayload<ExtArgs>[]
     requirements: Prisma.$TuitionRequirementPayload<ExtArgs>[]
-    packages: Prisma.$TuitionPackagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1156,7 +1055,6 @@ export interface Prisma__AreaClient<T, Null = never, ExtArgs extends runtime.Typ
   students<T extends Prisma.Area$studentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Area$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tutorAreas<T extends Prisma.Area$tutorAreasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Area$tutorAreasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorAreaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   requirements<T extends Prisma.Area$requirementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Area$requirementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TuitionRequirementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  packages<T extends Prisma.Area$packagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Area$packagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TuitionPackagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1652,30 +1550,6 @@ export type Area$requirementsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.TuitionRequirementScalarFieldEnum | Prisma.TuitionRequirementScalarFieldEnum[]
-}
-
-/**
- * Area.packages
- */
-export type Area$packagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the TuitionPackage
-   */
-  select?: Prisma.TuitionPackageSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the TuitionPackage
-   */
-  omit?: Prisma.TuitionPackageOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.TuitionPackageInclude<ExtArgs> | null
-  where?: Prisma.TuitionPackageWhereInput
-  orderBy?: Prisma.TuitionPackageOrderByWithRelationInput | Prisma.TuitionPackageOrderByWithRelationInput[]
-  cursor?: Prisma.TuitionPackageWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.TuitionPackageScalarFieldEnum | Prisma.TuitionPackageScalarFieldEnum[]
 }
 
 /**

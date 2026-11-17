@@ -129,7 +129,9 @@
               "APPLICATION_WITHDRAWN",
               "APPLICATION_REOPENED",
               "APPLICATION_CANCELLED",
-              "APPLICATION_COMPLETED"
+              "APPLICATION_COMPLETED",
+              "PACKAGE_UPDATED",
+              "PACKAGE_CLOSED"
             ]
           },
           "applicationId": {
@@ -590,6 +592,24 @@
               "string",
               "null"
             ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "price": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "durationWeeks": {
+            "type": [
+              "number",
+              "null"
+            ]
           }
         },
         "required": [
@@ -604,7 +624,10 @@
           "academicGroup",
           "salary",
           "daysPerWeek",
-          "timeOfDay"
+          "timeOfDay",
+          "title",
+          "price",
+          "durationWeeks"
         ],
         "additionalProperties": false
       },
@@ -769,8 +792,7 @@
             "type": "string",
             "enum": [
               "MATCH",
-              "DEFAULT",
-              "PACKAGE"
+              "DEFAULT"
             ]
           },
           "set": {
@@ -1136,6 +1158,174 @@
         "required": [
           "consentVersion",
           "consentAcceptedAt"
+        ],
+        "additionalProperties": false
+      },
+      "CreatePackageInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "coverage": {
+            "type": "string",
+            "enum": [
+              "FULL_CURRICULUM",
+              "PARTIAL"
+            ]
+          },
+          "durationWeeks": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 104
+          },
+          "price": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 5000000
+          },
+          "subjectIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "levelMin": {
+            "type": "integer",
+            "minimum": -4,
+            "maximum": 13
+          },
+          "levelMax": {
+            "type": "integer",
+            "minimum": -4,
+            "maximum": 13
+          },
+          "curricula": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BANGLA_MEDIUM",
+                "ENGLISH_VERSION",
+                "EM_CAMBRIDGE",
+                "EM_EDEXCEL",
+                "EM_IB",
+                "EM_AMERICAN",
+                "MADRASAH"
+              ]
+            }
+          },
+          "academicGroups": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "SCIENCE",
+                "BUSINESS",
+                "HUMANITIES",
+                "MUJABBID"
+              ]
+            }
+          },
+          "admissionTargets": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ENGINEERING",
+                "MEDICAL",
+                "VARSITY_SCIENCE",
+                "VARSITY_HUMANITIES",
+                "VARSITY_BUSINESS",
+                "AGRICULTURE",
+                "IBA_BUP",
+                "PRIVATE_UNI",
+                "ABROAD_TESTS",
+                "ISSB"
+              ]
+            }
+          },
+          "timeFrom": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "timeTo": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "availableDays": {
+            "default": 127,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 127
+          },
+          "daysPerWeek": {
+            "default": null,
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxStudents": {
+            "default": 1,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "availableFrom": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "teachesOnline": {
+            "default": false,
+            "type": "boolean"
+          },
+          "zoneIds": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "syncProfileSubjects": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "coverage",
+          "durationWeeks",
+          "price",
+          "subjectIds",
+          "levelMin",
+          "levelMax",
+          "curricula",
+          "timeFrom",
+          "timeTo",
+          "availableFrom"
         ],
         "additionalProperties": false
       },
@@ -2062,7 +2252,6 @@
           "WHATSAPP_IN_USE",
           "REQUIREMENT_LIMIT_REACHED",
           "REQUIREMENT_IS_DEFAULT",
-          "REQUIREMENT_IN_USE",
           "REQUIREMENT_ARCHIVED",
           "REQUIREMENT_NO_SUBJECTS",
           "REQUIREMENT_LOSES_LAST_SUBJECT",
@@ -2107,7 +2296,7 @@
         "properties": {
           "error": {
             "type": "string",
-            "description": "Error name, for example RequirementInUse."
+            "description": "Error name, for example RequirementIsDefault."
           },
           "code": {
             "$ref": "#/components/schemas/ErrorCode"
@@ -2841,6 +3030,256 @@
         ],
         "additionalProperties": false
       },
+      "MyPackage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tutor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "gender": {
+                "type": "string",
+                "enum": [
+                  "MALE",
+                  "FEMALE",
+                  "OTHER"
+                ]
+              },
+              "ratingAvg": {
+                "type": "number"
+              },
+              "ratingCount": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "gender",
+              "ratingAvg",
+              "ratingCount"
+            ],
+            "additionalProperties": false
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coverage": {
+            "type": "string",
+            "enum": [
+              "FULL_CURRICULUM",
+              "PARTIAL"
+            ]
+          },
+          "durationWeeks": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "subjectIds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "levelMin": {
+            "type": "number"
+          },
+          "levelMax": {
+            "type": "number"
+          },
+          "curricula": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BANGLA_MEDIUM",
+                "ENGLISH_VERSION",
+                "EM_CAMBRIDGE",
+                "EM_EDEXCEL",
+                "EM_IB",
+                "EM_AMERICAN",
+                "MADRASAH"
+              ]
+            }
+          },
+          "academicGroups": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "SCIENCE",
+                "BUSINESS",
+                "HUMANITIES",
+                "MUJABBID"
+              ]
+            }
+          },
+          "admissionTargets": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ENGINEERING",
+                "MEDICAL",
+                "VARSITY_SCIENCE",
+                "VARSITY_HUMANITIES",
+                "VARSITY_BUSINESS",
+                "AGRICULTURE",
+                "IBA_BUP",
+                "PRIVATE_UNI",
+                "ABROAD_TESTS",
+                "ISSB"
+              ]
+            }
+          },
+          "timeFrom": {
+            "type": "string"
+          },
+          "timeTo": {
+            "type": "string"
+          },
+          "availableDays": {
+            "type": "number"
+          },
+          "daysPerWeek": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "maxStudents": {
+            "type": "number"
+          },
+          "availableFrom": {
+            "type": "string"
+          },
+          "teachesOnline": {
+            "type": "boolean"
+          },
+          "zoneCount": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "FILLED",
+              "CLOSED",
+              "EXPIRED"
+            ]
+          },
+          "moderationStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closed": {
+            "type": "boolean"
+          },
+          "myApplication": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MyApplication"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "zoneIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "moderationNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pendingRequestCount": {
+            "type": "number"
+          },
+          "requestCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "tutor",
+          "title",
+          "description",
+          "coverage",
+          "durationWeeks",
+          "price",
+          "subjectIds",
+          "levelMin",
+          "levelMax",
+          "curricula",
+          "academicGroups",
+          "admissionTargets",
+          "timeFrom",
+          "timeTo",
+          "availableDays",
+          "daysPerWeek",
+          "maxStudents",
+          "availableFrom",
+          "teachesOnline",
+          "zoneCount",
+          "status",
+          "moderationStatus",
+          "createdAt",
+          "closed",
+          "myApplication",
+          "zoneIds",
+          "moderationNote",
+          "updatedAt",
+          "pendingRequestCount",
+          "requestCount"
+        ],
+        "additionalProperties": false
+      },
+      "MyPackageList": {
+        "type": "object",
+        "properties": {
+          "packages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyPackage"
+            }
+          }
+        },
+        "required": [
+          "packages"
+        ],
+        "additionalProperties": false
+      },
       "NotificationPage": {
         "type": "object",
         "properties": {
@@ -2908,45 +3347,63 @@
             ],
             "additionalProperties": false
           },
-          "subjectId": {
-            "type": "number"
+          "title": {
+            "type": "string"
           },
-          "areaId": {
-            "type": [
-              "number",
-              "null"
-            ]
+          "description": {
+            "type": "string"
           },
-          "curriculum": {
+          "coverage": {
             "type": "string",
             "enum": [
-              "BANGLA_MEDIUM",
-              "ENGLISH_VERSION",
-              "EM_CAMBRIDGE",
-              "EM_EDEXCEL",
-              "EM_IB",
-              "EM_AMERICAN",
-              "MADRASAH"
+              "FULL_CURRICULUM",
+              "PARTIAL"
             ]
           },
-          "levelCode": {
+          "durationWeeks": {
             "type": "number"
           },
-          "academicGroup": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "SCIENCE",
-                  "BUSINESS",
-                  "HUMANITIES",
-                  "MUJABBID"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ]
+          "price": {
+            "type": "number"
+          },
+          "subjectIds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "levelMin": {
+            "type": "number"
+          },
+          "levelMax": {
+            "type": "number"
+          },
+          "curricula": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BANGLA_MEDIUM",
+                "ENGLISH_VERSION",
+                "EM_CAMBRIDGE",
+                "EM_EDEXCEL",
+                "EM_IB",
+                "EM_AMERICAN",
+                "MADRASAH"
+              ]
+            }
+          },
+          "academicGroups": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "SCIENCE",
+                "BUSINESS",
+                "HUMANITIES",
+                "MUJABBID"
+              ]
+            }
           },
           "admissionTargets": {
             "type": "array",
@@ -2966,29 +3423,32 @@
               ]
             }
           },
-          "isRetaker": {
-            "type": "boolean"
+          "timeFrom": {
+            "type": "string"
           },
-          "levelNote": {
+          "timeTo": {
+            "type": "string"
+          },
+          "availableDays": {
+            "type": "number"
+          },
+          "daysPerWeek": {
             "type": [
-              "string",
+              "number",
               "null"
             ]
           },
-          "timeOfDay": {
-            "type": "string"
-          },
-          "daysPerWeek": {
-            "type": "number"
-          },
-          "expectedSalary": {
-            "type": "number"
-          },
-          "studentCount": {
+          "maxStudents": {
             "type": "number"
           },
           "availableFrom": {
             "type": "string"
+          },
+          "teachesOnline": {
+            "type": "boolean"
+          },
+          "zoneCount": {
+            "type": "number"
           },
           "status": {
             "type": "string",
@@ -3029,19 +3489,25 @@
         "required": [
           "id",
           "tutor",
-          "subjectId",
-          "areaId",
-          "curriculum",
-          "levelCode",
-          "academicGroup",
+          "title",
+          "description",
+          "coverage",
+          "durationWeeks",
+          "price",
+          "subjectIds",
+          "levelMin",
+          "levelMax",
+          "curricula",
+          "academicGroups",
           "admissionTargets",
-          "isRetaker",
-          "levelNote",
-          "timeOfDay",
+          "timeFrom",
+          "timeTo",
+          "availableDays",
           "daysPerWeek",
-          "expectedSalary",
-          "studentCount",
+          "maxStudents",
           "availableFrom",
+          "teachesOnline",
+          "zoneCount",
           "status",
           "moderationStatus",
           "createdAt",
@@ -4383,9 +4849,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "mappedPackageCount": {
-            "type": "number"
           }
         },
         "required": [
@@ -4407,8 +4870,7 @@
           "availableFrom",
           "teachesOnline",
           "subjectIds",
-          "zoneIds",
-          "mappedPackageCount"
+          "zoneIds"
         ],
         "additionalProperties": false
       },
@@ -4777,6 +5239,153 @@
         "required": [
           "count"
         ],
+        "additionalProperties": false
+      },
+      "UpdatePackageInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "coverage": {
+            "type": "string",
+            "enum": [
+              "FULL_CURRICULUM",
+              "PARTIAL"
+            ]
+          },
+          "durationWeeks": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 104
+          },
+          "price": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 5000000
+          },
+          "subjectIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "levelMin": {
+            "type": "integer",
+            "minimum": -4,
+            "maximum": 13
+          },
+          "levelMax": {
+            "type": "integer",
+            "minimum": -4,
+            "maximum": 13
+          },
+          "curricula": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BANGLA_MEDIUM",
+                "ENGLISH_VERSION",
+                "EM_CAMBRIDGE",
+                "EM_EDEXCEL",
+                "EM_IB",
+                "EM_AMERICAN",
+                "MADRASAH"
+              ]
+            }
+          },
+          "academicGroups": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "SCIENCE",
+                "BUSINESS",
+                "HUMANITIES",
+                "MUJABBID"
+              ]
+            }
+          },
+          "admissionTargets": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ENGINEERING",
+                "MEDICAL",
+                "VARSITY_SCIENCE",
+                "VARSITY_HUMANITIES",
+                "VARSITY_BUSINESS",
+                "AGRICULTURE",
+                "IBA_BUP",
+                "PRIVATE_UNI",
+                "ABROAD_TESTS",
+                "ISSB"
+              ]
+            }
+          },
+          "timeFrom": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "timeTo": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "availableDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 127
+          },
+          "daysPerWeek": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxStudents": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "availableFrom": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "teachesOnline": {
+            "type": "boolean"
+          },
+          "zoneIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "syncProfileSubjects": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "UpdateRequirementInput": {
@@ -5318,6 +5927,14 @@
               "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             }
           },
+          "packageIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
           "createdAt": {
             "type": "string"
           },
@@ -5334,6 +5951,7 @@
           "placeId",
           "addressText",
           "requirementIds",
+          "packageIds",
           "createdAt",
           "updatedAt"
         ],
@@ -5383,11 +6001,41 @@
               ],
               "additionalProperties": false
             }
+          },
+          "affectedPackages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "teachesOnline": {
+                  "type": "boolean"
+                },
+                "remainingZoneCount": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "teachesOnline",
+                "remainingZoneCount"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
           "id",
-          "affectedRequirements"
+          "affectedRequirements",
+          "affectedPackages"
         ],
         "additionalProperties": false
       },
@@ -6907,7 +7555,7 @@
         "tags": [
           "Tutors"
         ],
-        "description": "Replaces the tutor's subjects with subjectIds. Fails with 409 REQUIREMENT_LOSES_LAST_SUBJECT (details.requirementIds) when an active requirement set would be left with no subjects. Archived sets silently lose the subject.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "description": "Replaces the tutor's subjects with subjectIds. Fails with 409 REQUIREMENT_LOSES_LAST_SUBJECT (details.requirementIds, details.packageIds) when an active requirement set or an OPEN package would be left with no subjects. Archived sets, closed packages and OPEN packages that keep another subject lose the removed subject silently.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
         "requestBody": {
           "required": true,
           "content": {
@@ -7780,7 +8428,7 @@
         "tags": [
           "Tutor requirements"
         ],
-        "description": "status=active (default) lists active sets, archived lists archived sets (newest first, capped at 50), all lists both. mappedPackageCount counts OPEN packages, plus packages with no set chosen on the default set.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "description": "status=active (default) lists active sets, archived lists archived sets (newest first, capped at 50), all lists both.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
         "parameters": [
           {
             "schema": {
@@ -8192,7 +8840,7 @@
         "tags": [
           "Tutor requirements"
         ],
-        "description": "Sets isActive to false. Fails with 409 REQUIREMENT_IS_DEFAULT for the default set, and with 409 REQUIREMENT_IN_USE (details.packageIds) when OPEN packages use it. An archived set is returned unchanged.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "description": "Sets isActive to false. Fails with 409 REQUIREMENT_IS_DEFAULT for the default set. Packages are offers and do not reference a set, so archiving never waits on them. An archived set is returned unchanged.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
         "parameters": [
           {
             "schema": {
@@ -8811,7 +9459,7 @@
         "tags": [
           "Tutor zones"
         ],
-        "description": "Returns the requirement sets that used the zone and how many zones each has left.\n\n**Who:** TUTOR.\n\n**Rate limit:** 20/min per account.",
+        "description": "Returns the requirement sets and OPEN packages that used the zone (affectedRequirements, affectedPackages) and how many zones each has left. A package left with no zone and not online stays open but no longer shows in nearby browse.\n\n**Who:** TUTOR.\n\n**Rate limit:** 20/min per account.",
         "parameters": [
           {
             "schema": {
@@ -9793,7 +10441,7 @@
         "tags": [
           "Packages"
         ],
-        "description": "Student browse (#52). Packages are APPROVED, OPEN, from listed tutors. scope=nearby keeps online packages plus packages whose tutor has a zone covering the student pin. Without a usable pin, nearby falls back to online packages and the student's area, and locationMissing is true. scope=all skips the location match. Filters: curriculum, levelCode, subjectId. Newest first, keyset cursor.\n\n**Who:** STUDENT.\n\n**Rate limit:** 300/min per account.",
+        "description": "Student browse (#52). Packages are APPROVED, OPEN, from listed tutors. A filter matches when the package covers it: curriculum is one of its curricula, levelCode is inside its level range, subjectId is one of its subjects. scope=nearby keeps online packages plus packages with one of their own zones covering the student pin. Without a usable pin, nearby keeps online packages only and locationMissing is true. scope=all skips the location match. Newest first, keyset cursor.\n\n**Who:** STUDENT.\n\n**Rate limit:** 300/min per account.",
         "parameters": [
           {
             "schema": {
@@ -9943,6 +10591,180 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Create a package",
+        "tags": [
+          "Packages"
+        ],
+        "description": "#51. A tutor publishes a package offer: title, what it covers, duration in weeks and the total price in BDT. The placement fee is a percentage of that price. It goes live right away (admin moderation is not built yet). Fails with 403 PROFILE_INCOMPLETE until the profile passes the apply gate; the default requirement set is not needed. Fails with 400 INVALID_REQUIREMENT (fields subjectIds or zoneIds) when a subject is not on the profile or a zone is not one of the tutor's zones. The package needs a zone or teachesOnline (400 VALIDATION_ERROR on zoneIds). syncProfileSubjects adds missing subjects to the profile in the same transaction.\n\n**Who:** TUTOR.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePackageInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/packages/mine": {
+      "get": {
+        "summary": "List my packages",
+        "tags": [
+          "Packages"
+        ],
+        "description": "#53. The tutor's own packages in any state, newest first, at most 100. Each one lists its subjectIds and zoneIds, with request counts.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPackageList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/packages/{id}": {
@@ -10014,6 +10836,234 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Edit my package",
+        "tags": [
+          "Packages"
+        ],
+        "description": "#55. Partial edit of an OPEN package. The merged values are checked with the same rules as create (400 VALIDATION_ERROR with issues, one per field). subjectIds and zoneIds replace the lists when sent, and subjects must be on the profile and zones must be the tutor's own. Clearing every zone needs teachesOnline. Price is the total for the package. daysPerWeek accepts null to clear. Moderation is not reset. Students with a pending or confirmed request get a PACKAGE_UPDATED alert. 409 LISTING_NOT_OPEN when the package is not OPEN.\n\n**Who:** TUTOR.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePackageInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/packages/{id}/close": {
+      "post": {
+        "summary": "Close my package",
+        "tags": [
+          "Packages"
+        ],
+        "description": "#56. OPEN to CLOSED. Pending requests become EXPIRED and those students get a PACKAGE_CLOSED alert. Confirmed placements are not affected. 409 LISTING_NOT_OPEN when already closed.\n\n**Who:** TUTOR.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
             "content": {
               "application/json": {
                 "schema": {

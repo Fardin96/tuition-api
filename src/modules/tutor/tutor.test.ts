@@ -581,6 +581,79 @@ describe("tutor routes", () => {
       ).toHaveLength(1);
     });
 
+    describe("packages", () => {
+      async function profileWith(subjectCount: number) {
+        const account = await createAccount({ role: "TUTOR" });
+        const tutor = await createTutorProfile(account.id);
+        const subjects = [];
+        for (let i = 0; i < subjectCount; i++) subjects.push(await createSubject());
+        await prisma.tutorSubject.createMany({
+          data: subjects.map((s) => ({ tutorId: tutor.id, subjectId: s.id })),
+        });
+        return { tutor, subjects, headers: await getAuthHeaders(account) };
+      }
+
+      it("refuses when an OPEN package would lose its last subject (409) and lists it", async () => {
+        const app = await createTestApp();
+        const { tutor, subjects, headers } = await profileWith(2);
+        const [s1, s2] = subjects;
+        const pkg = await createTuitionPackage(tutor.id, { subjectIds: [s1.id] });
+
+        const res = await app.inject({
+          method: "PUT",
+          url: "/api/v1/tutors/me/subjects",
+          headers,
+          payload: { subjectIds: [s2.id] },
+        });
+
+        expect(res.statusCode).toBe(409);
+        const body = JSON.parse(res.body);
+        expect(body.error).toBe("RequirementLosesLastSubject");
+        expect(body.code).toBe("REQUIREMENT_LOSES_LAST_SUBJECT");
+        expect(body.details).toEqual({ requirementIds: [], packageIds: [pkg.id] });
+        expect(await prisma.tutorSubject.count({ where: { tutorId: tutor.id } })).toBe(2);
+        expect(await prisma.packageSubject.count({ where: { packageId: pkg.id } })).toBe(1);
+      });
+
+      it("does not block when the package is CLOSED; its subject rows go with the profile subject", async () => {
+        const app = await createTestApp();
+        const { tutor, subjects, headers } = await profileWith(2);
+        const [s1, s2] = subjects;
+        const closed = await createTuitionPackage(tutor.id, {
+          subjectIds: [s1.id],
+          status: "CLOSED",
+        });
+
+        const res = await app.inject({
+          method: "PUT",
+          url: "/api/v1/tutors/me/subjects",
+          headers,
+          payload: { subjectIds: [s2.id] },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(await prisma.packageSubject.count({ where: { packageId: closed.id } })).toBe(0);
+      });
+
+      it("does not block when the package keeps another subject", async () => {
+        const app = await createTestApp();
+        const { tutor, subjects, headers } = await profileWith(2);
+        const [s1, s2] = subjects;
+        const pkg = await createTuitionPackage(tutor.id, { subjectIds: [s1.id, s2.id] });
+
+        const res = await app.inject({
+          method: "PUT",
+          url: "/api/v1/tutors/me/subjects",
+          headers,
+          payload: { subjectIds: [s2.id] },
+        });
+
+        expect(res.statusCode).toBe(200);
+        const rows = await prisma.packageSubject.findMany({ where: { packageId: pkg.id } });
+        expect(rows.map((r) => r.subjectId)).toEqual([s2.id]);
+      });
+    });
+
     it("allows removing a subject from a requirement that keeps others", async () => {
       const app = await createTestApp();
       const account = await createAccount({ role: "TUTOR" });
@@ -1704,22 +1777,19 @@ describe("tutor routes", () => {
       expect(JSON.parse(res.body).code).toBe("REQUIREMENT_IS_DEFAULT");
     });
 
-    it("refuses to archive a set used by an OPEN package (409) and lists it", async () => {
+    it("archives a set while an OPEN package is listed (200); packages hold no set", async () => {
       const app = await createTestApp();
-      const { tutor, headers } = await setupTutor();
+      const { tutor, headers, subjects } = await setupTutor();
       await createTutorRequirement(tutor.id, { isDefault: true });
       const set = await createTutorRequirement(tutor.id);
-      const pkg = await createTuitionPackage(tutor.id, { requirementId: set.id });
+      const pkg = await createTuitionPackage(tutor.id, { subjectIds: [subjects[0].id] });
 
       const res = await app.inject({ method: "DELETE", url: `${base}/${set.id}`, headers });
 
-      expect(res.statusCode).toBe(409);
-      expect(JSON.parse(res.body).error).toBe("RequirementInUse");
-      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_IN_USE");
-      expect(JSON.parse(res.body).details.packageIds).toContain(pkg.id);
-      expect(JSON.parse(res.body).code).toBe("REQUIREMENT_IN_USE");
-      const row = await prisma.tutorRequirement.findUniqueOrThrow({ where: { id: set.id } });
-      expect(row.isActive).toBe(true);
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).isActive).toBe(false);
+      const pkgRow = await prisma.tuitionPackage.findUniqueOrThrow({ where: { id: pkg.id } });
+      expect(pkgRow.status).toBe("OPEN");
     });
 
     it("archives an unused non-default set (200)", async () => {
@@ -1790,21 +1860,16 @@ describe("tutor routes", () => {
       expect(JSON.parse(res.body).isActive).toBe(true);
     });
 
-    it("counts OPEN packages, including null-requirement ones on the default set", async () => {
+    it("does not expose mappedPackageCount on a set", async () => {
       const app = await createTestApp();
       const { tutor, headers } = await setupTutor();
-      const defaultSet = await createTutorRequirement(tutor.id, { isDefault: true });
-      const other = await createTutorRequirement(tutor.id);
-      await createTuitionPackage(tutor.id, { requirementId: defaultSet.id });
-      await createTuitionPackage(tutor.id, { requirementId: null });
-      await createTuitionPackage(tutor.id, { requirementId: other.id });
-      await createTuitionPackage(tutor.id, { requirementId: defaultSet.id, status: "CLOSED" });
+      await createTutorRequirement(tutor.id, { isDefault: true });
 
       const res = await app.inject({ method: "GET", url: base, headers });
 
-      const sets: { id: string; mappedPackageCount: number }[] = JSON.parse(res.body).requirements;
-      expect(sets.find((s) => s.id === defaultSet.id)?.mappedPackageCount).toBe(2);
-      expect(sets.find((s) => s.id === other.id)?.mappedPackageCount).toBe(1);
+      const sets: Record<string, unknown>[] = JSON.parse(res.body).requirements;
+      expect(sets).toHaveLength(1);
+      expect(sets[0]).not.toHaveProperty("mappedPackageCount");
     });
 
     it("accepts level 13 and rejects 14 (400)", async () => {

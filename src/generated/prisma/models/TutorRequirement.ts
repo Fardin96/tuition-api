@@ -347,7 +347,6 @@ export type TutorRequirementWhereInput = {
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   subjects?: Prisma.TutorRequirementSubjectListRelationFilter
   zones?: Prisma.TutorRequirementZoneListRelationFilter
-  packages?: Prisma.TuitionPackageListRelationFilter
 }
 
 export type TutorRequirementOrderByWithRelationInput = {
@@ -374,7 +373,6 @@ export type TutorRequirementOrderByWithRelationInput = {
   tutor?: Prisma.TutorOrderByWithRelationInput
   subjects?: Prisma.TutorRequirementSubjectOrderByRelationAggregateInput
   zones?: Prisma.TutorRequirementZoneOrderByRelationAggregateInput
-  packages?: Prisma.TuitionPackageOrderByRelationAggregateInput
 }
 
 export type TutorRequirementWhereUniqueInput = Prisma.AtLeast<{
@@ -405,7 +403,6 @@ export type TutorRequirementWhereUniqueInput = Prisma.AtLeast<{
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   subjects?: Prisma.TutorRequirementSubjectListRelationFilter
   zones?: Prisma.TutorRequirementZoneListRelationFilter
-  packages?: Prisma.TuitionPackageListRelationFilter
 }, "id" | "id_tutorId">
 
 export type TutorRequirementOrderByWithAggregationInput = {
@@ -485,7 +482,6 @@ export type TutorRequirementCreateInput = {
   tutor: Prisma.TutorCreateNestedOneWithoutRequirementsInput
   subjects?: Prisma.TutorRequirementSubjectCreateNestedManyWithoutRequirementInput
   zones?: Prisma.TutorRequirementZoneCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementUncheckedCreateInput = {
@@ -511,7 +507,6 @@ export type TutorRequirementUncheckedCreateInput = {
   updatedAt?: Date | string
   subjects?: Prisma.TutorRequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
   zones?: Prisma.TutorRequirementZoneUncheckedCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementUpdateInput = {
@@ -537,7 +532,6 @@ export type TutorRequirementUpdateInput = {
   tutor?: Prisma.TutorUpdateOneRequiredWithoutRequirementsNestedInput
   subjects?: Prisma.TutorRequirementSubjectUpdateManyWithoutRequirementNestedInput
   zones?: Prisma.TutorRequirementZoneUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementUncheckedUpdateInput = {
@@ -563,7 +557,6 @@ export type TutorRequirementUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.TutorRequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
   zones?: Prisma.TutorRequirementZoneUncheckedUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementCreateManyInput = {
@@ -759,11 +752,6 @@ export type TutorRequirementScalarRelationFilter = {
   isNot?: Prisma.TutorRequirementWhereInput
 }
 
-export type TutorRequirementNullableScalarRelationFilter = {
-  is?: Prisma.TutorRequirementWhereInput | null
-  isNot?: Prisma.TutorRequirementWhereInput | null
-}
-
 export type TutorRequirementCreateNestedManyWithoutTutorInput = {
   create?: Prisma.XOR<Prisma.TutorRequirementCreateWithoutTutorInput, Prisma.TutorRequirementUncheckedCreateWithoutTutorInput> | Prisma.TutorRequirementCreateWithoutTutorInput[] | Prisma.TutorRequirementUncheckedCreateWithoutTutorInput[]
   connectOrCreate?: Prisma.TutorRequirementCreateOrConnectWithoutTutorInput | Prisma.TutorRequirementCreateOrConnectWithoutTutorInput[]
@@ -869,22 +857,6 @@ export type TutorRequirementUpdateOneRequiredWithoutZonesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TutorRequirementUpdateToOneWithWhereWithoutZonesInput, Prisma.TutorRequirementUpdateWithoutZonesInput>, Prisma.TutorRequirementUncheckedUpdateWithoutZonesInput>
 }
 
-export type TutorRequirementCreateNestedOneWithoutPackagesInput = {
-  create?: Prisma.XOR<Prisma.TutorRequirementCreateWithoutPackagesInput, Prisma.TutorRequirementUncheckedCreateWithoutPackagesInput>
-  connectOrCreate?: Prisma.TutorRequirementCreateOrConnectWithoutPackagesInput
-  connect?: Prisma.TutorRequirementWhereUniqueInput
-}
-
-export type TutorRequirementUpdateOneWithoutPackagesNestedInput = {
-  create?: Prisma.XOR<Prisma.TutorRequirementCreateWithoutPackagesInput, Prisma.TutorRequirementUncheckedCreateWithoutPackagesInput>
-  connectOrCreate?: Prisma.TutorRequirementCreateOrConnectWithoutPackagesInput
-  upsert?: Prisma.TutorRequirementUpsertWithoutPackagesInput
-  disconnect?: Prisma.TutorRequirementWhereInput | boolean
-  delete?: Prisma.TutorRequirementWhereInput | boolean
-  connect?: Prisma.TutorRequirementWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.TutorRequirementUpdateToOneWithWhereWithoutPackagesInput, Prisma.TutorRequirementUpdateWithoutPackagesInput>, Prisma.TutorRequirementUncheckedUpdateWithoutPackagesInput>
-}
-
 export type TutorRequirementCreateWithoutTutorInput = {
   id?: string
   name: string
@@ -907,7 +879,6 @@ export type TutorRequirementCreateWithoutTutorInput = {
   updatedAt?: Date | string
   subjects?: Prisma.TutorRequirementSubjectCreateNestedManyWithoutRequirementInput
   zones?: Prisma.TutorRequirementZoneCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementUncheckedCreateWithoutTutorInput = {
@@ -932,7 +903,6 @@ export type TutorRequirementUncheckedCreateWithoutTutorInput = {
   updatedAt?: Date | string
   subjects?: Prisma.TutorRequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
   zones?: Prisma.TutorRequirementZoneUncheckedCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementCreateOrConnectWithoutTutorInput = {
@@ -1009,7 +979,6 @@ export type TutorRequirementCreateWithoutSubjectsInput = {
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutRequirementsInput
   zones?: Prisma.TutorRequirementZoneCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementUncheckedCreateWithoutSubjectsInput = {
@@ -1034,7 +1003,6 @@ export type TutorRequirementUncheckedCreateWithoutSubjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   zones?: Prisma.TutorRequirementZoneUncheckedCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementCreateOrConnectWithoutSubjectsInput = {
@@ -1075,7 +1043,6 @@ export type TutorRequirementUpdateWithoutSubjectsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutRequirementsNestedInput
   zones?: Prisma.TutorRequirementZoneUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementUncheckedUpdateWithoutSubjectsInput = {
@@ -1100,7 +1067,6 @@ export type TutorRequirementUncheckedUpdateWithoutSubjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zones?: Prisma.TutorRequirementZoneUncheckedUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementCreateWithoutZonesInput = {
@@ -1125,7 +1091,6 @@ export type TutorRequirementCreateWithoutZonesInput = {
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutRequirementsInput
   subjects?: Prisma.TutorRequirementSubjectCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementUncheckedCreateWithoutZonesInput = {
@@ -1150,7 +1115,6 @@ export type TutorRequirementUncheckedCreateWithoutZonesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subjects?: Prisma.TutorRequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
-  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutRequirementInput
 }
 
 export type TutorRequirementCreateOrConnectWithoutZonesInput = {
@@ -1191,7 +1155,6 @@ export type TutorRequirementUpdateWithoutZonesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutRequirementsNestedInput
   subjects?: Prisma.TutorRequirementSubjectUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementUncheckedUpdateWithoutZonesInput = {
@@ -1216,123 +1179,6 @@ export type TutorRequirementUncheckedUpdateWithoutZonesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.TutorRequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutRequirementNestedInput
-}
-
-export type TutorRequirementCreateWithoutPackagesInput = {
-  id?: string
-  name: string
-  isDefault?: boolean
-  isActive?: boolean
-  levelMin: number
-  levelMax: number
-  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
-  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
-  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
-  timeFrom: Date | string
-  timeTo: Date | string
-  availableDays?: number
-  daysPerWeek?: number | null
-  minSalary?: number | null
-  maxStudents?: number
-  availableFrom: Date | string
-  teachesOnline?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  tutor: Prisma.TutorCreateNestedOneWithoutRequirementsInput
-  subjects?: Prisma.TutorRequirementSubjectCreateNestedManyWithoutRequirementInput
-  zones?: Prisma.TutorRequirementZoneCreateNestedManyWithoutRequirementInput
-}
-
-export type TutorRequirementUncheckedCreateWithoutPackagesInput = {
-  id?: string
-  tutorId: string
-  name: string
-  isDefault?: boolean
-  isActive?: boolean
-  levelMin: number
-  levelMax: number
-  curricula?: Prisma.TutorRequirementCreatecurriculaInput | $Enums.Curriculum[]
-  academicGroups?: Prisma.TutorRequirementCreateacademicGroupsInput | $Enums.AcademicGroup[]
-  admissionTargets?: Prisma.TutorRequirementCreateadmissionTargetsInput | $Enums.AdmissionTarget[]
-  timeFrom: Date | string
-  timeTo: Date | string
-  availableDays?: number
-  daysPerWeek?: number | null
-  minSalary?: number | null
-  maxStudents?: number
-  availableFrom: Date | string
-  teachesOnline?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  subjects?: Prisma.TutorRequirementSubjectUncheckedCreateNestedManyWithoutRequirementInput
-  zones?: Prisma.TutorRequirementZoneUncheckedCreateNestedManyWithoutRequirementInput
-}
-
-export type TutorRequirementCreateOrConnectWithoutPackagesInput = {
-  where: Prisma.TutorRequirementWhereUniqueInput
-  create: Prisma.XOR<Prisma.TutorRequirementCreateWithoutPackagesInput, Prisma.TutorRequirementUncheckedCreateWithoutPackagesInput>
-}
-
-export type TutorRequirementUpsertWithoutPackagesInput = {
-  update: Prisma.XOR<Prisma.TutorRequirementUpdateWithoutPackagesInput, Prisma.TutorRequirementUncheckedUpdateWithoutPackagesInput>
-  create: Prisma.XOR<Prisma.TutorRequirementCreateWithoutPackagesInput, Prisma.TutorRequirementUncheckedCreateWithoutPackagesInput>
-  where?: Prisma.TutorRequirementWhereInput
-}
-
-export type TutorRequirementUpdateToOneWithWhereWithoutPackagesInput = {
-  where?: Prisma.TutorRequirementWhereInput
-  data: Prisma.XOR<Prisma.TutorRequirementUpdateWithoutPackagesInput, Prisma.TutorRequirementUncheckedUpdateWithoutPackagesInput>
-}
-
-export type TutorRequirementUpdateWithoutPackagesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
-  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
-  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
-  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
-  timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
-  daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  minSalary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  maxStudents?: Prisma.IntFieldUpdateOperationsInput | number
-  availableFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  teachesOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tutor?: Prisma.TutorUpdateOneRequiredWithoutRequirementsNestedInput
-  subjects?: Prisma.TutorRequirementSubjectUpdateManyWithoutRequirementNestedInput
-  zones?: Prisma.TutorRequirementZoneUpdateManyWithoutRequirementNestedInput
-}
-
-export type TutorRequirementUncheckedUpdateWithoutPackagesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  tutorId?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  levelMin?: Prisma.IntFieldUpdateOperationsInput | number
-  levelMax?: Prisma.IntFieldUpdateOperationsInput | number
-  curricula?: Prisma.TutorRequirementUpdatecurriculaInput | $Enums.Curriculum[]
-  academicGroups?: Prisma.TutorRequirementUpdateacademicGroupsInput | $Enums.AcademicGroup[]
-  admissionTargets?: Prisma.TutorRequirementUpdateadmissionTargetsInput | $Enums.AdmissionTarget[]
-  timeFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  timeTo?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  availableDays?: Prisma.IntFieldUpdateOperationsInput | number
-  daysPerWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  minSalary?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  maxStudents?: Prisma.IntFieldUpdateOperationsInput | number
-  availableFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  teachesOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subjects?: Prisma.TutorRequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
-  zones?: Prisma.TutorRequirementZoneUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementCreateManyTutorInput = {
@@ -1379,7 +1225,6 @@ export type TutorRequirementUpdateWithoutTutorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.TutorRequirementSubjectUpdateManyWithoutRequirementNestedInput
   zones?: Prisma.TutorRequirementZoneUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementUncheckedUpdateWithoutTutorInput = {
@@ -1404,7 +1249,6 @@ export type TutorRequirementUncheckedUpdateWithoutTutorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.TutorRequirementSubjectUncheckedUpdateManyWithoutRequirementNestedInput
   zones?: Prisma.TutorRequirementZoneUncheckedUpdateManyWithoutRequirementNestedInput
-  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutRequirementNestedInput
 }
 
 export type TutorRequirementUncheckedUpdateManyWithoutTutorInput = {
@@ -1437,13 +1281,11 @@ export type TutorRequirementUncheckedUpdateManyWithoutTutorInput = {
 export type TutorRequirementCountOutputType = {
   subjects: number
   zones: number
-  packages: number
 }
 
 export type TutorRequirementCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subjects?: boolean | TutorRequirementCountOutputTypeCountSubjectsArgs
   zones?: boolean | TutorRequirementCountOutputTypeCountZonesArgs
-  packages?: boolean | TutorRequirementCountOutputTypeCountPackagesArgs
 }
 
 /**
@@ -1468,13 +1310,6 @@ export type TutorRequirementCountOutputTypeCountSubjectsArgs<ExtArgs extends run
  */
 export type TutorRequirementCountOutputTypeCountZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TutorRequirementZoneWhereInput
-}
-
-/**
- * TutorRequirementCountOutputType without action
- */
-export type TutorRequirementCountOutputTypeCountPackagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TuitionPackageWhereInput
 }
 
 
@@ -1502,7 +1337,6 @@ export type TutorRequirementSelect<ExtArgs extends runtime.Types.Extensions.Inte
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   subjects?: boolean | Prisma.TutorRequirement$subjectsArgs<ExtArgs>
   zones?: boolean | Prisma.TutorRequirement$zonesArgs<ExtArgs>
-  packages?: boolean | Prisma.TutorRequirement$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.TutorRequirementCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tutorRequirement"]>
 
@@ -1582,7 +1416,6 @@ export type TutorRequirementInclude<ExtArgs extends runtime.Types.Extensions.Int
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   subjects?: boolean | Prisma.TutorRequirement$subjectsArgs<ExtArgs>
   zones?: boolean | Prisma.TutorRequirement$zonesArgs<ExtArgs>
-  packages?: boolean | Prisma.TutorRequirement$packagesArgs<ExtArgs>
   _count?: boolean | Prisma.TutorRequirementCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TutorRequirementIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1598,7 +1431,6 @@ export type $TutorRequirementPayload<ExtArgs extends runtime.Types.Extensions.In
     tutor: Prisma.$TutorPayload<ExtArgs>
     subjects: Prisma.$TutorRequirementSubjectPayload<ExtArgs>[]
     zones: Prisma.$TutorRequirementZonePayload<ExtArgs>[]
-    packages: Prisma.$TuitionPackagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2018,7 +1850,6 @@ export interface Prisma__TutorRequirementClient<T, Null = never, ExtArgs extends
   tutor<T extends Prisma.TutorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorDefaultArgs<ExtArgs>>): Prisma.Prisma__TutorClient<runtime.Types.Result.GetResult<Prisma.$TutorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   subjects<T extends Prisma.TutorRequirement$subjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorRequirement$subjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorRequirementSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   zones<T extends Prisma.TutorRequirement$zonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorRequirement$zonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorRequirementZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  packages<T extends Prisma.TutorRequirement$packagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorRequirement$packagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TuitionPackagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2514,30 +2345,6 @@ export type TutorRequirement$zonesArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.TutorRequirementZoneScalarFieldEnum | Prisma.TutorRequirementZoneScalarFieldEnum[]
-}
-
-/**
- * TutorRequirement.packages
- */
-export type TutorRequirement$packagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the TuitionPackage
-   */
-  select?: Prisma.TuitionPackageSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the TuitionPackage
-   */
-  omit?: Prisma.TuitionPackageOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.TuitionPackageInclude<ExtArgs> | null
-  where?: Prisma.TuitionPackageWhereInput
-  orderBy?: Prisma.TuitionPackageOrderByWithRelationInput | Prisma.TuitionPackageOrderByWithRelationInput[]
-  cursor?: Prisma.TuitionPackageWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.TuitionPackageScalarFieldEnum | Prisma.TuitionPackageScalarFieldEnum[]
 }
 
 /**
