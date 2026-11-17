@@ -87,7 +87,7 @@ export function routeDocs(opts: RouteDocsOptions) {
     description: lines.filter(Boolean).join("\n\n"),
     security:
       opts.auth === "public" ? [] : opts.auth === "optional" ? [{}, ...BEARER] : [...BEARER],
-    ...(opts.deferred ? { "x-deferred": true } : {}),
+    ...(opts.deferred ? { "x-deferred": true, hide: true } : {}),
     "x-roles": roleText(opts.auth),
     ...(opts.rateLimit ? { "x-rate-limit": opts.rateLimit } : {}),
     "x-errors": [...errors].sort((a, b) => a - b),

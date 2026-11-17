@@ -1,4 +1,5 @@
 import type { TuitionRequirement } from "../../generated/prisma/client.js";
+import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import { validateStudentEducation } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
@@ -156,6 +157,14 @@ export async function updateRequirement(
     });
   }
 
+  const daysPerWeek = data.daysPerWeek ?? existing.daysPerWeek;
+  const availableDays = data.availableDays ?? existing.availableDays;
+  if (!daysPerWeekFits(daysPerWeek, availableDays)) {
+    throw appError("InvalidRequirement", 400, DAYS_PER_WEEK_MESSAGE, {
+      fields: ["daysPerWeek"],
+    });
+  }
+
   const targetStatus = data.status ?? existing.status;
   if (targetStatus === "OPEN") {
     const candidateSubjects =
@@ -167,7 +176,7 @@ export async function updateRequirement(
       areaId: data.areaId ?? existing.areaId,
       levelCode: education.levelCode,
       timeOfDay: data.timeOfDay !== undefined ? data.timeOfDay : existing.timeOfDay,
-      daysPerWeek: data.daysPerWeek ?? existing.daysPerWeek,
+      daysPerWeek,
       salary: data.salary ?? existing.salary,
       hireByDate: data.hireByDate !== undefined ? data.hireByDate : existing.hireByDate,
       tuitionType: data.tuitionType ?? existing.tuitionType,

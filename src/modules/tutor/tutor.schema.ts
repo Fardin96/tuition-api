@@ -5,6 +5,7 @@ import {
   ModerationStatus,
   VerificationStatus,
 } from "../../generated/prisma/enums.js";
+import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import {
   ACADEMIC_GROUPS,
   ADMISSION_TARGETS,
@@ -289,6 +290,8 @@ const hhmm = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 
 const availableDaysSchema = z.number().int().min(1).max(127);
+// null = no fixed count: any number of the available days.
+const daysPerWeekSchema = z.number().int().min(1).max(7).nullable();
 const maxStudentsSchema = z.number().int().min(1);
 const zoneIdsSchema = z.array(z.string().uuid()).refine((v) => new Set(v).size === v.length);
 
@@ -302,6 +305,7 @@ const tutorRequirementBaseSchema = z.object({
   timeFrom: z.string().regex(hhmm),
   timeTo: z.string().regex(hhmm),
   availableDays: availableDaysSchema,
+  daysPerWeek: daysPerWeekSchema.optional(),
   minSalary: z.number().int().positive().nullable().optional(),
   maxStudents: maxStudentsSchema,
   availableFrom: z.string().regex(isoDate),
@@ -329,6 +333,9 @@ export const createTutorRequirementSchema = tutorRequirementBaseSchema
   .superRefine((v, ctx) => {
     for (const issue of validateTutorCoverage(v)) {
       ctx.addIssue({ code: "custom", path: [issue.path], message: issue.message });
+    }
+    if (!daysPerWeekFits(v.daysPerWeek, v.availableDays)) {
+      ctx.addIssue({ code: "custom", path: ["daysPerWeek"], message: DAYS_PER_WEEK_MESSAGE });
     }
   })
   .meta({ id: "CreateTutorRequirement" });
@@ -360,6 +367,7 @@ export const tutorRequirementResponseSchema = z
     timeFrom: z.string(),
     timeTo: z.string(),
     availableDays: z.number(),
+    daysPerWeek: z.number().nullable(),
     minSalary: z.number().nullable(),
     maxStudents: z.number(),
     availableFrom: z.string(),

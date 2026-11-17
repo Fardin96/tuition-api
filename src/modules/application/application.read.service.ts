@@ -289,6 +289,7 @@ async function findTutorSet(
     timeFrom: toTimeString(row.timeFrom),
     timeTo: toTimeString(row.timeTo),
     availableDays: row.availableDays,
+    daysPerWeek: row.daysPerWeek,
     minSalary: row.minSalary,
     maxStudents: row.maxStudents,
     teachesOnline: row.teachesOnline,

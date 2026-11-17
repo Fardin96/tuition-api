@@ -83,6 +83,7 @@ export const applicationTutorSetSchema = z
       /** "HH:MM" */
       timeTo: z.string(),
       availableDays: z.number(),
+      daysPerWeek: z.number().nullable(),
       minSalary: z.number().nullable(),
       maxStudents: z.number(),
       teachesOnline: z.boolean(),

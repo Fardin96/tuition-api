@@ -3490,6 +3490,7 @@ export const TutorRequirementScalarFieldEnum = {
   timeFrom: 'timeFrom',
   timeTo: 'timeTo',
   availableDays: 'availableDays',
+  daysPerWeek: 'daysPerWeek',
   minSalary: 'minSalary',
   maxStudents: 'maxStudents',
   availableFrom: 'availableFrom',

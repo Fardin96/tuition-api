@@ -2225,5 +2225,101 @@ describe("tutor routes", () => {
         ).toHaveLength(0);
       });
     });
+
+    describe("daysPerWeek", () => {
+      it("stores and returns daysPerWeek", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ daysPerWeek: 3, subjectIds: [subjects[0].id] }),
+        });
+
+        expect(res.statusCode).toBe(201);
+        expect(JSON.parse(res.body).daysPerWeek).toBe(3);
+      });
+
+      it("returns null daysPerWeek when omitted", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [subjects[0].id] }),
+        });
+
+        expect(res.statusCode).toBe(201);
+        expect(JSON.parse(res.body).daysPerWeek).toBeNull();
+      });
+
+      it("rejects a daysPerWeek larger than the available days (400)", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({
+            daysPerWeek: 4,
+            availableDays: 0b0000011,
+            subjectIds: [subjects[0].id],
+          }),
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      });
+
+      it("clears daysPerWeek when PATCHed with null", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+        const created = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ daysPerWeek: 3, subjectIds: [subjects[0].id] }),
+        });
+        const id = JSON.parse(created.body).id;
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${id}`,
+          headers,
+          payload: { daysPerWeek: null },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(JSON.parse(res.body).daysPerWeek).toBeNull();
+      });
+
+      it("rejects a PATCH that shrinks availableDays below daysPerWeek (400)", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+        const created = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ daysPerWeek: 5, subjectIds: [subjects[0].id] }),
+        });
+        const id = JSON.parse(created.body).id;
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${id}`,
+          headers,
+          payload: { availableDays: 0b0000011 },
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).error).toBe("InvalidRequirement");
+        expect(JSON.parse(res.body).code).toBe("INVALID_REQUIREMENT");
+      });
+    });
   });
 });

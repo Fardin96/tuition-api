@@ -1258,4 +1258,129 @@ describe("requirement module", () => {
 
     expect(response.statusCode).toBe(400);
   });
+
+  describe("availableDays and daysPerWeek", () => {
+    const openPayload = (
+      areaId: number,
+      subjectId: number,
+      overrides: Record<string, unknown> = {},
+    ) => ({
+      areaId,
+      subjectIds: [subjectId],
+      curriculum: "BANGLA_MEDIUM",
+      levelCode: 10,
+      timeOfDay: "10:00",
+      daysPerWeek: 3,
+      salary: 5000,
+      hireByDate: "2024-12-31",
+      tuitionType: "Home Tutoring Solo",
+      ...overrides,
+    });
+
+    it("stores and returns the availableDays mask", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const subject = await createSubject();
+      await createStudentProfile(account.id, area.id);
+      const authHeaders = await getAuthHeaders(account);
+
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/requirements/",
+        headers: authHeaders,
+        payload: openPayload(area.id, subject.id, { availableDays: 0b0010101 }),
+      });
+
+      expect(response.statusCode).toBe(201);
+      expect(response.json().availableDays).toBe(21);
+    });
+
+    it("defaults availableDays to every day when omitted", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const subject = await createSubject();
+      await createStudentProfile(account.id, area.id);
+      const authHeaders = await getAuthHeaders(account);
+
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/requirements/",
+        headers: authHeaders,
+        payload: openPayload(area.id, subject.id),
+      });
+
+      expect(response.statusCode).toBe(201);
+      expect(response.json().availableDays).toBe(127);
+    });
+
+    it("rejects a daysPerWeek larger than the number of available days", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const subject = await createSubject();
+      await createStudentProfile(account.id, area.id);
+      const authHeaders = await getAuthHeaders(account);
+
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/requirements/",
+        headers: authHeaders,
+        payload: openPayload(area.id, subject.id, { daysPerWeek: 5, availableDays: 3 }),
+      });
+
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("rejects a PATCH that leaves daysPerWeek above the available days", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const subject = await createSubject();
+      const studentProfile = await createStudentProfile(account.id, area.id);
+      const authHeaders = await getAuthHeaders(account);
+      const requirement = await createRequirement({
+        studentId: studentProfile.id,
+        areaId: area.id,
+        subjectId: subject.id,
+        daysPerWeek: 3,
+      });
+
+      const response = await app.inject({
+        method: "PATCH",
+        url: `/api/v1/requirements/${requirement.id}`,
+        headers: authHeaders,
+        payload: { availableDays: 1 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json().code).toBe("INVALID_REQUIREMENT");
+    });
+
+    it("accepts a PATCH that sets availableDays and daysPerWeek together", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const subject = await createSubject();
+      const studentProfile = await createStudentProfile(account.id, area.id);
+      const authHeaders = await getAuthHeaders(account);
+      const requirement = await createRequirement({
+        studentId: studentProfile.id,
+        areaId: area.id,
+        subjectId: subject.id,
+        daysPerWeek: 3,
+      });
+
+      const response = await app.inject({
+        method: "PATCH",
+        url: `/api/v1/requirements/${requirement.id}`,
+        headers: authHeaders,
+        payload: { availableDays: 7, daysPerWeek: 2 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toMatchObject({ availableDays: 7, daysPerWeek: 2 });
+    });
+  });
 });

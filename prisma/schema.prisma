@@ -675,6 +675,7 @@ model TutorRequirement {
   timeFrom         DateTime          @map("time_from") @db.Time(0)
   timeTo           DateTime          @map("time_to") @db.Time(0)
   availableDays    Int               @default(127) @map("available_days") @db.SmallInt // bit0=Sat ... bit6=Fri
+  daysPerWeek      Int?              @map("days_per_week") @db.SmallInt // 1..7; null = any number of the available days
   minSalary        Int?              @map("min_salary") // BDT/month floor; null = no floor
   maxStudents      Int               @default(1) @map("max_students") @db.SmallInt
   availableFrom    DateTime          @map("available_from") @db.Date
