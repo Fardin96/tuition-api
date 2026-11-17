@@ -589,21 +589,21 @@ export type EnumListingStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumListingStatusFilter<$PrismaModel>
 }
 
-export type EnumCurriculumFilter<$PrismaModel = never> = {
-  equals?: $Enums.Curriculum | Prisma.EnumCurriculumFieldRefInput<$PrismaModel>
-  in?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCurriculumFilter<$PrismaModel> | $Enums.Curriculum
+export type EnumPackageCoverageFilter<$PrismaModel = never> = {
+  equals?: $Enums.PackageCoverage | Prisma.EnumPackageCoverageFieldRefInput<$PrismaModel>
+  in?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPackageCoverageFilter<$PrismaModel> | $Enums.PackageCoverage
 }
 
-export type EnumCurriculumWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Curriculum | Prisma.EnumCurriculumFieldRefInput<$PrismaModel>
-  in?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCurriculumWithAggregatesFilter<$PrismaModel> | $Enums.Curriculum
+export type EnumPackageCoverageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PackageCoverage | Prisma.EnumPackageCoverageFieldRefInput<$PrismaModel>
+  in?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPackageCoverageWithAggregatesFilter<$PrismaModel> | $Enums.PackageCoverage
   _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCurriculumFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCurriculumFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPackageCoverageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPackageCoverageFilter<$PrismaModel>
 }
 
 export type EnumInitiatedByFilter<$PrismaModel = never> = {
@@ -1513,21 +1513,21 @@ export type NestedEnumListingStatusWithAggregatesFilter<$PrismaModel = never> = 
   _max?: Prisma.NestedEnumListingStatusFilter<$PrismaModel>
 }
 
-export type NestedEnumCurriculumFilter<$PrismaModel = never> = {
-  equals?: $Enums.Curriculum | Prisma.EnumCurriculumFieldRefInput<$PrismaModel>
-  in?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCurriculumFilter<$PrismaModel> | $Enums.Curriculum
+export type NestedEnumPackageCoverageFilter<$PrismaModel = never> = {
+  equals?: $Enums.PackageCoverage | Prisma.EnumPackageCoverageFieldRefInput<$PrismaModel>
+  in?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPackageCoverageFilter<$PrismaModel> | $Enums.PackageCoverage
 }
 
-export type NestedEnumCurriculumWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Curriculum | Prisma.EnumCurriculumFieldRefInput<$PrismaModel>
-  in?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Curriculum[] | Prisma.ListEnumCurriculumFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumCurriculumWithAggregatesFilter<$PrismaModel> | $Enums.Curriculum
+export type NestedEnumPackageCoverageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PackageCoverage | Prisma.EnumPackageCoverageFieldRefInput<$PrismaModel>
+  in?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PackageCoverage[] | Prisma.ListEnumPackageCoverageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPackageCoverageWithAggregatesFilter<$PrismaModel> | $Enums.PackageCoverage
   _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumCurriculumFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumCurriculumFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPackageCoverageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPackageCoverageFilter<$PrismaModel>
 }
 
 export type NestedEnumInitiatedByFilter<$PrismaModel = never> = {

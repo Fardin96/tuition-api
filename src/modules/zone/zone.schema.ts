@@ -55,6 +55,8 @@ export const zoneResponseSchema = z
     placeId: z.string().nullable(),
     addressText: z.string().nullable(),
     requirementIds: z.array(z.string().uuid()),
+    /** OPEN packages taught in this zone. Packages in a CLOSED state are left out. */
+    packageIds: z.array(z.string().uuid()),
     createdAt: z.string(),
     updatedAt: z.string(),
   })
@@ -94,6 +96,15 @@ export const zoneDeleteResponseSchema = z
         name: z.string(),
         isDefault: z.boolean(),
         isActive: z.boolean(),
+        teachesOnline: z.boolean(),
+        remainingZoneCount: z.number(),
+      }),
+    ),
+    /** OPEN packages that used the zone. remainingZoneCount is their zones left after the delete. */
+    affectedPackages: z.array(
+      z.object({
+        id: z.string().uuid(),
+        title: z.string(),
         teachesOnline: z.boolean(),
         remainingZoneCount: z.number(),
       }),

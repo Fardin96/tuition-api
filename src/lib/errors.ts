@@ -12,7 +12,6 @@ export const ERROR_CODES = {
   WhatsappInUse: "WHATSAPP_IN_USE",
   RequirementLimitReached: "REQUIREMENT_LIMIT_REACHED",
   RequirementIsDefault: "REQUIREMENT_IS_DEFAULT",
-  RequirementInUse: "REQUIREMENT_IN_USE",
   RequirementArchived: "REQUIREMENT_ARCHIVED",
   RequirementHasNoSubjects: "REQUIREMENT_NO_SUBJECTS",
   RequirementLosesLastSubject: "REQUIREMENT_LOSES_LAST_SUBJECT",
@@ -43,11 +42,15 @@ const STATUS_FALLBACK: Record<number, ErrorName> = {
   501: "NotImplemented",
 };
 
+export type ErrorIssue = { path: (string | number)[]; message: string };
+
 export type AppError = Error & {
   name: ErrorName;
   statusCode: number;
   code: ErrorCode;
   details?: Record<string, unknown>;
+  /** Sent top-level, like the issues of a body validation error, so the frontend maps them to fields. */
+  issues?: ErrorIssue[];
 };
 
 export function appError(
@@ -66,6 +69,16 @@ export function appError(
 
 export function notFound(message: string) {
   return appError("NotFound", 404, message);
+}
+
+// A 400 VALIDATION_ERROR shaped like a body validation error, for rules checked on merged values.
+export function validationIssuesError(
+  message: string,
+  issues: { path: string; message: string }[],
+): AppError {
+  return Object.assign(appError("ValidationError", 400, message), {
+    issues: issues.map((issue) => ({ path: [issue.path], message: issue.message })),
+  });
 }
 
 // Fastify and Prisma errors carry their own `code` (FST_ERR_*, P2002); only our catalogue codes pass through.

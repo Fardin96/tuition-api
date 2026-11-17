@@ -151,7 +151,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutors",
           summary: "Replace my subjects",
           description:
-            "Replaces the tutor's subjects with subjectIds. Fails with 409 REQUIREMENT_LOSES_LAST_SUBJECT (details.requirementIds) when an active requirement set would be left with no subjects. Archived sets silently lose the subject.",
+            "Replaces the tutor's subjects with subjectIds. Fails with 409 REQUIREMENT_LOSES_LAST_SUBJECT (details.requirementIds, details.packageIds) when an active requirement set or an OPEN package would be left with no subjects. Archived sets, closed packages and OPEN packages that keep another subject lose the removed subject silently.",
           auth: ["TUTOR"],
           errors: [404, 409],
         }),
@@ -510,7 +510,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutor requirements",
           summary: "List my requirement sets",
           description:
-            "status=active (default) lists active sets, archived lists archived sets (newest first, capped at 50), all lists both. mappedPackageCount counts OPEN packages, plus packages with no set chosen on the default set.",
+            "status=active (default) lists active sets, archived lists archived sets (newest first, capped at 50), all lists both.",
           auth: ["TUTOR"],
           errors: [404],
         }),
@@ -651,7 +651,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutor requirements",
           summary: "Archive a requirement set",
           description:
-            "Sets isActive to false. Fails with 409 REQUIREMENT_IS_DEFAULT for the default set, and with 409 REQUIREMENT_IN_USE (details.packageIds) when OPEN packages use it. An archived set is returned unchanged.",
+            "Sets isActive to false. Fails with 409 REQUIREMENT_IS_DEFAULT for the default set. Packages are offers and do not reference a set, so archiving never waits on them. An archived set is returned unchanged.",
           auth: ["TUTOR"],
           errors: [404, 409],
         }),

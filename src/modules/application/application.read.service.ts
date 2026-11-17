@@ -62,17 +62,14 @@ const applicationInclude = {
   package: {
     select: {
       id: true,
-      requirementId: true,
-      subjectId: true,
-      areaId: true,
-      curriculum: true,
-      levelCode: true,
-      academicGroup: true,
-      expectedSalary: true,
+      title: true,
+      price: true,
+      durationWeeks: true,
       daysPerWeek: true,
-      timeOfDay: true,
+      timeFrom: true,
       status: true,
       moderationStatus: true,
+      subjects: { select: { subjectId: true }, orderBy: { subjectId: "asc" } },
     },
   },
 } satisfies Prisma.ApplicationInclude;
@@ -167,6 +164,9 @@ function toTargetAndState(
         salary: r.salary,
         daysPerWeek: r.daysPerWeek,
         timeOfDay: toTimeString(r.timeOfDay),
+        title: null,
+        price: null,
+        durationWeeks: null,
       },
       state: { status: r.status, closed, moderationStatus: null },
     };
@@ -179,14 +179,17 @@ function toTargetAndState(
         id: p.id,
         status: p.status,
         closed,
-        areaId: p.areaId,
-        subjectIds: [p.subjectId],
-        curriculum: p.curriculum,
-        levelCode: p.levelCode,
-        academicGroup: p.academicGroup,
-        salary: p.expectedSalary,
+        areaId: null,
+        subjectIds: p.subjects.map((s) => s.subjectId),
+        curriculum: null,
+        levelCode: null,
+        academicGroup: null,
+        salary: null,
         daysPerWeek: p.daysPerWeek,
-        timeOfDay: toTimeString(p.timeOfDay),
+        timeOfDay: toTimeString(p.timeFrom),
+        title: p.title,
+        price: p.price,
+        durationWeeks: p.durationWeeks,
       },
       state: { status: p.status, closed, moderationStatus: p.moderationStatus },
     };
@@ -318,18 +321,11 @@ async function matchedSetIdOf(requirementId: string, tutorId: string): Promise<s
   return rows[0]?.id ?? null;
 }
 
-// The set behind an application. Requirement: a matching set (MATCH), else the default set
-// (DEFAULT). Package: the package's own set (PACKAGE); a package without one belongs to the
-// tutor's default set. Null when there is no set to show.
+// The set behind a requirement application: a matching set (MATCH), else the default set
+// (DEFAULT). Null when there is no set to show. Packages are offers with no set, so they get null.
 async function tutorSetOf(row: AppRow): Promise<ApplicationTutorSet | null> {
+  if (row.package) return null;
   const { tutorId } = row;
-  if (row.package) {
-    const { requirementId } = row.package;
-    const set = requirementId
-      ? await findTutorSet({ id: requirementId, tutorId })
-      : await findTutorSet({ tutorId, isDefault: true, isActive: true });
-    return set ? { matchedBy: "PACKAGE", set } : null;
-  }
   const matchedId = row.requirementId ? await matchedSetIdOf(row.requirementId, tutorId) : null;
   if (matchedId) {
     const set = await findTutorSet({ id: matchedId, tutorId });

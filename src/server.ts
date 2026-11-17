@@ -49,6 +49,7 @@ export async function buildApp() {
       message: masked ? "Internal server error" : (err.message ?? ""),
     };
     if (err.details && !masked) body.details = err.details;
+    if (err.issues && !masked) body.issues = err.issues;
     if (hasZodFastifySchemaValidationErrors(error)) {
       body.error = "ValidationError";
       body.code = ERROR_CODES.ValidationError;

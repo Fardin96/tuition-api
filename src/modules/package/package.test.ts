@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Curriculum, ListingStatus } from "../../generated/prisma/enums.js";
 import { prisma } from "../../lib/prisma.js";
 import {
   createAccount,
@@ -27,43 +28,33 @@ async function createListedTutor({ listed = true }: { listed?: boolean } = {}) {
 }
 
 async function createStudentAt(
-  options: {
-    areaId?: number;
-    pin?: { lat: number; lng: number; needsReaddress?: boolean } | null;
-  } = {},
+  options: { pin?: { lat: number; lng: number; needsReaddress?: boolean } | null } = {},
 ) {
-  const area = options.areaId ?? (await createArea()).id;
+  const area = await createArea();
   const account = await createAccount({ role: "STUDENT" });
-  const student = await createStudentProfile(account.id, area);
+  const student = await createStudentProfile(account.id, area.id);
   if (options.pin) await setStudentLocation(student.id, options.pin);
-  return { student, areaId: area, headers: await getAuthHeaders(account) };
+  return { student, headers: await getAuthHeaders(account) };
 }
 
+// Helper defaults are online, levels 6-10, Bangla medium. Moderation is set afterwards when asked.
 async function createPackage(
   tutorId: string,
   overrides: {
-    areaId?: number | null;
-    status?: "OPEN" | "CLOSED" | "FILLED" | "EXPIRED" | "DRAFT";
+    subjectIds?: number[];
+    zoneIds?: string[];
+    teachesOnline?: boolean;
+    levelMin?: number;
+    levelMax?: number;
+    curricula?: Curriculum[];
+    status?: ListingStatus;
     moderationStatus?: "PENDING" | "APPROVED" | "REJECTED";
-    subjectId?: number;
-    levelCode?: number;
-    curriculum?: "BANGLA_MEDIUM" | "ENGLISH_VERSION";
   } = {},
 ) {
-  const pkg = await createTuitionPackage(tutorId, {
-    subjectId: overrides.subjectId,
-    levelCode: overrides.levelCode,
-    curriculum: overrides.curriculum,
-    status: overrides.status,
-  });
-  if (overrides.areaId !== undefined || overrides.moderationStatus !== undefined) {
-    return prisma.tuitionPackage.update({
-      where: { id: pkg.id },
-      data: {
-        ...(overrides.areaId !== undefined ? { areaId: overrides.areaId } : {}),
-        ...(overrides.moderationStatus ? { moderationStatus: overrides.moderationStatus } : {}),
-      },
-    });
+  const { moderationStatus, ...fields } = overrides;
+  const pkg = await createTuitionPackage(tutorId, fields);
+  if (moderationStatus) {
+    return prisma.tuitionPackage.update({ where: { id: pkg.id }, data: { moderationStatus } });
   }
   return pkg;
 }
@@ -92,7 +83,7 @@ describe("GET /packages (student browse, #52)", () => {
 
   it("nearby always lists an online package, even without a student pin", async () => {
     const { tutor } = await createListedTutor();
-    const online = await createPackage(tutor.id, { areaId: null });
+    const online = await createPackage(tutor.id);
     const { headers } = await createStudentAt();
 
     const res = await browse(headers, { scope: "nearby" });
@@ -102,16 +93,16 @@ describe("GET /packages (student browse, #52)", () => {
     expect(res.body.locationMissing).toBe(true);
   });
 
-  it("nearby lists an area package whose tutor has a zone covering the student pin, and hides one that does not", async () => {
+  it("nearby lists a package whose own zone covers the student pin, and hides one whose zone does not", async () => {
     const { tutor } = await createListedTutor();
-    await createTutorZone(tutor.id, { radiusM: 5000, ...CENTRE });
-    const area = await createArea();
-    const covered = await createPackage(tutor.id, { areaId: area.id });
-    const { headers } = await createStudentAt({ areaId: area.id, pin: CENTRE });
+    const zone = await createTutorZone(tutor.id, { radiusM: 5000, ...CENTRE });
+    const covered = await createPackage(tutor.id, { zoneIds: [zone] });
 
     const { tutor: remote } = await createListedTutor();
-    await createTutorZone(remote.id, { radiusM: 5000, ...FAR });
-    const uncovered = await createPackage(remote.id, { areaId: area.id });
+    const farZone = await createTutorZone(remote.id, { radiusM: 5000, ...FAR });
+    const uncovered = await createPackage(remote.id, { zoneIds: [farZone] });
+
+    const { headers } = await createStudentAt({ pin: CENTRE });
 
     const nearby = await browse(headers, { scope: "nearby" });
     expect(nearby.body.locationMissing).toBe(false);
@@ -122,32 +113,39 @@ describe("GET /packages (student browse, #52)", () => {
     expect(idsOf(all.body)).toEqual(expect.arrayContaining([covered.id, uncovered.id]));
   });
 
-  it("without a usable pin, nearby falls back to online packages and the student's own area, with locationMissing true", async () => {
+  it("does not count another zone of the same tutor: a student inside zone A does not see a package that only uses zone B", async () => {
     const { tutor } = await createListedTutor();
-    const home = await createArea();
-    const elsewhere = await createArea();
-    const inArea = await createPackage(tutor.id, { areaId: home.id });
-    const outOfArea = await createPackage(tutor.id, { areaId: elsewhere.id });
-    const online = await createPackage(tutor.id, { areaId: null });
-    const { headers } = await createStudentAt({ areaId: home.id });
+    const near = await createTutorZone(tutor.id, { radiusM: 5000, ...CENTRE });
+    const far = await createTutorZone(tutor.id, { radiusM: 5000, ...FAR });
+    const nearPkg = await createPackage(tutor.id, { zoneIds: [near] });
+    const farPkg = await createPackage(tutor.id, { zoneIds: [far] });
+    const { headers } = await createStudentAt({ pin: CENTRE });
+
+    const res = await browse(headers, { scope: "nearby" });
+
+    expect(idsOf(res.body)).toContain(nearPkg.id);
+    expect(idsOf(res.body)).not.toContain(farPkg.id);
+  });
+
+  it("without a usable pin, nearby lists online packages only, even when a zone would cover the student", async () => {
+    const { tutor } = await createListedTutor();
+    const zone = await createTutorZone(tutor.id, { radiusM: 5000, ...CENTRE });
+    const zoned = await createPackage(tutor.id, { zoneIds: [zone] });
+    const online = await createPackage(tutor.id);
+    const { headers } = await createStudentAt();
 
     const res = await browse(headers, { scope: "nearby" });
 
     expect(res.body.locationMissing).toBe(true);
-    expect(idsOf(res.body)).toEqual(expect.arrayContaining([inArea.id, online.id]));
-    expect(idsOf(res.body)).not.toContain(outOfArea.id);
+    expect(idsOf(res.body)).toEqual([online.id]);
+    expect(idsOf(res.body)).not.toContain(zoned.id);
   });
 
   it("treats a needs_readdress pin as missing, so the zone match is skipped", async () => {
     const { tutor } = await createListedTutor();
-    await createTutorZone(tutor.id, { radiusM: 5000, ...CENTRE });
-    const zoneArea = await createArea();
-    const zoned = await createPackage(tutor.id, { areaId: zoneArea.id });
-    const home = await createArea();
-    const { headers } = await createStudentAt({
-      areaId: home.id,
-      pin: { ...CENTRE, needsReaddress: true },
-    });
+    const zone = await createTutorZone(tutor.id, { radiusM: 5000, ...CENTRE });
+    const zoned = await createPackage(tutor.id, { zoneIds: [zone] });
+    const { headers } = await createStudentAt({ pin: { ...CENTRE, needsReaddress: true } });
 
     const res = await browse(headers, { scope: "nearby" });
 
@@ -157,12 +155,12 @@ describe("GET /packages (student browse, #52)", () => {
 
   it("lists only APPROVED, OPEN packages from listed tutors", async () => {
     const { tutor } = await createListedTutor();
-    const good = await createPackage(tutor.id, { areaId: null });
-    const pending = await createPackage(tutor.id, { areaId: null, moderationStatus: "PENDING" });
-    const rejected = await createPackage(tutor.id, { areaId: null, moderationStatus: "REJECTED" });
-    const closed = await createPackage(tutor.id, { areaId: null, status: "CLOSED" });
+    const good = await createPackage(tutor.id);
+    const pending = await createPackage(tutor.id, { moderationStatus: "PENDING" });
+    const rejected = await createPackage(tutor.id, { moderationStatus: "REJECTED" });
+    const closed = await createPackage(tutor.id, { status: "CLOSED" });
     const { tutor: unlisted } = await createListedTutor({ listed: false });
-    const hidden = await createPackage(unlisted.id, { areaId: null });
+    const hidden = await createPackage(unlisted.id);
     const { headers } = await createStudentAt();
 
     const res = await browse(headers, { scope: "all" });
@@ -173,40 +171,56 @@ describe("GET /packages (student browse, #52)", () => {
     }
   });
 
-  it("filters by subjectId, levelCode and curriculum", async () => {
+  it("matches a filter when the package covers the curriculum, the level and the subject", async () => {
     const { tutor } = await createListedTutor();
-    const math = await createSubject();
-    const english = await createSubject();
-    const mathPkg = await createPackage(tutor.id, {
-      areaId: null,
-      subjectId: math.id,
-      levelCode: 10,
-      curriculum: "BANGLA_MEDIUM",
+    const mathSubject = await createSubject();
+    const englishSubject = await createSubject();
+    const banglaPkg = await createPackage(tutor.id, {
+      subjectIds: [mathSubject.id],
+      levelMin: 6,
+      levelMax: 10,
+      curricula: ["BANGLA_MEDIUM"],
     });
     const englishPkg = await createPackage(tutor.id, {
-      areaId: null,
-      subjectId: english.id,
-      levelCode: 8,
-      curriculum: "ENGLISH_VERSION",
+      subjectIds: [englishSubject.id],
+      levelMin: 8,
+      levelMax: 12,
+      curricula: ["ENGLISH_VERSION"],
+    });
+    const bothPkg = await createPackage(tutor.id, {
+      subjectIds: [mathSubject.id, englishSubject.id],
+      levelMin: 9,
+      levelMax: 10,
+      curricula: ["BANGLA_MEDIUM", "ENGLISH_VERSION"],
     });
     const { headers } = await createStudentAt();
+    const found = async (query: Record<string, string>) =>
+      new Set(idsOf((await browse(headers, { scope: "all", ...query })).body));
 
+    // Curricula is a list: any overlap with the filter matches.
+    expect(await found({ curriculum: "ENGLISH_VERSION" })).toEqual(
+      new Set([englishPkg.id, bothPkg.id]),
+    );
+    // The level filter is inside each package's range, so 8 is in 6-10 and 8-12, not in 9-10.
+    expect(await found({ levelCode: "8" })).toEqual(new Set([banglaPkg.id, englishPkg.id]));
+    expect(await found({ levelCode: "11" })).toEqual(new Set([englishPkg.id]));
+    expect(await found({ subjectId: String(mathSubject.id) })).toEqual(
+      new Set([banglaPkg.id, bothPkg.id]),
+    );
     expect(
-      idsOf((await browse(headers, { scope: "all", subjectId: String(math.id) })).body),
-    ).toEqual([mathPkg.id]);
-    expect(idsOf((await browse(headers, { scope: "all", levelCode: "8" })).body)).toEqual([
-      englishPkg.id,
-    ]);
-    expect(
-      idsOf((await browse(headers, { scope: "all", curriculum: "BANGLA_MEDIUM" })).body),
-    ).toEqual([mathPkg.id]);
+      await found({
+        curriculum: "ENGLISH_VERSION",
+        subjectId: String(mathSubject.id),
+        levelCode: "9",
+      }),
+    ).toEqual(new Set([bothPkg.id]));
   });
 
   it("pages newest first with a keyset cursor", async () => {
     const { tutor } = await createListedTutor();
     const ids: string[] = [];
     for (let i = 0; i < 3; i++) {
-      const pkg = await createPackage(tutor.id, { areaId: null });
+      const pkg = await createPackage(tutor.id);
       await prisma.tuitionPackage.update({
         where: { id: pkg.id },
         data: { createdAt: new Date(Date.UTC(2026, 0, 1 + i)) },
@@ -231,8 +245,8 @@ describe("GET /packages (student browse, #52)", () => {
 
   it("marks closed packages and myApplication for the calling student only", async () => {
     const { tutor } = await createListedTutor();
-    const requested = await createPackage(tutor.id, { areaId: null });
-    const taken = await createPackage(tutor.id, { areaId: null });
+    const requested = await createPackage(tutor.id);
+    const taken = await createPackage(tutor.id);
     const student = await createStudentAt();
     const rival = await createStudentAt();
 
@@ -264,8 +278,8 @@ describe("GET /packages/:id (#54)", () => {
   it("a student sees an APPROVED package and gets 404 for one that is not approved", async () => {
     const app = await createTestApp();
     const { tutor } = await createListedTutor();
-    const approved = await createPackage(tutor.id, { areaId: null });
-    const pending = await createPackage(tutor.id, { areaId: null, moderationStatus: "PENDING" });
+    const approved = await createPackage(tutor.id);
+    const pending = await createPackage(tutor.id, { moderationStatus: "PENDING" });
     const { headers } = await createStudentAt();
 
     const ok = await app.inject({ method: "GET", url: `${BASE}/${approved.id}`, headers });
@@ -281,10 +295,31 @@ describe("GET /packages/:id (#54)", () => {
     expect(hidden.statusCode).toBe(404);
   });
 
+  it("lists subjectIds and the zone count, and keeps the zone ids private", async () => {
+    const app = await createTestApp();
+    const { tutor } = await createListedTutor();
+    const subject = await createSubject();
+    const zone = await createTutorZone(tutor.id, { radiusM: 5000, ...CENTRE });
+    const pkg = await createPackage(tutor.id, { subjectIds: [subject.id], zoneIds: [zone] });
+    const { headers } = await createStudentAt();
+
+    const res = await app.inject({ method: "GET", url: `${BASE}/${pkg.id}`, headers });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      subjectIds: [subject.id],
+      zoneCount: 1,
+      timeFrom: "10:00",
+      timeTo: "12:00",
+      availableFrom: "2024-01-01",
+    });
+    expect(JSON.parse(res.body)).not.toHaveProperty("zoneIds");
+  });
+
   it("a student gets 404 for an APPROVED package whose tutor is not listed, and the owner still sees it", async () => {
     const app = await createTestApp();
     const { tutor, headers: ownerHeaders } = await createListedTutor({ listed: false });
-    const pkg = await createPackage(tutor.id, { areaId: null });
+    const pkg = await createPackage(tutor.id);
     const { headers } = await createStudentAt();
 
     const hidden = await app.inject({ method: "GET", url: `${BASE}/${pkg.id}`, headers });
@@ -302,7 +337,7 @@ describe("GET /packages/:id (#54)", () => {
   it("another tutor gets 404, while the owning tutor sees its own pending package", async () => {
     const app = await createTestApp();
     const { tutor, headers: ownerHeaders } = await createListedTutor();
-    const pending = await createPackage(tutor.id, { areaId: null, moderationStatus: "PENDING" });
+    const pending = await createPackage(tutor.id, { moderationStatus: "PENDING" });
     const { headers: otherHeaders } = await createListedTutor();
 
     const stranger = await app.inject({
@@ -328,7 +363,7 @@ describe("GET /packages/:id (#54)", () => {
   it("the calling student's own application is shown on the detail", async () => {
     const app = await createTestApp();
     const { tutor } = await createListedTutor();
-    const pkg = await createPackage(tutor.id, { areaId: null });
+    const pkg = await createPackage(tutor.id);
     const student = await createStudentAt();
     const mine = await createApplication({
       packageId: pkg.id,

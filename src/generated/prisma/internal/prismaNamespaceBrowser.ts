@@ -76,6 +76,8 @@ export const ModelName = {
   TuitionRequirement: 'TuitionRequirement',
   RequirementSubject: 'RequirementSubject',
   TuitionPackage: 'TuitionPackage',
+  PackageSubject: 'PackageSubject',
+  PackageZone: 'PackageZone',
   Application: 'Application',
   Review: 'Review',
   Report: 'Report',
@@ -464,20 +466,23 @@ export type RequirementSubjectScalarFieldEnum = (typeof RequirementSubjectScalar
 export const TuitionPackageScalarFieldEnum = {
   id: 'id',
   tutorId: 'tutorId',
-  subjectId: 'subjectId',
-  areaId: 'areaId',
-  requirementId: 'requirementId',
-  levelCode: 'levelCode',
-  curriculum: 'curriculum',
-  academicGroup: 'academicGroup',
+  title: 'title',
+  description: 'description',
+  coverage: 'coverage',
+  durationWeeks: 'durationWeeks',
+  price: 'price',
+  levelMin: 'levelMin',
+  levelMax: 'levelMax',
+  curricula: 'curricula',
+  academicGroups: 'academicGroups',
   admissionTargets: 'admissionTargets',
-  isRetaker: 'isRetaker',
-  levelNote: 'levelNote',
-  timeOfDay: 'timeOfDay',
+  timeFrom: 'timeFrom',
+  timeTo: 'timeTo',
+  availableDays: 'availableDays',
   daysPerWeek: 'daysPerWeek',
-  expectedSalary: 'expectedSalary',
-  studentCount: 'studentCount',
+  maxStudents: 'maxStudents',
   availableFrom: 'availableFrom',
+  teachesOnline: 'teachesOnline',
   status: 'status',
   moderationStatus: 'moderationStatus',
   moderationNote: 'moderationNote',
@@ -486,6 +491,24 @@ export const TuitionPackageScalarFieldEnum = {
 } as const
 
 export type TuitionPackageScalarFieldEnum = (typeof TuitionPackageScalarFieldEnum)[keyof typeof TuitionPackageScalarFieldEnum]
+
+
+export const PackageSubjectScalarFieldEnum = {
+  packageId: 'packageId',
+  tutorId: 'tutorId',
+  subjectId: 'subjectId'
+} as const
+
+export type PackageSubjectScalarFieldEnum = (typeof PackageSubjectScalarFieldEnum)[keyof typeof PackageSubjectScalarFieldEnum]
+
+
+export const PackageZoneScalarFieldEnum = {
+  packageId: 'packageId',
+  zoneId: 'zoneId',
+  tutorId: 'tutorId'
+} as const
+
+export type PackageZoneScalarFieldEnum = (typeof PackageZoneScalarFieldEnum)[keyof typeof PackageZoneScalarFieldEnum]
 
 
 export const ApplicationScalarFieldEnum = {

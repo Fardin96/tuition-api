@@ -10,6 +10,7 @@ import {
   createStudentProfile,
   createSubject,
   createTestApp,
+  createTuitionPackage,
   createTutorProfile,
   getAuthHeaders,
   setStudentLocation,
@@ -411,18 +412,12 @@ describe("me routes", () => {
         whatsappNumber: "+8801733333333",
         phoneNumber: "+8801744444444",
       });
-      const pkg = await prisma.tuitionPackage.create({
-        data: {
-          tutorId: tutor.id,
-          curriculum: "BANGLA_MEDIUM",
-          subjectId: subject.id,
-          levelCode: 10,
-          timeOfDay: new Date("2024-01-01T10:00:00Z"),
-          daysPerWeek: 3,
-          expectedSalary: 5000,
-          availableFrom: new Date("2024-01-01"),
-          status: "OPEN",
-        },
+      const pkg = await createTuitionPackage(tutor.id, {
+        subjectIds: [subject.id],
+        levelMin: 10,
+        levelMax: 10,
+        curricula: ["BANGLA_MEDIUM"],
+        status: "OPEN",
       });
 
       const otherStudentAccount = await createAccount({ role: "STUDENT" });

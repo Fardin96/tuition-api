@@ -63,11 +63,11 @@ export const applicationTutorProfileSchema = z
   .meta({ id: "ApplicationTutorProfile" });
 export type ApplicationTutorProfile = z.infer<typeof applicationTutorProfileSchema>;
 
-// The tutor set behind an application. MATCH: a set that covers the requirement. DEFAULT: no set
-// covers it, so the tutor's default set is shown. PACKAGE: the package's own set.
+// The tutor set behind a requirement application. MATCH: a set that covers the requirement.
+// DEFAULT: no set covers it, so the tutor's default set is shown. Package applications have none.
 export const applicationTutorSetSchema = z
   .object({
-    matchedBy: z.enum(["MATCH", "DEFAULT", "PACKAGE"]),
+    matchedBy: z.enum(["MATCH", "DEFAULT"]),
     set: z.object({
       id: z.string(),
       name: z.string(),
@@ -107,16 +107,26 @@ export const applicationTargetSchema = z
     id: z.string(),
     status: z.nativeEnum(ListingStatus),
     closed: z.boolean(),
+    /** Requirement only; null for packages. */
     areaId: z.number().nullable(),
     subjectIds: z.array(z.number()),
+    /** Requirement only; null for packages. */
     curriculum: z.enum(CURRICULA).nullable(),
+    /** Requirement only; null for packages. */
     levelCode: z.number().nullable(),
+    /** Requirement only; null for packages. */
     academicGroup: z.enum(ACADEMIC_GROUPS).nullable(),
-    /** BDT per month: requirement salary or package expected salary. */
+    /** BDT per month. Requirement only; null for packages (see price). */
     salary: z.number().nullable(),
     daysPerWeek: z.number().nullable(),
-    /** "HH:MM" */
+    /** "HH:MM". A package's start time. */
     timeOfDay: z.string().nullable(),
+    /** Package title; null for requirements. */
+    title: z.string().nullable(),
+    /** BDT for the whole package; null for requirements. */
+    price: z.number().nullable(),
+    /** Package length in weeks; null for requirements. */
+    durationWeeks: z.number().nullable(),
   })
   .meta({ id: "ApplicationTarget" });
 

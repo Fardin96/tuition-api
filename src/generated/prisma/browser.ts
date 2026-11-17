@@ -143,6 +143,16 @@ export type RequirementSubject = Prisma.RequirementSubjectModel
  */
 export type TuitionPackage = Prisma.TuitionPackageModel
 /**
+ * Model PackageSubject
+ * 
+ */
+export type PackageSubject = Prisma.PackageSubjectModel
+/**
+ * Model PackageZone
+ * 
+ */
+export type PackageZone = Prisma.PackageZoneModel
+/**
  * Model Application
  * 
  */
