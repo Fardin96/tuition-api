@@ -14,6 +14,7 @@ import {
   setPlatformSetting,
 } from "../../tests/helpers.js";
 import { newTranId } from "../fees/fee-quote.js";
+import { reconcileAttempt } from "./payment.service.js";
 import { runPaymentReconcile } from "./payment-reconcile.service.js";
 
 const MINUTE = 60_000;
@@ -62,7 +63,8 @@ function gatewayWith(
   return { gateway, queried };
 }
 
-function endedRecord(tranId: string, status: "FAILED" | "CANCELLED"): GatewayTransaction {
+// A query element with the given gateway status and no val_id (nothing was paid).
+function endedRecord(tranId: string, status: string): GatewayTransaction {
   return {
     status,
     tranId,
@@ -180,7 +182,7 @@ describe("runPaymentReconcile", () => {
     expect(result).toMatchObject({ checked: 1, ended: 1, stillPending: 0 });
     const after = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
     expect(after.status).toBe("EXPIRED");
-    expect(after.failureReason).toBe("No payment found at the gateway");
+    expect(after.failureReason).toBe("No completed payment at the gateway after 60 minutes");
   });
 
   it("keeps an unknown attempt PENDING while it is younger than 60 minutes", async () => {
@@ -192,6 +194,76 @@ describe("runPaymentReconcile", () => {
     const after = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
     expect(after.status).toBe("PENDING");
     expect(after.lastCheckedAt).not.toBeNull();
+  });
+
+  it.each(["PROCESSING", "PENDING", "INITIATED"])(
+    "keeps an attempt the gateway reports as %s PENDING while it is younger than 60 minutes",
+    async (status) => {
+      const attempt = await pendingAttempt(10 * MINUTE);
+      fake.setQuery(attempt.tranId, [endedRecord(attempt.tranId, status)]);
+
+      const result = await runPaymentReconcile();
+
+      expect(result).toMatchObject({ checked: 1, stillPending: 1, ended: 0, settled: 0 });
+      const after = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
+      expect(after.status).toBe("PENDING");
+      expect(after.failureReason).toBeNull();
+      expect(after.lastCheckedAt).not.toBeNull();
+    },
+  );
+
+  it("expires an attempt the gateway reports as PROCESSING once it is older than 60 minutes", async () => {
+    const attempt = await pendingAttempt(61 * MINUTE);
+    fake.setQuery(attempt.tranId, [endedRecord(attempt.tranId, "PROCESSING")]);
+
+    const result = await runPaymentReconcile();
+
+    expect(result).toMatchObject({ checked: 1, ended: 1, stillPending: 0 });
+    const after = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
+    expect(after.status).toBe("EXPIRED");
+    expect(after.failureReason).toBe("No completed payment at the gateway after 60 minutes");
+  });
+
+  it("expires an attempt the gateway reports as UNATTEMPTED at once, even when it is young", async () => {
+    const attempt = await pendingAttempt(10 * MINUTE);
+    fake.setQuery(attempt.tranId, [endedRecord(attempt.tranId, "UNATTEMPTED")]);
+
+    const result = await runPaymentReconcile();
+
+    expect(result).toMatchObject({ checked: 1, ended: 1, stillPending: 0 });
+    const after = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
+    expect(after.status).toBe("EXPIRED");
+    expect(after.failureReason).toBe("Gateway status UNATTEMPTED");
+  });
+
+  it("expires an attempt the gateway reports as EXPIRED at once, even when it is young", async () => {
+    const attempt = await pendingAttempt(10 * MINUTE);
+    fake.setQuery(attempt.tranId, [endedRecord(attempt.tranId, "EXPIRED")]);
+
+    const result = await runPaymentReconcile();
+
+    expect(result).toMatchObject({ checked: 1, ended: 1, stillPending: 0 });
+    const after = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
+    expect(after.status).toBe("EXPIRED");
+    expect(after.failureReason).toBe("Gateway status EXPIRED");
+  });
+
+  it("settles a late verified success on an attempt the gateway had expired", async () => {
+    const attempt = await pendingAttempt(10 * MINUTE);
+    fake.setQuery(attempt.tranId, [endedRecord(attempt.tranId, "UNATTEMPTED")]);
+    await runPaymentReconcile();
+    const expired = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
+    expect(expired.status).toBe("EXPIRED");
+
+    const tx = fakeSuccess({ tranId: attempt.tranId, valId: "VAL-LATE", amount: "1537.50" });
+    fake.setQuery(attempt.tranId, [tx]);
+    fake.setValidation("VAL-LATE", tx);
+    await reconcileAttempt(attempt.tranId);
+
+    const after = await prisma.paymentAttempt.findUniqueOrThrow({ where: { id: attempt.id } });
+    expect(after.status).toBe("SUCCEEDED");
+    const payments = await prisma.feePayment.findMany({ where: { feeId: attempt.feeId } });
+    expect(payments).toHaveLength(1);
   });
 
   it("stops after three gateway errors in a row and leaves the rest untouched", async () => {

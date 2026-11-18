@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { env } from "../../config/env.js";
 import { prisma } from "../../lib/prisma.js";
-import { setPaymentGatewayForTests } from "../../lib/sslcommerz.js";
+import { type GatewayTransaction, setPaymentGatewayForTests } from "../../lib/sslcommerz.js";
 import {
   createAccount,
   createFakeGateway,
@@ -33,6 +33,23 @@ async function checkout(
 
 function attemptUrl(feeId: string, tranId: string) {
   return `/api/v1/fees/${feeId}/attempts/${tranId}`;
+}
+
+// A gateway query element with the given status and no val_id (nothing was paid).
+function gatewayRecord(tranId: string, status: string): GatewayTransaction {
+  return {
+    status,
+    tranId,
+    valId: null,
+    amount: "1537.50",
+    currencyType: "BDT",
+    currencyAmount: "1537.50",
+    bankTranId: null,
+    cardType: null,
+    riskLevel: null,
+    riskTitle: null,
+    raw: {},
+  };
 }
 
 const savedEnv = {
@@ -246,6 +263,43 @@ describe("payment checkout", () => {
       expect(fake.sessions).toHaveLength(2);
     });
 
+    it("ends the old checkout with the gateway's UNATTEMPTED status and starts a new one", async () => {
+      const app = await createTestApp();
+      const setup = await createTutorFeeFixture();
+      const headers = await getAuthHeaders(setup.tutorAccount);
+      const first = JSON.parse((await checkout(app, headers, setup.fee.id)).body);
+      fake.setQuery(first.tranId, [gatewayRecord(first.tranId, "UNATTEMPTED")]);
+
+      const second = await checkout(app, headers, setup.fee.id);
+
+      expect(second.statusCode).toBe(201);
+      const oldRow = await prisma.paymentAttempt.findUniqueOrThrow({
+        where: { tranId: first.tranId },
+      });
+      expect(oldRow.status).toBe("EXPIRED");
+      expect(oldRow.failureReason).toBe("Gateway status UNATTEMPTED");
+      expect(
+        await prisma.paymentAttempt.count({ where: { feeId: setup.fee.id, status: "PENDING" } }),
+      ).toBe(1);
+    });
+
+    it("replaces a checkout the gateway reports as PROCESSING while it is younger than 60 minutes", async () => {
+      const app = await createTestApp();
+      const setup = await createTutorFeeFixture();
+      const headers = await getAuthHeaders(setup.tutorAccount);
+      const first = JSON.parse((await checkout(app, headers, setup.fee.id)).body);
+      fake.setQuery(first.tranId, [gatewayRecord(first.tranId, "PROCESSING")]);
+
+      const second = await checkout(app, headers, setup.fee.id);
+
+      expect(second.statusCode).toBe(201);
+      const oldRow = await prisma.paymentAttempt.findUniqueOrThrow({
+        where: { tranId: first.tranId },
+      });
+      expect(oldRow.status).toBe("EXPIRED");
+      expect(oldRow.failureReason).toBe("Replaced by a new checkout");
+    });
+
     it("answers 409 'This fee was just paid.' when the gateway shows the old checkout paid", async () => {
       const app = await createTestApp();
       const setup = await createTutorFeeFixture();
@@ -438,6 +492,53 @@ describe("payment checkout", () => {
 
       expect(res.statusCode).toBe(200);
       expect(JSON.parse(res.body).status).toBe("PENDING");
+    });
+  });
+
+  describe("GET attempt on read, gateway statuses", () => {
+    it("keeps a checkout the gateway reports as PROCESSING PENDING while it is younger than 60 minutes", async () => {
+      const app = await createTestApp();
+      const setup = await createTutorFeeFixture();
+      const headers = await getAuthHeaders(setup.tutorAccount);
+      const { tranId } = JSON.parse((await checkout(app, headers, setup.fee.id)).body);
+      await prisma.paymentAttempt.update({
+        where: { tranId },
+        data: { createdAt: new Date(Date.now() - 30_000) },
+      });
+      fake.setQuery(tranId, [gatewayRecord(tranId, "PROCESSING")]);
+
+      const res = await app.inject({
+        method: "GET",
+        url: attemptUrl(setup.fee.id, tranId),
+        headers,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toMatchObject({ status: "PENDING", failureReason: null });
+    });
+
+    it("expires a checkout the gateway reports as PROCESSING once it is older than 60 minutes", async () => {
+      const app = await createTestApp();
+      const setup = await createTutorFeeFixture();
+      const headers = await getAuthHeaders(setup.tutorAccount);
+      const { tranId } = JSON.parse((await checkout(app, headers, setup.fee.id)).body);
+      await prisma.paymentAttempt.update({
+        where: { tranId },
+        data: { createdAt: new Date(Date.now() - 61 * 60_000) },
+      });
+      fake.setQuery(tranId, [gatewayRecord(tranId, "PROCESSING")]);
+
+      const res = await app.inject({
+        method: "GET",
+        url: attemptUrl(setup.fee.id, tranId),
+        headers,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toMatchObject({
+        status: "EXPIRED",
+        failureReason: "No completed payment at the gateway after 60 minutes",
+      });
     });
   });
 

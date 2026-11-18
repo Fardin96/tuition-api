@@ -38,9 +38,15 @@ function buildPgConfig() {
     max,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
+    // TimeZone=UTC: the driver adapter sends a Date as a wall-clock time with no offset, which
+    // Postgres reads in the session time zone. Any other zone shifts every Date the app writes or
+    // compares against now()-based defaults. Pooled URLs rely on the database default (UTC on DO).
     ...(pooled
       ? {}
-      : { options: "-c statement_timeout=10000 -c idle_in_transaction_session_timeout=15000" }),
+      : {
+          options:
+            "-c statement_timeout=10000 -c idle_in_transaction_session_timeout=15000 -c TimeZone=UTC",
+        }),
     ...(sslMode !== "disable"
       ? {
           ssl: {

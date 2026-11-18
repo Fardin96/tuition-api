@@ -429,6 +429,12 @@ export async function settleAttempt(tranId: string, valId: string): Promise<Paym
 }
 
 // Asks the gateway about a PENDING attempt. GatewayError propagates. last_checked_at is always set.
+// The real sandbox answers a session the tutor opened but never paid with PROCESSING, PENDING,
+// INITIATED or UNATTEMPTED, so those are not "still going" evidence on their own:
+// - a verified success settles (SETTLABLE, so an EXPIRED attempt can still settle later);
+// - FAILED or CANCELLED is a soft end state;
+// - EXPIRED or UNATTEMPTED ends the attempt at once;
+// - no element, or only non-final statuses, ends it once it is older than ABANDON_AFTER_MS.
 export async function reconcileAttempt(tranId: string): Promise<void> {
   const gateway = getPaymentGateway();
   const attempt = await prisma.paymentAttempt.findUnique({
@@ -441,6 +447,7 @@ export async function reconcileAttempt(tranId: string): Promise<void> {
     const results = await gateway.queryByTranId(tranId);
     const verified = results.find((r) => isSuccessStatus(r.status) && r.valId);
     const ended = results.find((r) => r.status === "FAILED" || r.status === "CANCELLED");
+    const abandoned = results.find((r) => r.status === "EXPIRED" || r.status === "UNATTEMPTED");
     if (verified?.valId) {
       await settleAttempt(tranId, verified.valId);
     } else if (ended) {
@@ -449,11 +456,10 @@ export async function reconcileAttempt(tranId: string): Promise<void> {
         ended.status === "CANCELLED" ? "CANCELLED" : "FAILED",
         `Gateway status ${ended.status}`,
       );
-    } else if (
-      results.length === 0 &&
-      attempt.createdAt.getTime() < Date.now() - ABANDON_AFTER_MS
-    ) {
-      await endPending(tranId, "EXPIRED", "No payment found at the gateway");
+    } else if (abandoned) {
+      await endPending(tranId, "EXPIRED", `Gateway status ${abandoned.status}`);
+    } else if (attempt.createdAt.getTime() < Date.now() - ABANDON_AFTER_MS) {
+      await endPending(tranId, "EXPIRED", "No completed payment at the gateway after 60 minutes");
     }
   } finally {
     await prisma.paymentAttempt.updateMany({

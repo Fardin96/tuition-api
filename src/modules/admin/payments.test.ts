@@ -852,7 +852,7 @@ describe("admin payment attempts", () => {
       // EXPIRED is still settlable: a later verified success moves it on.
       expect(JSON.parse(res.body)).toMatchObject({
         status: "EXPIRED",
-        failureReason: "No payment found at the gateway",
+        failureReason: "No completed payment at the gateway after 60 minutes",
         canCheck: true,
       });
     });
