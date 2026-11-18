@@ -1963,6 +1963,144 @@ describe("tutor routes", () => {
       expect(JSON.parse(res.body).isDefault).toBe(false);
     });
 
+    describe("zone or online rule", () => {
+      it("rejects create that is offline with no zones (400 on zoneIds)", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [subjects[0].id], teachesOnline: false }),
+        });
+
+        expect(res.statusCode).toBe(400);
+        const body = JSON.parse(res.body);
+        expect(body.code).toBe("VALIDATION_ERROR");
+        expect(JSON.stringify(body)).toContain("zoneIds");
+        expect(JSON.stringify(body)).toContain("Pick a zone or turn on online teaching");
+      });
+
+      it("creates an online set with no zones", async () => {
+        const app = await createTestApp();
+        const { headers, subjects } = await setupTutor();
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({ subjectIds: [subjects[0].id], teachesOnline: true }),
+        });
+
+        expect(res.statusCode).toBe(201);
+      });
+
+      it("creates an offline set with a zone", async () => {
+        const app = await createTestApp();
+        const { headers, subjects, zoneIds } = await setupTutor(1, 1);
+
+        const res = await app.inject({
+          method: "POST",
+          url: base,
+          headers,
+          payload: requirementPayload({
+            subjectIds: [subjects[0].id],
+            teachesOnline: false,
+            zoneIds,
+          }),
+        });
+
+        expect(res.statusCode).toBe(201);
+      });
+
+      async function offlineSet(withZone: boolean) {
+        const ctx = await setupTutor(1, 1);
+        const set = await createTutorRequirement(ctx.tutor.id, {
+          isDefault: true,
+          subjectIds: [ctx.subjects[0].id],
+          zoneIds: withZone ? ctx.zoneIds : [],
+        });
+        return { ...ctx, set };
+      }
+
+      it("rejects turning online off on a set with no zones (400)", async () => {
+        const app = await createTestApp();
+        const { headers, set } = await offlineSet(false);
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { teachesOnline: false },
+        });
+
+        expect(res.statusCode).toBe(400);
+        const body = JSON.parse(res.body);
+        expect(body.code).toBe("INVALID_REQUIREMENT");
+        expect(body.message).toBe("Pick a zone or turn on online teaching");
+        expect(body.details.fields).toEqual(["zoneIds"]);
+        const row = await prisma.tutorRequirement.findUniqueOrThrow({ where: { id: set.id } });
+        expect(row.teachesOnline).toBe(true);
+      });
+
+      it("rejects clearing every zone on an offline set (400)", async () => {
+        const app = await createTestApp();
+        const { headers, set } = await offlineSet(true);
+        await prisma.tutorRequirement.update({
+          where: { id: set.id },
+          data: { teachesOnline: false },
+        });
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { zoneIds: [] },
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).code).toBe("INVALID_REQUIREMENT");
+        expect(JSON.parse(res.body).details.fields).toEqual(["zoneIds"]);
+        expect(await prisma.tutorRequirementZone.count({ where: { requirementId: set.id } })).toBe(
+          1,
+        );
+      });
+
+      it("allows turning online off when the set keeps a zone", async () => {
+        const app = await createTestApp();
+        const { headers, set } = await offlineSet(true);
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { teachesOnline: false },
+        });
+
+        expect(res.statusCode).toBe(200);
+      });
+
+      it("allows clearing zones together with teachesOnline true", async () => {
+        const app = await createTestApp();
+        const { headers, set } = await offlineSet(true);
+        await prisma.tutorRequirement.update({
+          where: { id: set.id },
+          data: { teachesOnline: false },
+        });
+
+        const res = await app.inject({
+          method: "PATCH",
+          url: `${base}/${set.id}`,
+          headers,
+          payload: { zoneIds: [], teachesOnline: true },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(JSON.parse(res.body).zoneIds).toEqual([]);
+      });
+    });
+
     it("rejects an 11th active set (409)", async () => {
       const app = await createTestApp();
       const { tutor, headers, subjects } = await setupTutor();

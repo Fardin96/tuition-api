@@ -819,6 +819,18 @@ export async function updateTutorRequirement(
   try {
     await prisma.$transaction(async (tx) => {
       await lockTutor(tx, tutor.id);
+      // A set needs a zone or online teaching. Check the merged result before any write.
+      if (!values.teachesOnline) {
+        const zoneCount =
+          zoneIds !== undefined
+            ? new Set(zoneIds).size
+            : await tx.tutorRequirementZone.count({ where: { requirementId: id } });
+        if (zoneCount === 0) {
+          throw appError("InvalidRequirement", 400, "Pick a zone or turn on online teaching", {
+            fields: ["zoneIds"],
+          });
+        }
+      }
       if (subjectIds !== undefined) {
         await prepareSetSubjects(tx, tutor.id, subjectIds, syncProfileSubjects === true);
         const current = await tx.tutorRequirementSubject.findMany({

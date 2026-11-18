@@ -554,7 +554,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutor requirements",
           summary: "Create a requirement set",
           description:
-            "The first set becomes the default. syncProfileSubjects adds missing subjects to the profile in the same transaction. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile or a subject fails the foreign key check, and 400 VALIDATION_ERROR for an unknown subject.",
+            "The first set becomes the default. syncProfileSubjects adds missing subjects to the profile in the same transaction. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile or a subject fails the foreign key check, and 400 VALIDATION_ERROR for an unknown subject. A set needs a zone or teachesOnline (400 VALIDATION_ERROR on zoneIds).",
           auth: ["TUTOR"],
           errors: [400, 404, 409],
         }),
@@ -609,7 +609,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutor requirements",
           summary: "Update a requirement set",
           description:
-            "Send at least one field. Allowed on archived sets. Values are checked against the stored set: 400 INVALID_REQUIREMENT (details.fields) for an invalid combination, 400 VALIDATION_ERROR for an unknown subject, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile. Subjects and zones are diff-applied.",
+            "Send at least one field. Allowed on archived sets. Values are checked against the stored set: 400 INVALID_REQUIREMENT (details.fields) for an invalid combination, 400 VALIDATION_ERROR for an unknown subject, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile. Subjects and zones are diff-applied. The merged set still needs a zone or teachesOnline: 400 INVALID_REQUIREMENT with fields zoneIds otherwise.",
           auth: ["TUTOR"],
           errors: [400, 404],
         }),

@@ -361,6 +361,13 @@ export const createTutorRequirementSchema = tutorRequirementBaseSchema
     if (!daysPerWeekFits(v.daysPerWeek, v.availableDays)) {
       ctx.addIssue({ code: "custom", path: ["daysPerWeek"], message: DAYS_PER_WEEK_MESSAGE });
     }
+    if (!v.teachesOnline && v.zoneIds.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["zoneIds"],
+        message: "Pick a zone or turn on online teaching",
+      });
+    }
   })
   .meta({ id: "CreateTutorRequirement" });
 
