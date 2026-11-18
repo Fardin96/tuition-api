@@ -496,6 +496,28 @@ async function superAdmin() {
 describe("createOrUpdateAccount", () => {
   const payload = (sub: string, email: string) => ({ sub, email });
 
+  it("creates an ACTIVE super admin on first sign-in for an allowlisted email, with no sign-up", async () => {
+    await prisma.superAdminEmail.create({ data: { slot: 1, email: "owner@example.com" } });
+
+    const result = await authService.createOrUpdateAccount(
+      payload("google-owner", "owner@example.com"),
+      undefined,
+    );
+
+    expect(result.isNew).toBe(true);
+    expect(result.account.role).toBe("ADMIN");
+    const admin = await prisma.adminUser.findUniqueOrThrow({
+      where: { accountId: result.account.id },
+    });
+    expect(admin).toMatchObject({ adminRole: "SUPER_ADMIN", status: "ACTIVE" });
+  });
+
+  it("still refuses sign-in without an account for an email that is not allowlisted", async () => {
+    await expect(
+      authService.createOrUpdateAccount(payload("google-nobody", "nobody@example.com"), undefined),
+    ).rejects.toMatchObject({ statusCode: 404 });
+  });
+
   it("refuses sign-in for a self-deleted account; sign-up reactivates it and restores its numbers", async () => {
     const area = await createArea();
     const account = await createAccount({

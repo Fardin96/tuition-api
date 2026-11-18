@@ -1,0 +1,112 @@
+import { writeAudit } from "../../lib/admin.js";
+import { validationIssuesError } from "../../lib/errors.js";
+import { prisma } from "../../lib/prisma.js";
+import {
+  type PlatformSettingItem,
+  SETTING_KEYS,
+  type SettingKey,
+  type SettingValue,
+} from "./settings.schema.js";
+
+// Used when a key has no platform_setting row yet.
+const DEFAULTS: Record<SettingKey, SettingValue> = {
+  commission_percent: 0,
+  require_tutor_verification: false,
+  require_phone_verification: false,
+};
+
+function readValue(key: SettingKey, raw: unknown): SettingValue {
+  if (typeof raw === "number" || typeof raw === "boolean") return raw;
+  return DEFAULTS[key];
+}
+
+function validateValue(key: SettingKey, value: SettingValue) {
+  if (key === "commission_percent") {
+    if (typeof value !== "number" || !(value >= 0 && value <= 100)) {
+      throw validationIssuesError("Invalid setting value", [
+        { path: "value", message: "commission_percent must be a number from 0 to 100" },
+      ]);
+    }
+    // At most 2 decimals; the tolerance absorbs float error in value * 100.
+    if (Math.abs(value * 100 - Math.round(value * 100)) > 1e-6) {
+      throw validationIssuesError("Invalid setting value", [
+        { path: "value", message: "commission_percent allows at most 2 decimal places" },
+      ]);
+    }
+    return;
+  }
+  if (typeof value !== "boolean") {
+    throw validationIssuesError("Invalid setting value", [
+      { path: "value", message: `${key} must be true or false` },
+    ]);
+  }
+}
+
+export async function listPlatformSettings(): Promise<PlatformSettingItem[]> {
+  const rows = await prisma.platformSetting.findMany({
+    where: { key: { in: [...SETTING_KEYS] } },
+    select: {
+      key: true,
+      value: true,
+      updatedAt: true,
+      updatedBy: { select: { name: true } },
+    },
+  });
+  const byKey = new Map(rows.map((row) => [row.key, row] as const));
+
+  return SETTING_KEYS.map((key) => {
+    const row = byKey.get(key);
+    return {
+      key,
+      value: row ? readValue(key, row.value) : DEFAULTS[key],
+      updatedAt: row?.updatedAt ?? null,
+      updatedByName: row?.updatedBy?.name ?? null,
+    };
+  });
+}
+
+export async function updatePlatformSetting(
+  key: SettingKey,
+  value: SettingValue,
+  admin: { accountId: string },
+  ip: string | undefined,
+): Promise<PlatformSettingItem> {
+  validateValue(key, value);
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.platformSetting.findUnique({
+      where: { key },
+      select: { value: true },
+    });
+    const previous = existing ? readValue(key, existing.value) : DEFAULTS[key];
+
+    const row = await tx.platformSetting.upsert({
+      where: { key },
+      create: { key, value, updatedById: admin.accountId },
+      update: { value, updatedById: admin.accountId },
+      select: { updatedAt: true, updatedBy: { select: { name: true } } },
+    });
+
+    // is_listed is written only by recompute_is_listed(); a rule change re-evaluates every tutor.
+    if (key === "require_tutor_verification" && previous !== value) {
+      await tx.$executeRaw`SELECT recompute_is_listed(t.id) FROM tutor t`;
+    }
+
+    await writeAudit(tx, {
+      actorAccountId: admin.accountId,
+      action: "setting.update",
+      entityType: "platform_setting",
+      entityId: key,
+      before: { value: previous },
+      after: { value },
+      ip: ip ?? null,
+    });
+
+    return {
+      key,
+      value,
+      updatedAt: row.updatedAt,
+      updatedByName: row.updatedBy?.name ?? null,
+    };
+  });
+}

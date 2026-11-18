@@ -61,13 +61,14 @@ export async function getAuthHeaders(account: { id: string; role: Role; email: s
 }
 
 export async function createArea(
-  overrides: { name?: string; district?: string; division?: string } = {},
+  overrides: { name?: string; district?: string; division?: string; isActive?: boolean } = {},
 ) {
   return prisma.area.create({
     data: {
       division: overrides.division ?? "Dhaka",
       district: overrides.district ?? "Dhaka",
       name: overrides.name ?? `Area ${crypto.randomUUID()}`,
+      isActive: overrides.isActive ?? true,
     },
   });
 }
@@ -404,6 +405,9 @@ export async function createTuitionPackage(
     levelMin?: number;
     levelMax?: number;
     curricula?: Curriculum[];
+    moderationStatus?: "PENDING" | "APPROVED" | "REJECTED";
+    moderationNote?: string;
+    createdAt?: Date;
   } = {},
 ) {
   const subjectIds = overrides.subjectIds ?? [(await createSubject()).id];
@@ -429,7 +433,9 @@ export async function createTuitionPackage(
       availableFrom: new Date("2024-01-01"),
       teachesOnline: overrides.teachesOnline ?? zoneIds.length === 0,
       status: overrides.status ?? "OPEN",
-      moderationStatus: "APPROVED",
+      moderationStatus: overrides.moderationStatus ?? "APPROVED",
+      moderationNote: overrides.moderationNote ?? null,
+      ...(overrides.createdAt ? { createdAt: overrides.createdAt } : {}),
       subjects: { create: subjectIds.map((subjectId) => ({ subjectId })) },
       zones: { create: zoneIds.map((zoneId) => ({ zoneId })) },
     },
@@ -454,6 +460,59 @@ async function createSuperAdminAccount() {
     },
   });
   return account;
+}
+
+// The active super admin, created on first use. Both slots can be filled, so reuse one when it exists.
+export async function createSuperAdmin() {
+  const existing = await prisma.adminUser.findFirst({
+    where: { adminRole: "SUPER_ADMIN", status: "ACTIVE" },
+    select: { account: true },
+  });
+  return existing?.account ?? createSuperAdminAccount();
+}
+
+// A placement fee on a CONFIRMED application. Status and amountPaid move only through fee_payment rows.
+export async function createPlatformFee(data: {
+  tutorId: string;
+  applicationId: string;
+  amountDue?: number;
+  dueDate?: Date;
+  feeType?: "PLACEMENT" | "RECURRING" | "OTHER";
+  status?: "DUE" | "WAIVED" | "VOID";
+}) {
+  return prisma.platformFee.create({
+    data: {
+      tutorId: data.tutorId,
+      applicationId: data.applicationId,
+      feeType: data.feeType ?? "PLACEMENT",
+      amountDue: data.amountDue ?? 1500,
+      dueDate: data.dueDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      status: data.status ?? "DUE",
+    },
+  });
+}
+
+// Records a payment through the ledger (the trigger updates amount_paid and status).
+export async function createFeePayment(data: {
+  feeId: string;
+  amount: number;
+  recordedById: string;
+  kind?: "PAYMENT" | "REVERSAL";
+  reversesPaymentId?: string;
+  reason?: string;
+}) {
+  return prisma.feePayment.create({
+    data: {
+      feeId: data.feeId,
+      amount: data.amount,
+      method: "CASH",
+      kind: data.kind ?? "PAYMENT",
+      reversesPaymentId: data.reversesPaymentId ?? null,
+      reason: data.reason ?? null,
+      receivedAt: new Date(),
+      recordedById: data.recordedById,
+    },
+  });
 }
 
 export async function createAdmin(

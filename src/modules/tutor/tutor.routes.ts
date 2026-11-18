@@ -124,7 +124,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutors",
           summary: "Replace my areas",
           description:
-            "Replaces the tutor's areas with areaIds. Every area must be in the tutor's city, the district of the saved address. Otherwise 409 AREA_OUTSIDE_CITY is returned with details.invalidAreaIds and nothing is written.",
+            "Replaces the tutor's areas with areaIds. Every area must be in the tutor's city, the district of the saved address. An area that is unknown, inactive or out-of-city gets 409 AREA_OUTSIDE_CITY with details.invalidAreaIds and nothing is written. An inactive area the tutor already has may stay in the set.",
           auth: ["TUTOR"],
           errors: [404, 409],
         }),

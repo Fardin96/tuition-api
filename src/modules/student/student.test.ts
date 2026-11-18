@@ -127,6 +127,38 @@ describe("student routes", () => {
       expect(res.statusCode).toBe(409);
     });
 
+    it("rejects an inactive area with a ValidationError (400)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const inactive = await createArea({ isActive: false });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: studentPayload(inactive.id),
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      expect(await prisma.student.count({ where: { accountId: account.id } })).toBe(0);
+    });
+
+    it("rejects an unknown area id with a ValidationError (400)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: studentPayload(999999),
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+    });
+
     it("rejects a WhatsApp number starting with the reserved deleted: prefix", async () => {
       const app = await createTestApp();
       const account = await createAccount({ role: "STUDENT" });
@@ -185,6 +217,45 @@ describe("student routes", () => {
       expect(JSON.parse(res.body).whatsappVerifiedAt).toBeNull();
       const saved = await prisma.student.findUniqueOrThrow({ where: { accountId: account.id } });
       expect(saved.whatsappNumber).toBeNull();
+    });
+
+    it("rejects changing to an inactive area (400)", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      const inactive = await createArea({ isActive: false });
+      await createStudentProfile(account.id, area.id);
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: { areaId: inactive.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      const saved = await prisma.student.findUniqueOrThrow({ where: { accountId: account.id } });
+      expect(saved.areaId).toBe(area.id);
+    });
+
+    it("keeps an area that was deactivated while the student still has it", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      await createStudentProfile(account.id, area.id);
+      await prisma.area.update({ where: { id: area.id }, data: { isActive: false } });
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: { name: "Updated Name", areaId: area.id },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).name).toBe("Updated Name");
+      expect(JSON.parse(res.body).areaId).toBe(area.id);
     });
 
     it("returns 404 when no profile exists", async () => {

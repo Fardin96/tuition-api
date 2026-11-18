@@ -1,4 +1,5 @@
 import type { TuitionRequirement } from "../../generated/prisma/client.js";
+import { unusableAreaIds } from "../../lib/areas.js";
 import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import { validateStudentEducation } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
@@ -35,6 +36,16 @@ function handleForeignKeyError(error: unknown): never {
   throw error;
 }
 
+// Same 400 as an unknown area (P2003), so clients see one message for both.
+async function assertAreaUsable(areaId: number) {
+  const unusable = await unusableAreaIds(prisma, [areaId]);
+  if (unusable.length > 0) {
+    const err = new Error("Invalid area or subject ID");
+    Object.assign(err, { statusCode: 400 });
+    throw err;
+  }
+}
+
 async function notFoundOrConflict(
   id: string,
   studentId: string,
@@ -63,6 +74,11 @@ export async function createRequirement(accountId: string, data: CreateRequireme
 
   const timeOfDayDate = data.timeOfDay ? new Date(`1970-01-01T${data.timeOfDay}:00Z`) : null;
   const hireByDate = data.hireByDate ? new Date(data.hireByDate) : null;
+
+  // Drafts may omit areaId; open requirements always carry one.
+  if (data.areaId != null) {
+    await assertAreaUsable(data.areaId);
+  }
 
   try {
     const created = await prisma.tuitionRequirement.create({
@@ -138,6 +154,11 @@ export async function updateRequirement(
     const err = new Error("Cannot modify requirement in current status");
     Object.assign(err, { statusCode: 409 });
     throw err;
+  }
+
+  // An area the requirement already has may be inactive; only a newly chosen one is checked.
+  if (data.areaId !== undefined && data.areaId !== existing.areaId) {
+    await assertAreaUsable(data.areaId);
   }
 
   // Education is checked on the merged row for every PATCH, not only when publishing.

@@ -39,6 +39,7 @@ export type AreaMinAggregateOutputType = {
   division: string | null
   district: string | null
   name: string | null
+  isActive: boolean | null
 }
 
 export type AreaMaxAggregateOutputType = {
@@ -46,6 +47,7 @@ export type AreaMaxAggregateOutputType = {
   division: string | null
   district: string | null
   name: string | null
+  isActive: boolean | null
 }
 
 export type AreaCountAggregateOutputType = {
@@ -53,6 +55,7 @@ export type AreaCountAggregateOutputType = {
   division: number
   district: number
   name: number
+  isActive: number
   _all: number
 }
 
@@ -70,6 +73,7 @@ export type AreaMinAggregateInputType = {
   division?: true
   district?: true
   name?: true
+  isActive?: true
 }
 
 export type AreaMaxAggregateInputType = {
@@ -77,6 +81,7 @@ export type AreaMaxAggregateInputType = {
   division?: true
   district?: true
   name?: true
+  isActive?: true
 }
 
 export type AreaCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type AreaCountAggregateInputType = {
   division?: true
   district?: true
   name?: true
+  isActive?: true
   _all?: true
 }
 
@@ -178,6 +184,7 @@ export type AreaGroupByOutputType = {
   division: string
   district: string
   name: string
+  isActive: boolean
   _count: AreaCountAggregateOutputType | null
   _avg: AreaAvgAggregateOutputType | null
   _sum: AreaSumAggregateOutputType | null
@@ -208,6 +215,7 @@ export type AreaWhereInput = {
   division?: Prisma.StringFilter<"Area"> | string
   district?: Prisma.StringFilter<"Area"> | string
   name?: Prisma.StringFilter<"Area"> | string
+  isActive?: Prisma.BoolFilter<"Area"> | boolean
   students?: Prisma.StudentListRelationFilter
   tutorAreas?: Prisma.TutorAreaListRelationFilter
   requirements?: Prisma.TuitionRequirementListRelationFilter
@@ -218,6 +226,7 @@ export type AreaOrderByWithRelationInput = {
   division?: Prisma.SortOrder
   district?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   students?: Prisma.StudentOrderByRelationAggregateInput
   tutorAreas?: Prisma.TutorAreaOrderByRelationAggregateInput
   requirements?: Prisma.TuitionRequirementOrderByRelationAggregateInput
@@ -232,6 +241,7 @@ export type AreaWhereUniqueInput = Prisma.AtLeast<{
   division?: Prisma.StringFilter<"Area"> | string
   district?: Prisma.StringFilter<"Area"> | string
   name?: Prisma.StringFilter<"Area"> | string
+  isActive?: Prisma.BoolFilter<"Area"> | boolean
   students?: Prisma.StudentListRelationFilter
   tutorAreas?: Prisma.TutorAreaListRelationFilter
   requirements?: Prisma.TuitionRequirementListRelationFilter
@@ -242,6 +252,7 @@ export type AreaOrderByWithAggregationInput = {
   division?: Prisma.SortOrder
   district?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   _count?: Prisma.AreaCountOrderByAggregateInput
   _avg?: Prisma.AreaAvgOrderByAggregateInput
   _max?: Prisma.AreaMaxOrderByAggregateInput
@@ -257,12 +268,14 @@ export type AreaScalarWhereWithAggregatesInput = {
   division?: Prisma.StringWithAggregatesFilter<"Area"> | string
   district?: Prisma.StringWithAggregatesFilter<"Area"> | string
   name?: Prisma.StringWithAggregatesFilter<"Area"> | string
+  isActive?: Prisma.BoolWithAggregatesFilter<"Area"> | boolean
 }
 
 export type AreaCreateInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   students?: Prisma.StudentCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutAreaInput
@@ -273,6 +286,7 @@ export type AreaUncheckedCreateInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutAreaInput
@@ -282,6 +296,7 @@ export type AreaUpdateInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   students?: Prisma.StudentUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutAreaNestedInput
@@ -292,6 +307,7 @@ export type AreaUncheckedUpdateInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   students?: Prisma.StudentUncheckedUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUncheckedUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutAreaNestedInput
@@ -302,12 +318,14 @@ export type AreaCreateManyInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
 }
 
 export type AreaUpdateManyMutationInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AreaUncheckedUpdateManyInput = {
@@ -315,6 +333,7 @@ export type AreaUncheckedUpdateManyInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AreaDistrictNameCompoundUniqueInput = {
@@ -327,6 +346,7 @@ export type AreaCountOrderByAggregateInput = {
   division?: Prisma.SortOrder
   district?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
 }
 
 export type AreaAvgOrderByAggregateInput = {
@@ -338,6 +358,7 @@ export type AreaMaxOrderByAggregateInput = {
   division?: Prisma.SortOrder
   district?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
 }
 
 export type AreaMinOrderByAggregateInput = {
@@ -345,6 +366,7 @@ export type AreaMinOrderByAggregateInput = {
   division?: Prisma.SortOrder
   district?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
 }
 
 export type AreaSumOrderByAggregateInput = {
@@ -409,6 +431,7 @@ export type AreaCreateWithoutStudentsInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   tutorAreas?: Prisma.TutorAreaCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutAreaInput
 }
@@ -418,6 +441,7 @@ export type AreaUncheckedCreateWithoutStudentsInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   tutorAreas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutAreaInput
 }
@@ -442,6 +466,7 @@ export type AreaUpdateWithoutStudentsInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutorAreas?: Prisma.TutorAreaUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutAreaNestedInput
 }
@@ -451,6 +476,7 @@ export type AreaUncheckedUpdateWithoutStudentsInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutorAreas?: Prisma.TutorAreaUncheckedUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutAreaNestedInput
 }
@@ -459,6 +485,7 @@ export type AreaCreateWithoutTutorAreasInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   students?: Prisma.StudentCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutAreaInput
 }
@@ -468,6 +495,7 @@ export type AreaUncheckedCreateWithoutTutorAreasInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutAreaInput
   requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutAreaInput
 }
@@ -492,6 +520,7 @@ export type AreaUpdateWithoutTutorAreasInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   students?: Prisma.StudentUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutAreaNestedInput
 }
@@ -501,6 +530,7 @@ export type AreaUncheckedUpdateWithoutTutorAreasInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   students?: Prisma.StudentUncheckedUpdateManyWithoutAreaNestedInput
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutAreaNestedInput
 }
@@ -509,6 +539,7 @@ export type AreaCreateWithoutRequirementsInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   students?: Prisma.StudentCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaCreateNestedManyWithoutAreaInput
 }
@@ -518,6 +549,7 @@ export type AreaUncheckedCreateWithoutRequirementsInput = {
   division: string
   district: string
   name: string
+  isActive?: boolean
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutAreaInput
   tutorAreas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutAreaInput
 }
@@ -542,6 +574,7 @@ export type AreaUpdateWithoutRequirementsInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   students?: Prisma.StudentUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUpdateManyWithoutAreaNestedInput
 }
@@ -551,6 +584,7 @@ export type AreaUncheckedUpdateWithoutRequirementsInput = {
   division?: Prisma.StringFieldUpdateOperationsInput | string
   district?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   students?: Prisma.StudentUncheckedUpdateManyWithoutAreaNestedInput
   tutorAreas?: Prisma.TutorAreaUncheckedUpdateManyWithoutAreaNestedInput
 }
@@ -609,6 +643,7 @@ export type AreaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   division?: boolean
   district?: boolean
   name?: boolean
+  isActive?: boolean
   students?: boolean | Prisma.Area$studentsArgs<ExtArgs>
   tutorAreas?: boolean | Prisma.Area$tutorAreasArgs<ExtArgs>
   requirements?: boolean | Prisma.Area$requirementsArgs<ExtArgs>
@@ -620,6 +655,7 @@ export type AreaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   division?: boolean
   district?: boolean
   name?: boolean
+  isActive?: boolean
 }, ExtArgs["result"]["area"]>
 
 export type AreaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -627,6 +663,7 @@ export type AreaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   division?: boolean
   district?: boolean
   name?: boolean
+  isActive?: boolean
 }, ExtArgs["result"]["area"]>
 
 export type AreaSelectScalar = {
@@ -634,9 +671,10 @@ export type AreaSelectScalar = {
   division?: boolean
   district?: boolean
   name?: boolean
+  isActive?: boolean
 }
 
-export type AreaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "division" | "district" | "name", ExtArgs["result"]["area"]>
+export type AreaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "division" | "district" | "name" | "isActive", ExtArgs["result"]["area"]>
 export type AreaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   students?: boolean | Prisma.Area$studentsArgs<ExtArgs>
   tutorAreas?: boolean | Prisma.Area$tutorAreasArgs<ExtArgs>
@@ -658,6 +696,7 @@ export type $AreaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     division: string
     district: string
     name: string
+    isActive: boolean
   }, ExtArgs["result"]["area"]>
   composites: {}
 }
@@ -1088,6 +1127,7 @@ export interface AreaFieldRefs {
   readonly division: Prisma.FieldRef<"Area", 'String'>
   readonly district: Prisma.FieldRef<"Area", 'String'>
   readonly name: Prisma.FieldRef<"Area", 'String'>
+  readonly isActive: Prisma.FieldRef<"Area", 'Boolean'>
 }
     
 

@@ -289,22 +289,23 @@ export async function createOrUpdateAccount(
     return { account, isNew: false };
   }
 
-  if (!role) {
+  const isSuperAdmin = await prisma.superAdminEmail.findUnique({
+    where: { email: payload.email },
+  });
+  // Allowlisted super admins have no sign-up step: their first sign-in creates the ACTIVE admin account.
+  if (!role && !isSuperAdmin) {
     const err = new Error("No account found for this Google account. Sign up first.");
     Object.assign(err, { statusCode: 404 });
     throw err;
   }
-
-  const isSuperAdmin = await prisma.superAdminEmail.findUnique({
-    where: { email: payload.email },
-  });
+  const accountRole: Role = role ?? "ADMIN";
   const adminRole = isSuperAdmin ? "SUPER_ADMIN" : "ADMIN";
 
   // DB constraint account_consent_recorded requires non-admin accounts to have
   // both consent fields set. Default to a version if the frontend didn't send one.
   // ponytail: consent is bundled into sign-up; split it out if legal needs explicit opt-in flow.
   const consent =
-    role !== "ADMIN"
+    accountRole !== "ADMIN"
       ? {
           consentVersion: consentVersion ?? "v1",
           consentAcceptedAt: new Date(),
@@ -313,13 +314,13 @@ export async function createOrUpdateAccount(
 
   const account = await prisma.account.create({
     data: {
-      role,
+      role: accountRole,
       googleSub: payload.sub,
       email: payload.email,
       status: "ACTIVE",
       lastLoginAt: new Date(),
       ...consent,
-      ...(role === "ADMIN"
+      ...(accountRole === "ADMIN"
         ? {
             adminUser: {
               create: {

@@ -37,13 +37,13 @@ const tutorCardSelect = {
 } as const;
 
 // Zones are read for the count and for the tutor's own list. Students only ever see zoneCount.
-const packageInclude = {
+export const packageInclude = {
   tutor: { select: tutorCardSelect },
   subjects: { select: { subjectId: true }, orderBy: { subjectId: "asc" } },
   zones: { select: { zoneId: true }, orderBy: { zoneId: "asc" } },
 } as const;
 
-type PackageRow = Prisma.TuitionPackageGetPayload<{ include: typeof packageInclude }>;
+export type PackageRow = Prisma.TuitionPackageGetPayload<{ include: typeof packageInclude }>;
 
 // Times are Time columns and the day is a Date. Only the HH:MM and YYYY-MM-DD parts matter.
 const clockOf = (d: Date) => d.toISOString().slice(11, 16);
@@ -51,7 +51,7 @@ const dayOf = (d: Date) => d.toISOString().slice(0, 10);
 const toClock = (hhmm: string) => new Date(`1970-01-01T${hhmm}:00Z`);
 const toDay = (ymd: string) => new Date(`${ymd}T00:00:00Z`);
 
-function toPackageResponse(
+export function toPackageResponse(
   pkg: PackageRow,
   closed: boolean,
   myApplication: { id: string; status: ApplicationStatus } | null,
@@ -371,8 +371,8 @@ export async function createPackage(
         timeTo: toClock(timeTo),
         availableFrom: toDay(availableFrom),
         status: "OPEN",
-        // Admin moderation is skipped for now, so packages go live on create.
-        moderationStatus: "APPROVED",
+        // Students see a package only after an admin approves it (POST /admin/packages/:id/moderate).
+        moderationStatus: "PENDING",
         subjects: { create: subjectIds.map((subjectId) => ({ subjectId })) },
         zones: { create: zoneIds.map((zoneId) => ({ zoneId })) },
       },
@@ -488,11 +488,14 @@ export async function updatePackage(
       });
     }
 
-    // Edits stay live and moderationStatus is not reset. Admin notice and revert are planned (endpoints.md #55).
+    // Edits to an approved package stay live (admin notice and revert are planned, endpoints.md #55).
+    // Editing a rejected package resubmits it for review.
+    const resubmit = existing.moderationStatus === "REJECTED";
     await tx.tuitionPackage.update({
       where: { id },
       data: {
         ...values,
+        ...(resubmit && { moderationStatus: "PENDING", moderationNote: null }),
         ...(timeFrom !== undefined && { timeFrom: toClock(timeFrom) }),
         ...(timeTo !== undefined && { timeTo: toClock(timeTo) }),
         ...(availableFrom !== undefined && { availableFrom: toDay(availableFrom) }),

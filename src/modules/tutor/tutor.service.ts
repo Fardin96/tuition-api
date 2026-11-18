@@ -148,11 +148,13 @@ export async function updateTutorProfile(
 }
 
 // A tutor's city is the district of their saved address; areas in any other district are refused.
-async function assertAreasInTutorCity(tutorId: string, areaIds: number[]) {
+// An inactive area is refused too, unless the tutor already has it.
+async function assertAreasInTutorCity(tutorId: string, areaIds: number[], currentIds: number[]) {
   if (areaIds.length === 0) return;
+  const owned = new Set(currentIds);
   const areas = await prisma.area.findMany({
     where: { id: { in: areaIds } },
-    select: { id: true, district: true },
+    select: { id: true, district: true, isActive: true },
   });
   const location = await prisma.tutorLocation.findUnique({
     where: { tutorId },
@@ -160,7 +162,11 @@ async function assertAreasInTutorCity(tutorId: string, areaIds: number[]) {
   });
   const valid = new Set(
     areas
-      .filter((area) => !location || toDistrictCode(area.district) === location.districtCode)
+      .filter(
+        (area) =>
+          (area.isActive || owned.has(area.id)) &&
+          (!location || toDistrictCode(area.district) === location.districtCode),
+      )
       .map((area) => area.id),
   );
   const invalidAreaIds = areaIds.filter((id) => !valid.has(id));
@@ -175,7 +181,15 @@ export async function replaceTutorAreas(accountId: string, areaIds: number[]) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
   const next = new Set(areaIds);
-  await assertAreasInTutorCity(tutor.id, [...next]);
+  const owned = await prisma.tutorArea.findMany({
+    where: { tutorId: tutor.id },
+    select: { areaId: true },
+  });
+  await assertAreasInTutorCity(
+    tutor.id,
+    [...next],
+    owned.map((row) => row.areaId),
+  );
 
   await prisma.$transaction(async (tx) => {
     const current = await tx.tutorArea.findMany({

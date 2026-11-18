@@ -36,3 +36,12 @@ export async function requireAdmin(request: FastifyRequest) {
   }
   return { ...account, adminRole: admin.adminRole };
 }
+
+// Super-admin-only routes (admin approval, blocking, settings): an ACTIVE admin_user with admin_role SUPER_ADMIN.
+export async function requireSuperAdmin(request: FastifyRequest) {
+  const admin = await requireAdmin(request);
+  if (admin.adminRole !== "SUPER_ADMIN") {
+    throw Object.assign(new Error("Forbidden"), { statusCode: 403 });
+  }
+  return admin;
+}
