@@ -2900,6 +2900,77 @@
         ],
         "additionalProperties": false
       },
+      "CheckoutQuote": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "unavailableReason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PAYMENTS_OFF",
+                  "BELOW_MINIMUM"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "feeAmount": {
+            "type": "string"
+          },
+          "chargePercent": {
+            "type": "string"
+          },
+          "chargeAmount": {
+            "type": "string"
+          },
+          "totalAmount": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "unavailableReason",
+          "feeAmount",
+          "chargePercent",
+          "chargeAmount",
+          "totalAmount"
+        ],
+        "additionalProperties": false
+      },
+      "CheckoutSession": {
+        "type": "object",
+        "properties": {
+          "tranId": {
+            "type": "string"
+          },
+          "gatewayUrl": {
+            "type": "string"
+          },
+          "feeAmount": {
+            "type": "string"
+          },
+          "chargeAmount": {
+            "type": "string"
+          },
+          "totalAmount": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tranId",
+          "gatewayUrl",
+          "feeAmount",
+          "chargeAmount",
+          "totalAmount"
+        ],
+        "additionalProperties": false
+      },
       "ConsentInput": {
         "type": "object",
         "properties": {
@@ -5493,6 +5564,99 @@
         ],
         "additionalProperties": false
       },
+      "PaymentAttemptView": {
+        "type": "object",
+        "properties": {
+          "tranId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SUCCEEDED",
+              "FAILED",
+              "CANCELLED",
+              "EXPIRED",
+              "REVIEW",
+              "UNAPPLIED"
+            ]
+          },
+          "feeAmount": {
+            "type": "string"
+          },
+          "chargeAmount": {
+            "type": "string"
+          },
+          "totalAmount": {
+            "type": "string"
+          },
+          "failureReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "settledAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fee": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "DUE",
+                  "PARTIAL",
+                  "PAID",
+                  "WAIVED",
+                  "VOID"
+                ]
+              },
+              "amountDue": {
+                "type": "string"
+              },
+              "amountPaid": {
+                "type": "string"
+              },
+              "remaining": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "amountDue",
+              "amountPaid",
+              "remaining"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "tranId",
+          "status",
+          "feeAmount",
+          "chargeAmount",
+          "totalAmount",
+          "failureReason",
+          "createdAt",
+          "settledAt",
+          "fee"
+        ],
+        "additionalProperties": false
+      },
       "PlatformSettingItem": {
         "type": "object",
         "properties": {
@@ -6476,6 +6640,330 @@
         },
         "required": [
           "credentials"
+        ],
+        "additionalProperties": false
+      },
+      "TutorFee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "feeType": {
+            "type": "string",
+            "enum": [
+              "PLACEMENT",
+              "RECURRING",
+              "OTHER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DUE",
+              "PARTIAL",
+              "PAID",
+              "WAIVED",
+              "VOID"
+            ]
+          },
+          "amountDue": {
+            "type": "string"
+          },
+          "amountPaid": {
+            "type": "string"
+          },
+          "remaining": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "overdue": {
+            "type": "boolean"
+          },
+          "unpaid": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "application": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "REQUIREMENT",
+                  "PACKAGE"
+                ]
+              },
+              "confirmedAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "packageTitle": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "studentName": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "confirmedAt",
+              "packageTitle",
+              "studentName"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "feeType",
+          "status",
+          "amountDue",
+          "amountPaid",
+          "remaining",
+          "dueDate",
+          "overdue",
+          "unpaid",
+          "createdAt",
+          "application"
+        ],
+        "additionalProperties": false
+      },
+      "TutorFeeDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "feeType": {
+            "type": "string",
+            "enum": [
+              "PLACEMENT",
+              "RECURRING",
+              "OTHER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DUE",
+              "PARTIAL",
+              "PAID",
+              "WAIVED",
+              "VOID"
+            ]
+          },
+          "amountDue": {
+            "type": "string"
+          },
+          "amountPaid": {
+            "type": "string"
+          },
+          "remaining": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "overdue": {
+            "type": "boolean"
+          },
+          "unpaid": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "application": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "REQUIREMENT",
+                  "PACKAGE"
+                ]
+              },
+              "confirmedAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "packageTitle": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "studentName": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "confirmedAt",
+              "packageTitle",
+              "studentName"
+            ],
+            "additionalProperties": false
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TutorFeePayment"
+            }
+          },
+          "checkout": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CheckoutQuote"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pendingAttempt": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "tranId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "tranId",
+                  "createdAt"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "feeType",
+          "status",
+          "amountDue",
+          "amountPaid",
+          "remaining",
+          "dueDate",
+          "overdue",
+          "unpaid",
+          "createdAt",
+          "application",
+          "payments",
+          "checkout",
+          "pendingAttempt"
+        ],
+        "additionalProperties": false
+      },
+      "TutorFeePage": {
+        "type": "object",
+        "properties": {
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TutorFee"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "fees",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "TutorFeePayment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "PAYMENT",
+              "REVERSAL"
+            ]
+          },
+          "amount": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "BKASH",
+              "NAGAD",
+              "ROCKET",
+              "BANK",
+              "CASH",
+              "SSLCOMMERZ",
+              "OTHER"
+            ]
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reversesPaymentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "amount",
+          "method",
+          "receivedAt",
+          "reversesPaymentId"
         ],
         "additionalProperties": false
       },
@@ -14900,6 +15388,434 @@
         }
       }
     },
+    "/api/v1/fees/mine": {
+      "get": {
+        "summary": "List my fees",
+        "tags": [
+          "Fees"
+        ],
+        "description": "The signed-in tutor's placement and other fees, newest first. Cursor-paginated, 50 per page: pass nextCursor back as cursor until it is null.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorFeePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fees/{id}": {
+      "get": {
+        "summary": "Get one of my fees",
+        "tags": [
+          "Fees"
+        ],
+        "description": "One fee with its payments, the online checkout quote (null when nothing can be paid online) and the pending gateway attempt, if any. A fee that belongs to another tutor is 404.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorFeeDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fees/{id}/checkout": {
+      "post": {
+        "summary": "Start an online payment for a fee",
+        "tags": [
+          "Fees"
+        ],
+        "description": "Opens an SSLCommerz checkout for the fee's remaining amount, plus the gateway charge when the platform sets one. Returns the gateway page to send the tutor to. Only one checkout can be in progress per fee. A checkout still in progress is checked with the gateway first. A fee that the gateway already paid is refused. The amounts are computed on the server.\n\n**Who:** TUTOR.\n\n**Rate limit:** 10/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "10/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fees/{id}/attempts/{tranId}": {
+      "get": {
+        "summary": "Get the status of an online payment",
+        "tags": [
+          "Fees"
+        ],
+        "description": "Returns one checkout of this fee and the fee's current balance. A payment still PENDING after a few seconds is checked with the gateway first. If the gateway is unreachable, the current status is returned.\n\n**Who:** TUTOR.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]{1,30}$"
+            },
+            "in": "path",
+            "name": "tranId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentAttemptView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/videos": {
       "get": {
         "summary": "List approved videos",
@@ -18316,6 +19232,10 @@
     {
       "name": "Notifications",
       "description": "In-app alerts for the dashboard bell."
+    },
+    {
+      "name": "Fees",
+      "description": "A tutor's platform fees and online payments (SSLCommerz)."
     },
     {
       "name": "Videos",

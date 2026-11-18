@@ -26,11 +26,14 @@ import { adminZoneRequestRoutes } from "./modules/admin/zone-requests.routes.js"
 import { applicationRoutes } from "./modules/application/application.routes.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
+import { feeRoutes } from "./modules/fees/fee.routes.js";
 import { areaRoutes } from "./modules/lookups/areas.routes.js";
 import { lookupRoutes } from "./modules/lookups/lookups.routes.js";
 import { subjectRoutes } from "./modules/lookups/subjects.routes.js";
 import { notificationRoutes } from "./modules/notification/notification.routes.js";
 import { packageRoutes } from "./modules/package/package.routes.js";
+import { paymentRoutes } from "./modules/payment/payment.routes.js";
+import { sslcommerzCallbackRoutes } from "./modules/payment/sslcommerz.callbacks.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
 import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
@@ -119,6 +122,11 @@ export async function buildApp() {
   // Full paths: /requirements/:id/applications, /packages/:id/applications and /applications/*.
   await app.register(applicationRoutes, { prefix: "/api/v1" });
   await app.register(notificationRoutes, { prefix: "/api/v1/notifications" });
+  // Full paths: /fees/mine, /fees/:id, /fees/:id/checkout and /fees/:id/attempts/:tranId.
+  await app.register(feeRoutes, { prefix: "/api/v1/fees" });
+  await app.register(paymentRoutes, { prefix: "/api/v1/fees" });
+  // Browser redirects and server-to-server IPN from SSLCommerz; hidden from OpenAPI.
+  await app.register(sslcommerzCallbackRoutes, { prefix: "/api/v1/payments/sslcommerz" });
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
   await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
   await app.register(areaRoutes, { prefix: "/api/v1/areas" });

@@ -1,0 +1,180 @@
+import type { Prisma } from "../../generated/prisma/client.js";
+import { FeeStatus } from "../../generated/prisma/enums.js";
+import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
+import { notFound } from "../../lib/errors.js";
+import { prisma } from "../../lib/prisma.js";
+import { paymentsConfigured } from "../../lib/sslcommerz.js";
+import { dhakaToday } from "../admin/fees.service.js";
+import { FEE_UNPAID_AFTER_DAYS } from "../application/application.schema.js";
+import type {
+  CheckoutQuoteResponse,
+  TutorFeeDetailResponse,
+  TutorFeePageResponse,
+  TutorFeeResponse,
+} from "./fee.schema.js";
+import { MIN_ONLINE_TOTAL, quoteFor, readPaymentSettings } from "./fee-quote.js";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const PAGE_SIZE = 50;
+const OPEN_FEE_STATUSES: FeeStatus[] = [FeeStatus.DUE, FeeStatus.PARTIAL];
+const TUTOR_PROFILE_NOT_FOUND = "Tutor profile not found";
+const FEE_NOT_FOUND = "Fee not found";
+
+// Default-deny: only these columns leave the API. The recorder and txnReference stay server-side.
+const feeSelect = {
+  id: true,
+  feeType: true,
+  status: true,
+  amountDue: true,
+  amountPaid: true,
+  dueDate: true,
+  createdAt: true,
+  application: {
+    select: {
+      id: true,
+      confirmedAt: true,
+      packageId: true,
+      package: { select: { title: true } },
+      student: { select: { name: true } },
+    },
+  },
+} satisfies Prisma.PlatformFeeSelect;
+
+const paymentSelect = {
+  id: true,
+  kind: true,
+  amount: true,
+  method: true,
+  receivedAt: true,
+  reversesPaymentId: true,
+} satisfies Prisma.FeePaymentSelect;
+
+type FeeRow = Prisma.PlatformFeeGetPayload<{ select: typeof feeSelect }>;
+
+const detailSelect = {
+  ...feeSelect,
+  payments: {
+    orderBy: [{ receivedAt: "asc" }, { createdAt: "asc" }],
+    select: paymentSelect,
+  },
+} satisfies Prisma.PlatformFeeSelect;
+
+function toTutorFee(row: FeeRow, today: string, now: Date): TutorFeeResponse {
+  const open = OPEN_FEE_STATUSES.includes(row.status);
+  const dueDate = row.dueDate.toISOString().slice(0, 10);
+  const { confirmedAt } = row.application;
+  return {
+    id: row.id,
+    feeType: row.feeType,
+    status: row.status,
+    amountDue: row.amountDue.toFixed(2),
+    amountPaid: row.amountPaid.toFixed(2),
+    remaining: row.amountDue.minus(row.amountPaid).toFixed(2),
+    dueDate,
+    overdue: open && dueDate < today,
+    unpaid:
+      open &&
+      confirmedAt !== null &&
+      confirmedAt.getTime() + FEE_UNPAID_AFTER_DAYS * DAY_MS < now.getTime(),
+    createdAt: row.createdAt,
+    application: {
+      id: row.application.id,
+      kind: row.application.packageId ? "PACKAGE" : "REQUIREMENT",
+      confirmedAt,
+      packageTitle: row.application.package?.title ?? null,
+      studentName: row.application.student.name,
+    },
+  };
+}
+
+// Quotes the tutor's remaining balance. Null when there is nothing to pay online.
+async function checkoutFor(
+  row: Pick<FeeRow, "status" | "amountDue" | "amountPaid">,
+): Promise<CheckoutQuoteResponse | null> {
+  const remaining = row.amountDue.minus(row.amountPaid);
+  if (!OPEN_FEE_STATUSES.includes(row.status) || remaining.lessThanOrEqualTo(0)) return null;
+
+  const settings = await readPaymentSettings(prisma);
+  const quote = quoteFor(remaining, settings.chargePercent);
+  const unavailableReason: CheckoutQuoteResponse["unavailableReason"] =
+    !settings.enabled || !paymentsConfigured()
+      ? "PAYMENTS_OFF"
+      : quote.totalAmount.lessThan(MIN_ONLINE_TOTAL)
+        ? "BELOW_MINIMUM"
+        : null;
+
+  return {
+    enabled: unavailableReason === null,
+    unavailableReason,
+    feeAmount: quote.feeAmount.toFixed(2),
+    chargePercent: quote.chargePercent.toFixed(2),
+    chargeAmount: quote.chargeAmount.toFixed(2),
+    totalAmount: quote.totalAmount.toFixed(2),
+  };
+}
+
+// The caller's fees, newest first. Keyset over (createdAt desc, id desc).
+export async function listMyFees(
+  accountId: string,
+  cursor: string | undefined,
+): Promise<TutorFeePageResponse> {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
+  if (!tutor) throw notFound(TUTOR_PROFILE_NOT_FOUND);
+
+  const clauses: Prisma.PlatformFeeWhereInput[] = [{ tutorId: tutor.id }];
+  if (cursor) {
+    const decoded = decodeCursor(cursor);
+    clauses.push({
+      OR: [
+        { createdAt: { lt: decoded.createdAt } },
+        { createdAt: decoded.createdAt, id: { lt: decoded.id } },
+      ],
+    });
+  }
+
+  const rows = await prisma.platformFee.findMany({
+    where: { AND: clauses },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: PAGE_SIZE + 1,
+    select: feeSelect,
+  });
+
+  const hasMore = rows.length > PAGE_SIZE;
+  const page = hasMore ? rows.slice(0, PAGE_SIZE) : rows;
+  const last = page[page.length - 1];
+  const today = dhakaToday();
+  const now = new Date();
+
+  return {
+    fees: page.map((row) => toTutorFee(row, today, now)),
+    nextCursor: hasMore && last ? encodeCursor({ createdAt: last.createdAt, id: last.id }) : null,
+  };
+}
+
+// Owner only: another tutor's fee is indistinguishable from a missing one.
+export async function getMyFee(accountId: string, feeId: string): Promise<TutorFeeDetailResponse> {
+  const row = await prisma.platformFee.findFirst({
+    where: { id: feeId, tutor: { accountId } },
+    select: detailSelect,
+  });
+  if (!row) throw notFound(FEE_NOT_FOUND);
+
+  const attempt = await prisma.paymentAttempt.findFirst({
+    where: { feeId: row.id, status: "PENDING" },
+    select: { tranId: true, createdAt: true },
+  });
+
+  return {
+    ...toTutorFee(row, dhakaToday(), new Date()),
+    payments: row.payments.map((p) => ({
+      id: p.id,
+      kind: p.kind,
+      amount: p.amount.toFixed(2),
+      method: p.method,
+      receivedAt: p.receivedAt,
+      reversesPaymentId: p.reversesPaymentId,
+    })),
+    checkout: await checkoutFor(row),
+    pendingAttempt: attempt ? { tranId: attempt.tranId, createdAt: attempt.createdAt } : null,
+  } satisfies TutorFeeDetailResponse;
+}
