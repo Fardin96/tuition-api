@@ -85,6 +85,8 @@ export const ModelName = {
   PlatformFee: 'PlatformFee',
   FeePayment: 'FeePayment',
   PaymentAttempt: 'PaymentAttempt',
+  PromoCode: 'PromoCode',
+  PromoRedemption: 'PromoRedemption',
   NotificationLog: 'NotificationLog',
   AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
@@ -639,6 +641,42 @@ export const PaymentAttemptScalarFieldEnum = {
 } as const
 
 export type PaymentAttemptScalarFieldEnum = (typeof PaymentAttemptScalarFieldEnum)[keyof typeof PaymentAttemptScalarFieldEnum]
+
+
+export const PromoCodeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  maxDiscount: 'maxDiscount',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  maxRedemptions: 'maxRedemptions',
+  maxPerTutor: 'maxPerTutor',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PromoCodeScalarFieldEnum = (typeof PromoCodeScalarFieldEnum)[keyof typeof PromoCodeScalarFieldEnum]
+
+
+export const PromoRedemptionScalarFieldEnum = {
+  id: 'id',
+  promoId: 'promoId',
+  feeId: 'feeId',
+  tutorId: 'tutorId',
+  originalAmount: 'originalAmount',
+  discountAmount: 'discountAmount',
+  status: 'status',
+  createdAt: 'createdAt',
+  releasedAt: 'releasedAt',
+  releaseReason: 'releaseReason'
+} as const
+
+export type PromoRedemptionScalarFieldEnum = (typeof PromoRedemptionScalarFieldEnum)[keyof typeof PromoRedemptionScalarFieldEnum]
 
 
 export const NotificationLogScalarFieldEnum = {

@@ -13,6 +13,7 @@ import type {
   TutorFeeResponse,
 } from "./fee.schema.js";
 import { MIN_ONLINE_TOTAL, quoteFor, readPaymentSettings } from "./fee-quote.js";
+import { feePromoOf } from "./promo.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const PAGE_SIZE = 50;
@@ -56,6 +57,16 @@ const detailSelect = {
   payments: {
     orderBy: [{ receivedAt: "asc" }, { createdAt: "asc" }],
     select: paymentSelect,
+  },
+  promoRedemptions: {
+    where: { status: "ACTIVE" },
+    take: 1,
+    select: {
+      createdAt: true,
+      originalAmount: true,
+      discountAmount: true,
+      promo: { select: { code: true } },
+    },
   },
 } satisfies Prisma.PlatformFeeSelect;
 
@@ -163,6 +174,7 @@ export async function getMyFee(accountId: string, feeId: string): Promise<TutorF
     where: { feeId: row.id, status: "PENDING" },
     select: { tranId: true, createdAt: true },
   });
+  const promo = feePromoOf(row.promoRedemptions[0]);
 
   return {
     ...toTutorFee(row, dhakaToday(), new Date()),
@@ -176,5 +188,7 @@ export async function getMyFee(accountId: string, feeId: string): Promise<TutorF
     })),
     checkout: await checkoutFor(row),
     pendingAttempt: attempt ? { tranId: attempt.tranId, createdAt: attempt.createdAt } : null,
+    promo,
+    promoAllowed: row.status === FeeStatus.DUE && row.amountPaid.isZero() && promo === null,
   } satisfies TutorFeeDetailResponse;
 }

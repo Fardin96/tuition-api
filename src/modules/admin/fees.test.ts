@@ -548,6 +548,44 @@ describe("admin fees", () => {
       ]);
     });
 
+    it("shows the promo code applied to the fee, or null when there is none", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const setup = await setupApplication();
+      const fee = await makeFee(setup, { dueDate: new Date("2031-01-15T00:00:00Z") });
+      const headers = await getAuthHeaders(admin);
+
+      const before = await app.inject({ method: "GET", url: `${FEES_URL}/${fee.id}`, headers });
+      expect(JSON.parse(before.body).promo).toBeNull();
+
+      const tutorAccount = await prisma.account.findUniqueOrThrow({
+        where: { id: setup.tutor.accountId },
+      });
+      await prisma.promoCode.create({
+        data: {
+          code: "ADMINSEE",
+          discountType: "FLAT",
+          discountValue: 300,
+          createdById: admin.id,
+        },
+      });
+      const applied = await app.inject({
+        method: "POST",
+        url: `/api/v1/fees/${fee.id}/promo`,
+        headers: await getAuthHeaders(tutorAccount),
+        payload: { code: "ADMINSEE" },
+      });
+      expect(applied.statusCode).toBe(200);
+
+      const res = await app.inject({ method: "GET", url: `${FEES_URL}/${fee.id}`, headers });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toMatchObject({
+        amountDue: "1200.00",
+        promo: { code: "ADMINSEE", discountAmount: "300.00", originalAmount: "1500.00" },
+      });
+    });
+
     it("unknown id returns 404", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });

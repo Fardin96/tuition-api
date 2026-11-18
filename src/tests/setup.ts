@@ -30,6 +30,8 @@ beforeEach(async () => {
       report,
       dispute,
       payment_attempt,
+      promo_redemption,
+      promo_code,
       fee_payment,
       platform_fee,
       notification_log,

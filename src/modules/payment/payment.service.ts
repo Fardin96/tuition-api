@@ -168,6 +168,34 @@ export async function feeIdOfAttempt(tranId: string): Promise<string | null> {
   return row?.feeId ?? null;
 }
 
+/**
+ * Settles or gives up the fee's PENDING checkout before something changes what the tutor owes
+ * (a new checkout, a promo code). Asks the gateway first: a payment that just went through is
+ * posted, and the caller gets 409 "This fee was just paid." Otherwise the attempt is EXPIRED
+ * with `reason`. A late success on it still settles (or lands in UNAPPLIED if it no longer fits).
+ * Gateway trouble is 503 GATEWAY_UNAVAILABLE. Call it outside any transaction.
+ */
+export async function clearPendingAttempt(feeId: string, reason: string): Promise<void> {
+  const pending = await prisma.paymentAttempt.findFirst({
+    where: { feeId, status: "PENDING" },
+    select: { tranId: true },
+  });
+  if (!pending) return;
+  try {
+    await reconcileAttempt(pending.tranId);
+  } catch (err) {
+    if (isGatewayUnreachable(err)) throw gatewayUnavailable();
+    throw err;
+  }
+  const after = await loadFee(feeId);
+  if (!after) throw notFound("Fee not found");
+  if (after.status === FeeStatus.PAID) throw invalidFee("This fee was just paid.");
+  if (!OPEN_STATUSES.includes(after.status) || remainingOf(after).lessThanOrEqualTo(0)) {
+    throw invalidFee("This fee is not open for online payment.");
+  }
+  await endPending(pending.tranId, "EXPIRED", reason);
+}
+
 export async function startCheckout(accountId: string, feeId: string): Promise<CheckoutSession> {
   // 1. Kill switch and configuration.
   const settings = await readPaymentSettings(prisma);
@@ -181,25 +209,7 @@ export async function startCheckout(accountId: string, feeId: string): Promise<C
   }
 
   // 3. A PENDING checkout must be settled or given up before a new one starts.
-  const pending = await prisma.paymentAttempt.findFirst({
-    where: { feeId, status: "PENDING" },
-    select: { tranId: true },
-  });
-  if (pending) {
-    try {
-      await reconcileAttempt(pending.tranId);
-    } catch (err) {
-      if (err instanceof GatewayError) throw gatewayUnavailable();
-      throw err;
-    }
-    const after = await loadFee(feeId);
-    if (!after) throw notFound("Fee not found");
-    if (after.status === FeeStatus.PAID) throw invalidFee("This fee was just paid.");
-    if (!OPEN_STATUSES.includes(after.status) || remainingOf(after).lessThanOrEqualTo(0)) {
-      throw invalidFee("This fee is not open for online payment.");
-    }
-    await endPending(pending.tranId, "EXPIRED", "Replaced by a new checkout");
-  }
+  await clearPendingAttempt(feeId, "Replaced by a new checkout");
 
   // 4. Quote and insert the PENDING attempt under the fee lock.
   const urls = {

@@ -69,6 +69,25 @@ export const checkoutQuoteSchema = z
   .meta({ id: "CheckoutQuote" });
 export type CheckoutQuoteResponse = z.infer<typeof checkoutQuoteSchema>;
 
+// The promo code applied to a fee (its ACTIVE redemption). Money is a 2-decimal string.
+export const feePromoSchema = z
+  .object({
+    code: z.string(),
+    discountAmount: z.string(),
+    originalAmount: z.string(),
+    appliedAt: z.date(),
+  })
+  .meta({ id: "FeePromo" });
+export type FeePromoResponse = z.infer<typeof feePromoSchema>;
+
+export const applyPromoSchema = z
+  .object({
+    code: z.string().trim().min(1).max(32),
+  })
+  .strict()
+  .meta({ id: "ApplyPromo" });
+export type ApplyPromoInput = z.infer<typeof applyPromoSchema>;
+
 export const tutorFeeDetailSchema = tutorFeeSchema
   .extend({
     payments: z.array(tutorFeePaymentSchema),
@@ -81,6 +100,10 @@ export const tutorFeeDetailSchema = tutorFeeSchema
         createdAt: z.date(),
       })
       .nullable(),
+    /** The promo code on this fee, if one is applied. */
+    promo: feePromoSchema.nullable(),
+    /** A code can be applied: the fee is DUE, nothing is paid and no code is applied yet. */
+    promoAllowed: z.boolean(),
   })
   .meta({ id: "TutorFeeDetail" });
 export type TutorFeeDetailResponse = z.infer<typeof tutorFeeDetailSchema>;

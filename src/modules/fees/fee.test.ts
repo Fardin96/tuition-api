@@ -484,6 +484,16 @@ describe("tutor fees", () => {
       expect(JSON.parse(res.body).pendingAttempt).toBeNull();
     });
 
+    it("shows no promo and allows one on a fresh DUE fee", async () => {
+      const me = await setupTutor();
+      const fee = await makeFee(me, { amountDue: 1500 });
+
+      const res = await getFee(await getAuthHeaders(me.tutorAccount), fee.id);
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toMatchObject({ promo: null, promoAllowed: true });
+    });
+
     describe("checkout quote", () => {
       it("is null for a PAID fee", async () => {
         const admin = await makeAdmin();

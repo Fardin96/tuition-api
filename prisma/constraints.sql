@@ -12,12 +12,13 @@
 --   zlr_one_pending_per_tutor, tutor_zone_center_gix, fee_payment_gateway_ref_uniq,
 --   tutor_location_geog_gist_idx, student_location_geog_gist_idx,
 --   tutor_location_searchable_idx, student_location_searchable_idx,
---   payment_attempt_one_pending_per_fee
+--   payment_attempt_one_pending_per_fee, promo_redemption_one_active_per_fee
 -- Needs PostgreSQL 13+ and PostGIS (created by migration 20261022876543_location_postgis).
 --
 -- v5 changes are marked [v5], v6 changes are marked [v6], payment changes are marked [payments].
 -- Deployed databases receive the [payments] changes through migrations
--- 20261121000100_payment_attempts and 20261121000200_payment_attempts_validate.
+-- 20261121000100_payment_attempts and 20261121000200_payment_attempts_validate; promo codes through
+-- 20261122000100_promo_codes.
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
@@ -397,6 +398,39 @@ ALTER TABLE payment_attempt
 -- At most one checkout in flight per fee. FAILED, CANCELLED, EXPIRED and the rest do not count.
 CREATE UNIQUE INDEX payment_attempt_one_pending_per_fee
   ON payment_attempt (fee_id) WHERE status = 'PENDING';
+
+-- ═════════ 7c. Promo codes ════════════════════════════════════════════════
+-- [payments] migration 20261122000100_promo_codes (the CHECKs are inline in its CREATE TABLEs).
+-- A redemption lowers platform_fee.amount_due (or WAIVES the fee when it covers all of it);
+-- original_amount keeps the amount before the discount, so removing the code restores it.
+ALTER TABLE promo_code
+  ADD CONSTRAINT promo_code_format CHECK (code ~ '^[A-Z0-9][A-Z0-9_-]{2,31}$'),
+  ADD CONSTRAINT promo_code_discount_valid CHECK (
+    (discount_type = 'PERCENT' AND discount_value > 0 AND discount_value <= 100)
+    OR (discount_type = 'FLAT' AND discount_value > 0)
+  ),
+  ADD CONSTRAINT promo_code_max_discount_positive CHECK (max_discount IS NULL OR max_discount > 0),
+  ADD CONSTRAINT promo_code_window CHECK (starts_at IS NULL OR ends_at IS NULL OR ends_at > starts_at),
+  ADD CONSTRAINT promo_code_limits CHECK ((max_redemptions IS NULL OR max_redemptions >= 1) AND max_per_tutor >= 1);
+
+ALTER TABLE promo_redemption
+  ADD CONSTRAINT promo_redemption_amounts CHECK (original_amount > 0 AND discount_amount > 0 AND discount_amount <= original_amount),
+  ADD CONSTRAINT promo_redemption_released_shape CHECK ((status = 'RELEASED') = (released_at IS NOT NULL));
+
+-- One code per fee.
+CREATE UNIQUE INDEX promo_redemption_one_active_per_fee ON promo_redemption (fee_id) WHERE status = 'ACTIVE';
+
+-- A voided fee gives its code back.
+CREATE OR REPLACE FUNCTION promo_release_on_fee_void() RETURNS trigger AS $$
+BEGIN
+  UPDATE promo_redemption
+     SET status = 'RELEASED', released_at = now(), release_reason = 'Fee voided'
+   WHERE fee_id = NEW.id AND status = 'ACTIVE';
+  RETURN NULL;
+END $$ LANGUAGE plpgsql;
+CREATE TRIGGER promo_release_on_fee_void_trg AFTER UPDATE OF status ON platform_fee
+  FOR EACH ROW WHEN (NEW.status = 'VOID' AND OLD.status IS DISTINCT FROM 'VOID')
+  EXECUTE FUNCTION promo_release_on_fee_void();
 
 -- ═════════ 8. Admin levels ═════════════════════════════════════════════
 -- super_admin_email holds the two allowed emails (slots 1 and 2).

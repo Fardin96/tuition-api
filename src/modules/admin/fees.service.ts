@@ -5,6 +5,7 @@ import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { FEE_UNPAID_AFTER_DAYS } from "../application/application.schema.js";
+import { feePromoOf } from "../fees/promo.js";
 import type {
   AdminFeeDetailResponse,
   AdminFeeListQuery,
@@ -49,6 +50,16 @@ const detailInclude = {
     include: {
       recordedBy: { select: { name: true } },
       reversals: { select: { amount: true } },
+    },
+  },
+  promoRedemptions: {
+    where: { status: "ACTIVE" },
+    take: 1,
+    select: {
+      createdAt: true,
+      originalAmount: true,
+      discountAmount: true,
+      promo: { select: { code: true } },
     },
   },
   attempts: {
@@ -129,6 +140,7 @@ function toAdminFeeDetail(row: FeeDetailRow): AdminFeeDetailResponse {
       createdAt: a.createdAt,
       settledAt: a.settledAt,
     })),
+    promo: feePromoOf(row.promoRedemptions[0]),
   };
 }
 

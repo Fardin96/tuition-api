@@ -174,6 +174,18 @@ enum PaymentAttemptStatus {
   UNAPPLIED
 }
 
+// Promo codes on tutor fees. A code takes a percent (optionally capped) or a flat amount off.
+enum PromoDiscountType {
+  PERCENT
+  FLAT
+}
+
+// ACTIVE redemptions count toward a code's limits. RELEASED ones (code removed, fee voided) do not.
+enum PromoRedemptionStatus {
+  ACTIVE
+  RELEASED
+}
+
 enum FilePurpose {
   STUDENT_ID
   TUTOR_ID
@@ -382,6 +394,7 @@ model AdminUser {
 
   reviewedVerifications TutorVerification[]
   recordedPayments      FeePayment[]
+  createdPromoCodes     PromoCode[]
   blogPosts             BlogPost[]
   contentEdits          SiteContent[]
   blocksMade            AccountBlock[]      @relation("BlockedBy")
@@ -557,6 +570,7 @@ model Tutor {
   zones             TutorZone[]
   zoneLimitRequests ZoneLimitRequest[]
   paymentAttempts   PaymentAttempt[]
+  promoRedemptions  PromoRedemption[]
 
   @@unique([accountId, role])
   @@index([isListed, ratingAvg(sort: Desc)])
@@ -1051,10 +1065,11 @@ model PlatformFee {
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  tutor       Tutor            @relation(fields: [tutorId], references: [id])
-  application Application      @relation(fields: [applicationId], references: [id])
-  payments    FeePayment[]
-  attempts    PaymentAttempt[]
+  tutor            Tutor             @relation(fields: [tutorId], references: [id])
+  application      Application       @relation(fields: [applicationId], references: [id])
+  payments         FeePayment[]
+  attempts         PaymentAttempt[]
+  promoRedemptions PromoRedemption[]
 
   @@index([tutorId, status, dueDate])
   @@index([status, dueDate]) // overdue report
@@ -1124,6 +1139,55 @@ model PaymentAttempt {
   @@index([feeId, createdAt(sort: Desc)])
   @@index([status, createdAt])
   @@map("payment_attempt")
+}
+
+// A discount code a super admin creates for tutor fees. Discount terms never change after creation.
+// Table rules (code format, value ranges, window) live in prisma/constraints.sql.
+model PromoCode {
+  id             String            @id @default(uuid(7)) @db.Uuid
+  code           String            @unique // stored uppercase
+  description    String?
+  discountType   PromoDiscountType @map("discount_type")
+  discountValue  Decimal           @map("discount_value") @db.Decimal(12, 2) // percent (0-100] or taka
+  maxDiscount    Decimal?          @map("max_discount") @db.Decimal(12, 2) // cap for PERCENT codes
+  startsAt       DateTime?         @map("starts_at") @db.Timestamptz(3)
+  endsAt         DateTime?         @map("ends_at") @db.Timestamptz(3)
+  maxRedemptions Int?              @map("max_redemptions") // across all tutors; null = no limit
+  maxPerTutor    Int               @default(1) @map("max_per_tutor")
+  isActive       Boolean           @default(true) @map("is_active")
+  createdById    String            @map("created_by") @db.Uuid
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdBy   AdminUser         @relation(fields: [createdById], references: [accountId], onDelete: Restrict)
+  redemptions PromoRedemption[]
+
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("promo_code")
+}
+
+// One code applied to one fee. original_amount is the fee's amount_due before the discount.
+// At most one ACTIVE redemption per fee is a partial unique index in constraints.sql.
+model PromoRedemption {
+  id             String                @id @default(uuid(7)) @db.Uuid
+  promoId        String                @map("promo_id") @db.Uuid
+  feeId          String                @map("fee_id") @db.Uuid
+  tutorId        String                @map("tutor_id") @db.Uuid
+  originalAmount Decimal               @map("original_amount") @db.Decimal(12, 2)
+  discountAmount Decimal               @map("discount_amount") @db.Decimal(12, 2)
+  status         PromoRedemptionStatus @default(ACTIVE)
+  createdAt      DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
+  releasedAt     DateTime?             @map("released_at") @db.Timestamptz(3)
+  releaseReason  String?               @map("release_reason")
+
+  promo PromoCode   @relation(fields: [promoId], references: [id])
+  fee   PlatformFee @relation(fields: [feeId], references: [id])
+  tutor Tutor       @relation(fields: [tutorId], references: [id])
+
+  @@index([promoId, status])
+  @@index([tutorId, promoId])
+  @@index([feeId])
+  @@map("promo_redemption")
 }
 
 // ───────────────────────── notifications (outbox) ─────────────────────────

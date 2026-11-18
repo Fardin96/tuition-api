@@ -191,6 +191,22 @@ export const PaymentAttemptStatus = {
 export type PaymentAttemptStatus = (typeof PaymentAttemptStatus)[keyof typeof PaymentAttemptStatus]
 
 
+export const PromoDiscountType = {
+  PERCENT: 'PERCENT',
+  FLAT: 'FLAT'
+} as const
+
+export type PromoDiscountType = (typeof PromoDiscountType)[keyof typeof PromoDiscountType]
+
+
+export const PromoRedemptionStatus = {
+  ACTIVE: 'ACTIVE',
+  RELEASED: 'RELEASED'
+} as const
+
+export type PromoRedemptionStatus = (typeof PromoRedemptionStatus)[keyof typeof PromoRedemptionStatus]
+
+
 export const FilePurpose = {
   STUDENT_ID: 'STUDENT_ID',
   TUTOR_ID: 'TUTOR_ID',

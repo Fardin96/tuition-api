@@ -7,6 +7,7 @@ import {
   PaymentKind,
   PaymentMethod,
 } from "../../generated/prisma/enums.js";
+import { feePromoSchema } from "../fees/fee.schema.js";
 
 export const FEE_MAX_AMOUNT = 5_000_000;
 
@@ -165,6 +166,8 @@ export const adminFeeDetailSchema = adminFeeSchema
   .extend({
     payments: z.array(adminFeePaymentSchema),
     attempts: z.array(adminFeeAttemptSchema),
+    /** The promo code applied to the fee, or null. The same object the tutor sees. */
+    promo: feePromoSchema.nullable(),
   })
   .meta({ id: "AdminFeeDetail" });
 export type AdminFeeDetailResponse = z.infer<typeof adminFeeDetailSchema>;
