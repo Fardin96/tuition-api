@@ -128,15 +128,17 @@ export async function completeUpload(
   const policy = FILE_POLICY[row.purpose];
   const start = head.size > 0 ? await storage.readStart(row.storageKey, SNIFF_BYTES) : null;
   const problem =
-    head.size !== row.sizeBytes || head.size > policy.maxBytes
-      ? appError("FileTooLarge", 400, "The uploaded file is not the size that was declared.", {
+    head.size > policy.maxBytes
+      ? appError("FileTooLarge", 400, "The uploaded file is too large.", {
           maxBytes: policy.maxBytes,
         })
-      : !start || !sniffMatches(row.contentType, start)
-        ? appError("UnsupportedFileType", 400, "The file's contents do not match its type.", {
-            allowed: policy.contentTypes,
-          })
-        : null;
+      : head.size !== row.sizeBytes
+        ? appError("InvalidFile", 400, "The uploaded file is not the one that was declared.")
+        : !start || !sniffMatches(row.contentType, start)
+          ? appError("UnsupportedFileType", 400, "The file's contents do not match its type.", {
+              allowed: policy.contentTypes,
+            })
+          : null;
 
   if (problem) {
     await storage.delete(row.storageKey);
@@ -254,20 +256,24 @@ export async function discardFile(
 }
 
 /**
- * Best-effort removal of objects from both buckets. A failure is logged and left for the
- * file-cleanup cron, which deletes DELETED files' objects again before purging the rows.
+ * Best-effort removal of objects from both buckets. Returns the storage keys that could not be
+ * removed; failures are logged and left for the file-cleanup cron, which removes DELETED files'
+ * objects again before purging their rows.
  */
-export async function removeObjects(files: { storageKey: string }[]): Promise<void> {
+export async function removeObjects(files: { storageKey: string }[]): Promise<string[]> {
   const storage = maybeStorage();
-  if (!storage) return;
+  if (!storage) return files.map((file) => file.storageKey);
+  const failed: string[] = [];
   for (const file of files) {
     try {
       await storage.delete(file.storageKey);
       await storage.delete(file.storageKey, "public");
     } catch (err) {
+      failed.push(file.storageKey);
       console.warn(`file cleanup: could not delete ${file.storageKey}: ${String(err)}`);
     }
   }
+  return failed;
 }
 
 /**
@@ -332,7 +338,7 @@ export async function publishFile(fileId: string): Promise<void> {
   const storage = maybeStorage();
   if (!storage) return;
   const row = await prisma.fileAsset.findUnique({ where: { id: fileId } });
-  if (!row || row.status !== "UPLOADED" || row.publishedAt) return;
+  if (row?.status !== "UPLOADED" || row.publishedAt) return;
   if (!storage.publicUrl(row.storageKey)) return;
   try {
     await storage.copyToPublic(row.storageKey);
@@ -342,16 +348,25 @@ export async function publishFile(fileId: string): Promise<void> {
   }
 }
 
-/** Removes the public copy. Call after the transaction that took the file down commits. */
+/**
+ * Removes the public copy, then clears the marker. Call after the transaction that took the file
+ * down commits. If the delete fails the marker stays, so the copy is not forgotten; the caller's
+ * status change already hides the file from every listing.
+ */
 export async function unpublishFile(fileId: string): Promise<void> {
   const row = await prisma.fileAsset.findUnique({ where: { id: fileId } });
   if (!row?.publishedAt) return;
-  await prisma.fileAsset.update({ where: { id: fileId }, data: { publishedAt: null } });
   const storage = maybeStorage();
-  if (!storage) return;
-  try {
-    await storage.delete(row.storageKey, "public");
-  } catch (err) {
-    console.warn(`unpublish: could not delete public ${row.storageKey}: ${String(err)}`);
+  if (storage) {
+    try {
+      await storage.delete(row.storageKey, "public");
+    } catch (err) {
+      console.warn(`unpublish: could not delete public ${row.storageKey}: ${String(err)}`);
+      return;
+    }
   }
+  await prisma.fileAsset.updateMany({
+    where: { id: fileId, publishedAt: row.publishedAt },
+    data: { publishedAt: null },
+  });
 }

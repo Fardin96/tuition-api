@@ -2,10 +2,13 @@ import crypto from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
+import { setStorageForTests } from "../../lib/storage.js";
 import {
   createAccount,
+  createAdmin,
   createApplication,
   createArea,
+  createFakeStorage,
   createFileAsset,
   createRequirement,
   createStudentProfile,
@@ -15,10 +18,30 @@ import {
   createTutorProfile,
   createTutorRequirement,
   createTutorZone,
+  fakeFileBytes,
   getAuthHeaders,
   setStudentLocation,
   setTutorLocation,
 } from "../../tests/helpers.js";
+
+type TestApp = Awaited<ReturnType<typeof createTestApp>>;
+
+// A file in the fake bucket, so object removal can be checked.
+async function storedFile(
+  fake: ReturnType<typeof createFakeStorage>,
+  ownerId: string,
+  purpose: "CREDENTIAL" | "TUTOR_VIDEO" | "TUTOR_ID",
+  overrides: { publishedAt?: Date | null } = {},
+) {
+  const key = `${purpose.toLowerCase()}/${crypto.randomUUID()}.bin`;
+  const contentType = purpose === "TUTOR_VIDEO" ? "video/mp4" : "application/pdf";
+  fake.put(key, fakeFileBytes(contentType, 64), contentType);
+  return createFileAsset(ownerId, purpose, {
+    storageKey: key,
+    contentType,
+    publishedAt: overrides.publishedAt,
+  });
+}
 
 function phone() {
   return `+88017${String(Math.floor(Math.random() * 1e8)).padStart(8, "0")}`;
@@ -728,20 +751,161 @@ describe("tutor routes", () => {
   });
 
   describe("POST /api/v1/tutors/me/verifications", () => {
-    it("is deferred", async () => {
+    const url = "/api/v1/tutors/me/verifications";
+
+    async function setup(overrides: Parameters<typeof createTutorProfile>[1] = {}) {
       const app = await createTestApp();
       const account = await createAccount({ role: "TUTOR" });
-      const headers = await getAuthHeaders(account);
+      const tutor = await createTutorProfile(account.id, overrides);
+      return { app, account, tutor, headers: await getAuthHeaders(account) };
+    }
 
-      const res = await app.inject({
-        method: "POST",
-        url: "/api/v1/tutors/me/verifications",
-        headers,
+    function submit(app: TestApp, headers: Record<string, string>, fileId: string) {
+      return app.inject({ method: "POST", url, headers, payload: { fileId } });
+    }
+
+    it("sends the ID for review and marks the tutor pending", async () => {
+      const { app, account, tutor, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_ID");
+
+      const res = await submit(app, headers, file.id);
+
+      expect(res.statusCode).toBe(201);
+      const body = JSON.parse(res.body);
+      expect(body.status).toBe("PENDING");
+      expect(body.file).toEqual({ id: file.id, status: "UPLOADED" });
+      const rows = await prisma.tutorVerification.findMany({ where: { tutorId: tutor.id } });
+      expect(rows).toHaveLength(1);
+      expect(rows[0].status).toBe("PENDING");
+      const updated = await prisma.tutor.findUniqueOrThrow({ where: { id: tutor.id } });
+      expect(updated.verificationStatus).toBe("PENDING");
+    });
+
+    it("returns 404 without a tutor profile", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const file = await createFileAsset(account.id, "TUTOR_ID");
+
+      const res = await submit(app, await getAuthHeaders(account), file.id);
+
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("needs a student ID number on the profile (400)", async () => {
+      const { app, account, tutor, headers } = await setup();
+      await prisma.tutor.update({ where: { id: tutor.id }, data: { studentIdNumber: null } });
+      const file = await createFileAsset(account.id, "TUTOR_ID");
+
+      const res = await submit(app, headers, file.id);
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).message).toBe(
+        "Add your student ID number to your profile first.",
+      );
+    });
+
+    it("refuses a second submission while under review (409)", async () => {
+      const { app, account, headers } = await setup();
+      const first = await createFileAsset(account.id, "TUTOR_ID");
+      const second = await createFileAsset(account.id, "TUTOR_ID");
+      await submit(app, headers, first.id);
+
+      const res = await submit(app, headers, second.id);
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("INVALID_VERIFICATION_STATE");
+      expect(JSON.parse(res.body).message).toBe("Your ID is already under review.");
+    });
+
+    it("refuses a submission once verified (409)", async () => {
+      const { app, account, headers } = await setup({ verificationStatus: "APPROVED" });
+      const file = await createFileAsset(account.id, "TUTOR_ID");
+
+      const res = await submit(app, headers, file.id);
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("You're already verified.");
+    });
+
+    it("accepts a new ID after rejection", async () => {
+      const { app, account, tutor, headers } = await setup();
+      const first = await createFileAsset(account.id, "TUTOR_ID");
+      const second = await createFileAsset(account.id, "TUTOR_ID");
+      await submit(app, headers, first.id);
+      await prisma.tutorVerification.updateMany({
+        where: { tutorId: tutor.id },
+        data: {
+          status: "REJECTED",
+          decidedAt: new Date(),
+          note: "Blurry",
+          reviewedById: (await createAdmin({ status: "ACTIVE" })).id,
+        },
       });
 
-      expect(res.statusCode).toBe(501);
-      expect(JSON.parse(res.body).error).toBe("NotImplemented");
-      expect(JSON.parse(res.body).code).toBe("NOT_IMPLEMENTED");
+      const res = await submit(app, headers, second.id);
+
+      expect(res.statusCode).toBe(201);
+      const updated = await prisma.tutor.findUniqueOrThrow({ where: { id: tutor.id } });
+      expect(updated.verificationStatus).toBe("PENDING");
+    });
+
+    it("refuses a rejected file sent again (409 FILE_IN_USE)", async () => {
+      const { app, account, tutor, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_ID");
+      await submit(app, headers, file.id);
+      await prisma.tutorVerification.updateMany({
+        where: { tutorId: tutor.id },
+        data: {
+          status: "REJECTED",
+          decidedAt: new Date(),
+          note: "Blurry",
+          reviewedById: (await createAdmin({ status: "ACTIVE" })).id,
+        },
+      });
+
+      const res = await submit(app, headers, file.id);
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("FILE_IN_USE");
+    });
+
+    it("refuses someone else's file (400 INVALID_FILE)", async () => {
+      const { app, headers } = await setup();
+      const other = await createAccount({ role: "TUTOR" });
+      const file = await createFileAsset(other.id, "TUTOR_ID");
+
+      const res = await submit(app, headers, file.id);
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file uploaded for another purpose (400 INVALID_FILE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "CREDENTIAL");
+
+      const res = await submit(app, headers, file.id);
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file that is still uploading (400 INVALID_FILE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_ID", { status: "PENDING_UPLOAD" });
+
+      const res = await submit(app, headers, file.id);
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("rejects a body without a fileId (400)", async () => {
+      const { app, headers } = await setup();
+
+      const res = await app.inject({ method: "POST", url, headers, payload: {} });
+
+      expect(res.statusCode).toBe(400);
     });
   });
 
@@ -1032,20 +1196,141 @@ describe("tutor routes", () => {
   });
 
   describe("POST /api/v1/tutors/me/credentials", () => {
-    it("is deferred", async () => {
+    const url = "/api/v1/tutors/me/credentials";
+
+    async function setup() {
       const app = await createTestApp();
       const account = await createAccount({ role: "TUTOR" });
-      const headers = await getAuthHeaders(account);
+      const tutor = await createTutorProfile(account.id);
+      return { app, account, tutor, headers: await getAuthHeaders(account) };
+    }
+
+    it("adds a credential with its file", async () => {
+      const { app, account, tutor, headers } = await setup();
+      const file = await createFileAsset(account.id, "CREDENTIAL");
 
       const res = await app.inject({
         method: "POST",
-        url: "/api/v1/tutors/me/credentials",
+        url,
         headers,
+        payload: { examLabel: "  HSC  ", result: " A+ ", fileId: file.id },
       });
 
-      expect(res.statusCode).toBe(501);
-      expect(JSON.parse(res.body).error).toBe("NotImplemented");
-      expect(JSON.parse(res.body).code).toBe("NOT_IMPLEMENTED");
+      expect(res.statusCode).toBe(201);
+      const body = JSON.parse(res.body);
+      expect(body.examLabel).toBe("HSC");
+      expect(body.result).toBe("A+");
+      expect(body.file).toEqual({ id: file.id, status: "UPLOADED" });
+      expect(body).not.toHaveProperty("storageKey");
+      const rows = await prisma.tutorCredential.findMany({ where: { tutorId: tutor.id } });
+      expect(rows.map((r) => r.fileId)).toEqual([file.id]);
+    });
+
+    it("returns 404 without a tutor profile", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const file = await createFileAsset(account.id, "CREDENTIAL");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers: await getAuthHeaders(account),
+        payload: { examLabel: "HSC", result: "A", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("rejects an empty exam label (400)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "CREDENTIAL");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { examLabel: "   ", result: "A", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("refuses someone else's file (400 INVALID_FILE)", async () => {
+      const { app, headers } = await setup();
+      const other = await createAccount({ role: "TUTOR" });
+      const file = await createFileAsset(other.id, "CREDENTIAL");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { examLabel: "HSC", result: "A", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file uploaded for another purpose (400 INVALID_FILE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_ID");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { examLabel: "HSC", result: "A", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file already attached to a credential (409 FILE_IN_USE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "CREDENTIAL");
+      await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { examLabel: "HSC", result: "A", fileId: file.id },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { examLabel: "SSC", result: "A+", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("FILE_IN_USE");
+    });
+
+    it("allows at most 20 credentials (409 UPLOAD_LIMIT_REACHED)", async () => {
+      const { app, account, tutor, headers } = await setup();
+      const shared = await createFileAsset(account.id, "CREDENTIAL");
+      await prisma.tutorCredential.createMany({
+        data: Array.from({ length: 20 }, (_, i) => ({
+          tutorId: tutor.id,
+          examLabel: `Exam ${i}`,
+          result: "A",
+          fileId: shared.id,
+        })),
+      });
+      const next = await createFileAsset(account.id, "CREDENTIAL");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { examLabel: "HSC", result: "A", fileId: next.id },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("UPLOAD_LIMIT_REACHED");
+      expect(JSON.parse(res.body).details).toEqual({ limit: 20 });
+      expect(await prisma.tutorCredential.count({ where: { tutorId: tutor.id } })).toBe(20);
     });
   });
 
@@ -1106,16 +1391,182 @@ describe("tutor routes", () => {
   });
 
   describe("POST /api/v1/tutors/me/videos", () => {
-    it("is deferred", async () => {
+    const url = "/api/v1/tutors/me/videos";
+
+    async function setup() {
       const app = await createTestApp();
       const account = await createAccount({ role: "TUTOR" });
-      const headers = await getAuthHeaders(account);
+      const tutor = await createTutorProfile(account.id);
+      return { app, account, tutor, headers: await getAuthHeaders(account) };
+    }
 
-      const res = await app.inject({ method: "POST", url: "/api/v1/tutors/me/videos", headers });
+    it("adds a pending video in display order", async () => {
+      const { app, account, tutor, headers } = await setup();
+      const first = await createFileAsset(account.id, "TUTOR_VIDEO");
+      const second = await createFileAsset(account.id, "TUTOR_VIDEO");
 
-      expect(res.statusCode).toBe(501);
-      expect(JSON.parse(res.body).error).toBe("NotImplemented");
-      expect(JSON.parse(res.body).code).toBe("NOT_IMPLEMENTED");
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "  Intro  ", fileId: first.id },
+      });
+      const next = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Algebra", fileId: second.id },
+      });
+
+      expect(res.statusCode).toBe(201);
+      const body = JSON.parse(res.body);
+      expect(body.title).toBe("Intro");
+      expect(body.status).toBe("PENDING");
+      expect(body.moderationNote).toBeNull();
+      expect(body.sortOrder).toBe(0);
+      expect(body.url).toBeNull();
+      expect(JSON.parse(next.body).sortOrder).toBe(1);
+      const rows = await prisma.tutorVideo.findMany({ where: { tutorId: tutor.id } });
+      expect(rows).toHaveLength(2);
+    });
+
+    it("returns a url for the new video when storage is configured", async () => {
+      const fake = createFakeStorage();
+      setStorageForTests(fake.storage);
+      const { app, account, headers } = await setup();
+      const file = await storedFile(fake, account.id, "TUTOR_VIDEO");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Intro", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(201);
+      const body = JSON.parse(res.body);
+      expect(body.url).toContain(file.storageKey);
+      expect(res.body).not.toContain('"storageKey"');
+      setStorageForTests(null);
+    });
+
+    it("returns 404 without a tutor profile", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const file = await createFileAsset(account.id, "TUTOR_VIDEO");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers: await getAuthHeaders(account),
+        payload: { title: "Intro", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("rejects an empty title (400)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_VIDEO");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("refuses someone else's file (400 INVALID_FILE)", async () => {
+      const { app, headers } = await setup();
+      const other = await createAccount({ role: "TUTOR" });
+      const file = await createFileAsset(other.id, "TUTOR_VIDEO");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Intro", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file uploaded for another purpose (400 INVALID_FILE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "CREDENTIAL");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Intro", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file that is still uploading (400 INVALID_FILE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_VIDEO", { status: "PENDING_UPLOAD" });
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Intro", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file already attached to a video (409 FILE_IN_USE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_VIDEO");
+      await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Intro", fileId: file.id },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Again", fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("FILE_IN_USE");
+    });
+
+    it("allows at most 3 videos (409 UPLOAD_LIMIT_REACHED)", async () => {
+      const { app, account, tutor, headers } = await setup();
+      for (let i = 0; i < 3; i++) {
+        const file = await createFileAsset(account.id, "TUTOR_VIDEO");
+        await prisma.tutorVideo.create({
+          data: { tutorId: tutor.id, fileId: file.id, title: `Video ${i}`, sortOrder: i },
+        });
+      }
+      const next = await createFileAsset(account.id, "TUTOR_VIDEO");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { title: "Fourth", fileId: next.id },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("UPLOAD_LIMIT_REACHED");
+      expect(JSON.parse(res.body).details).toEqual({ limit: 3 });
+      expect(await prisma.tutorVideo.count({ where: { tutorId: tutor.id } })).toBe(3);
     });
   });
 

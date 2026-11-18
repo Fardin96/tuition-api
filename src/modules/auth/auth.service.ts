@@ -6,6 +6,7 @@ import type { Role } from "../../generated/prisma/enums.js";
 import type { AccountModel } from "../../generated/prisma/models/Account.js";
 import { isNumberUsedByOtherAccount } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
+import { removeObjects } from "../files/files.service.js";
 import { findOwnLocation } from "../location/location.service.js";
 
 const GOOGLE_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
@@ -408,6 +409,12 @@ export async function softDeleteAccount(accountId: string) {
 }
 
 export async function hardDeleteAccount(accountId: string) {
+  // Keys are read first: the rows are gone after the transaction, and the objects go after it commits.
+  const files = await prisma.fileAsset.findMany({
+    where: { ownerAccountId: accountId },
+    select: { storageKey: true },
+  });
+
   await prisma.$transaction(async (tx) => {
     // Sequential: a transaction client cannot run queries concurrently (pg deprecation warning).
     const student = await tx.student.findUnique({ where: { accountId }, select: { id: true } });
@@ -447,6 +454,10 @@ export async function hardDeleteAccount(accountId: string) {
       await tx.tutorVerification.updateMany({
         where: { reviewedById: accountId },
         data: { reviewedById: null },
+      });
+      await tx.student.updateMany({
+        where: { verificationReviewedById: accountId },
+        data: { verificationReviewedById: null },
       });
       await tx.report.updateMany({
         where: { handledById: accountId },
@@ -530,6 +541,8 @@ export async function hardDeleteAccount(accountId: string) {
 
     await tx.account.delete({ where: { id: accountId } });
   });
+
+  await removeObjects(files);
 }
 
 export async function getMe(accountId: string) {

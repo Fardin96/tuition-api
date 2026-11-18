@@ -1,10 +1,17 @@
-import type { Prisma, TutorRequirement } from "../../generated/prisma/client.js";
+import type {
+  FileAsset,
+  Prisma,
+  TutorRequirement,
+  TutorVideo,
+} from "../../generated/prisma/client.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import { toDistrictCode } from "../../lib/districts.js";
 import { validateTutorCoverage } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { MAX_TUTOR_CREDENTIALS, MAX_TUTOR_VIDEOS } from "../files/file-policy.js";
+import { claimFile, discardFile, fileUrl, removeObjects } from "../files/files.service.js";
 import {
   findOwnLocation,
   getTutorNeedsReaddress,
@@ -13,7 +20,9 @@ import {
   upsertLocation,
 } from "../location/location.service.js";
 import type {
+  CreateCredentialInput,
   CreateTutorRequirementInput,
+  CreateVideoInput,
   TutorRequirementListQuery,
   UpdateTutorRequirementInput,
 } from "./tutor.schema.js";
@@ -268,6 +277,39 @@ export async function replaceTutorSubjects(accountId: string, subjectIds: number
   });
 }
 
+// Sends an uploaded ID for review. The tutor_verification trigger copies PENDING onto the tutor.
+export async function submitTutorVerification(accountId: string, fileId: string) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
+  if (!tutor) return null;
+
+  return prisma.$transaction(async (tx) => {
+    await lockTutor(tx, tutor.id);
+    const row = await tx.tutor.findUniqueOrThrow({
+      where: { id: tutor.id },
+      select: { studentIdNumber: true, verificationStatus: true },
+    });
+    if (!row.studentIdNumber?.trim()) {
+      throw appError("ValidationError", 400, "Add your student ID number to your profile first.");
+    }
+    const latest = await tx.tutorVerification.findFirst({
+      where: { tutorId: tutor.id },
+      orderBy: { submittedAt: "desc" },
+      select: { status: true },
+    });
+    if (latest?.status === "PENDING") {
+      throw appError("InvalidVerificationState", 409, "Your ID is already under review.");
+    }
+    if (row.verificationStatus === "APPROVED") {
+      throw appError("InvalidVerificationState", 409, "You're already verified.");
+    }
+    await claimFile(tx, { fileId, ownerAccountId: accountId, purpose: "TUTOR_ID" });
+    return tx.tutorVerification.create({
+      data: { tutorId: tutor.id, fileId },
+      include: { file: { select: { id: true, status: true } } },
+    });
+  });
+}
+
 export async function getTutorVerifications(accountId: string) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
@@ -308,7 +350,8 @@ export async function getPublicTutorProfile(tutorId: string) {
       credentials: { include: { file: { select: { id: true, status: true } } } },
       videos: {
         where: { status: "APPROVED" },
-        include: { file: { select: { id: true, status: true } } },
+        include: { file: videoFileSelect },
+        orderBy: { sortOrder: "asc" },
       },
     },
   });
@@ -321,6 +364,7 @@ export async function getPublicTutorProfile(tutorId: string) {
     needsReaddress: await getTutorNeedsReaddress(tutor.id),
     areas: tutor.areas.map((a) => a.area),
     subjects: tutor.subjects.map((s) => s.subject),
+    videos: await Promise.all(tutor.videos.map(publicVideoFields)),
   };
 }
 
@@ -365,43 +409,164 @@ export async function getTutorCredentials(accountId: string) {
   });
 }
 
-export async function deleteTutorCredential(accountId: string, credentialId: string) {
-  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+// Adds a credential. Limited to MAX_TUTOR_CREDENTIALS per tutor.
+export async function addTutorCredential(accountId: string, input: CreateCredentialInput) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
   if (!tutor) return null;
-  const result = await prisma.tutorCredential.deleteMany({
-    where: { id: credentialId, tutorId: tutor.id },
+
+  return prisma.$transaction(async (tx) => {
+    await lockTutor(tx, tutor.id);
+    const count = await tx.tutorCredential.count({ where: { tutorId: tutor.id } });
+    if (count >= MAX_TUTOR_CREDENTIALS) {
+      throw appError(
+        "UploadLimitReached",
+        409,
+        `You can add at most ${MAX_TUTOR_CREDENTIALS} credentials.`,
+        { limit: MAX_TUTOR_CREDENTIALS },
+      );
+    }
+    await claimFile(tx, { fileId: input.fileId, ownerAccountId: accountId, purpose: "CREDENTIAL" });
+    return tx.tutorCredential.create({
+      data: {
+        tutorId: tutor.id,
+        examLabel: input.examLabel,
+        result: input.result,
+        fileId: input.fileId,
+      },
+      select: {
+        id: true,
+        examLabel: true,
+        result: true,
+        file: { select: { id: true, status: true } },
+      },
+    });
   });
-  return result.count > 0;
+}
+
+export async function deleteTutorCredential(accountId: string, credentialId: string) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
+  if (!tutor) return false;
+
+  const removed = await prisma.$transaction(async (tx) => {
+    const credential = await tx.tutorCredential.findFirst({
+      where: { id: credentialId, tutorId: tutor.id },
+      select: { id: true, fileId: true },
+    });
+    if (!credential) return null;
+    await tx.tutorCredential.delete({ where: { id: credential.id } });
+    return { file: await discardFile(tx, credential.fileId) };
+  });
+  if (!removed) return false;
+  if (removed.file) await removeObjects([removed.file]);
+  return true;
+}
+
+const videoFileSelect = { select: { id: true, status: true, storageKey: true, publishedAt: true } };
+
+type VideoRow = TutorVideo & {
+  file: Pick<FileAsset, "id" | "status" | "storageKey" | "publishedAt">;
+};
+
+// The storage key and publish time stay here; only the embeddable url leaves.
+async function publicVideoFields(video: VideoRow) {
+  return {
+    id: video.id,
+    title: video.title,
+    sortOrder: video.sortOrder,
+    createdAt: video.createdAt.toISOString(),
+    url: await fileUrl(video.file),
+    file: { id: video.file.id, status: video.file.status },
+  };
+}
+
+async function ownerVideoFields(video: VideoRow) {
+  return {
+    ...(await publicVideoFields(video)),
+    status: video.status,
+    moderationNote: video.moderationNote,
+  };
 }
 
 export async function getTutorVideos(accountId: string) {
-  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
   if (!tutor) return null;
-  return prisma.tutorVideo.findMany({
+  const rows = await prisma.tutorVideo.findMany({
     where: { tutorId: tutor.id },
-    include: { file: { select: { id: true, status: true } } },
+    include: { file: videoFileSelect },
     orderBy: { sortOrder: "asc" },
   });
+  return Promise.all(rows.map(ownerVideoFields));
+}
+
+// Adds a video as PENDING for moderation, after the tutor's existing ones.
+export async function addTutorVideo(accountId: string, input: CreateVideoInput) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
+  if (!tutor) return null;
+
+  const video = await prisma.$transaction(async (tx) => {
+    await lockTutor(tx, tutor.id);
+    const count = await tx.tutorVideo.count({ where: { tutorId: tutor.id } });
+    if (count >= MAX_TUTOR_VIDEOS) {
+      throw appError("UploadLimitReached", 409, `You can add at most ${MAX_TUTOR_VIDEOS} videos.`, {
+        limit: MAX_TUTOR_VIDEOS,
+      });
+    }
+    await claimFile(tx, {
+      fileId: input.fileId,
+      ownerAccountId: accountId,
+      purpose: "TUTOR_VIDEO",
+    });
+    const last = await tx.tutorVideo.aggregate({
+      where: { tutorId: tutor.id },
+      _max: { sortOrder: true },
+    });
+    return tx.tutorVideo.create({
+      data: {
+        tutorId: tutor.id,
+        fileId: input.fileId,
+        title: input.title,
+        status: "PENDING",
+        sortOrder: (last._max.sortOrder ?? -1) + 1,
+      },
+      include: { file: videoFileSelect },
+    });
+  });
+  return ownerVideoFields(video);
 }
 
 export async function deleteTutorVideo(accountId: string, videoId: string) {
-  const tutor = await prisma.tutor.findUnique({ where: { accountId } });
-  if (!tutor) return null;
-  const result = await prisma.tutorVideo.deleteMany({
-    where: { id: videoId, tutorId: tutor.id },
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
+  if (!tutor) return false;
+
+  const removed = await prisma.$transaction(async (tx) => {
+    const video = await tx.tutorVideo.findFirst({
+      where: { id: videoId, tutorId: tutor.id },
+      select: { id: true, fileId: true },
+    });
+    if (!video) return null;
+    await tx.tutorVideo.delete({ where: { id: video.id } });
+    return { file: await discardFile(tx, video.fileId) };
   });
-  return result.count > 0;
+  if (!removed) return false;
+  if (removed.file) await removeObjects([removed.file]);
+  return true;
 }
 
 export async function getApprovedVideos() {
-  return prisma.tutorVideo.findMany({
+  const rows = await prisma.tutorVideo.findMany({
     where: { status: "APPROVED" },
     include: {
       tutor: { select: { id: true, name: true } },
-      file: { select: { id: true, status: true } },
+      file: videoFileSelect,
     },
     orderBy: { sortOrder: "asc" },
   });
+  return Promise.all(
+    rows.map(async (row) => ({
+      ...(await publicVideoFields(row)),
+      tutor: { id: row.tutor.id, name: row.tutor.name },
+    })),
+  );
 }
 
 const MAX_ACTIVE_REQUIREMENTS = 10;

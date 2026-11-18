@@ -1,10 +1,13 @@
 import crypto from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../lib/prisma.js";
+import { setStorageForTests } from "../../lib/storage.js";
 import {
   createAccount,
   createApplication,
   createArea,
+  createFakeStorage,
+  createFileAsset,
   createRequirement,
   createStudentProfile,
   createSubject,
@@ -366,19 +369,252 @@ describe("student routes", () => {
   });
 
   describe("POST /api/v1/students/me/verification", () => {
-    it("is deferred", async () => {
+    const url = "/api/v1/students/me/verification";
+
+    async function setup() {
       const app = await createTestApp();
       const account = await createAccount({ role: "STUDENT" });
-      const headers = await getAuthHeaders(account);
+      const area = await createArea();
+      const student = await createStudentProfile(account.id, area.id);
+      return { app, account, student, headers: await getAuthHeaders(account) };
+    }
+
+    it("sends the ID for review", async () => {
+      const { app, account, student, headers } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+
+      const res = await app.inject({ method: "POST", url, headers, payload: { fileId: file.id } });
+
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body);
+      expect(body.verificationStatus).toBe("PENDING");
+      expect(body.verificationNote).toBeNull();
+      expect(body.verificationSubmittedAt).not.toBeNull();
+      expect(body.verificationDecidedAt).toBeNull();
+      const row = await prisma.student.findUniqueOrThrow({ where: { id: student.id } });
+      expect(row.verificationStatus).toBe("PENDING");
+      expect(row.verificationFileId).toBe(file.id);
+      expect(row.verificationSubmittedAt).not.toBeNull();
+    });
+
+    it("returns 404 without a student profile", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers: await getAuthHeaders(account),
+        payload: { fileId: file.id },
+      });
+
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("refuses a second submission while under review (409)", async () => {
+      const { app, account, headers } = await setup();
+      const first = await createFileAsset(account.id, "STUDENT_ID");
+      const second = await createFileAsset(account.id, "STUDENT_ID");
+      await app.inject({ method: "POST", url, headers, payload: { fileId: first.id } });
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { fileId: second.id },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("INVALID_VERIFICATION_STATE");
+      expect(JSON.parse(res.body).message).toBe("Your ID is already under review.");
+    });
+
+    it("refuses a submission once verified (409)", async () => {
+      const { app, account, student, headers } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+      await prisma.student.update({
+        where: { id: student.id },
+        data: { verificationFileId: file.id, verificationStatus: "APPROVED" },
+      });
+      const next = await createFileAsset(account.id, "STUDENT_ID");
+
+      const res = await app.inject({ method: "POST", url, headers, payload: { fileId: next.id } });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("Your ID is already verified.");
+    });
+
+    it("accepts a new ID after rejection and clears the review", async () => {
+      const { app, account, student, headers } = await setup();
+      const first = await createFileAsset(account.id, "STUDENT_ID");
+      const second = await createFileAsset(account.id, "STUDENT_ID");
+      await app.inject({ method: "POST", url, headers, payload: { fileId: first.id } });
+      await prisma.student.update({
+        where: { id: student.id },
+        data: {
+          verificationStatus: "REJECTED",
+          verificationNote: "The photo is blurry",
+          verificationDecidedAt: new Date(),
+        },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url,
+        headers,
+        payload: { fileId: second.id },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body);
+      expect(body.verificationStatus).toBe("PENDING");
+      expect(body.verificationNote).toBeNull();
+      expect(body.verificationDecidedAt).toBeNull();
+      const row = await prisma.student.findUniqueOrThrow({ where: { id: student.id } });
+      expect(row.verificationFileId).toBe(second.id);
+      expect(row.verificationNote).toBeNull();
+      expect(row.verificationDecidedAt).toBeNull();
+    });
+
+    it("refuses a file that belongs to someone else (400 INVALID_FILE)", async () => {
+      const { app, headers } = await setup();
+      const other = await createAccount({ role: "STUDENT" });
+      const file = await createFileAsset(other.id, "STUDENT_ID");
+
+      const res = await app.inject({ method: "POST", url, headers, payload: { fileId: file.id } });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file uploaded for another purpose (400 INVALID_FILE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "TUTOR_ID");
+
+      const res = await app.inject({ method: "POST", url, headers, payload: { fileId: file.id } });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file that is still uploading (400 INVALID_FILE)", async () => {
+      const { app, account, headers } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID", { status: "PENDING_UPLOAD" });
+
+      const res = await app.inject({ method: "POST", url, headers, payload: { fileId: file.id } });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("INVALID_FILE");
+    });
+
+    it("refuses a file that is already attached (409 FILE_IN_USE)", async () => {
+      const { app, account, student, headers } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+      await app.inject({ method: "POST", url, headers, payload: { fileId: file.id } });
+      await prisma.student.update({
+        where: { id: student.id },
+        data: { verificationStatus: "REJECTED" },
+      });
+
+      const res = await app.inject({ method: "POST", url, headers, payload: { fileId: file.id } });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("FILE_IN_USE");
+    });
+
+    it("rejects a body without a fileId (400)", async () => {
+      const { app, headers } = await setup();
+
+      const res = await app.inject({ method: "POST", url, headers, payload: {} });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("shows the review fields to the student on GET /me", async () => {
+      const { app, account, student, headers } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+      await prisma.student.update({
+        where: { id: student.id },
+        data: {
+          verificationFileId: file.id,
+          verificationStatus: "REJECTED",
+          verificationNote: "Name does not match",
+          verificationSubmittedAt: new Date("2026-01-02T03:04:05Z"),
+          verificationDecidedAt: new Date("2026-01-03T03:04:05Z"),
+        },
+      });
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+
+      const me = JSON.parse(res.body).account.student;
+      expect(me.verificationNote).toBe("Name does not match");
+      expect(me.verificationSubmittedAt).toBe("2026-01-02T03:04:05.000Z");
+      expect(me.verificationDecidedAt).toBe("2026-01-03T03:04:05.000Z");
+    });
+
+    it("does not add the review fields to the public student profile", async () => {
+      const { app, account, student } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+      await prisma.student.update({
+        where: { id: student.id },
+        data: {
+          verificationFileId: file.id,
+          verificationStatus: "PENDING",
+          verificationNote: "Private note",
+        },
+      });
+      const tutorAccount = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(tutorAccount.id);
+      const subject = await createSubject();
+      const requirement = await createRequirement({
+        studentId: student.id,
+        areaId: student.areaId,
+        subjectId: subject.id,
+      });
+      await createApplication({
+        requirementId: requirement.id,
+        tutorId: tutor.id,
+        studentId: student.id,
+        initiatedBy: "TUTOR",
+        status: "PENDING",
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `/api/v1/students/${student.id}`,
+        headers: await getAuthHeaders(tutorAccount),
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).not.toContain("Private note");
+      expect(res.body).not.toContain("verificationStatus");
+    });
+  });
+
+  describe("student verification file storage", () => {
+    it("never returns the storage key in the owner's profile", async () => {
+      const fake = createFakeStorage();
+      setStorageForTests(fake.storage);
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+      await createStudentProfile(account.id, area.id);
+      const file = await createFileAsset(account.id, "STUDENT_ID", {
+        storageKey: "student_id/secret-key.pdf",
+      });
 
       const res = await app.inject({
         method: "POST",
         url: "/api/v1/students/me/verification",
-        headers,
+        headers: await getAuthHeaders(account),
+        payload: { fileId: file.id },
       });
 
-      expect(res.statusCode).toBe(501);
-      expect(JSON.parse(res.body).error).toBe("NotImplemented");
+      expect(res.statusCode).toBe(200);
+      expect(res.body).not.toContain("secret-key");
+      expect(res.body).not.toContain("storageKey");
+      setStorageForTests(null);
     });
   });
 
