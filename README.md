@@ -72,7 +72,7 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
 | Script                             | Purpose                                                                  |
 | ---------------------------------- | ------------------------------------------------------------------------ |
 | `yarn dev`                         | Start dev server with watch                                              |
-| `yarn build`                       | Build production bundle to `dist/` (tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts) |
+| `yarn build`                       | Build production bundle to `dist/` (tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts src/cron/payment-reconcile.ts src/cron/file-cleanup.ts) |
 | `yarn start`                       | Run production bundle (env vars injected by host)                        |
 | `yarn db:migrate:create`           | Create a new empty migration                                             |
 | `yarn db:migrate`                  | Apply migrations in dev                                                  |
@@ -88,6 +88,47 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
 | `yarn test:ci`                     | Vitest (single run)                                                      |
 | `yarn cron:weekly-location-expiry` | Run the weekly location-expiry cron manually                             |
 | `yarn cron:fee-reminders`          | Run the daily fee-reminder cron manually                                 |
+| `yarn cron:file-cleanup`           | Run the file-cleanup cron manually (does nothing without R2 env)         |
+| `yarn r2:smoke`                    | Round-trip a test file through the R2 buckets (see Cloudflare R2)        |
+
+## Cloudflare R2 (file uploads)
+
+ID documents, credentials, videos and blog covers are stored in Cloudflare R2 through its S3 API. Storage stays off until the R2 variables are set. Without them the upload, complete and download routes answer 503 `STORAGE_UNAVAILABLE`.
+
+Create these in Cloudflare:
+
+1. Two R2 buckets with the APAC location hint: a **private** bucket (`R2_BUCKET`) that holds every file, and a **public** bucket (`R2_PUBLIC_BUCKET`) that holds copies of approved videos and blog covers only.
+2. An API token with Object Read & Write permission, scoped to those two buckets. Its access key ID and secret go into `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`.
+3. A custom domain on the public bucket, for example `files.example.com`. Its base URL goes into `R2_PUBLIC_URL_PREFIX`. Without the domain, approved videos and covers are served through signed links instead.
+4. On the private bucket, the CORS rule below. It lets the browser PUT uploads straight to R2.
+5. On the private bucket, a lifecycle rule that aborts incomplete multipart uploads after 1 day.
+
+CORS for the private bucket. `AllowedOrigins` lists every web origin: the production site and `http://localhost:3000` for local work.
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://www.example.com", "http://localhost:3000"],
+    "AllowedMethods": ["PUT", "GET"],
+    "AllowedHeaders": ["Content-Type"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+Environment variables:
+
+- `R2_ENDPOINT`: `https://<account-id>.r2.cloudflarestorage.com`
+- `R2_REGION`: `auto`
+- `R2_BUCKET`: the private bucket name
+- `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`: from the API token
+- `R2_PUBLIC_BUCKET`: the public bucket name (optional; works only with `R2_PUBLIC_URL_PREFIX`)
+- `R2_PUBLIC_URL_PREFIX`: the public domain, for example `https://files.example.com` (optional; works only with `R2_PUBLIC_BUCKET`)
+
+Check the setup with `yarn r2:smoke` after the variables are in `.env`. It uploads a 64-byte PDF under `smoke/`, reads it back, fetches a signed link, copies it to the public bucket when both public variables are set and fetches that URL, then deletes what it wrote. It prints each step and exits 1 on failure.
+
+The daily `file-cleanup` job (`src/cron/file-cleanup.ts`, 04:00 UTC) removes abandoned uploads and files that no record uses.
 
 ## Deploy to DigitalOcean App Platform
 
@@ -97,7 +138,7 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
    ```bash
    psql "$DATABASE_URL" -c "CREATE EXTENSION IF NOT EXISTS postgis;"
    ```
-3. Create a Cloudflare R2 bucket and API token for file uploads.
+3. Set up Cloudflare R2 for file uploads (see [Cloudflare R2 (file uploads)](#cloudflare-r2-file-uploads)).
 4. Set up a Google OAuth client and add the production `GOOGLE_CLIENT_ID` to `.do/app.yaml`.
 5. Fill in `.do/app.yaml` placeholders (GitHub repo, R2 credentials, token secrets, DB URLs).
 6. Install `doctl` and run:
@@ -194,7 +235,7 @@ See `.env.example` for the full list. Required for the app to start:
 Required once you build auth/files/notifications:
 
 - `GOOGLE_CLIENT_ID` (backend verifies the ID token from the frontend)
-- `R2_ENDPOINT`, `R2_REGION`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_URL_PREFIX`
+- `R2_ENDPOINT`, `R2_REGION`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (see Cloudflare R2; `R2_PUBLIC_BUCKET` and `R2_PUBLIC_URL_PREFIX` are optional and work only together)
 - `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`
 - `SUPER_ADMIN_EMAIL_1`, `SUPER_ADMIN_EMAIL_2`
 
