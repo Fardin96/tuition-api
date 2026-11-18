@@ -86,7 +86,7 @@ describe("admin platform settings", () => {
         updatedAt: null,
         updatedByName: null,
       });
-      expect(body.settings.slice(1).map((s) => s.value)).toEqual([0, false, 7, false, false]);
+      expect(body.settings.slice(1).map((s) => s.value)).toEqual([0, true, 7, false, false]);
     });
 
     it("sends Cache-Control private, no-store", async () => {
