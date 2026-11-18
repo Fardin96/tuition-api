@@ -12,7 +12,7 @@ import {
 const DEFAULTS: Record<SettingKey, SettingValue> = {
   commission_percent: 0,
   gateway_charge_percent: 0,
-  online_payments_enabled: false,
+  online_payments_enabled: true,
   refund_window_days: 7,
   require_tutor_verification: false,
   require_phone_verification: false,

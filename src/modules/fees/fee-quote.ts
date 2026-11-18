@@ -34,7 +34,7 @@ export function newTranId(): string {
   return `TM${time}${randomBytes(6).toString("hex").toUpperCase()}`;
 }
 
-// Both keys default when their platform_setting row is missing: payments off, no charge.
+// Both keys default when their platform_setting row is missing: payments on, no charge.
 export async function readPaymentSettings(db: Prisma.TransactionClient): Promise<PaymentSettings> {
   const rows = await db.platformSetting.findMany({
     where: { key: { in: ["online_payments_enabled", "gateway_charge_percent"] } },
@@ -44,7 +44,7 @@ export async function readPaymentSettings(db: Prisma.TransactionClient): Promise
   const enabled = byKey.get("online_payments_enabled");
   const percent = byKey.get("gateway_charge_percent");
   return {
-    enabled: enabled === true,
+    enabled: enabled !== false,
     chargePercent: new Prisma.Decimal(typeof percent === "number" ? percent : 0),
   };
 }
