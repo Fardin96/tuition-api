@@ -36,6 +36,27 @@ const schema = z.object({
 
   SUPER_ADMIN_EMAIL_1: z.string().email(),
   SUPER_ADMIN_EMAIL_2: z.string().email(),
+
+  // SSLCommerz gateway. Sandbox unless SSLC_IS_LIVE is "true", which only production may use.
+  SSLC_STORE_ID: z.string().optional(),
+  SSLC_STORE_PASSWORD: z.string().optional(),
+  SSLC_IS_LIVE: z.enum(["true", "false"]).default("false"),
+  // Informational only: the SDK derives the gateway host from SSLC_IS_LIVE.
+  SSLC_BASE_URL: z.string().optional(),
+  // Public base of this API, used for gateway callback URLs (e.g. http://localhost:4000).
+  API_PUBLIC_URL: z.string().url().optional(),
+  // Public base of the web app the browser returns to (e.g. http://localhost:3000).
+  WEB_PUBLIC_URL: z.string().url().optional(),
 });
 
-export const env = schema.parse(process.env);
+export const env = schema
+  .superRefine((value, ctx) => {
+    if (value.SSLC_IS_LIVE === "true" && value.NODE_ENV !== "production") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["SSLC_IS_LIVE"],
+        message: "SSLC_IS_LIVE=true is only allowed when NODE_ENV=production",
+      });
+    }
+  })
+  .parse(process.env);

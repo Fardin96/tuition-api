@@ -1155,7 +1155,10 @@
             "format": "date-time"
           },
           "recordedByName": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "reversesPaymentId": {
             "type": [
@@ -4190,7 +4193,9 @@
           "INVALID_FEE_STATE",
           "PACKAGE_ALREADY_MODERATED",
           "SUBJECT_EXISTS",
-          "AREA_EXISTS"
+          "AREA_EXISTS",
+          "PAYMENTS_DISABLED",
+          "GATEWAY_UNAVAILABLE"
         ],
         "description": "Machine-readable error code. Match on this."
       },
@@ -5495,6 +5500,8 @@
             "type": "string",
             "enum": [
               "commission_percent",
+              "gateway_charge_percent",
+              "online_payments_enabled",
               "require_tutor_verification",
               "require_phone_verification"
             ]
@@ -17957,7 +17964,7 @@
         "tags": [
           "Admin"
         ],
-        "description": "The three known settings in a fixed order. A key with no row yet shows its default (commission_percent 0, the two switches false).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "description": "The known settings in a fixed order. A key with no row yet shows its default (the two percentages 0, the switches false).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
         "security": [
           {
             "bearerAuth": []
@@ -18025,7 +18032,7 @@
         "tags": [
           "Admin"
         ],
-        "description": "Super admin only. commission_percent takes 0 to 100 with at most 2 decimals. The switches take true or false. Changing require_tutor_verification re-evaluates every tutor's listing.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "description": "Super admin only. commission_percent takes 0 to 100 and gateway_charge_percent takes 0 to 10, each with at most 2 decimals. The switches take true or false. Changing require_tutor_verification re-evaluates every tutor's listing.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
         "requestBody": {
           "required": true,
           "content": {
@@ -18042,6 +18049,8 @@
               "type": "string",
               "enum": [
                 "commission_percent",
+                "gateway_charge_percent",
+                "online_payments_enabled",
                 "require_tutor_verification",
                 "require_phone_verification"
               ]

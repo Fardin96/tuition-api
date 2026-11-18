@@ -110,7 +110,8 @@ export const adminFeePaymentSchema = z
     reason: z.string().nullable(),
     receivedAt: z.date(),
     createdAt: z.date(),
-    recordedByName: z.string(),
+    // null for gateway (SSLCOMMERZ) payments, which have no admin recorder.
+    recordedByName: z.string().nullable(),
     reversesPaymentId: z.string().nullable(),
     /** PAYMENT rows: the sum of REVERSAL rows pointing at it. "0.00" for REVERSAL rows. */
     reversedAmount: z.string(),

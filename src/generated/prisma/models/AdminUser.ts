@@ -832,10 +832,12 @@ export type AdminUserCreateNestedOneWithoutRecordedPaymentsInput = {
   connect?: Prisma.AdminUserWhereUniqueInput
 }
 
-export type AdminUserUpdateOneRequiredWithoutRecordedPaymentsNestedInput = {
+export type AdminUserUpdateOneWithoutRecordedPaymentsNestedInput = {
   create?: Prisma.XOR<Prisma.AdminUserCreateWithoutRecordedPaymentsInput, Prisma.AdminUserUncheckedCreateWithoutRecordedPaymentsInput>
   connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutRecordedPaymentsInput
   upsert?: Prisma.AdminUserUpsertWithoutRecordedPaymentsInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
   connect?: Prisma.AdminUserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutRecordedPaymentsInput, Prisma.AdminUserUpdateWithoutRecordedPaymentsInput>, Prisma.AdminUserUncheckedUpdateWithoutRecordedPaymentsInput>
 }

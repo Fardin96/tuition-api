@@ -29,6 +29,7 @@ beforeEach(async () => {
       account_block,
       report,
       dispute,
+      payment_attempt,
       fee_payment,
       platform_fee,
       notification_log,

@@ -19,7 +19,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const OPEN_FEE_STATUSES: FeeStatus[] = [FeeStatus.DUE, FeeStatus.PARTIAL];
 
 // Today's date in Asia/Dhaka (UTC+6, no DST), as YYYY-MM-DD.
-function dhakaToday(): string {
+export function dhakaToday(): string {
   return new Date(Date.now() + 6 * 3600_000).toISOString().slice(0, 10);
 }
 
@@ -105,7 +105,7 @@ function toAdminFeeDetail(row: FeeDetailRow): AdminFeeDetailResponse {
       reason: p.reason,
       receivedAt: p.receivedAt,
       createdAt: p.createdAt,
-      recordedByName: p.recordedBy.name,
+      recordedByName: p.recordedBy?.name ?? null,
       reversesPaymentId: p.reversesPaymentId,
       reversedAmount: sumOf(p.reversals.map((r) => r.amount)).toFixed(2),
     })),

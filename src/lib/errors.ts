@@ -32,6 +32,8 @@ export const ERROR_CODES = {
   PackageAlreadyModerated: "PACKAGE_ALREADY_MODERATED",
   SubjectExists: "SUBJECT_EXISTS",
   AreaExists: "AREA_EXISTS",
+  PaymentsDisabled: "PAYMENTS_DISABLED",
+  GatewayUnavailable: "GATEWAY_UNAVAILABLE",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

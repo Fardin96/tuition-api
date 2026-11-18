@@ -430,6 +430,7 @@ export const ModelName = {
   Dispute: 'Dispute',
   PlatformFee: 'PlatformFee',
   FeePayment: 'FeePayment',
+  PaymentAttempt: 'PaymentAttempt',
   NotificationLog: 'NotificationLog',
   AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
@@ -451,7 +452,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2897,6 +2898,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PaymentAttempt: {
+      payload: Prisma.$PaymentAttemptPayload<ExtArgs>
+      fields: Prisma.PaymentAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentAttemptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>
+        }
+        update: {
+          args: Prisma.PaymentAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentAttemptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentAttempt>
+        }
+        groupBy: {
+          args: Prisma.PaymentAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
     NotificationLog: {
       payload: Prisma.$NotificationLogPayload<ExtArgs>
       fields: Prisma.NotificationLogFieldRefs
@@ -3886,6 +3961,32 @@ export const FeePaymentScalarFieldEnum = {
 export type FeePaymentScalarFieldEnum = (typeof FeePaymentScalarFieldEnum)[keyof typeof FeePaymentScalarFieldEnum]
 
 
+export const PaymentAttemptScalarFieldEnum = {
+  id: 'id',
+  feeId: 'feeId',
+  tutorId: 'tutorId',
+  tranId: 'tranId',
+  feeAmount: 'feeAmount',
+  chargeAmount: 'chargeAmount',
+  totalAmount: 'totalAmount',
+  status: 'status',
+  sessionKey: 'sessionKey',
+  valId: 'valId',
+  bankTranId: 'bankTranId',
+  cardType: 'cardType',
+  riskLevel: 'riskLevel',
+  failureReason: 'failureReason',
+  gatewayResponse: 'gatewayResponse',
+  paymentId: 'paymentId',
+  lastCheckedAt: 'lastCheckedAt',
+  settledAt: 'settledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentAttemptScalarFieldEnum = (typeof PaymentAttemptScalarFieldEnum)[keyof typeof PaymentAttemptScalarFieldEnum]
+
+
 export const NotificationLogScalarFieldEnum = {
   id: 'id',
   eventType: 'eventType',
@@ -4495,6 +4596,20 @@ export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'PaymentAttemptStatus'
+ */
+export type EnumPaymentAttemptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentAttemptStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentAttemptStatus[]'
+ */
+export type ListEnumPaymentAttemptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentAttemptStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'NotificationEvent'
  */
 export type EnumNotificationEventFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationEvent'>
@@ -4775,6 +4890,7 @@ export type GlobalOmitConfig = {
   dispute?: Prisma.DisputeOmit
   platformFee?: Prisma.PlatformFeeOmit
   feePayment?: Prisma.FeePaymentOmit
+  paymentAttempt?: Prisma.PaymentAttemptOmit
   notificationLog?: Prisma.NotificationLogOmit
   appNotification?: Prisma.AppNotificationOmit
   blogPost?: Prisma.BlogPostOmit

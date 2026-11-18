@@ -11,10 +11,13 @@
 --   report_one_open_per_pair, dispute_one_open_per_raiser, tutor_requirement_one_default,
 --   zlr_one_pending_per_tutor, tutor_zone_center_gix, fee_payment_gateway_ref_uniq,
 --   tutor_location_geog_gist_idx, student_location_geog_gist_idx,
---   tutor_location_searchable_idx, student_location_searchable_idx
+--   tutor_location_searchable_idx, student_location_searchable_idx,
+--   payment_attempt_one_pending_per_fee
 -- Needs PostgreSQL 13+ and PostGIS (created by migration 20261022876543_location_postgis).
 --
--- v5 changes are marked [v5], v6 changes are marked [v6].
+-- v5 changes are marked [v5], v6 changes are marked [v6], payment changes are marked [payments].
+-- Deployed databases receive the [payments] changes through migrations
+-- 20261121000100_payment_attempts and 20261121000200_payment_attempts_validate.
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
@@ -380,6 +383,21 @@ END $$ LANGUAGE plpgsql;
 CREATE TRIGGER fee_paid_guard_trg BEFORE UPDATE ON platform_fee
   FOR EACH ROW EXECUTE FUNCTION fee_paid_guard();
 
+-- ═════════ 7b. Payment attempts (SSLCommerz checkout) ══════════════════════
+-- [payments] migrations 20261121000100_payment_attempts (the CHECKs are inline in its CREATE TABLE).
+-- tran_id is our reference, at most 30 characters for the gateway.
+ALTER TABLE payment_attempt
+  ADD CONSTRAINT payment_attempt_tran_id_len CHECK (char_length(tran_id) BETWEEN 1 AND 30),
+  ADD CONSTRAINT payment_attempt_fee_positive CHECK (fee_amount > 0),
+  ADD CONSTRAINT payment_attempt_charge_nonneg CHECK (charge_amount >= 0),
+  ADD CONSTRAINT payment_attempt_total_sum CHECK (total_amount = fee_amount + charge_amount),
+  -- SUCCEEDED exactly when the ledger row exists
+  ADD CONSTRAINT payment_attempt_succeeded_has_payment CHECK ((status = 'SUCCEEDED') = (payment_id IS NOT NULL));
+
+-- At most one checkout in flight per fee. FAILED, CANCELLED, EXPIRED and the rest do not count.
+CREATE UNIQUE INDEX payment_attempt_one_pending_per_fee
+  ON payment_attempt (fee_id) WHERE status = 'PENDING';
+
 -- ═════════ 8. Admin levels ═════════════════════════════════════════════
 -- super_admin_email holds the two allowed emails (slots 1 and 2).
 ALTER TABLE super_admin_email ADD CONSTRAINT super_admin_slot CHECK (slot IN (1, 2));
@@ -545,6 +563,11 @@ DROP INDEX IF EXISTS fee_payment_gateway_ref_uniq;
 CREATE UNIQUE INDEX fee_payment_gateway_ref_uniq
   ON fee_payment (txn_reference) WHERE method = 'SSLCOMMERZ' AND kind = 'PAYMENT';
 
+-- [payments] gateway rows have no recorder; every other method needs one.
+-- NOT VALID here; validated by migration 20261121000200_payment_attempts_validate.
+ALTER TABLE fee_payment
+  ADD CONSTRAINT fee_payment_recorder_required CHECK (recorded_by IS NOT NULL OR method = 'SSLCOMMERZ') NOT VALID;
+
 -- ═════════ 14. Tutor requirement ═══════════════════════════════════════════
 -- [PR B] levels run -4..13 in age order; tr_class_range (1..20) is gone.
 ALTER TABLE tutor_requirement
@@ -658,12 +681,17 @@ ALTER TABLE application ADD CONSTRAINT app_match_score_range
 
 -- ═════════ 19. Platform settings ════════════════════════════════════════════
 -- [v6] a bad value can never break the ::boolean / ::numeric casts in the functions below
+-- [payments] online_payments_enabled and gateway_charge_percent added by migration 20261121000100_payment_attempts
+-- (validated by 20261121000200_payment_attempts_validate).
 ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
   CASE key
     WHEN 'require_tutor_verification' THEN jsonb_typeof(value) = 'boolean'
     WHEN 'require_phone_verification' THEN jsonb_typeof(value) = 'boolean'
+    WHEN 'online_payments_enabled' THEN jsonb_typeof(value) = 'boolean'
     WHEN 'commission_percent' THEN
       CASE WHEN jsonb_typeof(value) = 'number' THEN (value #>> '{}')::numeric BETWEEN 0 AND 100 ELSE false END
+    WHEN 'gateway_charge_percent' THEN
+      CASE WHEN jsonb_typeof(value) = 'number' THEN (value #>> '{}')::numeric BETWEEN 0 AND 10 ELSE false END
     ELSE false
   END);
 

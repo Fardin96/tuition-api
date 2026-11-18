@@ -207,6 +207,11 @@ export type PlatformFee = Prisma.PlatformFeeModel
  */
 export type FeePayment = Prisma.FeePaymentModel
 /**
+ * Model PaymentAttempt
+ * 
+ */
+export type PaymentAttempt = Prisma.PaymentAttemptModel
+/**
  * Model NotificationLog
  * 
  */

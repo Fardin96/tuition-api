@@ -84,6 +84,7 @@ export const ModelName = {
   Dispute: 'Dispute',
   PlatformFee: 'PlatformFee',
   FeePayment: 'FeePayment',
+  PaymentAttempt: 'PaymentAttempt',
   NotificationLog: 'NotificationLog',
   AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
@@ -612,6 +613,32 @@ export const FeePaymentScalarFieldEnum = {
 } as const
 
 export type FeePaymentScalarFieldEnum = (typeof FeePaymentScalarFieldEnum)[keyof typeof FeePaymentScalarFieldEnum]
+
+
+export const PaymentAttemptScalarFieldEnum = {
+  id: 'id',
+  feeId: 'feeId',
+  tutorId: 'tutorId',
+  tranId: 'tranId',
+  feeAmount: 'feeAmount',
+  chargeAmount: 'chargeAmount',
+  totalAmount: 'totalAmount',
+  status: 'status',
+  sessionKey: 'sessionKey',
+  valId: 'valId',
+  bankTranId: 'bankTranId',
+  cardType: 'cardType',
+  riskLevel: 'riskLevel',
+  failureReason: 'failureReason',
+  gatewayResponse: 'gatewayResponse',
+  paymentId: 'paymentId',
+  lastCheckedAt: 'lastCheckedAt',
+  settledAt: 'settledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentAttemptScalarFieldEnum = (typeof PaymentAttemptScalarFieldEnum)[keyof typeof PaymentAttemptScalarFieldEnum]
 
 
 export const NotificationLogScalarFieldEnum = {

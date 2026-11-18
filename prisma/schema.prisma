@@ -158,6 +158,22 @@ enum PaymentKind {
   REVERSAL
 }
 
+// Lifecycle of one SSLCommerz checkout (payment_attempt). Table rules live in prisma/constraints.sql.
+enum PaymentAttemptStatus {
+  // Session created, waiting for the gateway.
+  PENDING
+  // Validated and posted to the ledger (payment_id set).
+  SUCCEEDED
+  // Soft end states. A later validated gateway success still moves them on.
+  FAILED
+  CANCELLED
+  EXPIRED
+  // Gateway says paid, but amount, currency, tran_id or risk do not match. No ledger row.
+  REVIEW
+  // Gateway took the money but the ledger refused it (fee waived/void, already paid, overpay). Needs an admin refund.
+  UNAPPLIED
+}
+
 enum FilePurpose {
   STUDENT_ID
   TUTOR_ID
@@ -540,6 +556,7 @@ model Tutor {
   requirements      TutorRequirement[]
   zones             TutorZone[]
   zoneLimitRequests ZoneLimitRequest[]
+  paymentAttempts   PaymentAttempt[]
 
   @@unique([accountId, role])
   @@index([isListed, ratingAvg(sort: Desc)])
@@ -1034,9 +1051,10 @@ model PlatformFee {
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  tutor       Tutor        @relation(fields: [tutorId], references: [id])
-  application Application  @relation(fields: [applicationId], references: [id])
+  tutor       Tutor            @relation(fields: [tutorId], references: [id])
+  application Application      @relation(fields: [applicationId], references: [id])
   payments    FeePayment[]
+  attempts    PaymentAttempt[]
 
   @@index([tutorId, status, dueDate])
   @@index([status, dueDate]) // overdue report
@@ -1046,6 +1064,8 @@ model PlatformFee {
 
 // Append-only ledger. A wrong entry or a refund is a REVERSAL row pointing at
 // the original payment, never an edit or delete.
+// Admin-recorded rows (CASH, bKash, ...) have a recorder. Gateway rows (SSLCOMMERZ) have none:
+// recorded_by is NULL, and fee_payment_recorder_required in constraints.sql enforces that.
 model FeePayment {
   id                String        @id @default(uuid(7)) @db.Uuid
   feeId             String        @map("fee_id") @db.Uuid
@@ -1056,17 +1076,54 @@ model FeePayment {
   txnReference      String?       @map("txn_reference") // bKash/Nagad TrxID etc.
   reason            String? // required for a REVERSAL
   receivedAt        DateTime      @map("received_at") @db.Timestamptz(3)
-  recordedById      String        @map("recorded_by") @db.Uuid
+  recordedById      String?       @map("recorded_by") @db.Uuid
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  fee             PlatformFee  @relation(fields: [feeId], references: [id])
-  recordedBy      AdminUser    @relation(fields: [recordedById], references: [accountId])
-  reversesPayment FeePayment?  @relation("PaymentReversal", fields: [reversesPaymentId], references: [id], onDelete: Restrict)
-  reversals       FeePayment[] @relation("PaymentReversal")
+  fee             PlatformFee     @relation(fields: [feeId], references: [id])
+  recordedBy      AdminUser?      @relation(fields: [recordedById], references: [accountId], onDelete: Restrict)
+  reversesPayment FeePayment?     @relation("PaymentReversal", fields: [reversesPaymentId], references: [id], onDelete: Restrict)
+  reversals       FeePayment[]    @relation("PaymentReversal")
+  attempt         PaymentAttempt?
 
   @@index([feeId])
   @@index([reversesPaymentId])
   @@map("fee_payment")
+}
+
+// One SSLCommerz checkout for a placement fee. Created PENDING before the gateway call;
+// a ledger row (fee_payment) exists only once a verified success moves it to SUCCEEDED.
+// tran_id is our reference (1..30 chars). total_amount = fee_amount + charge_amount.
+// The gateway charge is paid by the tutor and is not recorded in the ledger.
+model PaymentAttempt {
+  id              String               @id @default(uuid(7)) @db.Uuid
+  feeId           String               @map("fee_id") @db.Uuid
+  tutorId         String               @map("tutor_id") @db.Uuid
+  tranId          String               @unique @map("tran_id")
+  feeAmount       Decimal              @map("fee_amount") @db.Decimal(12, 2)
+  chargeAmount    Decimal              @default(0) @map("charge_amount") @db.Decimal(12, 2)
+  totalAmount     Decimal              @map("total_amount") @db.Decimal(12, 2)
+  status          PaymentAttemptStatus @default(PENDING)
+  sessionKey      String?              @map("session_key")
+  valId           String?              @map("val_id")
+  bankTranId      String?              @map("bank_tran_id")
+  cardType        String?              @map("card_type")
+  riskLevel       Int?                 @map("risk_level") @db.SmallInt
+  failureReason   String?              @map("failure_reason")
+  gatewayResponse Json?                @map("gateway_response")
+  paymentId       String?              @unique @map("payment_id") @db.Uuid
+  lastCheckedAt   DateTime?            @map("last_checked_at") @db.Timestamptz(3)
+  settledAt       DateTime?            @map("settled_at") @db.Timestamptz(3)
+  createdAt       DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime             @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  fee     PlatformFee @relation(fields: [feeId], references: [id])
+  tutor   Tutor       @relation(fields: [tutorId], references: [id])
+  payment FeePayment? @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  // At most one PENDING attempt per fee is a partial unique index in constraints.sql.
+  @@index([feeId, createdAt(sort: Desc)])
+  @@index([status, createdAt])
+  @@map("payment_attempt")
 }
 
 // ───────────────────────── notifications (outbox) ─────────────────────────
@@ -1157,7 +1214,8 @@ model SiteContent {
 }
 
 // Admin-switchable platform flags and numbers. Values are validated per key by a CHECK in constraints.sql.
-// Keys: require_tutor_verification (bool), require_phone_verification (bool), commission_percent (0..100).
+// Keys: require_tutor_verification (bool), require_phone_verification (bool), commission_percent (0..100),
+// gateway_charge_percent (0..10), online_payments_enabled (bool).
 model PlatformSetting {
   key         String   @id
   value       Json

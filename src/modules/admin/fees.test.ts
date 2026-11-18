@@ -459,6 +459,37 @@ describe("admin fees", () => {
       });
     });
 
+    it("shows a null recordedByName for an SSLCOMMERZ payment with no admin recorder", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const setup = await setupApplication();
+      const fee = await makeFee(setup);
+      await prisma.feePayment.create({
+        data: {
+          feeId: fee.id,
+          amount: 500,
+          method: "SSLCOMMERZ",
+          txnReference: "TMTEST1",
+          receivedAt: new Date(),
+          recordedById: null,
+        },
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${FEES_URL}/${fee.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      const [payment] = JSON.parse(res.body).payments;
+      expect(payment).toMatchObject({
+        method: "SSLCOMMERZ",
+        txnReference: "TMTEST1",
+        recordedByName: null,
+      });
+    });
+
     it("unknown id returns 404", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
@@ -918,6 +949,25 @@ describe("admin fees", () => {
 
       expect(res.statusCode).toBe(404);
       expect(JSON.parse(res.body).message).toBe("Payment not found");
+    });
+  });
+
+  describe("ledger rules in the database", () => {
+    it("refuses a CASH payment with no recorder", async () => {
+      const setup = await setupApplication();
+      const fee = await makeFee(setup);
+
+      await expect(
+        prisma.feePayment.create({
+          data: {
+            feeId: fee.id,
+            amount: 500,
+            method: "CASH",
+            receivedAt: new Date(),
+            recordedById: null,
+          },
+        }),
+      ).rejects.toThrow(/fee_payment_recorder_required/);
     });
   });
 

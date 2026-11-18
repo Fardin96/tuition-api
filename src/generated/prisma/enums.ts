@@ -178,6 +178,19 @@ export const PaymentKind = {
 export type PaymentKind = (typeof PaymentKind)[keyof typeof PaymentKind]
 
 
+export const PaymentAttemptStatus = {
+  PENDING: 'PENDING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+  REVIEW: 'REVIEW',
+  UNAPPLIED: 'UNAPPLIED'
+} as const
+
+export type PaymentAttemptStatus = (typeof PaymentAttemptStatus)[keyof typeof PaymentAttemptStatus]
+
+
 export const FilePurpose = {
   STUDENT_ID: 'STUDENT_ID',
   TUTOR_ID: 'TUTOR_ID',
