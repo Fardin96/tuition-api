@@ -212,6 +212,11 @@ export type FeePayment = Prisma.FeePaymentModel
  */
 export type PaymentAttempt = Prisma.PaymentAttemptModel
 /**
+ * Model PaymentRefund
+ * 
+ */
+export type PaymentRefund = Prisma.PaymentRefundModel
+/**
  * Model PromoCode
  * 
  */

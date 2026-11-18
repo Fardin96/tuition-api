@@ -191,6 +191,26 @@ export const PaymentAttemptStatus = {
 export type PaymentAttemptStatus = (typeof PaymentAttemptStatus)[keyof typeof PaymentAttemptStatus]
 
 
+export const RefundStatus = {
+  REQUESTED: 'REQUESTED',
+  REJECTED: 'REJECTED',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  NEEDS_REVIEW: 'NEEDS_REVIEW'
+} as const
+
+export type RefundStatus = (typeof RefundStatus)[keyof typeof RefundStatus]
+
+
+export const RefundSource = {
+  TUTOR: 'TUTOR',
+  ADMIN: 'ADMIN'
+} as const
+
+export type RefundSource = (typeof RefundSource)[keyof typeof RefundSource]
+
+
 export const PromoDiscountType = {
   PERCENT: 'PERCENT',
   FLAT: 'FLAT'

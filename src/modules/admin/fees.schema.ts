@@ -8,6 +8,7 @@ import {
   PaymentMethod,
 } from "../../generated/prisma/enums.js";
 import { feePromoSchema } from "../fees/fee.schema.js";
+import { adminRefundSchema } from "../refunds/refund.schema.js";
 
 export const FEE_MAX_AMOUNT = 5_000_000;
 
@@ -168,6 +169,8 @@ export const adminFeeDetailSchema = adminFeeSchema
     attempts: z.array(adminFeeAttemptSchema),
     /** The promo code applied to the fee, or null. The same object the tutor sees. */
     promo: feePromoSchema.nullable(),
+    /** Refunds of this fee's online payments, newest first. Only the last 20 are sent. */
+    refunds: z.array(adminRefundSchema),
   })
   .meta({ id: "AdminFeeDetail" });
 export type AdminFeeDetailResponse = z.infer<typeof adminFeeDetailSchema>;

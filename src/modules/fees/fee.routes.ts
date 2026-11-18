@@ -3,6 +3,7 @@ import { privateNoStore } from "../../lib/admin.js";
 import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
+import { requestRefund } from "../refunds/refund-request.service.js";
 import {
   type ApplyPromoInput,
   applyPromoSchema,
@@ -10,6 +11,8 @@ import {
   type FeeListQuery,
   feeIdParamSchema,
   feeListQuerySchema,
+  type RequestRefundInput,
+  requestRefundSchema,
   tutorFeeDetailSchema,
   tutorFeePageSchema,
 } from "./fee.schema.js";
@@ -123,6 +126,34 @@ export async function feeRoutes(app: FastifyInstance) {
       const { id } = request.params as FeeIdParam;
       const fee = await removePromo(account.accountId, id);
       return reply.send(fee);
+    },
+  );
+
+  app.post(
+    "/:id/refunds",
+    {
+      config: accountRateLimit(5, "1 minute"),
+      schema: {
+        ...routeDocs({
+          tag: "Fees",
+          summary: "Request a refund of an online payment",
+          description:
+            "Asks for a refund of one online (SSLCommerz) payment on one of my fees. Only the payment's fee part is refunded; the gateway charge is not. The request covers the whole refundable amount and waits for a super admin to approve it. Allowed only for a settled payment with a bank transaction id, within the refund window (refund_window_days after it was settled; 0 turns requests off), with nothing already refunded and no other refund open for it. Cash payments are refunded outside the app. Returns the fee with the new refund in refunds.",
+          auth: ["TUTOR"],
+          errors: [404, 409],
+          rateLimit: "5/min per account",
+        }),
+        params: feeIdParamSchema,
+        body: requestRefundSchema,
+        response: { 201: tutorFeeDetailSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { id } = request.params as FeeIdParam;
+      const body = request.body as RequestRefundInput;
+      const fee = await requestRefund(account.accountId, id, body);
+      return reply.code(201).send(fee);
     },
   );
 }

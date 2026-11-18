@@ -30,10 +30,40 @@ export type CreateSessionInput = {
   valueA?: string;
 };
 
+export type RefundInput = {
+  bankTranId: string;
+  amount: string; // "1500.00"
+  remarks: string;
+  refeId: string; // our payment_refund id
+};
+
+// initiateRefund answer. status is the gateway's word: "success" (accepted, processing),
+// "processing" (already accepted earlier) or "failed". Anything else is unknown.
+export type RefundInitResult = {
+  status: string;
+  refundRefId: string | null;
+  errorReason: string | null;
+  raw: Record<string, unknown>;
+};
+
+// refundQuery answer. status: "refunded", "processing" or "cancelled".
+export type RefundQueryResult = {
+  status: string;
+  refundRefId: string | null;
+  refundedOn: string | null;
+  errorReason: string | null;
+  raw: Record<string, unknown>;
+};
+
 export interface PaymentGateway {
   createSession(input: CreateSessionInput): Promise<{ sessionKey: string; gatewayUrl: string }>;
   validate(valId: string): Promise<GatewayTransaction>;
   queryByTranId(tranId: string): Promise<GatewayTransaction[]>; // [] when none found
+  // "rejected": the gateway refused the request, so no refund started. "unavailable": the outcome
+  // is unknown (timeout, network), so the refund may or may not have started.
+  initiateRefund(input: RefundInput): Promise<RefundInitResult>;
+  // "unavailable" when the gateway cannot answer.
+  queryRefund(refundRefId: string): Promise<RefundQueryResult>;
 }
 
 export class GatewayError extends Error {
@@ -94,9 +124,15 @@ export function mapTransaction(obj: Raw): GatewayTransaction {
     cardType: orNull(obj.card_type),
     riskLevel: riskLevelOf(obj.risk_level),
     riskTitle: orNull(obj.risk_title),
-    raw: Object.fromEntries(Object.entries(obj).filter(([key]) => !SECRET_KEY.test(key))),
+    raw: sanitized(obj),
   };
 }
+
+function sanitized(obj: Raw): Raw {
+  return Object.fromEntries(Object.entries(obj).filter(([key]) => !SECRET_KEY.test(key)));
+}
+
+const REFUND_AMOUNT = /^\d{1,10}\.\d{2}$/;
 
 function scrub(message: string, storePassword: string): string {
   const masked = message.replace(/store_passwd=[^&\s]*/g, "store_passwd=***");
@@ -205,6 +241,55 @@ export function createSslcommerzGateway({
       }
       const elements = Array.isArray(res.element) ? res.element : [];
       return elements.filter(isRecord).map(mapTransaction);
+    },
+
+    async initiateRefund(input) {
+      assertSafeId(input.bankTranId, "bank_tran_id");
+      assertSafeId(input.refeId, "refe_id");
+      if (!REFUND_AMOUNT.test(input.amount)) {
+        throw new GatewayError("rejected", "Invalid refund amount");
+      }
+      // The SDK interpolates these into the URL without encoding.
+      const remarks = encodeURIComponent(input.remarks.slice(0, 200));
+      const res = await call(() =>
+        client.initiateRefund({
+          bank_tran_id: input.bankTranId,
+          refund_amount: input.amount,
+          refund_remarks: remarks,
+          refe_id: input.refeId,
+        }),
+      );
+      // APIConnect other than DONE: the request was refused (credentials, permission, inactive store).
+      if (res.APIConnect !== "DONE") {
+        throw new GatewayError(
+          "rejected",
+          clean(`Gateway refused the refund: ${text(res.APIConnect) || "no answer"}`),
+        );
+      }
+      return {
+        status: text(res.status).toLowerCase(),
+        refundRefId: orNull(res.refund_ref_id),
+        errorReason: orNull(res.errorReason),
+        raw: sanitized(res),
+      };
+    },
+
+    async queryRefund(refundRefId) {
+      assertSafeId(refundRefId, "refund_ref_id");
+      const res = await call(() => client.refundQuery({ refund_ref_id: refundRefId }));
+      if (res.APIConnect !== "DONE") {
+        throw new GatewayError(
+          "unavailable",
+          clean(`Gateway refund query failed: ${text(res.APIConnect)}`),
+        );
+      }
+      return {
+        status: text(res.status).toLowerCase(),
+        refundRefId: orNull(res.refund_ref_id),
+        refundedOn: orNull(res.refunded_on),
+        errorReason: orNull(res.errorReason),
+        raw: sanitized(res),
+      };
     },
   };
 }

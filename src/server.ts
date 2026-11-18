@@ -22,6 +22,7 @@ import { adminFeeRoutes } from "./modules/admin/fees.routes.js";
 import { adminPackageRoutes } from "./modules/admin/packages.routes.js";
 import { adminPaymentRoutes } from "./modules/admin/payments.routes.js";
 import { adminPromoCodeRoutes } from "./modules/admin/promo-codes.routes.js";
+import { adminRefundRoutes } from "./modules/admin/refunds.routes.js";
 import { adminSettingRoutes } from "./modules/admin/settings.routes.js";
 import { adminSubjectRoutes } from "./modules/admin/subjects.routes.js";
 import { adminZoneRequestRoutes } from "./modules/admin/zone-requests.routes.js";
@@ -141,6 +142,7 @@ export async function buildApp() {
   await app.register(adminFeeRoutes, { prefix: "/api/v1/admin" });
   await app.register(adminPaymentRoutes, { prefix: "/api/v1/admin" });
   await app.register(adminPromoCodeRoutes, { prefix: "/api/v1/admin" });
+  await app.register(adminRefundRoutes, { prefix: "/api/v1/admin" });
   await app.register(adminPackageRoutes, { prefix: "/api/v1/admin/packages" });
   await app.register(adminSubjectRoutes, { prefix: "/api/v1/admin/subjects" });
   await app.register(adminAreaRoutes, { prefix: "/api/v1/admin/areas" });

@@ -1131,6 +1131,12 @@
                 "type": "null"
               }
             ]
+          },
+          "refunds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminRefund"
+            }
           }
         },
         "required": [
@@ -1151,7 +1157,8 @@
           "application",
           "payments",
           "attempts",
-          "promo"
+          "promo",
+          "refunds"
         ],
         "additionalProperties": false
       },
@@ -1852,6 +1859,15 @@
           },
           "canReview": {
             "type": "boolean"
+          },
+          "refundable": {
+            "type": "string"
+          },
+          "refunds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminRefund"
+            }
           }
         },
         "required": [
@@ -1875,7 +1891,9 @@
           "tutor",
           "gatewayResponse",
           "canCheck",
-          "canReview"
+          "canReview",
+          "refundable",
+          "refunds"
         ],
         "additionalProperties": false
       },
@@ -2254,6 +2272,489 @@
           "createdAt",
           "releasedAt",
           "releaseReason"
+        ],
+        "additionalProperties": false
+      },
+      "AdminRefund": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REQUESTED",
+              "REJECTED",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "NEEDS_REVIEW"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "TUTOR",
+              "ADMIN"
+            ]
+          },
+          "amount": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "refundRefId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "failureReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "decisionNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lastCheckedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "attempt": {
+            "type": "object",
+            "properties": {
+              "tranId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "SUCCEEDED",
+                  "FAILED",
+                  "CANCELLED",
+                  "EXPIRED",
+                  "REVIEW",
+                  "UNAPPLIED"
+                ]
+              },
+              "feeAmount": {
+                "type": "string"
+              },
+              "totalAmount": {
+                "type": "string"
+              },
+              "bankTranId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "tranId",
+              "status",
+              "feeAmount",
+              "totalAmount",
+              "bankTranId"
+            ],
+            "additionalProperties": false
+          },
+          "fee": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "DUE",
+                  "PARTIAL",
+                  "PAID",
+                  "WAIVED",
+                  "VOID"
+                ]
+              },
+              "amountDue": {
+                "type": "string"
+              },
+              "amountPaid": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "amountDue",
+              "amountPaid"
+            ],
+            "additionalProperties": false
+          },
+          "tutor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          "requestedByName": {
+            "type": "string"
+          },
+          "decidedByName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reversalId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "source",
+          "amount",
+          "reason",
+          "refundRefId",
+          "failureReason",
+          "decisionNote",
+          "createdAt",
+          "updatedAt",
+          "decidedAt",
+          "completedAt",
+          "lastCheckedAt",
+          "attempt",
+          "fee",
+          "tutor",
+          "requestedByName",
+          "decidedByName",
+          "reversalId"
+        ],
+        "additionalProperties": false
+      },
+      "AdminRefundDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REQUESTED",
+              "REJECTED",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "NEEDS_REVIEW"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "TUTOR",
+              "ADMIN"
+            ]
+          },
+          "amount": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "refundRefId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "failureReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "decisionNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lastCheckedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "attempt": {
+            "type": "object",
+            "properties": {
+              "tranId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "SUCCEEDED",
+                  "FAILED",
+                  "CANCELLED",
+                  "EXPIRED",
+                  "REVIEW",
+                  "UNAPPLIED"
+                ]
+              },
+              "feeAmount": {
+                "type": "string"
+              },
+              "totalAmount": {
+                "type": "string"
+              },
+              "bankTranId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "tranId",
+              "status",
+              "feeAmount",
+              "totalAmount",
+              "bankTranId"
+            ],
+            "additionalProperties": false
+          },
+          "fee": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "DUE",
+                  "PARTIAL",
+                  "PAID",
+                  "WAIVED",
+                  "VOID"
+                ]
+              },
+              "amountDue": {
+                "type": "string"
+              },
+              "amountPaid": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "amountDue",
+              "amountPaid"
+            ],
+            "additionalProperties": false
+          },
+          "tutor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          "requestedByName": {
+            "type": "string"
+          },
+          "decidedByName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reversalId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "gatewayResponse": {
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "canApprove": {
+            "type": "boolean"
+          },
+          "canReject": {
+            "type": "boolean"
+          },
+          "canCheck": {
+            "type": "boolean"
+          },
+          "canResolve": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "source",
+          "amount",
+          "reason",
+          "refundRefId",
+          "failureReason",
+          "decisionNote",
+          "createdAt",
+          "updatedAt",
+          "decidedAt",
+          "completedAt",
+          "lastCheckedAt",
+          "attempt",
+          "fee",
+          "tutor",
+          "requestedByName",
+          "decidedByName",
+          "reversalId",
+          "gatewayResponse",
+          "canApprove",
+          "canReject",
+          "canCheck",
+          "canResolve"
+        ],
+        "additionalProperties": false
+      },
+      "AdminRefundPage": {
+        "type": "object",
+        "properties": {
+          "refunds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminRefund"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "refunds",
+          "nextCursor"
         ],
         "additionalProperties": false
       },
@@ -3335,6 +3836,17 @@
         ],
         "additionalProperties": false
       },
+      "ApproveRefundInput": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          }
+        },
+        "additionalProperties": false
+      },
       "AreaDistrict": {
         "type": "object",
         "properties": {
@@ -4181,6 +4693,28 @@
           "code",
           "discountType",
           "discountValue"
+        ],
+        "additionalProperties": false
+      },
+      "CreateRefundInput": {
+        "type": "object",
+        "properties": {
+          "tranId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]{1,30}$"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "tranId",
+          "reason"
         ],
         "additionalProperties": false
       },
@@ -5157,7 +5691,9 @@
           "GATEWAY_UNAVAILABLE",
           "INVALID_PAYMENT_STATE",
           "PROMO_INVALID",
-          "PROMO_CODE_EXISTS"
+          "PROMO_CODE_EXISTS",
+          "REFUND_NOT_ALLOWED",
+          "INVALID_REFUND_STATE"
         ],
         "description": "Machine-readable error code. Match on this."
       },
@@ -6582,6 +7118,7 @@
               "commission_percent",
               "gateway_charge_percent",
               "online_payments_enabled",
+              "refund_window_days",
               "require_tutor_verification",
               "require_phone_verification"
             ]
@@ -6669,6 +7206,20 @@
           "refreshToken"
         ]
       },
+      "RejectRefundInput": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "note"
+        ],
+        "additionalProperties": false
+      },
       "ReplaceTutorAreasInput": {
         "type": "object",
         "properties": {
@@ -6702,6 +7253,26 @@
         "required": [
           "subjectIds"
         ]
+      },
+      "RequestRefundInput": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "paymentId",
+          "reason"
+        ],
+        "additionalProperties": false
       },
       "Requirement": {
         "type": "object",
@@ -6910,6 +7481,32 @@
         },
         "required": [
           "requirements"
+        ],
+        "additionalProperties": false
+      },
+      "ResolveRefundInput": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          },
+          "refundRefId": {
+            "type": "string",
+            "pattern": "^[\\w.-]{1,64}$"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "outcome",
+          "note"
         ],
         "additionalProperties": false
       },
@@ -7781,6 +8378,12 @@
               "$ref": "#/components/schemas/TutorFeePayment"
             }
           },
+          "refunds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TutorRefund"
+            }
+          },
           "checkout": {
             "anyOf": [
               {
@@ -7842,6 +8445,7 @@
           "createdAt",
           "application",
           "payments",
+          "refunds",
           "checkout",
           "pendingAttempt",
           "promo",
@@ -7908,6 +8512,17 @@
               "string",
               "null"
             ]
+          },
+          "refundableUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -7916,7 +8531,8 @@
           "amount",
           "method",
           "receivedAt",
-          "reversesPaymentId"
+          "reversesPaymentId",
+          "refundableUntil"
         ],
         "additionalProperties": false
       },
@@ -8269,6 +8885,69 @@
         },
         "required": [
           "videos"
+        ],
+        "additionalProperties": false
+      },
+      "TutorRefund": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "paymentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "amount": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REQUESTED",
+              "REJECTED",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "NEEDS_REVIEW"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decisionNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "paymentId",
+          "amount",
+          "status",
+          "reason",
+          "createdAt",
+          "completedAt",
+          "decisionNote"
         ],
         "additionalProperties": false
       },
@@ -16838,6 +17517,126 @@
         }
       }
     },
+    "/api/v1/fees/{id}/refunds": {
+      "post": {
+        "summary": "Request a refund of an online payment",
+        "tags": [
+          "Fees"
+        ],
+        "description": "Asks for a refund of one online (SSLCommerz) payment on one of my fees. Only the payment's fee part is refunded; the gateway charge is not. The request covers the whole refundable amount and waits for a super admin to approve it. Allowed only for a settled payment with a bank transaction id, within the refund window (refund_window_days after it was settled; 0 turns requests off), with nothing already refunded and no other refund open for it. Cash payments are refunded outside the app. Returns the fee with the new refund in refunds.\n\n**Who:** TUTOR.\n\n**Rate limit:** 5/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestRefundInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "5/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorFeeDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/fees/{id}/checkout": {
       "post": {
         "summary": "Start an online payment for a fee",
@@ -18986,7 +19785,7 @@
         "tags": [
           "Admin"
         ],
-        "description": "Appends a REVERSAL row pointing at the payment. Payments are never edited or deleted. Refused on waived or void fees.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "description": "Appends a REVERSAL row pointing at the payment. Payments are never edited or deleted. Refused on waived or void fees. Online (SSLCommerz) payments are refused too: refund them from Refunds, so the gateway returns the money.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
         "requestBody": {
           "required": true,
           "content": {
@@ -20039,6 +20838,857 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/refunds": {
+      "get": {
+        "summary": "List refunds",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Newest first. Filter by status, open (true: REQUESTED, PROCESSING or NEEDS_REVIEW; false: the rest) and fee. Cursor-paginated (limit 1 to 100, default 25).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "REQUESTED",
+                "REJECTED",
+                "PROCESSING",
+                "SUCCEEDED",
+                "FAILED",
+                "NEEDS_REVIEW"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "in": "query",
+            "name": "open",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "feeId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRefundPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Refund an online payment",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Super admins only. Refunds the fee part of an SSLCommerz payment the gateway took (SUCCEEDED, or UNAPPLIED with a bank transaction id). Without an amount the whole refundable part is refunded. The refund is sent to the gateway straight away and is PROCESSING, SUCCEEDED, FAILED or NEEDS_REVIEW when the response comes back. Writes a refund.create audit row. 409 REFUND_NOT_ALLOWED when the payment cannot be refunded.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRefundInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRefundDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/refunds/{id}": {
+      "get": {
+        "summary": "Get one refund",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Amounts, status, the payment and fee it belongs to, the raw gateway response and the actions allowed right now (canApprove, canReject, canCheck, canResolve).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRefundDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/refunds/{id}/approve": {
+      "post": {
+        "summary": "Approve a tutor's refund request",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Super admins only. Only a REQUESTED refund can be approved. It is sent to the gateway straight away, and the response is PROCESSING, FAILED or NEEDS_REVIEW. Writes a refund.approve audit row.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ApproveRefundInput"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRefundDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/refunds/{id}/reject": {
+      "post": {
+        "summary": "Decline a tutor's refund request",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Super admins only. Only a REQUESTED refund can be declined. Nothing is sent to the gateway. Writes a refund.reject audit row.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRefundInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRefundDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/refunds/{id}/check": {
+      "post": {
+        "summary": "Check a refund with the gateway",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Asks the gateway about a PROCESSING refund and completes it when the gateway says it was refunded (a REVERSAL is written when the payment was on the ledger) or ends it when the gateway cancelled it. Only PROCESSING refunds with a gateway reference can be checked. Writes a refund.check audit row. A gateway that does not answer returns 503 and the refund is left as it was.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 30/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRefundDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/refunds/{id}/resolve": {
+      "post": {
+        "summary": "Resolve a refund that needs review",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Super admins only. For a NEEDS_REVIEW refund, decided by hand after checking the merchant panel. SUCCEEDED completes it (a REVERSAL is written when the payment was on the ledger; refundRefId is optional and only allowed here). FAILED ends it with the note as the failure reason. Writes a refund.resolve audit row.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveRefundInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRefundDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
             "content": {
               "application/json": {
                 "schema": {
@@ -21188,6 +22838,7 @@
                 "commission_percent",
                 "gateway_charge_percent",
                 "online_payments_enabled",
+                "refund_window_days",
                 "require_tutor_verification",
                 "require_phone_verification"
               ]

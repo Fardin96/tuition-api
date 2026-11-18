@@ -13,6 +13,9 @@ import {
   GatewayError,
   type GatewayTransaction,
   type PaymentGateway,
+  type RefundInitResult,
+  type RefundInput,
+  type RefundQueryResult,
 } from "../lib/sslcommerz.js";
 import { generateRefreshToken, hashToken, signAccessToken } from "../modules/auth/auth.service.js";
 import { buildApp } from "../server.js";
@@ -580,6 +583,14 @@ export function createFakeGateway() {
   const sessions: CreateSessionInput[] = [];
   const validations = new Map<string, GatewayTransaction>();
   const queries = new Map<string, GatewayTransaction[]>();
+  const refunds: RefundInput[] = [];
+  let refundAnswer: RefundInitResult = {
+    status: "success",
+    refundRefId: "RREF-1",
+    errorReason: null,
+    raw: {},
+  };
+  const refundQueries = new Map<string, RefundQueryResult>();
   let nextFailure: GatewayError["kind"] | null = null;
 
   const maybeFail = () => {
@@ -620,6 +631,23 @@ export function createFakeGateway() {
       maybeFail();
       return [...(queries.get(tranId) ?? [])];
     },
+    async initiateRefund(input) {
+      maybeFail();
+      refunds.push(input);
+      return { ...refundAnswer };
+    },
+    async queryRefund(refundRefId) {
+      maybeFail();
+      return (
+        refundQueries.get(refundRefId) ?? {
+          status: "processing",
+          refundRefId,
+          refundedOn: null,
+          errorReason: null,
+          raw: {},
+        }
+      );
+    },
   };
 
   return {
@@ -633,6 +661,16 @@ export function createFakeGateway() {
     },
     failNext(kind: GatewayError["kind"]) {
       nextFailure = kind;
+    },
+    /** Every initiateRefund call, in order. */
+    refunds,
+    /** What the next initiateRefund calls answer (default: accepted with refund_ref_id "RREF-1"). */
+    setRefundAnswer(answer: RefundInitResult) {
+      refundAnswer = answer;
+    },
+    /** What queryRefund answers for a refund_ref_id (default: "processing"). */
+    setRefundQuery(refundRefId: string, answer: RefundQueryResult) {
+      refundQueries.set(refundRefId, answer);
     },
   };
 }

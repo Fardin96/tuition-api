@@ -37,6 +37,8 @@ export const ERROR_CODES = {
   InvalidPaymentState: "INVALID_PAYMENT_STATE",
   PromoInvalid: "PROMO_INVALID",
   PromoCodeExists: "PROMO_CODE_EXISTS",
+  RefundNotAllowed: "REFUND_NOT_ALLOWED",
+  InvalidRefundState: "INVALID_REFUND_STATE",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

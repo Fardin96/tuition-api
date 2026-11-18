@@ -12,6 +12,8 @@ import {
   reconcileAttempt,
   SETTLABLE,
 } from "../payment/payment.service.js";
+import { adminRefundSelect, toAdminRefund } from "../refunds/refund.schema.js";
+import { refundableAmount } from "../refunds/refund-rules.js";
 import type {
   AdminPaymentAttemptDetailResponse,
   AdminPaymentAttemptResponse,
@@ -55,6 +57,10 @@ const attemptSelect = {
 const detailSelect = {
   ...attemptSelect,
   gatewayResponse: true,
+  refunds: {
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: adminRefundSelect,
+  },
 } satisfies Prisma.PaymentAttemptSelect;
 
 type AttemptRow = Prisma.PaymentAttemptGetPayload<{ select: typeof attemptSelect }>;
@@ -94,12 +100,21 @@ function plainObjectOrNull(value: Prisma.JsonValue | null): Record<string, unkno
   return value as Record<string, unknown>;
 }
 
-function toDetail(row: DetailRow): AdminPaymentAttemptDetailResponse {
+async function toDetail(db: Tx, row: DetailRow): Promise<AdminPaymentAttemptDetailResponse> {
+  // Only a gateway payment with a bank transaction id can be refunded through the gateway.
+  const refundable =
+    (row.status === PaymentAttemptStatus.SUCCEEDED ||
+      row.status === PaymentAttemptStatus.UNAPPLIED) &&
+    row.bankTranId !== null
+      ? (await refundableAmount(db, row)).toFixed(2)
+      : "0.00";
   return {
     ...toAttempt(row),
     gatewayResponse: plainObjectOrNull(row.gatewayResponse),
     canCheck: SETTLABLE.includes(row.status) && paymentsConfigured(),
     canReview: row.status === PaymentAttemptStatus.REVIEW,
+    refundable,
+    refunds: row.refunds.map((refund) => toAdminRefund(refund)),
   };
 }
 
@@ -107,7 +122,7 @@ function toDetail(row: DetailRow): AdminPaymentAttemptDetailResponse {
 async function readDetail(db: Tx, tranId: string): Promise<AdminPaymentAttemptDetailResponse> {
   const row = await db.paymentAttempt.findUnique({ where: { tranId }, select: detailSelect });
   if (!row) throw notFound("Payment not found");
-  return toDetail(row);
+  return toDetail(db, row);
 }
 
 // Keyset over (createdAt desc, id desc), the same shape as listFees.
@@ -185,7 +200,7 @@ export async function getPaymentAttempt(
 ): Promise<AdminPaymentAttemptDetailResponse> {
   const row = await prisma.paymentAttempt.findUnique({ where: { tranId }, select: detailSelect });
   if (!row) throw notFound("Payment not found");
-  return toDetail(row);
+  return toDetail(prisma, row);
 }
 
 // Asks the gateway about one attempt, outside any transaction. The audit row is written after.

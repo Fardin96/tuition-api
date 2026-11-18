@@ -246,6 +246,7 @@ export type AdminUserWhereInput = {
   reviewedVerifications?: Prisma.TutorVerificationListRelationFilter
   recordedPayments?: Prisma.FeePaymentListRelationFilter
   createdPromoCodes?: Prisma.PromoCodeListRelationFilter
+  decidedRefunds?: Prisma.PaymentRefundListRelationFilter
   blogPosts?: Prisma.BlogPostListRelationFilter
   contentEdits?: Prisma.SiteContentListRelationFilter
   blocksMade?: Prisma.AccountBlockListRelationFilter
@@ -277,6 +278,7 @@ export type AdminUserOrderByWithRelationInput = {
   reviewedVerifications?: Prisma.TutorVerificationOrderByRelationAggregateInput
   recordedPayments?: Prisma.FeePaymentOrderByRelationAggregateInput
   createdPromoCodes?: Prisma.PromoCodeOrderByRelationAggregateInput
+  decidedRefunds?: Prisma.PaymentRefundOrderByRelationAggregateInput
   blogPosts?: Prisma.BlogPostOrderByRelationAggregateInput
   contentEdits?: Prisma.SiteContentOrderByRelationAggregateInput
   blocksMade?: Prisma.AccountBlockOrderByRelationAggregateInput
@@ -312,6 +314,7 @@ export type AdminUserWhereUniqueInput = Prisma.AtLeast<{
   reviewedVerifications?: Prisma.TutorVerificationListRelationFilter
   recordedPayments?: Prisma.FeePaymentListRelationFilter
   createdPromoCodes?: Prisma.PromoCodeListRelationFilter
+  decidedRefunds?: Prisma.PaymentRefundListRelationFilter
   blogPosts?: Prisma.BlogPostListRelationFilter
   contentEdits?: Prisma.SiteContentListRelationFilter
   blocksMade?: Prisma.AccountBlockListRelationFilter
@@ -375,6 +378,7 @@ export type AdminUserCreateInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -403,6 +407,7 @@ export type AdminUserUncheckedCreateInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -430,6 +435,7 @@ export type AdminUserUpdateInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -458,6 +464,7 @@ export type AdminUserUncheckedUpdateInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -849,6 +856,22 @@ export type AdminUserUpdateOneWithoutRecordedPaymentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutRecordedPaymentsInput, Prisma.AdminUserUpdateWithoutRecordedPaymentsInput>, Prisma.AdminUserUncheckedUpdateWithoutRecordedPaymentsInput>
 }
 
+export type AdminUserCreateNestedOneWithoutDecidedRefundsInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutDecidedRefundsInput, Prisma.AdminUserUncheckedCreateWithoutDecidedRefundsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutDecidedRefundsInput
+  connect?: Prisma.AdminUserWhereUniqueInput
+}
+
+export type AdminUserUpdateOneWithoutDecidedRefundsNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutDecidedRefundsInput, Prisma.AdminUserUncheckedCreateWithoutDecidedRefundsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutDecidedRefundsInput
+  upsert?: Prisma.AdminUserUpsertWithoutDecidedRefundsInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
+  connect?: Prisma.AdminUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutDecidedRefundsInput, Prisma.AdminUserUpdateWithoutDecidedRefundsInput>, Prisma.AdminUserUncheckedUpdateWithoutDecidedRefundsInput>
+}
+
 export type AdminUserCreateNestedOneWithoutCreatedPromoCodesInput = {
   create?: Prisma.XOR<Prisma.AdminUserCreateWithoutCreatedPromoCodesInput, Prisma.AdminUserUncheckedCreateWithoutCreatedPromoCodesInput>
   connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutCreatedPromoCodesInput
@@ -925,6 +948,7 @@ export type AdminUserCreateWithoutAccountInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -951,6 +975,7 @@ export type AdminUserUncheckedCreateWithoutAccountInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -993,6 +1018,7 @@ export type AdminUserUpdateWithoutAccountInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -1019,6 +1045,7 @@ export type AdminUserUncheckedUpdateWithoutAccountInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -1045,6 +1072,7 @@ export type AdminUserCreateWithoutApprovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1072,6 +1100,7 @@ export type AdminUserUncheckedCreateWithoutApprovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -1103,6 +1132,7 @@ export type AdminUserCreateWithoutApprovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1130,6 +1160,7 @@ export type AdminUserUncheckedCreateWithoutApprovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -1166,6 +1197,7 @@ export type AdminUserCreateWithoutRemovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1193,6 +1225,7 @@ export type AdminUserUncheckedCreateWithoutRemovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -1224,6 +1257,7 @@ export type AdminUserCreateWithoutRemovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1251,6 +1285,7 @@ export type AdminUserUncheckedCreateWithoutRemovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -1298,6 +1333,7 @@ export type AdminUserUpdateWithoutApprovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -1325,6 +1361,7 @@ export type AdminUserUncheckedUpdateWithoutApprovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -1396,6 +1433,7 @@ export type AdminUserUpdateWithoutRemovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -1423,6 +1461,7 @@ export type AdminUserUncheckedUpdateWithoutRemovalsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -1466,6 +1505,7 @@ export type AdminUserCreateWithoutBlocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
@@ -1493,6 +1533,7 @@ export type AdminUserUncheckedCreateWithoutBlocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
@@ -1524,6 +1565,7 @@ export type AdminUserCreateWithoutUnblocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1551,6 +1593,7 @@ export type AdminUserUncheckedCreateWithoutUnblocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -1593,6 +1636,7 @@ export type AdminUserUpdateWithoutBlocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
@@ -1620,6 +1664,7 @@ export type AdminUserUncheckedUpdateWithoutBlocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
@@ -1657,6 +1702,7 @@ export type AdminUserUpdateWithoutUnblocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -1684,6 +1730,7 @@ export type AdminUserUncheckedUpdateWithoutUnblocksMadeInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -1709,6 +1756,7 @@ export type AdminUserCreateWithoutReviewedVerificationsInput = {
   removals?: Prisma.AdminUserCreateNestedManyWithoutRemovedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1736,6 +1784,7 @@ export type AdminUserUncheckedCreateWithoutReviewedVerificationsInput = {
   removals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutRemovedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -1778,6 +1827,7 @@ export type AdminUserUpdateWithoutReviewedVerificationsInput = {
   removals?: Prisma.AdminUserUpdateManyWithoutRemovedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -1805,6 +1855,7 @@ export type AdminUserUncheckedUpdateWithoutReviewedVerificationsInput = {
   removals?: Prisma.AdminUserUncheckedUpdateManyWithoutRemovedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -1832,6 +1883,7 @@ export type AdminUserCreateWithoutZoneRequestsDecidedInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1859,6 +1911,7 @@ export type AdminUserUncheckedCreateWithoutZoneRequestsDecidedInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -1901,6 +1954,7 @@ export type AdminUserUpdateWithoutZoneRequestsDecidedInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -1928,6 +1982,7 @@ export type AdminUserUncheckedUpdateWithoutZoneRequestsDecidedInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -1954,6 +2009,7 @@ export type AdminUserCreateWithoutHandledReportsInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -1981,6 +2037,7 @@ export type AdminUserUncheckedCreateWithoutHandledReportsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -2023,6 +2080,7 @@ export type AdminUserUpdateWithoutHandledReportsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -2050,6 +2108,7 @@ export type AdminUserUncheckedUpdateWithoutHandledReportsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -2076,6 +2135,7 @@ export type AdminUserCreateWithoutHandledDisputesInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -2103,6 +2163,7 @@ export type AdminUserUncheckedCreateWithoutHandledDisputesInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -2145,6 +2206,7 @@ export type AdminUserUpdateWithoutHandledDisputesInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -2172,6 +2234,7 @@ export type AdminUserUncheckedUpdateWithoutHandledDisputesInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -2197,6 +2260,7 @@ export type AdminUserCreateWithoutRecordedPaymentsInput = {
   removals?: Prisma.AdminUserCreateNestedManyWithoutRemovedByInput
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -2224,6 +2288,7 @@ export type AdminUserUncheckedCreateWithoutRecordedPaymentsInput = {
   removals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutRemovedByInput
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -2266,6 +2331,7 @@ export type AdminUserUpdateWithoutRecordedPaymentsInput = {
   removals?: Prisma.AdminUserUpdateManyWithoutRemovedByNestedInput
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -2293,6 +2359,133 @@ export type AdminUserUncheckedUpdateWithoutRecordedPaymentsInput = {
   removals?: Prisma.AdminUserUncheckedUpdateManyWithoutRemovedByNestedInput
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
+  blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
+  contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
+  blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
+  unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
+  handledReports?: Prisma.ReportUncheckedUpdateManyWithoutHandledByNestedInput
+  handledDisputes?: Prisma.DisputeUncheckedUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type AdminUserCreateWithoutDecidedRefundsInput = {
+  name: string
+  adminRole?: $Enums.AdminRole
+  status?: $Enums.AdminStatus
+  approvedAt?: Date | string | null
+  removedAt?: Date | string | null
+  mfaEnabled?: boolean
+  mfaSecretEnc?: string | null
+  createdAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutAdminUserInput
+  approvedBy?: Prisma.AdminUserCreateNestedOneWithoutApprovalsInput
+  approvals?: Prisma.AdminUserCreateNestedManyWithoutApprovedByInput
+  removedBy?: Prisma.AdminUserCreateNestedOneWithoutRemovalsInput
+  removals?: Prisma.AdminUserCreateNestedManyWithoutRemovedByInput
+  reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
+  recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
+  createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
+  contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
+  blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
+  unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
+  handledReports?: Prisma.ReportCreateNestedManyWithoutHandledByInput
+  handledDisputes?: Prisma.DisputeCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingCreateNestedManyWithoutUpdatedByInput
+}
+
+export type AdminUserUncheckedCreateWithoutDecidedRefundsInput = {
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  adminRole?: $Enums.AdminRole
+  status?: $Enums.AdminStatus
+  approvedById?: string | null
+  approvedAt?: Date | string | null
+  removedById?: string | null
+  removedAt?: Date | string | null
+  mfaEnabled?: boolean
+  mfaSecretEnc?: string | null
+  createdAt?: Date | string
+  approvals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutApprovedByInput
+  removals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutRemovedByInput
+  reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
+  recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
+  contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
+  blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
+  unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
+  handledReports?: Prisma.ReportUncheckedCreateNestedManyWithoutHandledByInput
+  handledDisputes?: Prisma.DisputeUncheckedCreateNestedManyWithoutHandledByInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutDecidedByInput
+  settingsEdits?: Prisma.PlatformSettingUncheckedCreateNestedManyWithoutUpdatedByInput
+}
+
+export type AdminUserCreateOrConnectWithoutDecidedRefundsInput = {
+  where: Prisma.AdminUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutDecidedRefundsInput, Prisma.AdminUserUncheckedCreateWithoutDecidedRefundsInput>
+}
+
+export type AdminUserUpsertWithoutDecidedRefundsInput = {
+  update: Prisma.XOR<Prisma.AdminUserUpdateWithoutDecidedRefundsInput, Prisma.AdminUserUncheckedUpdateWithoutDecidedRefundsInput>
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutDecidedRefundsInput, Prisma.AdminUserUncheckedCreateWithoutDecidedRefundsInput>
+  where?: Prisma.AdminUserWhereInput
+}
+
+export type AdminUserUpdateToOneWithWhereWithoutDecidedRefundsInput = {
+  where?: Prisma.AdminUserWhereInput
+  data: Prisma.XOR<Prisma.AdminUserUpdateWithoutDecidedRefundsInput, Prisma.AdminUserUncheckedUpdateWithoutDecidedRefundsInput>
+}
+
+export type AdminUserUpdateWithoutDecidedRefundsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  adminRole?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  status?: Prisma.EnumAdminStatusFieldUpdateOperationsInput | $Enums.AdminStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mfaSecretEnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutAdminUserNestedInput
+  approvedBy?: Prisma.AdminUserUpdateOneWithoutApprovalsNestedInput
+  approvals?: Prisma.AdminUserUpdateManyWithoutApprovedByNestedInput
+  removedBy?: Prisma.AdminUserUpdateOneWithoutRemovalsNestedInput
+  removals?: Prisma.AdminUserUpdateManyWithoutRemovedByNestedInput
+  reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
+  recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
+  createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
+  contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
+  blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
+  unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
+  handledReports?: Prisma.ReportUpdateManyWithoutHandledByNestedInput
+  handledDisputes?: Prisma.DisputeUpdateManyWithoutHandledByNestedInput
+  zoneRequestsDecided?: Prisma.ZoneLimitRequestUpdateManyWithoutDecidedByNestedInput
+  settingsEdits?: Prisma.PlatformSettingUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type AdminUserUncheckedUpdateWithoutDecidedRefundsInput = {
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  adminRole?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  status?: Prisma.EnumAdminStatusFieldUpdateOperationsInput | $Enums.AdminStatus
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  removedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mfaSecretEnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approvals?: Prisma.AdminUserUncheckedUpdateManyWithoutApprovedByNestedInput
+  removals?: Prisma.AdminUserUncheckedUpdateManyWithoutRemovedByNestedInput
+  reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
+  recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -2319,6 +2512,7 @@ export type AdminUserCreateWithoutCreatedPromoCodesInput = {
   removals?: Prisma.AdminUserCreateNestedManyWithoutRemovedByInput
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -2346,6 +2540,7 @@ export type AdminUserUncheckedCreateWithoutCreatedPromoCodesInput = {
   removals?: Prisma.AdminUserUncheckedCreateNestedManyWithoutRemovedByInput
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -2388,6 +2583,7 @@ export type AdminUserUpdateWithoutCreatedPromoCodesInput = {
   removals?: Prisma.AdminUserUpdateManyWithoutRemovedByNestedInput
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -2415,6 +2611,7 @@ export type AdminUserUncheckedUpdateWithoutCreatedPromoCodesInput = {
   removals?: Prisma.AdminUserUncheckedUpdateManyWithoutRemovedByNestedInput
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -2442,6 +2639,7 @@ export type AdminUserCreateWithoutBlogPostsInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
@@ -2469,6 +2667,7 @@ export type AdminUserUncheckedCreateWithoutBlogPostsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
@@ -2511,6 +2710,7 @@ export type AdminUserUpdateWithoutBlogPostsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
@@ -2538,6 +2738,7 @@ export type AdminUserUncheckedUpdateWithoutBlogPostsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
@@ -2564,6 +2765,7 @@ export type AdminUserCreateWithoutContentEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockCreateNestedManyWithoutUnblockedByInput
@@ -2591,6 +2793,7 @@ export type AdminUserUncheckedCreateWithoutContentEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
   unblocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutUnblockedByInput
@@ -2633,6 +2836,7 @@ export type AdminUserUpdateWithoutContentEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUpdateManyWithoutUnblockedByNestedInput
@@ -2660,6 +2864,7 @@ export type AdminUserUncheckedUpdateWithoutContentEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
   unblocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutUnblockedByNestedInput
@@ -2686,6 +2891,7 @@ export type AdminUserCreateWithoutSettingsEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockCreateNestedManyWithoutBlockedByInput
@@ -2713,6 +2919,7 @@ export type AdminUserUncheckedCreateWithoutSettingsEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutReviewedByInput
   recordedPayments?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutRecordedByInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedCreateNestedManyWithoutCreatedByInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutDecidedByInput
   blogPosts?: Prisma.BlogPostUncheckedCreateNestedManyWithoutAuthorInput
   contentEdits?: Prisma.SiteContentUncheckedCreateNestedManyWithoutUpdatedByInput
   blocksMade?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutBlockedByInput
@@ -2755,6 +2962,7 @@ export type AdminUserUpdateWithoutSettingsEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -2782,6 +2990,7 @@ export type AdminUserUncheckedUpdateWithoutSettingsEditsInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -2835,6 +3044,7 @@ export type AdminUserUpdateWithoutApprovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -2862,6 +3072,7 @@ export type AdminUserUncheckedUpdateWithoutApprovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -2902,6 +3113,7 @@ export type AdminUserUpdateWithoutRemovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUpdateManyWithoutBlockedByNestedInput
@@ -2929,6 +3141,7 @@ export type AdminUserUncheckedUpdateWithoutRemovedByInput = {
   reviewedVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutReviewedByNestedInput
   recordedPayments?: Prisma.FeePaymentUncheckedUpdateManyWithoutRecordedByNestedInput
   createdPromoCodes?: Prisma.PromoCodeUncheckedUpdateManyWithoutCreatedByNestedInput
+  decidedRefunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutDecidedByNestedInput
   blogPosts?: Prisma.BlogPostUncheckedUpdateManyWithoutAuthorNestedInput
   contentEdits?: Prisma.SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput
   blocksMade?: Prisma.AccountBlockUncheckedUpdateManyWithoutBlockedByNestedInput
@@ -2964,6 +3177,7 @@ export type AdminUserCountOutputType = {
   reviewedVerifications: number
   recordedPayments: number
   createdPromoCodes: number
+  decidedRefunds: number
   blogPosts: number
   contentEdits: number
   blocksMade: number
@@ -2980,6 +3194,7 @@ export type AdminUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   reviewedVerifications?: boolean | AdminUserCountOutputTypeCountReviewedVerificationsArgs
   recordedPayments?: boolean | AdminUserCountOutputTypeCountRecordedPaymentsArgs
   createdPromoCodes?: boolean | AdminUserCountOutputTypeCountCreatedPromoCodesArgs
+  decidedRefunds?: boolean | AdminUserCountOutputTypeCountDecidedRefundsArgs
   blogPosts?: boolean | AdminUserCountOutputTypeCountBlogPostsArgs
   contentEdits?: boolean | AdminUserCountOutputTypeCountContentEditsArgs
   blocksMade?: boolean | AdminUserCountOutputTypeCountBlocksMadeArgs
@@ -3033,6 +3248,13 @@ export type AdminUserCountOutputTypeCountRecordedPaymentsArgs<ExtArgs extends ru
  */
 export type AdminUserCountOutputTypeCountCreatedPromoCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PromoCodeWhereInput
+}
+
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeCountDecidedRefundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentRefundWhereInput
 }
 
 /**
@@ -3113,6 +3335,7 @@ export type AdminUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   reviewedVerifications?: boolean | Prisma.AdminUser$reviewedVerificationsArgs<ExtArgs>
   recordedPayments?: boolean | Prisma.AdminUser$recordedPaymentsArgs<ExtArgs>
   createdPromoCodes?: boolean | Prisma.AdminUser$createdPromoCodesArgs<ExtArgs>
+  decidedRefunds?: boolean | Prisma.AdminUser$decidedRefundsArgs<ExtArgs>
   blogPosts?: boolean | Prisma.AdminUser$blogPostsArgs<ExtArgs>
   contentEdits?: boolean | Prisma.AdminUser$contentEditsArgs<ExtArgs>
   blocksMade?: boolean | Prisma.AdminUser$blocksMadeArgs<ExtArgs>
@@ -3185,6 +3408,7 @@ export type AdminUserInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   reviewedVerifications?: boolean | Prisma.AdminUser$reviewedVerificationsArgs<ExtArgs>
   recordedPayments?: boolean | Prisma.AdminUser$recordedPaymentsArgs<ExtArgs>
   createdPromoCodes?: boolean | Prisma.AdminUser$createdPromoCodesArgs<ExtArgs>
+  decidedRefunds?: boolean | Prisma.AdminUser$decidedRefundsArgs<ExtArgs>
   blogPosts?: boolean | Prisma.AdminUser$blogPostsArgs<ExtArgs>
   contentEdits?: boolean | Prisma.AdminUser$contentEditsArgs<ExtArgs>
   blocksMade?: boolean | Prisma.AdminUser$blocksMadeArgs<ExtArgs>
@@ -3217,6 +3441,7 @@ export type $AdminUserPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     reviewedVerifications: Prisma.$TutorVerificationPayload<ExtArgs>[]
     recordedPayments: Prisma.$FeePaymentPayload<ExtArgs>[]
     createdPromoCodes: Prisma.$PromoCodePayload<ExtArgs>[]
+    decidedRefunds: Prisma.$PaymentRefundPayload<ExtArgs>[]
     blogPosts: Prisma.$BlogPostPayload<ExtArgs>[]
     contentEdits: Prisma.$SiteContentPayload<ExtArgs>[]
     blocksMade: Prisma.$AccountBlockPayload<ExtArgs>[]
@@ -3641,6 +3866,7 @@ export interface Prisma__AdminUserClient<T, Null = never, ExtArgs extends runtim
   reviewedVerifications<T extends Prisma.AdminUser$reviewedVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$reviewedVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TutorVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recordedPayments<T extends Prisma.AdminUser$recordedPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$recordedPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdPromoCodes<T extends Prisma.AdminUser$createdPromoCodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$createdPromoCodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromoCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  decidedRefunds<T extends Prisma.AdminUser$decidedRefundsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$decidedRefundsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRefundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   blogPosts<T extends Prisma.AdminUser$blogPostsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$blogPostsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   contentEdits<T extends Prisma.AdminUser$contentEditsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$contentEditsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   blocksMade<T extends Prisma.AdminUser$blocksMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$blocksMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4246,6 +4472,30 @@ export type AdminUser$createdPromoCodesArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.PromoCodeScalarFieldEnum | Prisma.PromoCodeScalarFieldEnum[]
+}
+
+/**
+ * AdminUser.decidedRefunds
+ */
+export type AdminUser$decidedRefundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentRefund
+   */
+  select?: Prisma.PaymentRefundSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentRefund
+   */
+  omit?: Prisma.PaymentRefundOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentRefundInclude<ExtArgs> | null
+  where?: Prisma.PaymentRefundWhereInput
+  orderBy?: Prisma.PaymentRefundOrderByWithRelationInput | Prisma.PaymentRefundOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentRefundWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentRefundScalarFieldEnum | Prisma.PaymentRefundScalarFieldEnum[]
 }
 
 /**

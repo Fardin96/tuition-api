@@ -20,6 +20,37 @@ import {
 const FEES_URL = "/api/v1/fees";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// A settled SSLCommerz payment on the fee: a PAYMENT row plus a SUCCEEDED attempt pointing at it.
+async function settledOnlinePayment(feeId: string, tutorId: string, opts: { settledAt: Date }) {
+  const tranId = `TM${crypto.randomUUID().replace(/-/g, "").slice(0, 20).toUpperCase()}`;
+  const payment = await prisma.feePayment.create({
+    data: {
+      feeId,
+      kind: "PAYMENT",
+      amount: 1500,
+      method: "SSLCOMMERZ",
+      txnReference: tranId,
+      receivedAt: opts.settledAt,
+      recordedById: null,
+    },
+  });
+  await prisma.paymentAttempt.create({
+    data: {
+      feeId,
+      tutorId,
+      tranId,
+      feeAmount: 1500,
+      chargeAmount: 37.5,
+      totalAmount: 1537.5,
+      status: "SUCCEEDED",
+      bankTranId: `BANK-${tranId}`,
+      settledAt: opts.settledAt,
+      paymentId: payment.id,
+    },
+  });
+  return { payment };
+}
+
 const ENV_KEYS = [
   "SSLC_STORE_ID",
   "SSLC_STORE_PASSWORD",
@@ -362,7 +393,15 @@ describe("tutor fees", () => {
       const body = JSON.parse(res.body);
       expect(body.payments.map((p: { amount: string }) => p.amount)).toEqual(["300.00", "200.00"]);
       expect(Object.keys(body.payments[0]).sort()).toEqual(
-        ["amount", "id", "kind", "method", "receivedAt", "reversesPaymentId"].sort(),
+        [
+          "amount",
+          "id",
+          "kind",
+          "method",
+          "receivedAt",
+          "refundableUntil",
+          "reversesPaymentId",
+        ].sort(),
       );
       expect(body.payments[0]).toMatchObject({ kind: "PAYMENT", method: "CASH" });
       expect(body.status).toBe("PARTIAL");
@@ -482,6 +521,47 @@ describe("tutor fees", () => {
       });
 
       expect(JSON.parse(res.body).pendingAttempt).toBeNull();
+    });
+
+    it("shows no refunds and no refundable payment on a fresh fee", async () => {
+      const admin = await makeAdmin();
+      const me = await setupTutor();
+      const fee = await makeFee(me, { amountDue: 1500 });
+      await createFeePayment({ feeId: fee.id, amount: 500, recordedById: admin.id });
+
+      const res = await getFee(await getAuthHeaders(me.tutorAccount), fee.id);
+
+      expect(JSON.parse(res.body)).toMatchObject({
+        refunds: [],
+        payments: [{ method: "CASH", refundableUntil: null }],
+      });
+    });
+
+    it("marks a settled online payment refundable until its window closes", async () => {
+      const me = await setupTutor();
+      const fee = await makeFee(me, { amountDue: 1500 });
+      const settledAt = new Date(Date.now() - DAY_MS);
+      const { payment } = await settledOnlinePayment(fee.id, me.tutor.id, { settledAt });
+
+      const res = await getFee(await getAuthHeaders(me.tutorAccount), fee.id);
+
+      const body = JSON.parse(res.body);
+      const shown = body.payments.find((p: { id: string }) => p.id === payment.id);
+      expect(shown.method).toBe("SSLCOMMERZ");
+      // The default window is 7 days after settlement.
+      expect(new Date(shown.refundableUntil).getTime()).toBe(settledAt.getTime() + 7 * DAY_MS);
+    });
+
+    it("clears refundableUntil once the refund window has closed", async () => {
+      const me = await setupTutor();
+      const fee = await makeFee(me, { amountDue: 1500 });
+      await settledOnlinePayment(fee.id, me.tutor.id, {
+        settledAt: new Date(Date.now() - 8 * DAY_MS),
+      });
+
+      const res = await getFee(await getAuthHeaders(me.tutorAccount), fee.id);
+
+      expect(JSON.parse(res.body).payments[0].refundableUntil).toBeNull();
     });
 
     it("shows no promo and allows one on a fresh DUE fee", async () => {

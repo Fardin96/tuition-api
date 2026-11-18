@@ -347,6 +347,7 @@ export type PaymentAttemptWhereInput = {
   fee?: Prisma.XOR<Prisma.PlatformFeeScalarRelationFilter, Prisma.PlatformFeeWhereInput>
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   payment?: Prisma.XOR<Prisma.FeePaymentNullableScalarRelationFilter, Prisma.FeePaymentWhereInput> | null
+  refunds?: Prisma.PaymentRefundListRelationFilter
 }
 
 export type PaymentAttemptOrderByWithRelationInput = {
@@ -373,6 +374,7 @@ export type PaymentAttemptOrderByWithRelationInput = {
   fee?: Prisma.PlatformFeeOrderByWithRelationInput
   tutor?: Prisma.TutorOrderByWithRelationInput
   payment?: Prisma.FeePaymentOrderByWithRelationInput
+  refunds?: Prisma.PaymentRefundOrderByRelationAggregateInput
 }
 
 export type PaymentAttemptWhereUniqueInput = Prisma.AtLeast<{
@@ -402,6 +404,7 @@ export type PaymentAttemptWhereUniqueInput = Prisma.AtLeast<{
   fee?: Prisma.XOR<Prisma.PlatformFeeScalarRelationFilter, Prisma.PlatformFeeWhereInput>
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   payment?: Prisma.XOR<Prisma.FeePaymentNullableScalarRelationFilter, Prisma.FeePaymentWhereInput> | null
+  refunds?: Prisma.PaymentRefundListRelationFilter
 }, "id" | "tranId" | "paymentId">
 
 export type PaymentAttemptOrderByWithAggregationInput = {
@@ -479,6 +482,7 @@ export type PaymentAttemptCreateInput = {
   fee: Prisma.PlatformFeeCreateNestedOneWithoutAttemptsInput
   tutor: Prisma.TutorCreateNestedOneWithoutPaymentAttemptsInput
   payment?: Prisma.FeePaymentCreateNestedOneWithoutAttemptInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptUncheckedCreateInput = {
@@ -502,6 +506,7 @@ export type PaymentAttemptUncheckedCreateInput = {
   settledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptUpdateInput = {
@@ -525,6 +530,7 @@ export type PaymentAttemptUpdateInput = {
   fee?: Prisma.PlatformFeeUpdateOneRequiredWithoutAttemptsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPaymentAttemptsNestedInput
   payment?: Prisma.FeePaymentUpdateOneWithoutAttemptNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutAttemptNestedInput
 }
 
 export type PaymentAttemptUncheckedUpdateInput = {
@@ -548,6 +554,7 @@ export type PaymentAttemptUncheckedUpdateInput = {
   settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutAttemptNestedInput
 }
 
 export type PaymentAttemptCreateManyInput = {
@@ -712,6 +719,11 @@ export type PaymentAttemptSumOrderByAggregateInput = {
   riskLevel?: Prisma.SortOrder
 }
 
+export type PaymentAttemptScalarRelationFilter = {
+  is?: Prisma.PaymentAttemptWhereInput
+  isNot?: Prisma.PaymentAttemptWhereInput
+}
+
 export type PaymentAttemptCreateNestedManyWithoutTutorInput = {
   create?: Prisma.XOR<Prisma.PaymentAttemptCreateWithoutTutorInput, Prisma.PaymentAttemptUncheckedCreateWithoutTutorInput> | Prisma.PaymentAttemptCreateWithoutTutorInput[] | Prisma.PaymentAttemptUncheckedCreateWithoutTutorInput[]
   connectOrCreate?: Prisma.PaymentAttemptCreateOrConnectWithoutTutorInput | Prisma.PaymentAttemptCreateOrConnectWithoutTutorInput[]
@@ -832,6 +844,20 @@ export type EnumPaymentAttemptStatusFieldUpdateOperationsInput = {
   set?: $Enums.PaymentAttemptStatus
 }
 
+export type PaymentAttemptCreateNestedOneWithoutRefundsInput = {
+  create?: Prisma.XOR<Prisma.PaymentAttemptCreateWithoutRefundsInput, Prisma.PaymentAttemptUncheckedCreateWithoutRefundsInput>
+  connectOrCreate?: Prisma.PaymentAttemptCreateOrConnectWithoutRefundsInput
+  connect?: Prisma.PaymentAttemptWhereUniqueInput
+}
+
+export type PaymentAttemptUpdateOneRequiredWithoutRefundsNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentAttemptCreateWithoutRefundsInput, Prisma.PaymentAttemptUncheckedCreateWithoutRefundsInput>
+  connectOrCreate?: Prisma.PaymentAttemptCreateOrConnectWithoutRefundsInput
+  upsert?: Prisma.PaymentAttemptUpsertWithoutRefundsInput
+  connect?: Prisma.PaymentAttemptWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentAttemptUpdateToOneWithWhereWithoutRefundsInput, Prisma.PaymentAttemptUpdateWithoutRefundsInput>, Prisma.PaymentAttemptUncheckedUpdateWithoutRefundsInput>
+}
+
 export type PaymentAttemptCreateWithoutTutorInput = {
   id?: string
   tranId: string
@@ -852,6 +878,7 @@ export type PaymentAttemptCreateWithoutTutorInput = {
   updatedAt?: Date | string
   fee: Prisma.PlatformFeeCreateNestedOneWithoutAttemptsInput
   payment?: Prisma.FeePaymentCreateNestedOneWithoutAttemptInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptUncheckedCreateWithoutTutorInput = {
@@ -874,6 +901,7 @@ export type PaymentAttemptUncheckedCreateWithoutTutorInput = {
   settledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptCreateOrConnectWithoutTutorInput = {
@@ -948,6 +976,7 @@ export type PaymentAttemptCreateWithoutFeeInput = {
   updatedAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutPaymentAttemptsInput
   payment?: Prisma.FeePaymentCreateNestedOneWithoutAttemptInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptUncheckedCreateWithoutFeeInput = {
@@ -970,6 +999,7 @@ export type PaymentAttemptUncheckedCreateWithoutFeeInput = {
   settledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptCreateOrConnectWithoutFeeInput = {
@@ -1018,6 +1048,7 @@ export type PaymentAttemptCreateWithoutPaymentInput = {
   updatedAt?: Date | string
   fee: Prisma.PlatformFeeCreateNestedOneWithoutAttemptsInput
   tutor: Prisma.TutorCreateNestedOneWithoutPaymentAttemptsInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptUncheckedCreateWithoutPaymentInput = {
@@ -1040,6 +1071,7 @@ export type PaymentAttemptUncheckedCreateWithoutPaymentInput = {
   settledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutAttemptInput
 }
 
 export type PaymentAttemptCreateOrConnectWithoutPaymentInput = {
@@ -1078,6 +1110,7 @@ export type PaymentAttemptUpdateWithoutPaymentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.PlatformFeeUpdateOneRequiredWithoutAttemptsNestedInput
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPaymentAttemptsNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutAttemptNestedInput
 }
 
 export type PaymentAttemptUncheckedUpdateWithoutPaymentInput = {
@@ -1096,6 +1129,115 @@ export type PaymentAttemptUncheckedUpdateWithoutPaymentInput = {
   riskLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutAttemptNestedInput
+}
+
+export type PaymentAttemptCreateWithoutRefundsInput = {
+  id?: string
+  tranId: string
+  feeAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  chargeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.PaymentAttemptStatus
+  sessionKey?: string | null
+  valId?: string | null
+  bankTranId?: string | null
+  cardType?: string | null
+  riskLevel?: number | null
+  failureReason?: string | null
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastCheckedAt?: Date | string | null
+  settledAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fee: Prisma.PlatformFeeCreateNestedOneWithoutAttemptsInput
+  tutor: Prisma.TutorCreateNestedOneWithoutPaymentAttemptsInput
+  payment?: Prisma.FeePaymentCreateNestedOneWithoutAttemptInput
+}
+
+export type PaymentAttemptUncheckedCreateWithoutRefundsInput = {
+  id?: string
+  feeId: string
+  tutorId: string
+  tranId: string
+  feeAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  chargeAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.PaymentAttemptStatus
+  sessionKey?: string | null
+  valId?: string | null
+  bankTranId?: string | null
+  cardType?: string | null
+  riskLevel?: number | null
+  failureReason?: string | null
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  paymentId?: string | null
+  lastCheckedAt?: Date | string | null
+  settledAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PaymentAttemptCreateOrConnectWithoutRefundsInput = {
+  where: Prisma.PaymentAttemptWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentAttemptCreateWithoutRefundsInput, Prisma.PaymentAttemptUncheckedCreateWithoutRefundsInput>
+}
+
+export type PaymentAttemptUpsertWithoutRefundsInput = {
+  update: Prisma.XOR<Prisma.PaymentAttemptUpdateWithoutRefundsInput, Prisma.PaymentAttemptUncheckedUpdateWithoutRefundsInput>
+  create: Prisma.XOR<Prisma.PaymentAttemptCreateWithoutRefundsInput, Prisma.PaymentAttemptUncheckedCreateWithoutRefundsInput>
+  where?: Prisma.PaymentAttemptWhereInput
+}
+
+export type PaymentAttemptUpdateToOneWithWhereWithoutRefundsInput = {
+  where?: Prisma.PaymentAttemptWhereInput
+  data: Prisma.XOR<Prisma.PaymentAttemptUpdateWithoutRefundsInput, Prisma.PaymentAttemptUncheckedUpdateWithoutRefundsInput>
+}
+
+export type PaymentAttemptUpdateWithoutRefundsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tranId?: Prisma.StringFieldUpdateOperationsInput | string
+  feeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  chargeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumPaymentAttemptStatusFieldUpdateOperationsInput | $Enums.PaymentAttemptStatus
+  sessionKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  valId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankTranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cardType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fee?: Prisma.PlatformFeeUpdateOneRequiredWithoutAttemptsNestedInput
+  tutor?: Prisma.TutorUpdateOneRequiredWithoutPaymentAttemptsNestedInput
+  payment?: Prisma.FeePaymentUpdateOneWithoutAttemptNestedInput
+}
+
+export type PaymentAttemptUncheckedUpdateWithoutRefundsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  feeId?: Prisma.StringFieldUpdateOperationsInput | string
+  tutorId?: Prisma.StringFieldUpdateOperationsInput | string
+  tranId?: Prisma.StringFieldUpdateOperationsInput | string
+  feeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  chargeAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumPaymentAttemptStatusFieldUpdateOperationsInput | $Enums.PaymentAttemptStatus
+  sessionKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  valId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankTranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cardType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  paymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1144,6 +1286,7 @@ export type PaymentAttemptUpdateWithoutTutorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.PlatformFeeUpdateOneRequiredWithoutAttemptsNestedInput
   payment?: Prisma.FeePaymentUpdateOneWithoutAttemptNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutAttemptNestedInput
 }
 
 export type PaymentAttemptUncheckedUpdateWithoutTutorInput = {
@@ -1166,6 +1309,7 @@ export type PaymentAttemptUncheckedUpdateWithoutTutorInput = {
   settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutAttemptNestedInput
 }
 
 export type PaymentAttemptUncheckedUpdateManyWithoutTutorInput = {
@@ -1232,6 +1376,7 @@ export type PaymentAttemptUpdateWithoutFeeInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutPaymentAttemptsNestedInput
   payment?: Prisma.FeePaymentUpdateOneWithoutAttemptNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutAttemptNestedInput
 }
 
 export type PaymentAttemptUncheckedUpdateWithoutFeeInput = {
@@ -1254,6 +1399,7 @@ export type PaymentAttemptUncheckedUpdateWithoutFeeInput = {
   settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutAttemptNestedInput
 }
 
 export type PaymentAttemptUncheckedUpdateManyWithoutFeeInput = {
@@ -1278,6 +1424,35 @@ export type PaymentAttemptUncheckedUpdateManyWithoutFeeInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type PaymentAttemptCountOutputType
+ */
+
+export type PaymentAttemptCountOutputType = {
+  refunds: number
+}
+
+export type PaymentAttemptCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  refunds?: boolean | PaymentAttemptCountOutputTypeCountRefundsArgs
+}
+
+/**
+ * PaymentAttemptCountOutputType without action
+ */
+export type PaymentAttemptCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentAttemptCountOutputType
+   */
+  select?: Prisma.PaymentAttemptCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PaymentAttemptCountOutputType without action
+ */
+export type PaymentAttemptCountOutputTypeCountRefundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentRefundWhereInput
+}
 
 
 export type PaymentAttemptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1304,6 +1479,8 @@ export type PaymentAttemptSelect<ExtArgs extends runtime.Types.Extensions.Intern
   fee?: boolean | Prisma.PlatformFeeDefaultArgs<ExtArgs>
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   payment?: boolean | Prisma.PaymentAttempt$paymentArgs<ExtArgs>
+  refunds?: boolean | Prisma.PaymentAttempt$refundsArgs<ExtArgs>
+  _count?: boolean | Prisma.PaymentAttemptCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentAttempt"]>
 
 export type PaymentAttemptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1386,6 +1563,8 @@ export type PaymentAttemptInclude<ExtArgs extends runtime.Types.Extensions.Inter
   fee?: boolean | Prisma.PlatformFeeDefaultArgs<ExtArgs>
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   payment?: boolean | Prisma.PaymentAttempt$paymentArgs<ExtArgs>
+  refunds?: boolean | Prisma.PaymentAttempt$refundsArgs<ExtArgs>
+  _count?: boolean | Prisma.PaymentAttemptCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PaymentAttemptIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fee?: boolean | Prisma.PlatformFeeDefaultArgs<ExtArgs>
@@ -1404,6 +1583,7 @@ export type $PaymentAttemptPayload<ExtArgs extends runtime.Types.Extensions.Inte
     fee: Prisma.$PlatformFeePayload<ExtArgs>
     tutor: Prisma.$TutorPayload<ExtArgs>
     payment: Prisma.$FeePaymentPayload<ExtArgs> | null
+    refunds: Prisma.$PaymentRefundPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1823,6 +2003,7 @@ export interface Prisma__PaymentAttemptClient<T, Null = never, ExtArgs extends r
   fee<T extends Prisma.PlatformFeeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlatformFeeDefaultArgs<ExtArgs>>): Prisma.Prisma__PlatformFeeClient<runtime.Types.Result.GetResult<Prisma.$PlatformFeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   tutor<T extends Prisma.TutorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutorDefaultArgs<ExtArgs>>): Prisma.Prisma__TutorClient<runtime.Types.Result.GetResult<Prisma.$TutorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   payment<T extends Prisma.PaymentAttempt$paymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentAttempt$paymentArgs<ExtArgs>>): Prisma.Prisma__FeePaymentClient<runtime.Types.Result.GetResult<Prisma.$FeePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  refunds<T extends Prisma.PaymentAttempt$refundsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentAttempt$refundsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRefundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2289,6 +2470,30 @@ export type PaymentAttempt$paymentArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.FeePaymentInclude<ExtArgs> | null
   where?: Prisma.FeePaymentWhereInput
+}
+
+/**
+ * PaymentAttempt.refunds
+ */
+export type PaymentAttempt$refundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentRefund
+   */
+  select?: Prisma.PaymentRefundSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentRefund
+   */
+  omit?: Prisma.PaymentRefundOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentRefundInclude<ExtArgs> | null
+  where?: Prisma.PaymentRefundWhereInput
+  orderBy?: Prisma.PaymentRefundOrderByWithRelationInput | Prisma.PaymentRefundOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentRefundWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentRefundScalarFieldEnum | Prisma.PaymentRefundScalarFieldEnum[]
 }
 
 /**

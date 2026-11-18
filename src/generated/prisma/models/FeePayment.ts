@@ -269,6 +269,8 @@ export type FeePaymentWhereInput = {
   reversesPayment?: Prisma.XOR<Prisma.FeePaymentNullableScalarRelationFilter, Prisma.FeePaymentWhereInput> | null
   reversals?: Prisma.FeePaymentListRelationFilter
   attempt?: Prisma.XOR<Prisma.PaymentAttemptNullableScalarRelationFilter, Prisma.PaymentAttemptWhereInput> | null
+  refunds?: Prisma.PaymentRefundListRelationFilter
+  refundReversal?: Prisma.XOR<Prisma.PaymentRefundNullableScalarRelationFilter, Prisma.PaymentRefundWhereInput> | null
 }
 
 export type FeePaymentOrderByWithRelationInput = {
@@ -288,6 +290,8 @@ export type FeePaymentOrderByWithRelationInput = {
   reversesPayment?: Prisma.FeePaymentOrderByWithRelationInput
   reversals?: Prisma.FeePaymentOrderByRelationAggregateInput
   attempt?: Prisma.PaymentAttemptOrderByWithRelationInput
+  refunds?: Prisma.PaymentRefundOrderByRelationAggregateInput
+  refundReversal?: Prisma.PaymentRefundOrderByWithRelationInput
 }
 
 export type FeePaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -310,6 +314,8 @@ export type FeePaymentWhereUniqueInput = Prisma.AtLeast<{
   reversesPayment?: Prisma.XOR<Prisma.FeePaymentNullableScalarRelationFilter, Prisma.FeePaymentWhereInput> | null
   reversals?: Prisma.FeePaymentListRelationFilter
   attempt?: Prisma.XOR<Prisma.PaymentAttemptNullableScalarRelationFilter, Prisma.PaymentAttemptWhereInput> | null
+  refunds?: Prisma.PaymentRefundListRelationFilter
+  refundReversal?: Prisma.XOR<Prisma.PaymentRefundNullableScalarRelationFilter, Prisma.PaymentRefundWhereInput> | null
 }, "id">
 
 export type FeePaymentOrderByWithAggregationInput = {
@@ -362,6 +368,8 @@ export type FeePaymentCreateInput = {
   reversesPayment?: Prisma.FeePaymentCreateNestedOneWithoutReversalsInput
   reversals?: Prisma.FeePaymentCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentUncheckedCreateInput = {
@@ -378,6 +386,8 @@ export type FeePaymentUncheckedCreateInput = {
   createdAt?: Date | string
   reversals?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptUncheckedCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundUncheckedCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentUpdateInput = {
@@ -394,6 +404,8 @@ export type FeePaymentUpdateInput = {
   reversesPayment?: Prisma.FeePaymentUpdateOneWithoutReversalsNestedInput
   reversals?: Prisma.FeePaymentUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateInput = {
@@ -410,6 +422,8 @@ export type FeePaymentUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reversals?: Prisma.FeePaymentUncheckedUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUncheckedUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUncheckedUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentCreateManyInput = {
@@ -682,6 +696,38 @@ export type FeePaymentUpdateOneWithoutAttemptNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FeePaymentUpdateToOneWithWhereWithoutAttemptInput, Prisma.FeePaymentUpdateWithoutAttemptInput>, Prisma.FeePaymentUncheckedUpdateWithoutAttemptInput>
 }
 
+export type FeePaymentCreateNestedOneWithoutRefundsInput = {
+  create?: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundsInput, Prisma.FeePaymentUncheckedCreateWithoutRefundsInput>
+  connectOrCreate?: Prisma.FeePaymentCreateOrConnectWithoutRefundsInput
+  connect?: Prisma.FeePaymentWhereUniqueInput
+}
+
+export type FeePaymentCreateNestedOneWithoutRefundReversalInput = {
+  create?: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundReversalInput, Prisma.FeePaymentUncheckedCreateWithoutRefundReversalInput>
+  connectOrCreate?: Prisma.FeePaymentCreateOrConnectWithoutRefundReversalInput
+  connect?: Prisma.FeePaymentWhereUniqueInput
+}
+
+export type FeePaymentUpdateOneWithoutRefundsNestedInput = {
+  create?: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundsInput, Prisma.FeePaymentUncheckedCreateWithoutRefundsInput>
+  connectOrCreate?: Prisma.FeePaymentCreateOrConnectWithoutRefundsInput
+  upsert?: Prisma.FeePaymentUpsertWithoutRefundsInput
+  disconnect?: Prisma.FeePaymentWhereInput | boolean
+  delete?: Prisma.FeePaymentWhereInput | boolean
+  connect?: Prisma.FeePaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FeePaymentUpdateToOneWithWhereWithoutRefundsInput, Prisma.FeePaymentUpdateWithoutRefundsInput>, Prisma.FeePaymentUncheckedUpdateWithoutRefundsInput>
+}
+
+export type FeePaymentUpdateOneWithoutRefundReversalNestedInput = {
+  create?: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundReversalInput, Prisma.FeePaymentUncheckedCreateWithoutRefundReversalInput>
+  connectOrCreate?: Prisma.FeePaymentCreateOrConnectWithoutRefundReversalInput
+  upsert?: Prisma.FeePaymentUpsertWithoutRefundReversalInput
+  disconnect?: Prisma.FeePaymentWhereInput | boolean
+  delete?: Prisma.FeePaymentWhereInput | boolean
+  connect?: Prisma.FeePaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FeePaymentUpdateToOneWithWhereWithoutRefundReversalInput, Prisma.FeePaymentUpdateWithoutRefundReversalInput>, Prisma.FeePaymentUncheckedUpdateWithoutRefundReversalInput>
+}
+
 export type FeePaymentCreateWithoutRecordedByInput = {
   id?: string
   kind?: $Enums.PaymentKind
@@ -695,6 +741,8 @@ export type FeePaymentCreateWithoutRecordedByInput = {
   reversesPayment?: Prisma.FeePaymentCreateNestedOneWithoutReversalsInput
   reversals?: Prisma.FeePaymentCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentUncheckedCreateWithoutRecordedByInput = {
@@ -710,6 +758,8 @@ export type FeePaymentUncheckedCreateWithoutRecordedByInput = {
   createdAt?: Date | string
   reversals?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptUncheckedCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundUncheckedCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentCreateOrConnectWithoutRecordedByInput = {
@@ -768,6 +818,8 @@ export type FeePaymentCreateWithoutFeeInput = {
   reversesPayment?: Prisma.FeePaymentCreateNestedOneWithoutReversalsInput
   reversals?: Prisma.FeePaymentCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentUncheckedCreateWithoutFeeInput = {
@@ -783,6 +835,8 @@ export type FeePaymentUncheckedCreateWithoutFeeInput = {
   createdAt?: Date | string
   reversals?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptUncheckedCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundUncheckedCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentCreateOrConnectWithoutFeeInput = {
@@ -824,6 +878,8 @@ export type FeePaymentCreateWithoutReversalsInput = {
   recordedBy?: Prisma.AdminUserCreateNestedOneWithoutRecordedPaymentsInput
   reversesPayment?: Prisma.FeePaymentCreateNestedOneWithoutReversalsInput
   attempt?: Prisma.PaymentAttemptCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentUncheckedCreateWithoutReversalsInput = {
@@ -839,6 +895,8 @@ export type FeePaymentUncheckedCreateWithoutReversalsInput = {
   recordedById?: string | null
   createdAt?: Date | string
   attempt?: Prisma.PaymentAttemptUncheckedCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundUncheckedCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentCreateOrConnectWithoutReversalsInput = {
@@ -859,6 +917,8 @@ export type FeePaymentCreateWithoutReversesPaymentInput = {
   recordedBy?: Prisma.AdminUserCreateNestedOneWithoutRecordedPaymentsInput
   reversals?: Prisma.FeePaymentCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentUncheckedCreateWithoutReversesPaymentInput = {
@@ -874,6 +934,8 @@ export type FeePaymentUncheckedCreateWithoutReversesPaymentInput = {
   createdAt?: Date | string
   reversals?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutReversesPaymentInput
   attempt?: Prisma.PaymentAttemptUncheckedCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundUncheckedCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentCreateOrConnectWithoutReversesPaymentInput = {
@@ -910,6 +972,8 @@ export type FeePaymentUpdateWithoutReversalsInput = {
   recordedBy?: Prisma.AdminUserUpdateOneWithoutRecordedPaymentsNestedInput
   reversesPayment?: Prisma.FeePaymentUpdateOneWithoutReversalsNestedInput
   attempt?: Prisma.PaymentAttemptUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateWithoutReversalsInput = {
@@ -925,6 +989,8 @@ export type FeePaymentUncheckedUpdateWithoutReversalsInput = {
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attempt?: Prisma.PaymentAttemptUncheckedUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUncheckedUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUpsertWithWhereUniqueWithoutReversesPaymentInput = {
@@ -956,6 +1022,8 @@ export type FeePaymentCreateWithoutAttemptInput = {
   recordedBy?: Prisma.AdminUserCreateNestedOneWithoutRecordedPaymentsInput
   reversesPayment?: Prisma.FeePaymentCreateNestedOneWithoutReversalsInput
   reversals?: Prisma.FeePaymentCreateNestedManyWithoutReversesPaymentInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentUncheckedCreateWithoutAttemptInput = {
@@ -971,6 +1039,8 @@ export type FeePaymentUncheckedCreateWithoutAttemptInput = {
   recordedById?: string | null
   createdAt?: Date | string
   reversals?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutReversesPaymentInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundUncheckedCreateNestedOneWithoutReversalInput
 }
 
 export type FeePaymentCreateOrConnectWithoutAttemptInput = {
@@ -1002,6 +1072,8 @@ export type FeePaymentUpdateWithoutAttemptInput = {
   recordedBy?: Prisma.AdminUserUpdateOneWithoutRecordedPaymentsNestedInput
   reversesPayment?: Prisma.FeePaymentUpdateOneWithoutReversalsNestedInput
   reversals?: Prisma.FeePaymentUpdateManyWithoutReversesPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateWithoutAttemptInput = {
@@ -1017,6 +1089,176 @@ export type FeePaymentUncheckedUpdateWithoutAttemptInput = {
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reversals?: Prisma.FeePaymentUncheckedUpdateManyWithoutReversesPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUncheckedUpdateOneWithoutReversalNestedInput
+}
+
+export type FeePaymentCreateWithoutRefundsInput = {
+  id?: string
+  kind?: $Enums.PaymentKind
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  txnReference?: string | null
+  reason?: string | null
+  receivedAt: Date | string
+  createdAt?: Date | string
+  fee: Prisma.PlatformFeeCreateNestedOneWithoutPaymentsInput
+  recordedBy?: Prisma.AdminUserCreateNestedOneWithoutRecordedPaymentsInput
+  reversesPayment?: Prisma.FeePaymentCreateNestedOneWithoutReversalsInput
+  reversals?: Prisma.FeePaymentCreateNestedManyWithoutReversesPaymentInput
+  attempt?: Prisma.PaymentAttemptCreateNestedOneWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundCreateNestedOneWithoutReversalInput
+}
+
+export type FeePaymentUncheckedCreateWithoutRefundsInput = {
+  id?: string
+  feeId: string
+  kind?: $Enums.PaymentKind
+  reversesPaymentId?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  txnReference?: string | null
+  reason?: string | null
+  receivedAt: Date | string
+  recordedById?: string | null
+  createdAt?: Date | string
+  reversals?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutReversesPaymentInput
+  attempt?: Prisma.PaymentAttemptUncheckedCreateNestedOneWithoutPaymentInput
+  refundReversal?: Prisma.PaymentRefundUncheckedCreateNestedOneWithoutReversalInput
+}
+
+export type FeePaymentCreateOrConnectWithoutRefundsInput = {
+  where: Prisma.FeePaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundsInput, Prisma.FeePaymentUncheckedCreateWithoutRefundsInput>
+}
+
+export type FeePaymentCreateWithoutRefundReversalInput = {
+  id?: string
+  kind?: $Enums.PaymentKind
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  txnReference?: string | null
+  reason?: string | null
+  receivedAt: Date | string
+  createdAt?: Date | string
+  fee: Prisma.PlatformFeeCreateNestedOneWithoutPaymentsInput
+  recordedBy?: Prisma.AdminUserCreateNestedOneWithoutRecordedPaymentsInput
+  reversesPayment?: Prisma.FeePaymentCreateNestedOneWithoutReversalsInput
+  reversals?: Prisma.FeePaymentCreateNestedManyWithoutReversesPaymentInput
+  attempt?: Prisma.PaymentAttemptCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentInput
+}
+
+export type FeePaymentUncheckedCreateWithoutRefundReversalInput = {
+  id?: string
+  feeId: string
+  kind?: $Enums.PaymentKind
+  reversesPaymentId?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  txnReference?: string | null
+  reason?: string | null
+  receivedAt: Date | string
+  recordedById?: string | null
+  createdAt?: Date | string
+  reversals?: Prisma.FeePaymentUncheckedCreateNestedManyWithoutReversesPaymentInput
+  attempt?: Prisma.PaymentAttemptUncheckedCreateNestedOneWithoutPaymentInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentInput
+}
+
+export type FeePaymentCreateOrConnectWithoutRefundReversalInput = {
+  where: Prisma.FeePaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundReversalInput, Prisma.FeePaymentUncheckedCreateWithoutRefundReversalInput>
+}
+
+export type FeePaymentUpsertWithoutRefundsInput = {
+  update: Prisma.XOR<Prisma.FeePaymentUpdateWithoutRefundsInput, Prisma.FeePaymentUncheckedUpdateWithoutRefundsInput>
+  create: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundsInput, Prisma.FeePaymentUncheckedCreateWithoutRefundsInput>
+  where?: Prisma.FeePaymentWhereInput
+}
+
+export type FeePaymentUpdateToOneWithWhereWithoutRefundsInput = {
+  where?: Prisma.FeePaymentWhereInput
+  data: Prisma.XOR<Prisma.FeePaymentUpdateWithoutRefundsInput, Prisma.FeePaymentUncheckedUpdateWithoutRefundsInput>
+}
+
+export type FeePaymentUpdateWithoutRefundsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumPaymentKindFieldUpdateOperationsInput | $Enums.PaymentKind
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  txnReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fee?: Prisma.PlatformFeeUpdateOneRequiredWithoutPaymentsNestedInput
+  recordedBy?: Prisma.AdminUserUpdateOneWithoutRecordedPaymentsNestedInput
+  reversesPayment?: Prisma.FeePaymentUpdateOneWithoutReversalsNestedInput
+  reversals?: Prisma.FeePaymentUpdateManyWithoutReversesPaymentNestedInput
+  attempt?: Prisma.PaymentAttemptUpdateOneWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUpdateOneWithoutReversalNestedInput
+}
+
+export type FeePaymentUncheckedUpdateWithoutRefundsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  feeId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumPaymentKindFieldUpdateOperationsInput | $Enums.PaymentKind
+  reversesPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  txnReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reversals?: Prisma.FeePaymentUncheckedUpdateManyWithoutReversesPaymentNestedInput
+  attempt?: Prisma.PaymentAttemptUncheckedUpdateOneWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUncheckedUpdateOneWithoutReversalNestedInput
+}
+
+export type FeePaymentUpsertWithoutRefundReversalInput = {
+  update: Prisma.XOR<Prisma.FeePaymentUpdateWithoutRefundReversalInput, Prisma.FeePaymentUncheckedUpdateWithoutRefundReversalInput>
+  create: Prisma.XOR<Prisma.FeePaymentCreateWithoutRefundReversalInput, Prisma.FeePaymentUncheckedCreateWithoutRefundReversalInput>
+  where?: Prisma.FeePaymentWhereInput
+}
+
+export type FeePaymentUpdateToOneWithWhereWithoutRefundReversalInput = {
+  where?: Prisma.FeePaymentWhereInput
+  data: Prisma.XOR<Prisma.FeePaymentUpdateWithoutRefundReversalInput, Prisma.FeePaymentUncheckedUpdateWithoutRefundReversalInput>
+}
+
+export type FeePaymentUpdateWithoutRefundReversalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumPaymentKindFieldUpdateOperationsInput | $Enums.PaymentKind
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  txnReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fee?: Prisma.PlatformFeeUpdateOneRequiredWithoutPaymentsNestedInput
+  recordedBy?: Prisma.AdminUserUpdateOneWithoutRecordedPaymentsNestedInput
+  reversesPayment?: Prisma.FeePaymentUpdateOneWithoutReversalsNestedInput
+  reversals?: Prisma.FeePaymentUpdateManyWithoutReversesPaymentNestedInput
+  attempt?: Prisma.PaymentAttemptUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentNestedInput
+}
+
+export type FeePaymentUncheckedUpdateWithoutRefundReversalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  feeId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumPaymentKindFieldUpdateOperationsInput | $Enums.PaymentKind
+  reversesPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  txnReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reversals?: Prisma.FeePaymentUncheckedUpdateManyWithoutReversesPaymentNestedInput
+  attempt?: Prisma.PaymentAttemptUncheckedUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
 export type FeePaymentCreateManyRecordedByInput = {
@@ -1045,6 +1287,8 @@ export type FeePaymentUpdateWithoutRecordedByInput = {
   reversesPayment?: Prisma.FeePaymentUpdateOneWithoutReversalsNestedInput
   reversals?: Prisma.FeePaymentUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateWithoutRecordedByInput = {
@@ -1060,6 +1304,8 @@ export type FeePaymentUncheckedUpdateWithoutRecordedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reversals?: Prisma.FeePaymentUncheckedUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUncheckedUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUncheckedUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateManyWithoutRecordedByInput = {
@@ -1101,6 +1347,8 @@ export type FeePaymentUpdateWithoutFeeInput = {
   reversesPayment?: Prisma.FeePaymentUpdateOneWithoutReversalsNestedInput
   reversals?: Prisma.FeePaymentUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateWithoutFeeInput = {
@@ -1116,6 +1364,8 @@ export type FeePaymentUncheckedUpdateWithoutFeeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reversals?: Prisma.FeePaymentUncheckedUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUncheckedUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUncheckedUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateManyWithoutFeeInput = {
@@ -1157,6 +1407,8 @@ export type FeePaymentUpdateWithoutReversesPaymentInput = {
   recordedBy?: Prisma.AdminUserUpdateOneWithoutRecordedPaymentsNestedInput
   reversals?: Prisma.FeePaymentUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateWithoutReversesPaymentInput = {
@@ -1172,6 +1424,8 @@ export type FeePaymentUncheckedUpdateWithoutReversesPaymentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reversals?: Prisma.FeePaymentUncheckedUpdateManyWithoutReversesPaymentNestedInput
   attempt?: Prisma.PaymentAttemptUncheckedUpdateOneWithoutPaymentNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentNestedInput
+  refundReversal?: Prisma.PaymentRefundUncheckedUpdateOneWithoutReversalNestedInput
 }
 
 export type FeePaymentUncheckedUpdateManyWithoutReversesPaymentInput = {
@@ -1194,10 +1448,12 @@ export type FeePaymentUncheckedUpdateManyWithoutReversesPaymentInput = {
 
 export type FeePaymentCountOutputType = {
   reversals: number
+  refunds: number
 }
 
 export type FeePaymentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reversals?: boolean | FeePaymentCountOutputTypeCountReversalsArgs
+  refunds?: boolean | FeePaymentCountOutputTypeCountRefundsArgs
 }
 
 /**
@@ -1215,6 +1471,13 @@ export type FeePaymentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
  */
 export type FeePaymentCountOutputTypeCountReversalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FeePaymentWhereInput
+}
+
+/**
+ * FeePaymentCountOutputType without action
+ */
+export type FeePaymentCountOutputTypeCountRefundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentRefundWhereInput
 }
 
 
@@ -1235,6 +1498,8 @@ export type FeePaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   reversesPayment?: boolean | Prisma.FeePayment$reversesPaymentArgs<ExtArgs>
   reversals?: boolean | Prisma.FeePayment$reversalsArgs<ExtArgs>
   attempt?: boolean | Prisma.FeePayment$attemptArgs<ExtArgs>
+  refunds?: boolean | Prisma.FeePayment$refundsArgs<ExtArgs>
+  refundReversal?: boolean | Prisma.FeePayment$refundReversalArgs<ExtArgs>
   _count?: boolean | Prisma.FeePaymentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["feePayment"]>
 
@@ -1293,6 +1558,8 @@ export type FeePaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   reversesPayment?: boolean | Prisma.FeePayment$reversesPaymentArgs<ExtArgs>
   reversals?: boolean | Prisma.FeePayment$reversalsArgs<ExtArgs>
   attempt?: boolean | Prisma.FeePayment$attemptArgs<ExtArgs>
+  refunds?: boolean | Prisma.FeePayment$refundsArgs<ExtArgs>
+  refundReversal?: boolean | Prisma.FeePayment$refundReversalArgs<ExtArgs>
   _count?: boolean | Prisma.FeePaymentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FeePaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1314,6 +1581,8 @@ export type $FeePaymentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     reversesPayment: Prisma.$FeePaymentPayload<ExtArgs> | null
     reversals: Prisma.$FeePaymentPayload<ExtArgs>[]
     attempt: Prisma.$PaymentAttemptPayload<ExtArgs> | null
+    refunds: Prisma.$PaymentRefundPayload<ExtArgs>[]
+    refundReversal: Prisma.$PaymentRefundPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1726,6 +1995,8 @@ export interface Prisma__FeePaymentClient<T, Null = never, ExtArgs extends runti
   reversesPayment<T extends Prisma.FeePayment$reversesPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeePayment$reversesPaymentArgs<ExtArgs>>): Prisma.Prisma__FeePaymentClient<runtime.Types.Result.GetResult<Prisma.$FeePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reversals<T extends Prisma.FeePayment$reversalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeePayment$reversalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attempt<T extends Prisma.FeePayment$attemptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeePayment$attemptArgs<ExtArgs>>): Prisma.Prisma__PaymentAttemptClient<runtime.Types.Result.GetResult<Prisma.$PaymentAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  refunds<T extends Prisma.FeePayment$refundsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeePayment$refundsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRefundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  refundReversal<T extends Prisma.FeePayment$refundReversalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeePayment$refundReversalArgs<ExtArgs>>): Prisma.Prisma__PaymentRefundClient<runtime.Types.Result.GetResult<Prisma.$PaymentRefundPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2245,6 +2516,49 @@ export type FeePayment$attemptArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.PaymentAttemptInclude<ExtArgs> | null
   where?: Prisma.PaymentAttemptWhereInput
+}
+
+/**
+ * FeePayment.refunds
+ */
+export type FeePayment$refundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentRefund
+   */
+  select?: Prisma.PaymentRefundSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentRefund
+   */
+  omit?: Prisma.PaymentRefundOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentRefundInclude<ExtArgs> | null
+  where?: Prisma.PaymentRefundWhereInput
+  orderBy?: Prisma.PaymentRefundOrderByWithRelationInput | Prisma.PaymentRefundOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentRefundWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentRefundScalarFieldEnum | Prisma.PaymentRefundScalarFieldEnum[]
+}
+
+/**
+ * FeePayment.refundReversal
+ */
+export type FeePayment$refundReversalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentRefund
+   */
+  select?: Prisma.PaymentRefundSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentRefund
+   */
+  omit?: Prisma.PaymentRefundOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentRefundInclude<ExtArgs> | null
+  where?: Prisma.PaymentRefundWhereInput
 }
 
 /**

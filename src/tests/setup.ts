@@ -29,6 +29,7 @@ beforeEach(async () => {
       account_block,
       report,
       dispute,
+      payment_refund,
       payment_attempt,
       promo_redemption,
       promo_code,

@@ -6,6 +6,7 @@ import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { FEE_UNPAID_AFTER_DAYS } from "../application/application.schema.js";
 import { feePromoOf } from "../fees/promo.js";
+import { adminRefundSelect, toAdminRefund } from "../refunds/refund.schema.js";
 import type {
   AdminFeeDetailResponse,
   AdminFeeListQuery,
@@ -74,6 +75,11 @@ const detailInclude = {
       settledAt: true,
     },
   },
+  refunds: {
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 20,
+    select: adminRefundSelect,
+  },
 } satisfies Prisma.PlatformFeeInclude;
 
 type FeeRow = Prisma.PlatformFeeGetPayload<{ include: typeof feeInclude }>;
@@ -141,6 +147,7 @@ function toAdminFeeDetail(row: FeeDetailRow): AdminFeeDetailResponse {
       settledAt: a.settledAt,
     })),
     promo: feePromoOf(row.promoRedemptions[0]),
+    refunds: row.refunds.map((refund) => toAdminRefund(refund)),
   };
 }
 
@@ -410,6 +417,15 @@ export async function reversePayment(
     }
     if (original.kind === "REVERSAL") {
       throw appError("InvalidFeeState", 409, "A reversal cannot be reversed");
+    }
+    // The gateway holds the money of an online payment, so only a refund through the gateway can
+    // return it. A ledger-only reversal would leave the tutor's money with the gateway.
+    if (original.method === "SSLCOMMERZ") {
+      throw appError(
+        "InvalidFeeState",
+        409,
+        "Online payments are refunded from Refunds, so the gateway returns the money.",
+      );
     }
 
     await lockFee(tx, original.feeId);

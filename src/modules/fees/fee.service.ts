@@ -1,11 +1,17 @@
-import type { Prisma } from "../../generated/prisma/client.js";
-import { FeeStatus } from "../../generated/prisma/enums.js";
+import { Prisma } from "../../generated/prisma/client.js";
+import { FeeStatus, RefundStatus } from "../../generated/prisma/enums.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { paymentsConfigured } from "../../lib/sslcommerz.js";
 import { dhakaToday } from "../admin/fees.service.js";
 import { FEE_UNPAID_AFTER_DAYS } from "../application/application.schema.js";
+import { toTutorRefund, tutorRefundSelect } from "../refunds/refund.schema.js";
+import {
+  OPEN_REFUND_STATUSES,
+  readRefundWindowDays,
+  refundDeadline,
+} from "../refunds/refund-rules.js";
 import type {
   CheckoutQuoteResponse,
   TutorFeeDetailResponse,
@@ -50,7 +56,22 @@ const paymentSelect = {
   reversesPaymentId: true,
 } satisfies Prisma.FeePaymentSelect;
 
+// The attempt behind each online payment, with its refunds: enough to tell whether one can still be refunded.
+const attemptSelect = {
+  paymentId: true,
+  status: true,
+  feeAmount: true,
+  bankTranId: true,
+  settledAt: true,
+  refunds: { select: { status: true, amount: true } },
+} satisfies Prisma.PaymentAttemptSelect;
+
+// Refunds that count against the fee part of a payment: open ones and succeeded ones.
+const COUNTED_REFUND_STATUSES: RefundStatus[] = [...OPEN_REFUND_STATUSES, RefundStatus.SUCCEEDED];
+
 type FeeRow = Prisma.PlatformFeeGetPayload<{ select: typeof feeSelect }>;
+type AttemptRow = Prisma.PaymentAttemptGetPayload<{ select: typeof attemptSelect }>;
+type PaymentRow = Prisma.FeePaymentGetPayload<{ select: typeof paymentSelect }>;
 
 const detailSelect = {
   ...feeSelect,
@@ -96,6 +117,29 @@ function toTutorFee(row: FeeRow, today: string, now: Date): TutorFeeResponse {
       studentName: row.application.student.name,
     },
   };
+}
+
+// The last moment the tutor can ask for a refund of this payment, or null when they cannot. Only an
+// SSLCommerz payment whose attempt succeeded with a bank transaction id, inside the window, with
+// fee part left to refund and no refund already open. Mirrors the checks in requestRefund.
+function refundableUntilOf(
+  payment: Pick<PaymentRow, "id" | "kind" | "method">,
+  attempt: AttemptRow | undefined,
+  windowDays: number,
+  now: Date,
+): Date | null {
+  if (payment.kind !== "PAYMENT" || payment.method !== "SSLCOMMERZ" || !attempt) return null;
+  if (attempt.status !== "SUCCEEDED" || attempt.settledAt === null || attempt.bankTranId === null) {
+    return null;
+  }
+  if (windowDays <= 0) return null;
+  const until = refundDeadline(attempt.settledAt, windowDays);
+  if (now.getTime() > until.getTime()) return null;
+  if (attempt.refunds.some((r) => OPEN_REFUND_STATUSES.includes(r.status))) return null;
+  const counted = attempt.refunds
+    .filter((r) => COUNTED_REFUND_STATUSES.includes(r.status))
+    .reduce((sum, r) => sum.plus(r.amount), new Prisma.Decimal(0));
+  return attempt.feeAmount.greaterThan(counted) ? until : null;
 }
 
 // Quotes the tutor's remaining balance. Null when there is nothing to pay online.
@@ -176,8 +220,21 @@ export async function getMyFee(accountId: string, feeId: string): Promise<TutorF
   });
   const promo = feePromoOf(row.promoRedemptions[0]);
 
+  const now = new Date();
+  const onlineAttempts = await prisma.paymentAttempt.findMany({
+    where: { feeId: row.id, paymentId: { not: null } },
+    select: attemptSelect,
+  });
+  const attemptByPayment = new Map(onlineAttempts.map((a) => [a.paymentId, a] as const));
+  const windowDays = await readRefundWindowDays(prisma);
+  const refunds = await prisma.paymentRefund.findMany({
+    where: { feeId: row.id },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: tutorRefundSelect,
+  });
+
   return {
-    ...toTutorFee(row, dhakaToday(), new Date()),
+    ...toTutorFee(row, dhakaToday(), now),
     payments: row.payments.map((p) => ({
       id: p.id,
       kind: p.kind,
@@ -185,7 +242,9 @@ export async function getMyFee(accountId: string, feeId: string): Promise<TutorF
       method: p.method,
       receivedAt: p.receivedAt,
       reversesPaymentId: p.reversesPaymentId,
+      refundableUntil: refundableUntilOf(p, attemptByPayment.get(p.id), windowDays, now),
     })),
+    refunds: refunds.map((r) => toTutorRefund(r)),
     checkout: await checkoutFor(row),
     pendingAttempt: attempt ? { tranId: attempt.tranId, createdAt: attempt.createdAt } : null,
     promo,

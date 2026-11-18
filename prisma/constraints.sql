@@ -12,13 +12,14 @@
 --   zlr_one_pending_per_tutor, tutor_zone_center_gix, fee_payment_gateway_ref_uniq,
 --   tutor_location_geog_gist_idx, student_location_geog_gist_idx,
 --   tutor_location_searchable_idx, student_location_searchable_idx,
---   payment_attempt_one_pending_per_fee, promo_redemption_one_active_per_fee
+--   payment_attempt_one_pending_per_fee, promo_redemption_one_active_per_fee,
+--   payment_refund_one_open_per_attempt, payment_refund_ref_uniq
 -- Needs PostgreSQL 13+ and PostGIS (created by migration 20261022876543_location_postgis).
 --
 -- v5 changes are marked [v5], v6 changes are marked [v6], payment changes are marked [payments].
 -- Deployed databases receive the [payments] changes through migrations
 -- 20261121000100_payment_attempts and 20261121000200_payment_attempts_validate; promo codes through
--- 20261122000100_promo_codes.
+-- 20261122000100_promo_codes; refunds through 20261123000100_refunds and 20261123000200_refunds_validate.
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
@@ -432,6 +433,21 @@ CREATE TRIGGER promo_release_on_fee_void_trg AFTER UPDATE OF status ON platform_
   FOR EACH ROW WHEN (NEW.status = 'VOID' AND OLD.status IS DISTINCT FROM 'VOID')
   EXECUTE FUNCTION promo_release_on_fee_void();
 
+-- ═════════ 7d. Refunds ════════════════════════════════════════════════════
+-- [payments] migration 20261123000100_refunds (the CHECKs are inline in its CREATE TABLE).
+-- The REVERSAL ledger row is written only when the gateway confirms the refund (status SUCCEEDED).
+ALTER TABLE payment_refund
+  ADD CONSTRAINT payment_refund_amount_positive CHECK (amount > 0),
+  ADD CONSTRAINT payment_refund_reason_len CHECK (char_length(btrim(reason)) BETWEEN 3 AND 500),
+  ADD CONSTRAINT payment_refund_decided_shape CHECK (status = 'REQUESTED' OR (decided_by IS NOT NULL AND decided_at IS NOT NULL)),
+  ADD CONSTRAINT payment_refund_completed_shape CHECK ((status IN ('SUCCEEDED', 'FAILED', 'REJECTED')) = (completed_at IS NOT NULL)),
+  ADD CONSTRAINT payment_refund_reversal_only_succeeded CHECK (reversal_id IS NULL OR status = 'SUCCEEDED');
+
+-- At most one open refund per attempt, and each gateway refund reference once.
+CREATE UNIQUE INDEX payment_refund_one_open_per_attempt ON payment_refund (attempt_id)
+  WHERE status IN ('REQUESTED', 'PROCESSING', 'NEEDS_REVIEW');
+CREATE UNIQUE INDEX payment_refund_ref_uniq ON payment_refund (refund_ref_id) WHERE refund_ref_id IS NOT NULL;
+
 -- ═════════ 8. Admin levels ═════════════════════════════════════════════
 -- super_admin_email holds the two allowed emails (slots 1 and 2).
 ALTER TABLE super_admin_email ADD CONSTRAINT super_admin_slot CHECK (slot IN (1, 2));
@@ -726,6 +742,11 @@ ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
       CASE WHEN jsonb_typeof(value) = 'number' THEN (value #>> '{}')::numeric BETWEEN 0 AND 100 ELSE false END
     WHEN 'gateway_charge_percent' THEN
       CASE WHEN jsonb_typeof(value) = 'number' THEN (value #>> '{}')::numeric BETWEEN 0 AND 10 ELSE false END
+    -- [payments] whole days, 0..90 (migration 20261123000100_refunds)
+    WHEN 'refund_window_days' THEN
+      CASE WHEN jsonb_typeof(value) = 'number'
+        THEN (value #>> '{}')::numeric BETWEEN 0 AND 90 AND (value #>> '{}')::numeric = trunc((value #>> '{}')::numeric)
+        ELSE false END
     ELSE false
   END);
 

@@ -47,6 +47,7 @@ type AttemptOptions = {
   lastCheckedAt?: Date;
   failureReason?: string;
   valId?: string;
+  bankTranId?: string;
   paymentId?: string;
   gatewayResponse?: Prisma.InputJsonValue;
 };
@@ -66,6 +67,7 @@ async function makeAttempt(feeId: string, tutorId: string, opts: AttemptOptions 
       totalAmount: (feeAmount + chargeAmount).toFixed(2),
       failureReason: opts.failureReason,
       valId: opts.valId,
+      bankTranId: opts.bankTranId,
       paymentId: opts.paymentId,
       createdAt: opts.createdAt,
       settledAt: opts.settledAt,
@@ -79,7 +81,7 @@ async function makeAttempt(feeId: string, tutorId: string, opts: AttemptOptions 
 async function makeSucceeded(
   feeId: string,
   tutorId: string,
-  opts: { feeAmount: number; settledAt: Date; createdAt?: Date },
+  opts: { feeAmount: number; settledAt: Date; createdAt?: Date; bankTranId?: string },
 ) {
   const tranId = newTranId();
   const payment = await prisma.feePayment.create({
@@ -97,9 +99,42 @@ async function makeSucceeded(
     tranId,
     feeAmount: opts.feeAmount,
     chargeAmount: 0,
+    bankTranId: opts.bankTranId,
     paymentId: payment.id,
     settledAt: opts.settledAt,
     createdAt: opts.createdAt,
+  });
+}
+
+// A refund row written directly, so tests can set any status. The CHECKs in constraints.sql
+// (decided shape, completed shape) are satisfied the way the service writes them.
+async function makeRefund(
+  attempt: { id: string; feeId: string; tutorId: string },
+  opts: {
+    status: "PROCESSING" | "FAILED";
+    amount: number;
+    decidedById: string;
+    createdAt?: Date;
+  },
+) {
+  const completed = opts.status === "FAILED";
+  return prisma.paymentRefund.create({
+    data: {
+      attemptId: attempt.id,
+      feeId: attempt.feeId,
+      tutorId: attempt.tutorId,
+      amount: opts.amount.toFixed(2),
+      reason: "Booked the wrong term",
+      source: "ADMIN",
+      status: opts.status,
+      requestedById: opts.decidedById,
+      decidedById: opts.decidedById,
+      decidedAt: new Date(),
+      completedAt: completed ? new Date() : null,
+      failureReason: completed ? "The gateway refused the refund" : null,
+      refundRefId: completed ? null : `RR-${crypto.randomBytes(4).toString("hex")}`,
+      createdAt: opts.createdAt,
+    },
   });
 }
 
@@ -488,6 +523,148 @@ describe("admin payment attempts", () => {
     });
   });
 
+  describe("refunds on the attempt detail", () => {
+    it("a SUCCEEDED attempt with a bank id shows refundable equal to the fee and no refunds", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const fixture = await createTutorFeeFixture(1500);
+      const attempt = await makeSucceeded(fixture.fee.id, fixture.tutor.id, {
+        feeAmount: 1500,
+        settledAt: new Date(),
+        bankTranId: "BANK-REF-1",
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${LIST_URL}/${attempt.tranId}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toMatchObject({
+        status: "SUCCEEDED",
+        refundable: "1500.00",
+        refunds: [],
+      });
+    });
+
+    it("a PROCESSING refund lowers refundable and is listed with its gateway reference", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const superAdmin = await createSuperAdmin();
+      const fixture = await createTutorFeeFixture(1500);
+      const attempt = await makeSucceeded(fixture.fee.id, fixture.tutor.id, {
+        feeAmount: 1500,
+        settledAt: new Date(),
+        bankTranId: "BANK-REF-2",
+      });
+      await makeRefund(attempt, {
+        status: "PROCESSING",
+        amount: 400,
+        decidedById: superAdmin.id,
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${LIST_URL}/${attempt.tranId}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body);
+      expect(body.refundable).toBe("1100.00");
+      expect(body.refunds).toHaveLength(1);
+      expect(body.refunds[0]).toMatchObject({
+        status: "PROCESSING",
+        source: "ADMIN",
+        amount: "400.00",
+        reason: "Booked the wrong term",
+        requestedByName: "Test Super Admin",
+        decidedByName: "Test Super Admin",
+        attempt: { tranId: attempt.tranId, bankTranId: "BANK-REF-2" },
+        fee: { id: fixture.fee.id },
+        tutor: { id: fixture.tutor.id },
+      });
+      expect(body.refunds[0].refundRefId).toEqual(expect.any(String));
+    });
+
+    it("lists refunds newest first, and a FAILED refund does not reduce refundable", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const superAdmin = await createSuperAdmin();
+      const fixture = await createTutorFeeFixture(1500);
+      const attempt = await makeSucceeded(fixture.fee.id, fixture.tutor.id, {
+        feeAmount: 1500,
+        settledAt: new Date(),
+        bankTranId: "BANK-REF-3",
+      });
+      await makeRefund(attempt, {
+        status: "FAILED",
+        amount: 300,
+        decidedById: superAdmin.id,
+        createdAt: new Date(Date.now() - 2 * HOUR_MS),
+      });
+      await makeRefund(attempt, {
+        status: "PROCESSING",
+        amount: 400,
+        decidedById: superAdmin.id,
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${LIST_URL}/${attempt.tranId}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      const body = JSON.parse(res.body);
+      expect(body.refundable).toBe("1100.00");
+      expect(body.refunds.map((r: { status: string }) => r.status)).toEqual([
+        "PROCESSING",
+        "FAILED",
+      ]);
+      expect(body.refunds[1]).toMatchObject({
+        amount: "300.00",
+        failureReason: "The gateway refused the refund",
+      });
+    });
+
+    it("a PENDING attempt shows refundable 0.00 even with a bank id", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const fixture = await createTutorFeeFixture(1500);
+      const attempt = await makeAttempt(fixture.fee.id, fixture.tutor.id, {
+        status: "PENDING",
+        bankTranId: "BANK-REF-4",
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${LIST_URL}/${attempt.tranId}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(JSON.parse(res.body)).toMatchObject({ refundable: "0.00", refunds: [] });
+    });
+
+    it("a SUCCEEDED attempt without a bank id shows refundable 0.00", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const fixture = await createTutorFeeFixture(1500);
+      const attempt = await makeSucceeded(fixture.fee.id, fixture.tutor.id, {
+        feeAmount: 1500,
+        settledAt: new Date(),
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${LIST_URL}/${attempt.tranId}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(JSON.parse(res.body)).toMatchObject({ refundable: "0.00" });
+    });
+  });
+
   describe("POST /api/v1/admin/payment-attempts/:tranId/check", () => {
     it("refuses a final attempt with 409 and does not call the gateway", async () => {
       const app = await createTestApp();
@@ -812,6 +989,7 @@ describe("admin payment attempts", () => {
         canReview: false,
         canCheck: false,
         fee: { status: "PAID", amountPaid: "1500.00" },
+        refunds: [],
       });
       expect(body.paymentId).toEqual(expect.any(String));
 

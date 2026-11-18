@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { FeeStatus, PaymentAttemptStatus } from "../../generated/prisma/enums.js";
+import { adminRefundSchema } from "../refunds/refund.schema.js";
 
 // Money is always a 2-decimal string, for example "1537.50".
 export const adminPaymentAttemptSchema = z
@@ -39,6 +40,10 @@ export const adminPaymentAttemptDetailSchema = adminPaymentAttemptSchema
     canCheck: z.boolean(),
     /** Status is REVIEW: a super admin can approve or reject it. */
     canReview: z.boolean(),
+    /** Fee part still refundable: SUCCEEDED or UNAPPLIED with a bank id, else "0.00". */
+    refundable: z.string(),
+    /** Refunds of this attempt, newest first. */
+    refunds: z.array(adminRefundSchema),
   })
   .meta({ id: "AdminPaymentAttemptDetail" });
 export type AdminPaymentAttemptDetailResponse = z.infer<typeof adminPaymentAttemptDetailSchema>;

@@ -23,12 +23,16 @@ const sdk = vi.hoisted(() => ({
   init: vi.fn(),
   validate: vi.fn(),
   transactionQueryByTransactionId: vi.fn(),
+  initiateRefund: vi.fn(),
+  refundQuery: vi.fn(),
 }));
 vi.mock("sslcommerz-lts", () => ({
   default: class {
     init = sdk.init;
     validate = sdk.validate;
     transactionQueryByTransactionId = sdk.transactionQueryByTransactionId;
+    initiateRefund = sdk.initiateRefund;
+    refundQuery = sdk.refundQuery;
   },
 }));
 
@@ -273,6 +277,190 @@ describe("queryByTranId", () => {
   });
 });
 
+describe("initiateRefund", () => {
+  const refund = {
+    bankTranId: "BANK1",
+    amount: "1500.00",
+    remarks: "Fee & term 1",
+    refeId: "REFE1",
+  };
+
+  it("sends the remarks URL-encoded, so spaces and & cannot split the query string", async () => {
+    sdk.initiateRefund.mockResolvedValue({ APIConnect: "DONE", status: "SUCCESS" });
+
+    await gateway().initiateRefund(refund);
+
+    expect(sdk.initiateRefund).toHaveBeenCalledWith({
+      bank_tran_id: "BANK1",
+      refund_amount: "1500.00",
+      refund_remarks: "Fee%20%26%20term%201",
+      refe_id: "REFE1",
+    });
+  });
+
+  it("truncates remarks to 200 characters before encoding", async () => {
+    sdk.initiateRefund.mockResolvedValue({ APIConnect: "DONE", status: "SUCCESS" });
+
+    await gateway().initiateRefund({ ...refund, remarks: "x".repeat(250) });
+
+    expect(sdk.initiateRefund).toHaveBeenCalledWith(
+      expect.objectContaining({ refund_remarks: "x".repeat(200) }),
+    );
+  });
+
+  it.each([
+    ["a bank_tran_id with URL syntax", { bankTranId: "BANK1&store_id=other" }],
+    ["a refe_id with a space", { refeId: "REFE 1" }],
+    ["an amount without two decimals", { amount: "10" }],
+    ["an amount with a thousands separator", { amount: "1,000.00" }],
+  ])("refuses %s as rejected, without calling the SDK", async (_label, override) => {
+    const err = await catchError(gateway().initiateRefund({ ...refund, ...override }));
+
+    expect(err.kind).toBe("rejected");
+    expect(sdk.initiateRefund).not.toHaveBeenCalled();
+  });
+
+  it("is rejected when APIConnect is not DONE", async () => {
+    sdk.initiateRefund.mockResolvedValue({ APIConnect: "INVALID_CREDENTIAL" });
+
+    const err = await catchError(gateway().initiateRefund(refund));
+
+    expect(err.kind).toBe("rejected");
+    expect(err.message).toBe("Gateway refused the refund: INVALID_CREDENTIAL");
+  });
+
+  it("is unavailable when the SDK resolves an Error, and keeps the password out of the message", async () => {
+    sdk.initiateRefund.mockResolvedValue(
+      new Error(
+        `request to https://sandbox.sslcommerz.com/validator/api/merchantTransIDvalidationAPI.php?refund_amount=1500.00&store_passwd=${PASSWORD} failed`,
+      ),
+    );
+
+    const err = await catchError(gateway().initiateRefund(refund));
+
+    expect(err.kind).toBe("unavailable");
+    expect(err.message).not.toContain(PASSWORD);
+    expect(err.message).toContain("store_passwd=***");
+  });
+
+  it("keeps the password out of a rejected message that echoes it", async () => {
+    sdk.initiateRefund.mockResolvedValue({ APIConnect: `store_passwd=${PASSWORD}` });
+
+    const err = await catchError(gateway().initiateRefund(refund));
+
+    expect(err.kind).toBe("rejected");
+    expect(err.message).not.toContain(PASSWORD);
+  });
+
+  it("lowercases the status and maps refund_ref_id", async () => {
+    sdk.initiateRefund.mockResolvedValue({
+      APIConnect: "DONE",
+      status: "SUCCESS",
+      refund_ref_id: "RR-100",
+    });
+
+    const result = await gateway().initiateRefund(refund);
+
+    expect(result).toMatchObject({ status: "success", refundRefId: "RR-100", errorReason: null });
+  });
+
+  it("maps a failed refund's errorReason and an empty refund_ref_id to null", async () => {
+    sdk.initiateRefund.mockResolvedValue({
+      APIConnect: "DONE",
+      status: "FAILED",
+      refund_ref_id: "",
+      errorReason: "Insufficient balance",
+    });
+
+    const result = await gateway().initiateRefund(refund);
+
+    expect(result).toMatchObject({
+      status: "failed",
+      refundRefId: null,
+      errorReason: "Insufficient balance",
+    });
+  });
+
+  it("keeps store_passwd, store_id and verify keys out of raw", async () => {
+    sdk.initiateRefund.mockResolvedValue({
+      APIConnect: "DONE",
+      status: "SUCCESS",
+      refund_ref_id: "RR-100",
+      store_passwd: "leaked",
+      store_id: "store_test",
+      verify_key: "k",
+      verify_sign: "sig",
+    });
+
+    const result = await gateway().initiateRefund(refund);
+
+    expect(result.raw).toEqual({ APIConnect: "DONE", status: "SUCCESS", refund_ref_id: "RR-100" });
+  });
+});
+
+describe("queryRefund", () => {
+  it("looks the refund up by refund_ref_id and maps the answer", async () => {
+    sdk.refundQuery.mockResolvedValue({
+      APIConnect: "DONE",
+      status: "REFUNDED",
+      refund_ref_id: "RR-100",
+      refunded_on: "2026-11-18 10:00:00",
+      errorReason: "",
+    });
+
+    const result = await gateway().queryRefund("RR-100");
+
+    expect(sdk.refundQuery).toHaveBeenCalledWith({ refund_ref_id: "RR-100" });
+    expect(result).toMatchObject({
+      status: "refunded",
+      refundRefId: "RR-100",
+      refundedOn: "2026-11-18 10:00:00",
+      errorReason: null,
+    });
+  });
+
+  it("keeps store_passwd and store_id out of raw", async () => {
+    sdk.refundQuery.mockResolvedValue({
+      APIConnect: "DONE",
+      status: "PROCESSING",
+      store_passwd: "leaked",
+      store_id: "store_test",
+    });
+
+    const result = await gateway().queryRefund("RR-100");
+
+    expect(result.status).toBe("processing");
+    expect(result.raw).toEqual({ APIConnect: "DONE", status: "PROCESSING" });
+  });
+
+  it("is unavailable when APIConnect is not DONE", async () => {
+    sdk.refundQuery.mockResolvedValue({ APIConnect: "FAILED" });
+
+    const err = await catchError(gateway().queryRefund("RR-100"));
+
+    expect(err.kind).toBe("unavailable");
+    expect(err.message).toBe("Gateway refund query failed: FAILED");
+  });
+
+  it("refuses an unsafe refund_ref_id before calling the SDK", async () => {
+    const err = await catchError(gateway().queryRefund("RR-100&store_id=other"));
+
+    expect(err.kind).toBe("rejected");
+    expect(sdk.refundQuery).not.toHaveBeenCalled();
+  });
+
+  it("is unavailable when the SDK resolves an Error, and keeps the password out of the message", async () => {
+    sdk.refundQuery.mockResolvedValue(
+      new Error(`request failed: merchantTransIDvalidationAPI.php?store_passwd=${PASSWORD}`),
+    );
+
+    const err = await catchError(gateway().queryRefund("RR-100"));
+
+    expect(err.kind).toBe("unavailable");
+    expect(err.message).not.toContain(PASSWORD);
+  });
+});
+
 describe("mapTransaction", () => {
   it("drops password, store id and verify keys from raw", () => {
     const tx = mapTransaction({
@@ -323,6 +511,8 @@ describe("getPaymentGateway", () => {
       createSession: vi.fn(),
       validate: vi.fn(),
       queryByTranId: vi.fn(),
+      initiateRefund: vi.fn(),
+      queryRefund: vi.fn(),
     };
     setPaymentGatewayForTests(fake);
 

@@ -175,6 +175,27 @@ enum PaymentAttemptStatus {
 }
 
 // Promo codes on tutor fees. A code takes a percent (optionally capped) or a flat amount off.
+// Lifecycle of a refund of an SSLCommerz payment (payment_refund).
+enum RefundStatus {
+  // A tutor asked; waiting for a super admin.
+  REQUESTED
+  // A super admin said no. Nothing was sent to the gateway.
+  REJECTED
+  // Sent to the gateway and accepted; waiting for the gateway to finish.
+  PROCESSING
+  // The gateway refunded it. A REVERSAL ledger row is written when the payment was on the ledger.
+  SUCCEEDED
+  // The gateway refused or cancelled it. No money moved.
+  FAILED
+  // The outcome is unknown (timeout, crash mid-call). A person checks the merchant panel.
+  NEEDS_REVIEW
+}
+
+enum RefundSource {
+  TUTOR
+  ADMIN
+}
+
 enum PromoDiscountType {
   PERCENT
   FLAT
@@ -343,6 +364,7 @@ model Account {
   reportsAgainst  Report[]          @relation("ReportTarget")
   disputesRaised  Dispute[]         @relation("DisputeRaisedBy")
   disputesAgainst Dispute[]         @relation("DisputeAgainst")
+  refundRequests  PaymentRefund[]
 
   @@unique([id, role]) // target of the profile composite FKs
   @@map("account")
@@ -395,6 +417,7 @@ model AdminUser {
   reviewedVerifications TutorVerification[]
   recordedPayments      FeePayment[]
   createdPromoCodes     PromoCode[]
+  decidedRefunds        PaymentRefund[]
   blogPosts             BlogPost[]
   contentEdits          SiteContent[]
   blocksMade            AccountBlock[]      @relation("BlockedBy")
@@ -571,6 +594,7 @@ model Tutor {
   zoneLimitRequests ZoneLimitRequest[]
   paymentAttempts   PaymentAttempt[]
   promoRedemptions  PromoRedemption[]
+  refunds           PaymentRefund[]
 
   @@unique([accountId, role])
   @@index([isListed, ratingAvg(sort: Desc)])
@@ -1070,6 +1094,7 @@ model PlatformFee {
   payments         FeePayment[]
   attempts         PaymentAttempt[]
   promoRedemptions PromoRedemption[]
+  refunds          PaymentRefund[]
 
   @@index([tutorId, status, dueDate])
   @@index([status, dueDate]) // overdue report
@@ -1099,6 +1124,8 @@ model FeePayment {
   reversesPayment FeePayment?     @relation("PaymentReversal", fields: [reversesPaymentId], references: [id], onDelete: Restrict)
   reversals       FeePayment[]    @relation("PaymentReversal")
   attempt         PaymentAttempt?
+  refunds         PaymentRefund[] @relation("RefundPayment")
+  refundReversal  PaymentRefund?  @relation("RefundReversal")
 
   @@index([feeId])
   @@index([reversesPaymentId])
@@ -1131,14 +1158,56 @@ model PaymentAttempt {
   createdAt       DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime             @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  fee     PlatformFee @relation(fields: [feeId], references: [id])
-  tutor   Tutor       @relation(fields: [tutorId], references: [id])
-  payment FeePayment? @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  fee     PlatformFee     @relation(fields: [feeId], references: [id])
+  tutor   Tutor           @relation(fields: [tutorId], references: [id])
+  payment FeePayment?     @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  refunds PaymentRefund[]
 
   // At most one PENDING attempt per fee is a partial unique index in constraints.sql.
   @@index([feeId, createdAt(sort: Desc)])
   @@index([status, createdAt])
   @@map("payment_attempt")
+}
+
+// A refund of (part of) one SSLCommerz attempt's fee part. The processing charge is never refunded.
+// payment_id is the attempt's ledger row (null for UNAPPLIED attempts, which never reached the ledger).
+// reversal_id is the REVERSAL row written when the gateway confirms. At most one open refund
+// (REQUESTED, PROCESSING, NEEDS_REVIEW) per attempt: a partial unique index in constraints.sql.
+model PaymentRefund {
+  id              String       @id @default(uuid(7)) @db.Uuid
+  attemptId       String       @map("attempt_id") @db.Uuid
+  feeId           String       @map("fee_id") @db.Uuid
+  tutorId         String       @map("tutor_id") @db.Uuid
+  paymentId       String?      @map("payment_id") @db.Uuid
+  amount          Decimal      @db.Decimal(12, 2)
+  reason          String
+  source          RefundSource
+  status          RefundStatus @default(REQUESTED)
+  requestedById   String       @map("requested_by") @db.Uuid // account id of the tutor or admin
+  decidedById     String?      @map("decided_by") @db.Uuid
+  decidedAt       DateTime?    @map("decided_at") @db.Timestamptz(3)
+  decisionNote    String?      @map("decision_note")
+  refundRefId     String?      @map("refund_ref_id") // the gateway's refund reference
+  failureReason   String?      @map("failure_reason")
+  gatewayResponse Json?        @map("gateway_response")
+  reversalId      String?      @unique @map("reversal_id") @db.Uuid
+  lastCheckedAt   DateTime?    @map("last_checked_at") @db.Timestamptz(3)
+  completedAt     DateTime?    @map("completed_at") @db.Timestamptz(3)
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  attempt     PaymentAttempt @relation(fields: [attemptId], references: [id])
+  fee         PlatformFee    @relation(fields: [feeId], references: [id])
+  tutor       Tutor          @relation(fields: [tutorId], references: [id])
+  payment     FeePayment?    @relation("RefundPayment", fields: [paymentId], references: [id], onDelete: Restrict)
+  reversal    FeePayment?    @relation("RefundReversal", fields: [reversalId], references: [id], onDelete: Restrict)
+  requestedBy Account        @relation(fields: [requestedById], references: [id])
+  decidedBy   AdminUser?     @relation(fields: [decidedById], references: [accountId], onDelete: Restrict)
+
+  @@index([status, createdAt])
+  @@index([feeId, createdAt(sort: Desc)])
+  @@index([attemptId])
+  @@map("payment_refund")
 }
 
 // A discount code a super admin creates for tutor fees. Discount terms never change after creation.

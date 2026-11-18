@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { FeeStatus, FeeType, PaymentKind, PaymentMethod } from "../../generated/prisma/enums.js";
+import { tutorRefundSchema } from "../refunds/refund.schema.js";
 
 export const feeIdParamSchema = z.object({ id: z.string().uuid() });
 export type FeeIdParam = z.infer<typeof feeIdParamSchema>;
@@ -52,6 +53,8 @@ export const tutorFeePaymentSchema = z
     method: z.nativeEnum(PaymentMethod),
     receivedAt: z.date(),
     reversesPaymentId: z.string().nullable(),
+    /** Set on an online payment that the tutor can still ask to have refunded, until this moment. */
+    refundableUntil: z.date().nullable(),
   })
   .meta({ id: "TutorFeePayment" });
 export type TutorFeePaymentResponse = z.infer<typeof tutorFeePaymentSchema>;
@@ -88,9 +91,21 @@ export const applyPromoSchema = z
   .meta({ id: "ApplyPromo" });
 export type ApplyPromoInput = z.infer<typeof applyPromoSchema>;
 
+// The tutor asks for a refund of one online payment on the fee. The reason is required.
+export const requestRefundSchema = z
+  .object({
+    paymentId: z.string().uuid(),
+    reason: z.string().trim().min(3).max(500),
+  })
+  .strict()
+  .meta({ id: "RequestRefund" });
+export type RequestRefundInput = z.infer<typeof requestRefundSchema>;
+
 export const tutorFeeDetailSchema = tutorFeeSchema
   .extend({
     payments: z.array(tutorFeePaymentSchema),
+    /** The fee's refund requests, newest first. */
+    refunds: z.array(tutorRefundSchema),
     /** null unless the fee is DUE or PARTIAL with something left to pay. */
     checkout: checkoutQuoteSchema.nullable(),
     /** The PENDING gateway attempt for this fee, if one is in progress. */
