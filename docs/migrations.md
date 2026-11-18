@@ -36,6 +36,7 @@ Quick reference for running and recovering Prisma migrations in this repo.
 | `20261112000100_whatsapp_optional`          | whatsapp_optional          | Drops NOT NULL on `student.whatsapp_number` and `tutor.whatsapp_number`. `phone_number` stays required. No data change.                                                              |
 | `20261121000100_payment_attempts`           | payment_attempts           | Enum PaymentAttemptStatus, table payment_attempt (tran_id, fee_amount, charge_amount, total_amount, status, session_key, val_id, bank_tran_id, card_type, risk_level, failure_reason, gateway_response, payment_id, last_checked_at, settled_at), indexes including partial unique payment_attempt_one_pending_per_fee, recorded_by DROP NOT NULL, recorder CHECK NOT VALID, settings CHECK replaced NOT VALID. |
 | `20261121000200_payment_attempts_validate`  | payment_attempts_validate  | Runs VALIDATE CONSTRAINT on the recorder CHECK and the settings CHECK.                                                                                                               |
+| `20261122000100_promo_codes`                | promo_codes                | Enums PromoDiscountType and PromoRedemptionStatus, tables promo_code and promo_redemption, CHECKs (constraints.sql section 7c), partial unique index promo_redemption_one_active_per_fee, trigger promo_release_on_fee_void_trg. |
 
 **Note:** v6 ran cleanly on a restored copy of the production backup before being pushed.
 
