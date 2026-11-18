@@ -173,7 +173,7 @@ export async function adminFeeRoutes(app: FastifyInstance) {
           tag: "Admin",
           summary: "Reverse all or part of a payment",
           description:
-            "Appends a REVERSAL row pointing at the payment. Payments are never edited or deleted. Refused on waived or void fees.",
+            "Appends a REVERSAL row pointing at the payment. Payments are never edited or deleted. Refused on waived or void fees. Online (SSLCommerz) payments are refused too: refund them from Refunds, so the gateway returns the money.",
           auth: "admin",
           errors: [404, 409],
           rateLimit: "60/min per account",

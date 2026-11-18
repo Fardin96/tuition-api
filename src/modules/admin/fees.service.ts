@@ -5,6 +5,8 @@ import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { FEE_UNPAID_AFTER_DAYS } from "../application/application.schema.js";
+import { feePromoOf } from "../fees/promo.js";
+import { adminRefundSelect, toAdminRefund } from "../refunds/refund.schema.js";
 import type {
   AdminFeeDetailResponse,
   AdminFeeListQuery,
@@ -19,7 +21,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const OPEN_FEE_STATUSES: FeeStatus[] = [FeeStatus.DUE, FeeStatus.PARTIAL];
 
 // Today's date in Asia/Dhaka (UTC+6, no DST), as YYYY-MM-DD.
-function dhakaToday(): string {
+export function dhakaToday(): string {
   return new Date(Date.now() + 6 * 3600_000).toISOString().slice(0, 10);
 }
 
@@ -50,6 +52,33 @@ const detailInclude = {
       recordedBy: { select: { name: true } },
       reversals: { select: { amount: true } },
     },
+  },
+  promoRedemptions: {
+    where: { status: "ACTIVE" },
+    take: 1,
+    select: {
+      createdAt: true,
+      originalAmount: true,
+      discountAmount: true,
+      promo: { select: { code: true } },
+    },
+  },
+  attempts: {
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 20,
+    select: {
+      tranId: true,
+      status: true,
+      totalAmount: true,
+      failureReason: true,
+      createdAt: true,
+      settledAt: true,
+    },
+  },
+  refunds: {
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 20,
+    select: adminRefundSelect,
   },
 } satisfies Prisma.PlatformFeeInclude;
 
@@ -105,10 +134,20 @@ function toAdminFeeDetail(row: FeeDetailRow): AdminFeeDetailResponse {
       reason: p.reason,
       receivedAt: p.receivedAt,
       createdAt: p.createdAt,
-      recordedByName: p.recordedBy.name,
+      recordedByName: p.recordedBy?.name ?? null,
       reversesPaymentId: p.reversesPaymentId,
       reversedAmount: sumOf(p.reversals.map((r) => r.amount)).toFixed(2),
     })),
+    attempts: row.attempts.map((a) => ({
+      tranId: a.tranId,
+      status: a.status,
+      totalAmount: a.totalAmount.toFixed(2),
+      failureReason: a.failureReason,
+      createdAt: a.createdAt,
+      settledAt: a.settledAt,
+    })),
+    promo: feePromoOf(row.promoRedemptions[0]),
+    refunds: row.refunds.map((refund) => toAdminRefund(refund)),
   };
 }
 
@@ -378,6 +417,15 @@ export async function reversePayment(
     }
     if (original.kind === "REVERSAL") {
       throw appError("InvalidFeeState", 409, "A reversal cannot be reversed");
+    }
+    // The gateway holds the money of an online payment, so only a refund through the gateway can
+    // return it. A ledger-only reversal would leave the tutor's money with the gateway.
+    if (original.method === "SSLCOMMERZ") {
+      throw appError(
+        "InvalidFeeState",
+        409,
+        "Online payments are refunded from Refunds, so the gateway returns the money.",
+      );
     }
 
     await lockFee(tx, original.feeId);

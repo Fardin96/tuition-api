@@ -9,6 +9,7 @@ import {
   createPlatformFee,
   createRequirement,
   createStudentProfile,
+  createSuperAdmin,
   createTestApp,
   createTutorProfile,
   getAuthHeaders,
@@ -459,6 +460,206 @@ describe("admin fees", () => {
       });
     });
 
+    it("lists the fee's refunds, newest first, capped at the last 20", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const superAdmin = await createSuperAdmin();
+      const setup = await setupApplication();
+      const fee = await makeFee(setup);
+      const attempt = await prisma.paymentAttempt.create({
+        data: {
+          feeId: fee.id,
+          tutorId: setup.tutor.id,
+          tranId: `T${crypto.randomBytes(8).toString("hex")}`,
+          status: "PENDING",
+          feeAmount: "1500.00",
+          chargeAmount: "0.00",
+          totalAmount: "1500.00",
+        },
+      });
+      const base = Date.now() - 60 * 60 * 1000;
+      const rejected = Array.from({ length: 21 }, (_, i) => ({
+        attemptId: attempt.id,
+        feeId: fee.id,
+        tutorId: setup.tutor.id,
+        amount: "10.00",
+        reason: `Refund ${i + 1}`,
+        source: "TUTOR" as const,
+        status: "REJECTED" as const,
+        requestedById: setup.tutor.accountId,
+        decidedById: superAdmin.id,
+        decidedAt: new Date(base + i * 1000),
+        completedAt: new Date(base + i * 1000),
+        decisionNote: "Not eligible",
+        createdAt: new Date(base + i * 1000),
+      }));
+      await prisma.paymentRefund.createMany({ data: rejected });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${FEES_URL}/${fee.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      const { refunds } = JSON.parse(res.body);
+      expect(refunds).toHaveLength(20);
+      expect(refunds[0]).toMatchObject({
+        reason: "Refund 21",
+        status: "REJECTED",
+        source: "TUTOR",
+        amount: "10.00",
+        decisionNote: "Not eligible",
+        decidedByName: "Test Super Admin",
+        attempt: { tranId: attempt.tranId, status: "PENDING", feeAmount: "1500.00" },
+        fee: { id: fee.id, amountDue: "1500.00" },
+        tutor: { id: setup.tutor.id, name: setup.tutor.name },
+        requestedByName: setup.tutor.name,
+      });
+      expect(refunds[19].reason).toBe("Refund 2");
+    });
+
+    it("shows an empty refunds list when the fee has none", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const fee = await makeFee(await setupApplication());
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${FEES_URL}/${fee.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(JSON.parse(res.body).refunds).toEqual([]);
+    });
+
+    it("shows a null recordedByName for an SSLCOMMERZ payment with no admin recorder", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const setup = await setupApplication();
+      const fee = await makeFee(setup);
+      await prisma.feePayment.create({
+        data: {
+          feeId: fee.id,
+          amount: 500,
+          method: "SSLCOMMERZ",
+          txnReference: "TMTEST1",
+          receivedAt: new Date(),
+          recordedById: null,
+        },
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${FEES_URL}/${fee.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      const [payment] = JSON.parse(res.body).payments;
+      expect(payment).toMatchObject({
+        method: "SSLCOMMERZ",
+        txnReference: "TMTEST1",
+        recordedByName: null,
+      });
+    });
+
+    it("lists the online attempts of the fee, newest first, with money as strings", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const setup = await setupApplication();
+      const fee = await makeFee(setup);
+      await prisma.paymentAttempt.create({
+        data: {
+          feeId: fee.id,
+          tutorId: setup.tutor.id,
+          tranId: "TATTEMPTOLD",
+          status: "FAILED",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          failureReason: "Gateway status FAILED",
+          createdAt: new Date("2031-01-01T00:00:00Z"),
+        },
+      });
+      await prisma.paymentAttempt.create({
+        data: {
+          feeId: fee.id,
+          tutorId: setup.tutor.id,
+          tranId: "TATTEMPTNEW",
+          status: "PENDING",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          createdAt: new Date("2031-01-02T00:00:00Z"),
+        },
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${FEES_URL}/${fee.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).attempts).toEqual([
+        {
+          tranId: "TATTEMPTNEW",
+          status: "PENDING",
+          totalAmount: "1537.50",
+          failureReason: null,
+          createdAt: "2031-01-02T00:00:00.000Z",
+          settledAt: null,
+        },
+        {
+          tranId: "TATTEMPTOLD",
+          status: "FAILED",
+          totalAmount: "1537.50",
+          failureReason: "Gateway status FAILED",
+          createdAt: "2031-01-01T00:00:00.000Z",
+          settledAt: null,
+        },
+      ]);
+    });
+
+    it("shows the promo code applied to the fee, or null when there is none", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const setup = await setupApplication();
+      const fee = await makeFee(setup, { dueDate: new Date("2031-01-15T00:00:00Z") });
+      const headers = await getAuthHeaders(admin);
+
+      const before = await app.inject({ method: "GET", url: `${FEES_URL}/${fee.id}`, headers });
+      expect(JSON.parse(before.body).promo).toBeNull();
+
+      const tutorAccount = await prisma.account.findUniqueOrThrow({
+        where: { id: setup.tutor.accountId },
+      });
+      await prisma.promoCode.create({
+        data: {
+          code: "ADMINSEE",
+          discountType: "FLAT",
+          discountValue: 300,
+          createdById: admin.id,
+        },
+      });
+      const applied = await app.inject({
+        method: "POST",
+        url: `/api/v1/fees/${fee.id}/promo`,
+        headers: await getAuthHeaders(tutorAccount),
+        payload: { code: "ADMINSEE" },
+      });
+      expect(applied.statusCode).toBe(200);
+
+      const res = await app.inject({ method: "GET", url: `${FEES_URL}/${fee.id}`, headers });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toMatchObject({
+        amountDue: "1200.00",
+        promo: { code: "ADMINSEE", discountAmount: "300.00", originalAmount: "1500.00" },
+      });
+    });
+
     it("unknown id returns 404", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
@@ -863,6 +1064,41 @@ describe("admin fees", () => {
       );
     });
 
+    it("refuses to reverse an online (SSLCommerz) payment with 409 and writes no reversal row", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const fee = await makeFee(await setupApplication());
+      const online = await prisma.feePayment.create({
+        data: {
+          feeId: fee.id,
+          kind: "PAYMENT",
+          amount: "500.00",
+          method: "SSLCOMMERZ",
+          txnReference: `T${crypto.randomBytes(8).toString("hex")}`,
+          receivedAt: new Date(),
+        },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${PAYMENTS_URL}/${online.id}/reverse`,
+        headers: await getAuthHeaders(admin),
+        payload: { reason: "Wrong student" },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body)).toMatchObject({
+        code: "INVALID_FEE_STATE",
+        message: "Online payments are refunded from Refunds, so the gateway returns the money.",
+      });
+      expect(await prisma.feePayment.count({ where: { reversesPaymentId: online.id } })).toBe(0);
+      expect(
+        await prisma.auditLog.count({ where: { action: "payment.reverse", entityId: online.id } }),
+      ).toBe(0);
+      const after = await prisma.platformFee.findUniqueOrThrow({ where: { id: fee.id } });
+      expect(after.amountPaid.toFixed(2)).toBe("500.00");
+    });
+
     it("writes an audit_log row payment.reverse", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
@@ -918,6 +1154,25 @@ describe("admin fees", () => {
 
       expect(res.statusCode).toBe(404);
       expect(JSON.parse(res.body).message).toBe("Payment not found");
+    });
+  });
+
+  describe("ledger rules in the database", () => {
+    it("refuses a CASH payment with no recorder", async () => {
+      const setup = await setupApplication();
+      const fee = await makeFee(setup);
+
+      await expect(
+        prisma.feePayment.create({
+          data: {
+            feeId: fee.id,
+            amount: 500,
+            method: "CASH",
+            receivedAt: new Date(),
+            recordedById: null,
+          },
+        }),
+      ).rejects.toThrow(/fee_payment_recorder_required/);
     });
   });
 

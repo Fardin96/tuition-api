@@ -183,6 +183,26 @@ export type PlatformFee = Prisma.PlatformFeeModel
  */
 export type FeePayment = Prisma.FeePaymentModel
 /**
+ * Model PaymentAttempt
+ * 
+ */
+export type PaymentAttempt = Prisma.PaymentAttemptModel
+/**
+ * Model PaymentRefund
+ * 
+ */
+export type PaymentRefund = Prisma.PaymentRefundModel
+/**
+ * Model PromoCode
+ * 
+ */
+export type PromoCode = Prisma.PromoCodeModel
+/**
+ * Model PromoRedemption
+ * 
+ */
+export type PromoRedemption = Prisma.PromoRedemptionModel
+/**
  * Model NotificationLog
  * 
  */

@@ -8,6 +8,15 @@ import type {
   Role,
 } from "../generated/prisma/enums.js";
 import { prisma } from "../lib/prisma.js";
+import {
+  type CreateSessionInput,
+  GatewayError,
+  type GatewayTransaction,
+  type PaymentGateway,
+  type RefundInitResult,
+  type RefundInput,
+  type RefundQueryResult,
+} from "../lib/sslcommerz.js";
 import { generateRefreshToken, hashToken, signAccessToken } from "../modules/auth/auth.service.js";
 import { buildApp } from "../server.js";
 
@@ -566,5 +575,174 @@ export async function createZoneLimitRequest(
       decidedAt: decided ? new Date() : null,
       ...(overrides.createdAt ? { createdAt: overrides.createdAt } : {}),
     },
+  });
+}
+
+// In-memory SSLCommerz stand-in. Tests drive it with setValidation, setQuery and failNext.
+export function createFakeGateway() {
+  const sessions: CreateSessionInput[] = [];
+  const validations = new Map<string, GatewayTransaction>();
+  const queries = new Map<string, GatewayTransaction[]>();
+  const refunds: RefundInput[] = [];
+  let refundAnswer: RefundInitResult = {
+    status: "success",
+    refundRefId: "RREF-1",
+    errorReason: null,
+    raw: {},
+  };
+  const refundQueries = new Map<string, RefundQueryResult>();
+  let nextFailure: GatewayError["kind"] | null = null;
+
+  const maybeFail = () => {
+    if (!nextFailure) return;
+    const kind = nextFailure;
+    nextFailure = null;
+    throw new GatewayError(kind, `Fake gateway ${kind}`);
+  };
+
+  const gateway: PaymentGateway = {
+    async createSession(input) {
+      maybeFail();
+      sessions.push(input);
+      return {
+        sessionKey: `SK-${input.tranId}`,
+        gatewayUrl: `https://sandbox.sslcommerz.com/EasyCheckOut/test${input.tranId}`,
+      };
+    },
+    async validate(valId) {
+      maybeFail();
+      return (
+        validations.get(valId) ?? {
+          status: "INVALID_TRANSACTION",
+          tranId: "",
+          valId,
+          amount: "0.00",
+          currencyType: "BDT",
+          currencyAmount: "0.00",
+          bankTranId: null,
+          cardType: null,
+          riskLevel: null,
+          riskTitle: null,
+          raw: {},
+        }
+      );
+    },
+    async queryByTranId(tranId) {
+      maybeFail();
+      return [...(queries.get(tranId) ?? [])];
+    },
+    async initiateRefund(input) {
+      maybeFail();
+      refunds.push(input);
+      return { ...refundAnswer };
+    },
+    async queryRefund(refundRefId) {
+      maybeFail();
+      return (
+        refundQueries.get(refundRefId) ?? {
+          status: "processing",
+          refundRefId,
+          refundedOn: null,
+          errorReason: null,
+          raw: {},
+        }
+      );
+    },
+  };
+
+  return {
+    gateway,
+    sessions,
+    setValidation(valId: string, tx: GatewayTransaction) {
+      validations.set(valId, tx);
+    },
+    setQuery(tranId: string, txs: GatewayTransaction[]) {
+      queries.set(tranId, txs);
+    },
+    failNext(kind: GatewayError["kind"]) {
+      nextFailure = kind;
+    },
+    /** Every initiateRefund call, in order. */
+    refunds,
+    /** What the next initiateRefund calls answer (default: accepted with refund_ref_id "RREF-1"). */
+    setRefundAnswer(answer: RefundInitResult) {
+      refundAnswer = answer;
+    },
+    /** What queryRefund answers for a refund_ref_id (default: "processing"). */
+    setRefundQuery(refundRefId: string, answer: RefundQueryResult) {
+      refundQueries.set(refundRefId, answer);
+    },
+  };
+}
+
+export function fakeSuccess({
+  tranId,
+  valId,
+  amount,
+}: {
+  tranId: string;
+  valId: string;
+  amount: string;
+}): GatewayTransaction {
+  return {
+    status: "VALID",
+    tranId,
+    valId,
+    amount,
+    currencyType: "BDT",
+    currencyAmount: amount,
+    bankTranId: `BANK-${valId}`,
+    cardType: "VISA",
+    riskLevel: 0,
+    riskTitle: "Safe",
+    raw: {
+      status: "VALID",
+      tran_id: tranId,
+      val_id: valId,
+      amount,
+      currency_type: "BDT",
+      currency_amount: amount,
+      risk_level: "0",
+    },
+  };
+}
+
+// A tutor with a CONFIRMED requirement application and a placement fee of amountDue, ready to pay.
+export async function createTutorFeeFixture(amountDue = 1500) {
+  const area = await createArea();
+  const studentAccount = await createAccount({ role: "STUDENT" });
+  const student = await createStudentProfile(studentAccount.id, area.id);
+  const tutorAccount = await createAccount({ role: "TUTOR" });
+  const tutor = await createTutorProfile(tutorAccount.id);
+  const requirement = await createRequirement({ studentId: student.id });
+  const application = await createApplication({
+    requirementId: requirement.id,
+    tutorId: tutor.id,
+    studentId: student.id,
+    initiatedBy: "TUTOR",
+    status: "CONFIRMED",
+  });
+  const fee = await createPlatformFee({
+    tutorId: tutor.id,
+    applicationId: application.id,
+    amountDue,
+  });
+  return {
+    studentAccount,
+    student,
+    tutorAccount,
+    tutor,
+    tutorHeaders: await getAuthHeaders(tutorAccount),
+    application,
+    fee,
+  };
+}
+
+// Upserts one platform_setting row. The value is JSON, so booleans and numbers are kept as they are.
+export async function setPlatformSetting(key: string, value: boolean | number | string) {
+  await prisma.platformSetting.upsert({
+    where: { key },
+    update: { value },
+    create: { key, value },
   });
 }

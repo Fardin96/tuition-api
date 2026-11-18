@@ -3,9 +3,12 @@ import {
   ApplicationStatus,
   FeeStatus,
   FeeType,
+  PaymentAttemptStatus,
   PaymentKind,
   PaymentMethod,
 } from "../../generated/prisma/enums.js";
+import { feePromoSchema } from "../fees/fee.schema.js";
+import { adminRefundSchema } from "../refunds/refund.schema.js";
 
 export const FEE_MAX_AMOUNT = 5_000_000;
 
@@ -110,7 +113,8 @@ export const adminFeePaymentSchema = z
     reason: z.string().nullable(),
     receivedAt: z.date(),
     createdAt: z.date(),
-    recordedByName: z.string(),
+    // null for gateway (SSLCOMMERZ) payments, which have no admin recorder.
+    recordedByName: z.string().nullable(),
     reversesPaymentId: z.string().nullable(),
     /** PAYMENT rows: the sum of REVERSAL rows pointing at it. "0.00" for REVERSAL rows. */
     reversedAmount: z.string(),
@@ -147,9 +151,26 @@ export const adminFeeSchema = z
   .meta({ id: "AdminFee" });
 export type AdminFeeResponse = z.infer<typeof adminFeeSchema>;
 
+// Online (SSLCommerz) checkouts of this fee, newest first. Only the last 20 are sent.
+export const adminFeeAttemptSchema = z
+  .object({
+    tranId: z.string(),
+    status: z.nativeEnum(PaymentAttemptStatus),
+    totalAmount: z.string(),
+    failureReason: z.string().nullable(),
+    createdAt: z.date(),
+    settledAt: z.date().nullable(),
+  })
+  .meta({ id: "AdminFeeAttempt" });
+
 export const adminFeeDetailSchema = adminFeeSchema
   .extend({
     payments: z.array(adminFeePaymentSchema),
+    attempts: z.array(adminFeeAttemptSchema),
+    /** The promo code applied to the fee, or null. The same object the tutor sees. */
+    promo: feePromoSchema.nullable(),
+    /** Refunds of this fee's online payments, newest first. Only the last 20 are sent. */
+    refunds: z.array(adminRefundSchema),
   })
   .meta({ id: "AdminFeeDetail" });
 export type AdminFeeDetailResponse = z.infer<typeof adminFeeDetailSchema>;

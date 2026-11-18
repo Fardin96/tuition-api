@@ -11,9 +11,22 @@ import {
 // Used when a key has no platform_setting row yet.
 const DEFAULTS: Record<SettingKey, SettingValue> = {
   commission_percent: 0,
+  gateway_charge_percent: 0,
+  online_payments_enabled: true,
+  refund_window_days: 7,
   require_tutor_verification: false,
   require_phone_verification: false,
 };
+
+// Number settings and their allowed range. Decimals: at most 2 places (none for WHOLE_NUMBER_KEYS).
+const NUMBER_RANGES: Partial<Record<SettingKey, { min: number; max: number }>> = {
+  commission_percent: { min: 0, max: 100 },
+  gateway_charge_percent: { min: 0, max: 10 },
+  refund_window_days: { min: 0, max: 90 },
+};
+
+// Number settings that count whole units (days), so a fraction is refused.
+const WHOLE_NUMBER_KEYS: SettingKey[] = ["refund_window_days"];
 
 function readValue(key: SettingKey, raw: unknown): SettingValue {
   if (typeof raw === "number" || typeof raw === "boolean") return raw;
@@ -21,16 +34,22 @@ function readValue(key: SettingKey, raw: unknown): SettingValue {
 }
 
 function validateValue(key: SettingKey, value: SettingValue) {
-  if (key === "commission_percent") {
-    if (typeof value !== "number" || !(value >= 0 && value <= 100)) {
+  const range = NUMBER_RANGES[key];
+  if (range) {
+    if (typeof value !== "number" || !(value >= range.min && value <= range.max)) {
       throw validationIssuesError("Invalid setting value", [
-        { path: "value", message: "commission_percent must be a number from 0 to 100" },
+        { path: "value", message: `${key} must be a number from ${range.min} to ${range.max}` },
       ]);
     }
-    // At most 2 decimals; the tolerance absorbs float error in value * 100.
+    if (WHOLE_NUMBER_KEYS.includes(key) && !Number.isInteger(value)) {
+      throw validationIssuesError("Invalid setting value", [
+        { path: "value", message: `${key} must be a whole number of days` },
+      ]);
+    }
+    // The tolerance absorbs float error in value * 100.
     if (Math.abs(value * 100 - Math.round(value * 100)) > 1e-6) {
       throw validationIssuesError("Invalid setting value", [
-        { path: "value", message: "commission_percent allows at most 2 decimal places" },
+        { path: "value", message: `${key} allows at most 2 decimal places` },
       ]);
     }
     return;

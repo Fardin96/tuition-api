@@ -3,6 +3,9 @@ import { z } from "zod";
 // Known platform_setting keys, in the order the admin list returns them.
 export const SETTING_KEYS = [
   "commission_percent",
+  "gateway_charge_percent",
+  "online_payments_enabled",
+  "refund_window_days",
   "require_tutor_verification",
   "require_phone_verification",
 ] as const;

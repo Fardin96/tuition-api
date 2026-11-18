@@ -84,6 +84,10 @@ export const ModelName = {
   Dispute: 'Dispute',
   PlatformFee: 'PlatformFee',
   FeePayment: 'FeePayment',
+  PaymentAttempt: 'PaymentAttempt',
+  PaymentRefund: 'PaymentRefund',
+  PromoCode: 'PromoCode',
+  PromoRedemption: 'PromoRedemption',
   NotificationLog: 'NotificationLog',
   AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
@@ -612,6 +616,95 @@ export const FeePaymentScalarFieldEnum = {
 } as const
 
 export type FeePaymentScalarFieldEnum = (typeof FeePaymentScalarFieldEnum)[keyof typeof FeePaymentScalarFieldEnum]
+
+
+export const PaymentAttemptScalarFieldEnum = {
+  id: 'id',
+  feeId: 'feeId',
+  tutorId: 'tutorId',
+  tranId: 'tranId',
+  feeAmount: 'feeAmount',
+  chargeAmount: 'chargeAmount',
+  totalAmount: 'totalAmount',
+  status: 'status',
+  sessionKey: 'sessionKey',
+  valId: 'valId',
+  bankTranId: 'bankTranId',
+  cardType: 'cardType',
+  riskLevel: 'riskLevel',
+  failureReason: 'failureReason',
+  gatewayResponse: 'gatewayResponse',
+  paymentId: 'paymentId',
+  lastCheckedAt: 'lastCheckedAt',
+  settledAt: 'settledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentAttemptScalarFieldEnum = (typeof PaymentAttemptScalarFieldEnum)[keyof typeof PaymentAttemptScalarFieldEnum]
+
+
+export const PaymentRefundScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  feeId: 'feeId',
+  tutorId: 'tutorId',
+  paymentId: 'paymentId',
+  amount: 'amount',
+  reason: 'reason',
+  source: 'source',
+  status: 'status',
+  requestedById: 'requestedById',
+  decidedById: 'decidedById',
+  decidedAt: 'decidedAt',
+  decisionNote: 'decisionNote',
+  refundRefId: 'refundRefId',
+  failureReason: 'failureReason',
+  gatewayResponse: 'gatewayResponse',
+  reversalId: 'reversalId',
+  lastCheckedAt: 'lastCheckedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentRefundScalarFieldEnum = (typeof PaymentRefundScalarFieldEnum)[keyof typeof PaymentRefundScalarFieldEnum]
+
+
+export const PromoCodeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  maxDiscount: 'maxDiscount',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  maxRedemptions: 'maxRedemptions',
+  maxPerTutor: 'maxPerTutor',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PromoCodeScalarFieldEnum = (typeof PromoCodeScalarFieldEnum)[keyof typeof PromoCodeScalarFieldEnum]
+
+
+export const PromoRedemptionScalarFieldEnum = {
+  id: 'id',
+  promoId: 'promoId',
+  feeId: 'feeId',
+  tutorId: 'tutorId',
+  originalAmount: 'originalAmount',
+  discountAmount: 'discountAmount',
+  status: 'status',
+  createdAt: 'createdAt',
+  releasedAt: 'releasedAt',
+  releaseReason: 'releaseReason'
+} as const
+
+export type PromoRedemptionScalarFieldEnum = (typeof PromoRedemptionScalarFieldEnum)[keyof typeof PromoRedemptionScalarFieldEnum]
 
 
 export const NotificationLogScalarFieldEnum = {

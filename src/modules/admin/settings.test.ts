@@ -59,7 +59,7 @@ describe("admin platform settings", () => {
       expect(res.statusCode).toBe(403);
     });
 
-    it("lists the three known settings in order, with defaults for missing rows", async () => {
+    it("lists the six known settings in order, with defaults for missing rows", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
 
@@ -73,6 +73,9 @@ describe("admin platform settings", () => {
       const body = JSON.parse(res.body) as { settings: Setting[] };
       expect(body.settings.map((s) => s.key)).toEqual([
         "commission_percent",
+        "gateway_charge_percent",
+        "online_payments_enabled",
+        "refund_window_days",
         "require_tutor_verification",
         "require_phone_verification",
       ]);
@@ -83,7 +86,7 @@ describe("admin platform settings", () => {
         updatedAt: null,
         updatedByName: null,
       });
-      expect(body.settings.slice(1).map((s) => s.value)).toEqual([false, false]);
+      expect(body.settings.slice(1).map((s) => s.value)).toEqual([0, true, 7, false, false]);
     });
 
     it("sends Cache-Control private, no-store", async () => {
@@ -147,6 +150,16 @@ describe("admin platform settings", () => {
       ["commission_percent", 100.5],
       ["commission_percent", 12.345],
       ["commission_percent", true],
+      ["gateway_charge_percent", -0.5],
+      ["gateway_charge_percent", 10.5],
+      ["gateway_charge_percent", 2.555],
+      ["gateway_charge_percent", true],
+      ["refund_window_days", 7.5],
+      ["refund_window_days", 91],
+      ["refund_window_days", -1],
+      ["refund_window_days", "7"],
+      ["online_payments_enabled", 1],
+      ["online_payments_enabled", "true"],
       ["require_tutor_verification", 1],
       ["require_phone_verification", 50],
       ["require_phone_verification", "yes"],
@@ -196,6 +209,144 @@ describe("admin platform settings", () => {
         });
         expect(res.statusCode, String(value)).toBe(200);
       }
+    });
+
+    it("accepts the gateway_charge_percent boundaries and two decimal places", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+
+      for (const value of [0, 10, 2.5, 1.25]) {
+        const res = await app.inject({
+          method: "PUT",
+          url: `${URL}/gateway_charge_percent`,
+          headers,
+          payload: { value },
+        });
+        expect(res.statusCode, String(value)).toBe(200);
+      }
+    });
+
+    it("reports gateway_charge_percent range and decimal problems on value", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+
+      for (const value of [11, -1, 2.555]) {
+        const res = await app.inject({
+          method: "PUT",
+          url: `${URL}/gateway_charge_percent`,
+          headers,
+          payload: { value },
+        });
+        expect(res.statusCode, String(value)).toBe(400);
+        const body = JSON.parse(res.body);
+        expect(body.message).toBe("Invalid setting value");
+        expect(body.issues[0].path).toEqual(["value"]);
+      }
+    });
+
+    it("saves gateway_charge_percent and online_payments_enabled and lists them back", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+
+      const charge = await app.inject({
+        method: "PUT",
+        url: `${URL}/gateway_charge_percent`,
+        headers,
+        payload: { value: 2.5 },
+      });
+      expect(charge.statusCode).toBe(200);
+      expect(JSON.parse(charge.body)).toEqual({
+        key: "gateway_charge_percent",
+        value: 2.5,
+        updatedAt: expect.any(String),
+        updatedByName: "Test Super Admin",
+      });
+
+      const online = await app.inject({
+        method: "PUT",
+        url: `${URL}/online_payments_enabled`,
+        headers,
+        payload: { value: true },
+      });
+      expect(online.statusCode).toBe(200);
+      expect(JSON.parse(online.body).value).toBe(true);
+
+      const list = await app.inject({ method: "GET", url: URL, headers });
+      const settings = JSON.parse(list.body).settings as Setting[];
+      expect(settings.slice(1, 3).map((s) => [s.key, s.value])).toEqual([
+        ["gateway_charge_percent", 2.5],
+        ["online_payments_enabled", true],
+      ]);
+    });
+
+    it("the database rejects a gateway_charge_percent above 10 written around the API", async () => {
+      await expect(
+        prisma.platformSetting.create({
+          data: { key: "gateway_charge_percent", value: 11 },
+        }),
+      ).rejects.toThrow();
+    });
+
+    it("accepts refund_window_days as whole days from 0 to 90", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+
+      for (const value of [0, 14, 90]) {
+        const res = await app.inject({
+          method: "PUT",
+          url: `${URL}/refund_window_days`,
+          headers,
+          payload: { value },
+        });
+        expect(res.statusCode, String(value)).toBe(200);
+      }
+    });
+
+    it("reports refund_window_days fractions as a whole-number problem on value", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+
+      const res = await app.inject({
+        method: "PUT",
+        url: `${URL}/refund_window_days`,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { value: 7.5 },
+      });
+
+      expect(res.statusCode).toBe(400);
+      const body = JSON.parse(res.body);
+      expect(body.message).toBe("Invalid setting value");
+      expect(body.issues).toEqual([
+        { path: ["value"], message: "refund_window_days must be a whole number of days" },
+      ]);
+    });
+
+    it("saves refund_window_days and lists it back between the switches", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+
+      const res = await app.inject({
+        method: "PUT",
+        url: `${URL}/refund_window_days`,
+        headers,
+        payload: { value: 14 },
+      });
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toEqual({
+        key: "refund_window_days",
+        value: 14,
+        updatedAt: expect.any(String),
+        updatedByName: "Test Super Admin",
+      });
+
+      const list = await app.inject({ method: "GET", url: URL, headers });
+      const settings = JSON.parse(list.body).settings as Setting[];
+      expect(settings[3]).toMatchObject({ key: "refund_window_days", value: 14 });
     });
 
     it("saves commission_percent and reports who changed it", async () => {

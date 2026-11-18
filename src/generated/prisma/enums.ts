@@ -178,6 +178,55 @@ export const PaymentKind = {
 export type PaymentKind = (typeof PaymentKind)[keyof typeof PaymentKind]
 
 
+export const PaymentAttemptStatus = {
+  PENDING: 'PENDING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+  REVIEW: 'REVIEW',
+  UNAPPLIED: 'UNAPPLIED'
+} as const
+
+export type PaymentAttemptStatus = (typeof PaymentAttemptStatus)[keyof typeof PaymentAttemptStatus]
+
+
+export const RefundStatus = {
+  REQUESTED: 'REQUESTED',
+  REJECTED: 'REJECTED',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  NEEDS_REVIEW: 'NEEDS_REVIEW'
+} as const
+
+export type RefundStatus = (typeof RefundStatus)[keyof typeof RefundStatus]
+
+
+export const RefundSource = {
+  TUTOR: 'TUTOR',
+  ADMIN: 'ADMIN'
+} as const
+
+export type RefundSource = (typeof RefundSource)[keyof typeof RefundSource]
+
+
+export const PromoDiscountType = {
+  PERCENT: 'PERCENT',
+  FLAT: 'FLAT'
+} as const
+
+export type PromoDiscountType = (typeof PromoDiscountType)[keyof typeof PromoDiscountType]
+
+
+export const PromoRedemptionStatus = {
+  ACTIVE: 'ACTIVE',
+  RELEASED: 'RELEASED'
+} as const
+
+export type PromoRedemptionStatus = (typeof PromoRedemptionStatus)[keyof typeof PromoRedemptionStatus]
+
+
 export const FilePurpose = {
   STUDENT_ID: 'STUDENT_ID',
   TUTOR_ID: 'TUTOR_ID',
