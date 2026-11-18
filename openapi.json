@@ -4253,6 +4253,7 @@
               {
                 "type": "string",
                 "enum": [
+                  "IN_REVIEW",
                   "PAYMENTS_OFF",
                   "BELOW_MINIMUM"
                 ]
@@ -8418,6 +8419,12 @@
               }
             ]
           },
+          "heldPayments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TutorHeldPayment"
+            }
+          },
           "promo": {
             "anyOf": [
               {
@@ -8448,6 +8455,7 @@
           "refunds",
           "checkout",
           "pendingAttempt",
+          "heldPayments",
           "promo",
           "promoAllowed"
         ],
@@ -8533,6 +8541,39 @@
           "receivedAt",
           "reversesPaymentId",
           "refundableUntil"
+        ],
+        "additionalProperties": false
+      },
+      "TutorHeldPayment": {
+        "type": "object",
+        "properties": {
+          "tranId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REVIEW",
+              "UNAPPLIED"
+            ]
+          },
+          "feeAmount": {
+            "type": "string"
+          },
+          "totalAmount": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "tranId",
+          "status",
+          "feeAmount",
+          "totalAmount",
+          "createdAt"
         ],
         "additionalProperties": false
       },

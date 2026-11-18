@@ -62,8 +62,11 @@ export type TutorFeePaymentResponse = z.infer<typeof tutorFeePaymentSchema>;
 export const checkoutQuoteSchema = z
   .object({
     enabled: z.boolean(),
-    /** PAYMENTS_OFF: payments are off or not configured. BELOW_MINIMUM: total under the gateway minimum. */
-    unavailableReason: z.enum(["PAYMENTS_OFF", "BELOW_MINIMUM"]).nullable(),
+    /**
+     * IN_REVIEW: an online payment for this fee is being checked (see heldPayments).
+     * PAYMENTS_OFF: payments are off or not configured. BELOW_MINIMUM: total under the gateway minimum.
+     */
+    unavailableReason: z.enum(["IN_REVIEW", "PAYMENTS_OFF", "BELOW_MINIMUM"]).nullable(),
     feeAmount: z.string(),
     chargePercent: z.string(),
     chargeAmount: z.string(),
@@ -71,6 +74,19 @@ export const checkoutQuoteSchema = z
   })
   .meta({ id: "CheckoutQuote" });
 export type CheckoutQuoteResponse = z.infer<typeof checkoutQuoteSchema>;
+
+// An online payment the gateway took that is not on the fee's ledger. REVIEW: being checked by
+// the team, and it is either added to the fee or refunded. UNAPPLIED: it could not be added to the
+// fee (waived, voided or already paid), so the fee part is refunded.
+export const tutorHeldPaymentSchema = z
+  .object({
+    tranId: z.string(),
+    status: z.enum(["REVIEW", "UNAPPLIED"]),
+    feeAmount: z.string(),
+    totalAmount: z.string(),
+    createdAt: z.date(),
+  })
+  .meta({ id: "TutorHeldPayment" });
 
 // The promo code applied to a fee (its ACTIVE redemption). Money is a 2-decimal string.
 export const feePromoSchema = z
@@ -115,9 +131,11 @@ export const tutorFeeDetailSchema = tutorFeeSchema
         createdAt: z.date(),
       })
       .nullable(),
+    /** Online payments held off the ledger (REVIEW, or UNAPPLIED with no refund yet), newest first. */
+    heldPayments: z.array(tutorHeldPaymentSchema),
     /** The promo code on this fee, if one is applied. */
     promo: feePromoSchema.nullable(),
-    /** A code can be applied: the fee is DUE, nothing is paid and no code is applied yet. */
+    /** A code can be applied: the fee is DUE, nothing is paid, no code yet and no payment in review. */
     promoAllowed: z.boolean(),
   })
   .meta({ id: "TutorFeeDetail" });

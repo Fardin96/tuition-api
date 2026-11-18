@@ -2,7 +2,7 @@ import { Prisma } from "../../generated/prisma/client.js";
 import { FeeStatus, PromoRedemptionStatus } from "../../generated/prisma/enums.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
-import { clearPendingAttempt, lockFee } from "../payment/payment.service.js";
+import { clearPendingAttempt, lockFee, refuseIfInReview } from "../payment/payment.service.js";
 import type { TutorFeeDetailResponse } from "./fee.schema.js";
 import { getMyFee } from "./fee.service.js";
 import { MIN_ONLINE_TOTAL } from "./fee-quote.js";
@@ -17,6 +17,8 @@ const ALREADY_HAS_CODE = "This fee already has a code. Remove it first.";
 const INVALID_CODE = "That code isn't valid.";
 const PAYMENT_STARTING =
   "A payment for this fee just started. Finish or cancel it, then try again.";
+const PAYMENT_IN_REVIEW =
+  "A payment for this fee is being checked. You can change the code once it's decided.";
 
 const feeSelect = {
   tutorId: true,
@@ -63,12 +65,14 @@ function isOneActiveConflict(err: unknown): boolean {
 
 // Checkout inserts its PENDING attempt under the fee lock, so a checkout that started after
 // clearPendingAttempt is visible here. Its amount was quoted before this change, so refuse.
+// A payment in REVIEW may still be added at the old amount, so refuse that too.
 async function refuseIfPaymentStarting(tx: Tx, feeId: string): Promise<void> {
   const pending = await tx.paymentAttempt.findFirst({
     where: { feeId, status: "PENDING" },
     select: { id: true },
   });
   if (pending) throw invalidFee(PAYMENT_STARTING);
+  await refuseIfInReview(tx, feeId, PAYMENT_IN_REVIEW);
 }
 
 // Applies a promo code to a DUE fee that has no payment yet. Lock order: fee row, then promo row.

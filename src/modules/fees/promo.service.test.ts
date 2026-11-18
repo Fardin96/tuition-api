@@ -350,6 +350,35 @@ describe("promo codes on a tutor's fee", () => {
       expect(fee.amountDue.toFixed(2)).toBe("1500.00");
     });
 
+    it("refuses a code while a payment for the fee is in REVIEW, and changes nothing", async () => {
+      const app = await createTestApp();
+      await makePromo({ code: "SAVE10" });
+      const setup = await createTutorFeeFixture(1500);
+      await prisma.paymentAttempt.create({
+        data: {
+          feeId: setup.fee.id,
+          tutorId: setup.tutor.id,
+          tranId: "TMREVIEWPROMO1",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          status: "REVIEW",
+        },
+      });
+
+      const res = await applyCode(app, setup.fee.id, "SAVE10", setup.tutorHeaders);
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body)).toMatchObject({
+        code: "INVALID_FEE_STATE",
+        message:
+          "A payment for this fee is being checked. You can change the code once it's decided.",
+      });
+      const fee = await prisma.platformFee.findUniqueOrThrow({ where: { id: setup.fee.id } });
+      expect(fee.amountDue.toFixed(2)).toBe("1500.00");
+      expect(await redemptionsOf(setup.fee.id)).toHaveLength(0);
+    });
+
     it("refuses a second code on the same fee, with 409 INVALID_FEE_STATE", async () => {
       const app = await createTestApp();
       await makePromo({ code: "SAVE10" });

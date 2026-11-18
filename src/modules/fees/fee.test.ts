@@ -564,6 +564,84 @@ describe("tutor fees", () => {
       expect(JSON.parse(res.body).payments[0].refundableUntil).toBeNull();
     });
 
+    it("shows a payment in REVIEW as held, blocks the quote with IN_REVIEW and allows no promo", async () => {
+      const me = await setupTutor();
+      const fee = await makeFee(me, { amountDue: 1500 });
+      await prisma.paymentAttempt.create({
+        data: {
+          feeId: fee.id,
+          tutorId: me.tutor.id,
+          tranId: "TMTESTREVIEW01",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          status: "REVIEW",
+          failureReason: "Gateway flagged the payment as risky (risk level 1)",
+        },
+      });
+
+      const res = await getFee(await getAuthHeaders(me.tutorAccount), fee.id);
+
+      const body = JSON.parse(res.body);
+      expect(body.heldPayments).toEqual([
+        {
+          tranId: "TMTESTREVIEW01",
+          status: "REVIEW",
+          feeAmount: "1500.00",
+          totalAmount: "1537.50",
+          createdAt: expect.any(String),
+        },
+      ]);
+      // The internal reason stays with the admins.
+      expect(res.body).not.toContain("risk level");
+      expect(body.checkout).toMatchObject({ enabled: false, unavailableReason: "IN_REVIEW" });
+      expect(body.promoAllowed).toBe(false);
+    });
+
+    it("shows an UNAPPLIED payment as held until its refund succeeds", async () => {
+      const admin = await makeAdmin();
+      const me = await setupTutor();
+      const fee = await makeFee(me, { amountDue: 1500, status: "WAIVED" });
+      const attempt = await prisma.paymentAttempt.create({
+        data: {
+          feeId: fee.id,
+          tutorId: me.tutor.id,
+          tranId: "TMTESTUNAPPL01",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          status: "UNAPPLIED",
+          bankTranId: "BANK-UNAPPLIED-1",
+        },
+      });
+      const headers = await getAuthHeaders(me.tutorAccount);
+
+      const before = JSON.parse((await getFee(headers, fee.id)).body);
+      expect(before.heldPayments).toMatchObject([
+        { tranId: "TMTESTUNAPPL01", status: "UNAPPLIED" },
+      ]);
+
+      await prisma.paymentRefund.create({
+        data: {
+          attemptId: attempt.id,
+          feeId: fee.id,
+          tutorId: me.tutor.id,
+          amount: 1500,
+          reason: "Fee was waived",
+          source: "ADMIN",
+          status: "SUCCEEDED",
+          requestedById: admin.id,
+          decidedById: admin.id,
+          decidedAt: new Date(),
+          completedAt: new Date(),
+        },
+      });
+
+      const after = JSON.parse((await getFee(headers, fee.id)).body);
+      expect(after.heldPayments).toEqual([]);
+      expect(after.refunds).toHaveLength(1);
+    });
+
     it("shows no promo and allows one on a fresh DUE fee", async () => {
       const me = await setupTutor();
       const fee = await makeFee(me, { amountDue: 1500 });
@@ -571,7 +649,11 @@ describe("tutor fees", () => {
       const res = await getFee(await getAuthHeaders(me.tutorAccount), fee.id);
 
       expect(res.statusCode).toBe(200);
-      expect(JSON.parse(res.body)).toMatchObject({ promo: null, promoAllowed: true });
+      expect(JSON.parse(res.body)).toMatchObject({
+        promo: null,
+        promoAllowed: true,
+        heldPayments: [],
+      });
     });
 
     describe("checkout quote", () => {

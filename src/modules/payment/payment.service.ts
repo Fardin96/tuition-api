@@ -160,6 +160,19 @@ export async function markAttempt(
   await endPending(tranId, status, reason);
 }
 
+// A payment in REVIEW may still be added to the fee. A second checkout or a promo change before
+// it is decided would charge the tutor twice or leave the reviewed payment over the amount due.
+export async function refuseIfInReview(db: Tx, feeId: string, message: string): Promise<void> {
+  const inReview = await db.paymentAttempt.findFirst({
+    where: { feeId, status: PaymentAttemptStatus.REVIEW },
+    select: { id: true },
+  });
+  if (inReview) throw invalidFee(message);
+}
+
+export const IN_REVIEW_CHECKOUT =
+  "A payment for this fee is being checked. Wait for the result before paying again.";
+
 export async function feeIdOfAttempt(tranId: string): Promise<string | null> {
   const row = await prisma.paymentAttempt.findUnique({
     where: { tranId },
@@ -208,6 +221,8 @@ export async function startCheckout(accountId: string, feeId: string): Promise<C
     throw invalidFee("This fee is not open for online payment.");
   }
 
+  await refuseIfInReview(prisma, feeId, IN_REVIEW_CHECKOUT);
+
   // 3. A PENDING checkout must be settled or given up before a new one starts.
   await clearPendingAttempt(feeId, "Replaced by a new checkout");
 
@@ -229,6 +244,8 @@ export async function startCheckout(accountId: string, feeId: string): Promise<C
       ) {
         throw invalidFee("This fee is not open for online payment.");
       }
+      // Re-checked under the fee lock: a review decision locks the fee first too.
+      await refuseIfInReview(tx, feeId, IN_REVIEW_CHECKOUT);
       const current = await readPaymentSettings(tx);
       const quote = quoteFor(remainingOf(locked), current.chargePercent);
       if (quote.totalAmount.lessThan(MIN_ONLINE_TOTAL)) {

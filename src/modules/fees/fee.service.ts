@@ -1,5 +1,5 @@
 import { Prisma } from "../../generated/prisma/client.js";
-import { FeeStatus, RefundStatus } from "../../generated/prisma/enums.js";
+import { FeeStatus, PaymentAttemptStatus, RefundStatus } from "../../generated/prisma/enums.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
@@ -142,17 +142,20 @@ function refundableUntilOf(
   return attempt.feeAmount.greaterThan(counted) ? until : null;
 }
 
-// Quotes the tutor's remaining balance. Null when there is nothing to pay online.
+// Quotes the tutor's remaining balance. Null when there is nothing to pay online. A payment in
+// review blocks a new checkout (startCheckout refuses it), so the quote says why.
 async function checkoutFor(
   row: Pick<FeeRow, "status" | "amountDue" | "amountPaid">,
+  inReview: boolean,
 ): Promise<CheckoutQuoteResponse | null> {
   const remaining = row.amountDue.minus(row.amountPaid);
   if (!OPEN_FEE_STATUSES.includes(row.status) || remaining.lessThanOrEqualTo(0)) return null;
 
   const settings = await readPaymentSettings(prisma);
   const quote = quoteFor(remaining, settings.chargePercent);
-  const unavailableReason: CheckoutQuoteResponse["unavailableReason"] =
-    !settings.enabled || !paymentsConfigured()
+  const unavailableReason: CheckoutQuoteResponse["unavailableReason"] = inReview
+    ? "IN_REVIEW"
+    : !settings.enabled || !paymentsConfigured()
       ? "PAYMENTS_OFF"
       : quote.totalAmount.lessThan(MIN_ONLINE_TOTAL)
         ? "BELOW_MINIMUM"
@@ -232,6 +235,17 @@ export async function getMyFee(accountId: string, feeId: string): Promise<TutorF
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     select: tutorRefundSelect,
   });
+  // Money the gateway took that is not on the ledger. An UNAPPLIED one drops off once refunded.
+  const held = await prisma.paymentAttempt.findMany({
+    where: {
+      feeId: row.id,
+      status: { in: [PaymentAttemptStatus.REVIEW, PaymentAttemptStatus.UNAPPLIED] },
+      refunds: { none: { status: RefundStatus.SUCCEEDED } },
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: { tranId: true, status: true, feeAmount: true, totalAmount: true, createdAt: true },
+  });
+  const inReview = held.some((a) => a.status === PaymentAttemptStatus.REVIEW);
 
   return {
     ...toTutorFee(row, dhakaToday(), now),
@@ -245,9 +259,17 @@ export async function getMyFee(accountId: string, feeId: string): Promise<TutorF
       refundableUntil: refundableUntilOf(p, attemptByPayment.get(p.id), windowDays, now),
     })),
     refunds: refunds.map((r) => toTutorRefund(r)),
-    checkout: await checkoutFor(row),
+    checkout: await checkoutFor(row, inReview),
     pendingAttempt: attempt ? { tranId: attempt.tranId, createdAt: attempt.createdAt } : null,
+    heldPayments: held.map((a) => ({
+      tranId: a.tranId,
+      status: a.status === PaymentAttemptStatus.REVIEW ? "REVIEW" : "UNAPPLIED",
+      feeAmount: a.feeAmount.toFixed(2),
+      totalAmount: a.totalAmount.toFixed(2),
+      createdAt: a.createdAt,
+    })),
     promo,
-    promoAllowed: row.status === FeeStatus.DUE && row.amountPaid.isZero() && promo === null,
+    promoAllowed:
+      row.status === FeeStatus.DUE && row.amountPaid.isZero() && promo === null && !inReview,
   } satisfies TutorFeeDetailResponse;
 }

@@ -192,6 +192,40 @@ describe("payment checkout", () => {
       expect(fake.sessions).toHaveLength(0);
     });
 
+    it("refuses a new checkout while a payment for the fee is in REVIEW, then allows it once decided", async () => {
+      const app = await createTestApp();
+      const setup = await createTutorFeeFixture(1500);
+      const reviewed = await prisma.paymentAttempt.create({
+        data: {
+          feeId: setup.fee.id,
+          tutorId: setup.tutor.id,
+          tranId: "TMREVIEWBLOCK1",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          status: "REVIEW",
+        },
+      });
+
+      const blocked = await checkout(app, setup.tutorHeaders, setup.fee.id);
+
+      expect(blocked.statusCode).toBe(409);
+      expect(JSON.parse(blocked.body)).toMatchObject({
+        code: "INVALID_FEE_STATE",
+        message:
+          "A payment for this fee is being checked. Wait for the result before paying again.",
+      });
+      expect(fake.sessions).toHaveLength(0);
+
+      // A rejected review leaves the money to be refunded and the fee open for a new payment.
+      await prisma.paymentAttempt.update({
+        where: { id: reviewed.id },
+        data: { status: "UNAPPLIED" },
+      });
+      const allowed = await checkout(app, setup.tutorHeaders, setup.fee.id);
+      expect(allowed.statusCode).toBe(201);
+    });
+
     it("refuses a WAIVED fee", async () => {
       const app = await createTestApp();
       const setup = await createTutorFeeFixture();
