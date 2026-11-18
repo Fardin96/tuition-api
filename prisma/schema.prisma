@@ -415,6 +415,7 @@ model AdminUser {
   removals   AdminUser[] @relation("AdminRemoval")
 
   reviewedVerifications TutorVerification[]
+  reviewedStudents      Student[]           @relation("StudentVerificationReviewer")
   recordedPayments      FeePayment[]
   createdPromoCodes     PromoCode[]
   decidedRefunds        PaymentRefund[]
@@ -501,6 +502,10 @@ model FileAsset {
   createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
   uploadedAt     DateTime?   @map("uploaded_at") @db.Timestamptz(3)
   deletedAt      DateTime?   @map("deleted_at") @db.Timestamptz(3)
+  // The name the uploader's device gave the file. Shown to admins; never used in the storage key.
+  originalName   String?     @map("original_name")
+  // Set while a copy sits in the public bucket under the same key (approved videos, blog covers).
+  publishedAt    DateTime?   @map("published_at") @db.Timestamptz(3)
 
   owner                Account             @relation(fields: [ownerAccountId], references: [id])
   studentVerifications Student[]           @relation("StudentVerificationFile")
@@ -517,33 +522,39 @@ model FileAsset {
 // ───────────────────────── profiles ─────────────────────────
 
 model Student {
-  id                 String             @id @default(uuid(7)) @db.Uuid
-  accountId          String             @unique @map("account_id") @db.Uuid
-  role               Role               @default(STUDENT)
-  name               String
-  areaId             Int                @map("area_id")
-  address            String
-  emergencyContact   String             @map("emergency_contact")
-  whatsappNumber     String?            @unique @map("whatsapp_number") // E.164 text, never numeric; optional
-  whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
-  phoneNumber        String             @unique @map("phone_number")
-  phoneVerifiedAt    DateTime?          @map("phone_verified_at") @db.Timestamptz(3)
-  studentIdNumber    String             @map("student_id_number")
-  verificationFileId String?            @map("verification_file_id") @db.Uuid
-  verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
+  id                       String             @id @default(uuid(7)) @db.Uuid
+  accountId                String             @unique @map("account_id") @db.Uuid
+  role                     Role               @default(STUDENT)
+  name                     String
+  areaId                   Int                @map("area_id")
+  address                  String
+  emergencyContact         String             @map("emergency_contact")
+  whatsappNumber           String?            @unique @map("whatsapp_number") // E.164 text, never numeric; optional
+  whatsappVerifiedAt       DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
+  phoneNumber              String             @unique @map("phone_number")
+  phoneVerifiedAt          DateTime?          @map("phone_verified_at") @db.Timestamptz(3)
+  studentIdNumber          String             @map("student_id_number")
+  verificationFileId       String?            @map("verification_file_id") @db.Uuid
+  verificationStatus       VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
+  // The latest ID submission's review. A resubmission clears the decision fields.
+  verificationSubmittedAt  DateTime?          @map("verification_submitted_at") @db.Timestamptz(3)
+  verificationDecidedAt    DateTime?          @map("verification_decided_at") @db.Timestamptz(3)
+  verificationReviewedById String?            @map("verification_reviewed_by") @db.Uuid
+  verificationNote         String?            @map("verification_note")
   // Rating tutors give this student. Written only by the review trigger.
-  ratingAvg          Decimal            @default(0) @map("rating_avg") @db.Decimal(3, 2)
-  ratingCount        Int                @default(0) @map("rating_count")
-  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+  ratingAvg                Decimal            @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  ratingCount              Int                @default(0) @map("rating_count")
+  createdAt                DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  account          Account              @relation(fields: [accountId, role], references: [id, role])
-  area             Area                 @relation(fields: [areaId], references: [id])
-  verificationFile FileAsset?           @relation("StudentVerificationFile", fields: [verificationFileId], references: [id], onDelete: Restrict)
-  requirements     TuitionRequirement[]
-  applications     Application[]
-  reviewsGiven     Review[]             @relation("ReviewStudent")
-  location         StudentLocation?
+  account                Account              @relation(fields: [accountId, role], references: [id, role])
+  area                   Area                 @relation(fields: [areaId], references: [id])
+  verificationFile       FileAsset?           @relation("StudentVerificationFile", fields: [verificationFileId], references: [id], onDelete: Restrict)
+  verificationReviewedBy AdminUser?           @relation("StudentVerificationReviewer", fields: [verificationReviewedById], references: [accountId], onDelete: Restrict)
+  requirements           TuitionRequirement[]
+  applications           Application[]
+  reviewsGiven           Review[]             @relation("ReviewStudent")
+  location               StudentLocation?
 
   @@unique([accountId, role])
   @@index([areaId])

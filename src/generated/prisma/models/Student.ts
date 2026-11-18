@@ -53,6 +53,10 @@ export type StudentMinAggregateOutputType = {
   studentIdNumber: string | null
   verificationFileId: string | null
   verificationStatus: $Enums.VerificationStatus | null
+  verificationSubmittedAt: Date | null
+  verificationDecidedAt: Date | null
+  verificationReviewedById: string | null
+  verificationNote: string | null
   ratingAvg: runtime.Decimal | null
   ratingCount: number | null
   createdAt: Date | null
@@ -74,6 +78,10 @@ export type StudentMaxAggregateOutputType = {
   studentIdNumber: string | null
   verificationFileId: string | null
   verificationStatus: $Enums.VerificationStatus | null
+  verificationSubmittedAt: Date | null
+  verificationDecidedAt: Date | null
+  verificationReviewedById: string | null
+  verificationNote: string | null
   ratingAvg: runtime.Decimal | null
   ratingCount: number | null
   createdAt: Date | null
@@ -95,6 +103,10 @@ export type StudentCountAggregateOutputType = {
   studentIdNumber: number
   verificationFileId: number
   verificationStatus: number
+  verificationSubmittedAt: number
+  verificationDecidedAt: number
+  verificationReviewedById: number
+  verificationNote: number
   ratingAvg: number
   ratingCount: number
   createdAt: number
@@ -130,6 +142,10 @@ export type StudentMinAggregateInputType = {
   studentIdNumber?: true
   verificationFileId?: true
   verificationStatus?: true
+  verificationSubmittedAt?: true
+  verificationDecidedAt?: true
+  verificationReviewedById?: true
+  verificationNote?: true
   ratingAvg?: true
   ratingCount?: true
   createdAt?: true
@@ -151,6 +167,10 @@ export type StudentMaxAggregateInputType = {
   studentIdNumber?: true
   verificationFileId?: true
   verificationStatus?: true
+  verificationSubmittedAt?: true
+  verificationDecidedAt?: true
+  verificationReviewedById?: true
+  verificationNote?: true
   ratingAvg?: true
   ratingCount?: true
   createdAt?: true
@@ -172,6 +192,10 @@ export type StudentCountAggregateInputType = {
   studentIdNumber?: true
   verificationFileId?: true
   verificationStatus?: true
+  verificationSubmittedAt?: true
+  verificationDecidedAt?: true
+  verificationReviewedById?: true
+  verificationNote?: true
   ratingAvg?: true
   ratingCount?: true
   createdAt?: true
@@ -280,6 +304,10 @@ export type StudentGroupByOutputType = {
   studentIdNumber: string
   verificationFileId: string | null
   verificationStatus: $Enums.VerificationStatus
+  verificationSubmittedAt: Date | null
+  verificationDecidedAt: Date | null
+  verificationReviewedById: string | null
+  verificationNote: string | null
   ratingAvg: runtime.Decimal
   ratingCount: number
   createdAt: Date
@@ -324,6 +352,10 @@ export type StudentWhereInput = {
   studentIdNumber?: Prisma.StringFilter<"Student"> | string
   verificationFileId?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Student"> | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  verificationDecidedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  verificationReviewedById?: Prisma.UuidNullableFilter<"Student"> | string | null
+  verificationNote?: Prisma.StringNullableFilter<"Student"> | string | null
   ratingAvg?: Prisma.DecimalFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFilter<"Student"> | number
   createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
@@ -331,6 +363,7 @@ export type StudentWhereInput = {
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   area?: Prisma.XOR<Prisma.AreaScalarRelationFilter, Prisma.AreaWhereInput>
   verificationFile?: Prisma.XOR<Prisma.FileAssetNullableScalarRelationFilter, Prisma.FileAssetWhereInput> | null
+  verificationReviewedBy?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
   requirements?: Prisma.TuitionRequirementListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
@@ -352,6 +385,10 @@ export type StudentOrderByWithRelationInput = {
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  verificationSubmittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationDecidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationReviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationNote?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -359,6 +396,7 @@ export type StudentOrderByWithRelationInput = {
   account?: Prisma.AccountOrderByWithRelationInput
   area?: Prisma.AreaOrderByWithRelationInput
   verificationFile?: Prisma.FileAssetOrderByWithRelationInput
+  verificationReviewedBy?: Prisma.AdminUserOrderByWithRelationInput
   requirements?: Prisma.TuitionRequirementOrderByRelationAggregateInput
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
   reviewsGiven?: Prisma.ReviewOrderByRelationAggregateInput
@@ -384,6 +422,10 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   studentIdNumber?: Prisma.StringFilter<"Student"> | string
   verificationFileId?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"Student"> | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  verificationDecidedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  verificationReviewedById?: Prisma.UuidNullableFilter<"Student"> | string | null
+  verificationNote?: Prisma.StringNullableFilter<"Student"> | string | null
   ratingAvg?: Prisma.DecimalFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFilter<"Student"> | number
   createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
@@ -391,6 +433,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   area?: Prisma.XOR<Prisma.AreaScalarRelationFilter, Prisma.AreaWhereInput>
   verificationFile?: Prisma.XOR<Prisma.FileAssetNullableScalarRelationFilter, Prisma.FileAssetWhereInput> | null
+  verificationReviewedBy?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
   requirements?: Prisma.TuitionRequirementListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
@@ -412,6 +455,10 @@ export type StudentOrderByWithAggregationInput = {
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  verificationSubmittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationDecidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationReviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationNote?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -441,6 +488,10 @@ export type StudentScalarWhereWithAggregatesInput = {
   studentIdNumber?: Prisma.StringWithAggregatesFilter<"Student"> | string
   verificationFileId?: Prisma.UuidNullableWithAggregatesFilter<"Student"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusWithAggregatesFilter<"Student"> | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
+  verificationDecidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
+  verificationReviewedById?: Prisma.UuidNullableWithAggregatesFilter<"Student"> | string | null
+  verificationNote?: Prisma.StringNullableWithAggregatesFilter<"Student"> | string | null
   ratingAvg?: Prisma.DecimalWithAggregatesFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntWithAggregatesFilter<"Student"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Student"> | Date | string
@@ -458,6 +509,9 @@ export type StudentCreateInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -465,6 +519,7 @@ export type StudentCreateInput = {
   account: Prisma.AccountCreateNestedOneWithoutStudentInput
   area: Prisma.AreaCreateNestedOneWithoutStudentsInput
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
@@ -486,6 +541,10 @@ export type StudentUncheckedCreateInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -507,6 +566,9 @@ export type StudentUpdateInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -514,6 +576,7 @@ export type StudentUpdateInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
   area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
@@ -535,6 +598,10 @@ export type StudentUncheckedUpdateInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -560,6 +627,10 @@ export type StudentCreateManyInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -577,6 +648,9 @@ export type StudentUpdateManyMutationInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -598,6 +672,10 @@ export type StudentUncheckedUpdateManyInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -639,6 +717,10 @@ export type StudentCountOrderByAggregateInput = {
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  verificationSubmittedAt?: Prisma.SortOrder
+  verificationDecidedAt?: Prisma.SortOrder
+  verificationReviewedById?: Prisma.SortOrder
+  verificationNote?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -666,6 +748,10 @@ export type StudentMaxOrderByAggregateInput = {
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  verificationSubmittedAt?: Prisma.SortOrder
+  verificationDecidedAt?: Prisma.SortOrder
+  verificationReviewedById?: Prisma.SortOrder
+  verificationNote?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -687,6 +773,10 @@ export type StudentMinOrderByAggregateInput = {
   studentIdNumber?: Prisma.SortOrder
   verificationFileId?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  verificationSubmittedAt?: Prisma.SortOrder
+  verificationDecidedAt?: Prisma.SortOrder
+  verificationReviewedById?: Prisma.SortOrder
+  verificationNote?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -734,6 +824,48 @@ export type StudentUncheckedUpdateOneWithoutAccountNestedInput = {
   delete?: Prisma.StudentWhereInput | boolean
   connect?: Prisma.StudentWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutAccountInput, Prisma.StudentUpdateWithoutAccountInput>, Prisma.StudentUncheckedUpdateWithoutAccountInput>
+}
+
+export type StudentCreateNestedManyWithoutVerificationReviewedByInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput> | Prisma.StudentCreateWithoutVerificationReviewedByInput[] | Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput[]
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput | Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput[]
+  createMany?: Prisma.StudentCreateManyVerificationReviewedByInputEnvelope
+  connect?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+}
+
+export type StudentUncheckedCreateNestedManyWithoutVerificationReviewedByInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput> | Prisma.StudentCreateWithoutVerificationReviewedByInput[] | Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput[]
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput | Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput[]
+  createMany?: Prisma.StudentCreateManyVerificationReviewedByInputEnvelope
+  connect?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+}
+
+export type StudentUpdateManyWithoutVerificationReviewedByNestedInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput> | Prisma.StudentCreateWithoutVerificationReviewedByInput[] | Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput[]
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput | Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput[]
+  upsert?: Prisma.StudentUpsertWithWhereUniqueWithoutVerificationReviewedByInput | Prisma.StudentUpsertWithWhereUniqueWithoutVerificationReviewedByInput[]
+  createMany?: Prisma.StudentCreateManyVerificationReviewedByInputEnvelope
+  set?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  disconnect?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  delete?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  connect?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  update?: Prisma.StudentUpdateWithWhereUniqueWithoutVerificationReviewedByInput | Prisma.StudentUpdateWithWhereUniqueWithoutVerificationReviewedByInput[]
+  updateMany?: Prisma.StudentUpdateManyWithWhereWithoutVerificationReviewedByInput | Prisma.StudentUpdateManyWithWhereWithoutVerificationReviewedByInput[]
+  deleteMany?: Prisma.StudentScalarWhereInput | Prisma.StudentScalarWhereInput[]
+}
+
+export type StudentUncheckedUpdateManyWithoutVerificationReviewedByNestedInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput> | Prisma.StudentCreateWithoutVerificationReviewedByInput[] | Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput[]
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput | Prisma.StudentCreateOrConnectWithoutVerificationReviewedByInput[]
+  upsert?: Prisma.StudentUpsertWithWhereUniqueWithoutVerificationReviewedByInput | Prisma.StudentUpsertWithWhereUniqueWithoutVerificationReviewedByInput[]
+  createMany?: Prisma.StudentCreateManyVerificationReviewedByInputEnvelope
+  set?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  disconnect?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  delete?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  connect?: Prisma.StudentWhereUniqueInput | Prisma.StudentWhereUniqueInput[]
+  update?: Prisma.StudentUpdateWithWhereUniqueWithoutVerificationReviewedByInput | Prisma.StudentUpdateWithWhereUniqueWithoutVerificationReviewedByInput[]
+  updateMany?: Prisma.StudentUpdateManyWithWhereWithoutVerificationReviewedByInput | Prisma.StudentUpdateManyWithWhereWithoutVerificationReviewedByInput[]
+  deleteMany?: Prisma.StudentScalarWhereInput | Prisma.StudentScalarWhereInput[]
 }
 
 export type StudentCreateNestedManyWithoutAreaInput = {
@@ -899,12 +1031,16 @@ export type StudentCreateWithoutAccountInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   area: Prisma.AreaCreateNestedOneWithoutStudentsInput
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
@@ -924,6 +1060,10 @@ export type StudentUncheckedCreateWithoutAccountInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -961,12 +1101,16 @@ export type StudentUpdateWithoutAccountInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
@@ -986,6 +1130,10 @@ export type StudentUncheckedUpdateWithoutAccountInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -994,6 +1142,115 @@ export type StudentUncheckedUpdateWithoutAccountInput = {
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
   location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type StudentCreateWithoutVerificationReviewedByInput = {
+  id?: string
+  name: string
+  address: string
+  emergencyContact: string
+  whatsappNumber?: string | null
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber: string
+  verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutStudentInput
+  area: Prisma.AreaCreateNestedOneWithoutStudentsInput
+  verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
+}
+
+export type StudentUncheckedCreateWithoutVerificationReviewedByInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  areaId: number
+  address: string
+  emergencyContact: string
+  whatsappNumber?: string | null
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber: string
+  verificationFileId?: string | null
+  verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  requirements?: Prisma.TuitionRequirementUncheckedCreateNestedManyWithoutStudentInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutStudentInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutStudentInput
+  location?: Prisma.StudentLocationUncheckedCreateNestedOneWithoutStudentInput
+}
+
+export type StudentCreateOrConnectWithoutVerificationReviewedByInput = {
+  where: Prisma.StudentWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudentCreateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput>
+}
+
+export type StudentCreateManyVerificationReviewedByInputEnvelope = {
+  data: Prisma.StudentCreateManyVerificationReviewedByInput | Prisma.StudentCreateManyVerificationReviewedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type StudentUpsertWithWhereUniqueWithoutVerificationReviewedByInput = {
+  where: Prisma.StudentWhereUniqueInput
+  update: Prisma.XOR<Prisma.StudentUpdateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedUpdateWithoutVerificationReviewedByInput>
+  create: Prisma.XOR<Prisma.StudentCreateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedCreateWithoutVerificationReviewedByInput>
+}
+
+export type StudentUpdateWithWhereUniqueWithoutVerificationReviewedByInput = {
+  where: Prisma.StudentWhereUniqueInput
+  data: Prisma.XOR<Prisma.StudentUpdateWithoutVerificationReviewedByInput, Prisma.StudentUncheckedUpdateWithoutVerificationReviewedByInput>
+}
+
+export type StudentUpdateManyWithWhereWithoutVerificationReviewedByInput = {
+  where: Prisma.StudentScalarWhereInput
+  data: Prisma.XOR<Prisma.StudentUpdateManyMutationInput, Prisma.StudentUncheckedUpdateManyWithoutVerificationReviewedByInput>
+}
+
+export type StudentScalarWhereInput = {
+  AND?: Prisma.StudentScalarWhereInput | Prisma.StudentScalarWhereInput[]
+  OR?: Prisma.StudentScalarWhereInput[]
+  NOT?: Prisma.StudentScalarWhereInput | Prisma.StudentScalarWhereInput[]
+  id?: Prisma.UuidFilter<"Student"> | string
+  accountId?: Prisma.UuidFilter<"Student"> | string
+  role?: Prisma.EnumRoleFilter<"Student"> | $Enums.Role
+  name?: Prisma.StringFilter<"Student"> | string
+  areaId?: Prisma.IntFilter<"Student"> | number
+  address?: Prisma.StringFilter<"Student"> | string
+  emergencyContact?: Prisma.StringFilter<"Student"> | string
+  whatsappNumber?: Prisma.StringNullableFilter<"Student"> | string | null
+  whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  phoneNumber?: Prisma.StringFilter<"Student"> | string
+  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  studentIdNumber?: Prisma.StringFilter<"Student"> | string
+  verificationFileId?: Prisma.UuidNullableFilter<"Student"> | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFilter<"Student"> | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  verificationDecidedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
+  verificationReviewedById?: Prisma.UuidNullableFilter<"Student"> | string | null
+  verificationNote?: Prisma.StringNullableFilter<"Student"> | string | null
+  ratingAvg?: Prisma.DecimalFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFilter<"Student"> | number
+  createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Student"> | Date | string
 }
 
 export type StudentCreateWithoutAreaInput = {
@@ -1007,12 +1264,16 @@ export type StudentCreateWithoutAreaInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   account: Prisma.AccountCreateNestedOneWithoutStudentInput
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
@@ -1033,6 +1294,10 @@ export type StudentUncheckedCreateWithoutAreaInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1069,30 +1334,6 @@ export type StudentUpdateManyWithWhereWithoutAreaInput = {
   data: Prisma.XOR<Prisma.StudentUpdateManyMutationInput, Prisma.StudentUncheckedUpdateManyWithoutAreaInput>
 }
 
-export type StudentScalarWhereInput = {
-  AND?: Prisma.StudentScalarWhereInput | Prisma.StudentScalarWhereInput[]
-  OR?: Prisma.StudentScalarWhereInput[]
-  NOT?: Prisma.StudentScalarWhereInput | Prisma.StudentScalarWhereInput[]
-  id?: Prisma.UuidFilter<"Student"> | string
-  accountId?: Prisma.UuidFilter<"Student"> | string
-  role?: Prisma.EnumRoleFilter<"Student"> | $Enums.Role
-  name?: Prisma.StringFilter<"Student"> | string
-  areaId?: Prisma.IntFilter<"Student"> | number
-  address?: Prisma.StringFilter<"Student"> | string
-  emergencyContact?: Prisma.StringFilter<"Student"> | string
-  whatsappNumber?: Prisma.StringNullableFilter<"Student"> | string | null
-  whatsappVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
-  phoneNumber?: Prisma.StringFilter<"Student"> | string
-  phoneVerifiedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
-  studentIdNumber?: Prisma.StringFilter<"Student"> | string
-  verificationFileId?: Prisma.UuidNullableFilter<"Student"> | string | null
-  verificationStatus?: Prisma.EnumVerificationStatusFilter<"Student"> | $Enums.VerificationStatus
-  ratingAvg?: Prisma.DecimalFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  ratingCount?: Prisma.IntFilter<"Student"> | number
-  createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Student"> | Date | string
-}
-
 export type StudentCreateWithoutVerificationFileInput = {
   id?: string
   name: string
@@ -1104,12 +1345,16 @@ export type StudentCreateWithoutVerificationFileInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   account: Prisma.AccountCreateNestedOneWithoutStudentInput
   area: Prisma.AreaCreateNestedOneWithoutStudentsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
@@ -1130,6 +1375,10 @@ export type StudentUncheckedCreateWithoutVerificationFileInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1177,6 +1426,9 @@ export type StudentCreateWithoutLocationInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1184,6 +1436,7 @@ export type StudentCreateWithoutLocationInput = {
   account: Prisma.AccountCreateNestedOneWithoutStudentInput
   area: Prisma.AreaCreateNestedOneWithoutStudentsInput
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
@@ -1204,6 +1457,10 @@ export type StudentUncheckedCreateWithoutLocationInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1240,6 +1497,9 @@ export type StudentUpdateWithoutLocationInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1247,6 +1507,7 @@ export type StudentUpdateWithoutLocationInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
   area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
@@ -1267,6 +1528,10 @@ export type StudentUncheckedUpdateWithoutLocationInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1287,6 +1552,9 @@ export type StudentCreateWithoutRequirementsInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1294,6 +1562,7 @@ export type StudentCreateWithoutRequirementsInput = {
   account: Prisma.AccountCreateNestedOneWithoutStudentInput
   area: Prisma.AreaCreateNestedOneWithoutStudentsInput
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
   location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
@@ -1314,6 +1583,10 @@ export type StudentUncheckedCreateWithoutRequirementsInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1350,6 +1623,9 @@ export type StudentUpdateWithoutRequirementsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1357,6 +1633,7 @@ export type StudentUpdateWithoutRequirementsInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
   area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
   location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
@@ -1377,6 +1654,10 @@ export type StudentUncheckedUpdateWithoutRequirementsInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1397,6 +1678,9 @@ export type StudentCreateWithoutApplicationsInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1404,6 +1688,7 @@ export type StudentCreateWithoutApplicationsInput = {
   account: Prisma.AccountCreateNestedOneWithoutStudentInput
   area: Prisma.AreaCreateNestedOneWithoutStudentsInput
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutStudentInput
   location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
@@ -1424,6 +1709,10 @@ export type StudentUncheckedCreateWithoutApplicationsInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1460,6 +1749,9 @@ export type StudentUpdateWithoutApplicationsInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1467,6 +1759,7 @@ export type StudentUpdateWithoutApplicationsInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
   area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
   location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
@@ -1487,6 +1780,10 @@ export type StudentUncheckedUpdateWithoutApplicationsInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1507,6 +1804,9 @@ export type StudentCreateWithoutReviewsGivenInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1514,6 +1814,7 @@ export type StudentCreateWithoutReviewsGivenInput = {
   account: Prisma.AccountCreateNestedOneWithoutStudentInput
   area: Prisma.AreaCreateNestedOneWithoutStudentsInput
   verificationFile?: Prisma.FileAssetCreateNestedOneWithoutStudentVerificationsInput
+  verificationReviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedStudentsInput
   requirements?: Prisma.TuitionRequirementCreateNestedManyWithoutStudentInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutStudentInput
   location?: Prisma.StudentLocationCreateNestedOneWithoutStudentInput
@@ -1534,6 +1835,10 @@ export type StudentUncheckedCreateWithoutReviewsGivenInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1570,6 +1875,9 @@ export type StudentUpdateWithoutReviewsGivenInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1577,6 +1885,7 @@ export type StudentUpdateWithoutReviewsGivenInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
   area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
@@ -1597,6 +1906,10 @@ export type StudentUncheckedUpdateWithoutReviewsGivenInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1604,6 +1917,109 @@ export type StudentUncheckedUpdateWithoutReviewsGivenInput = {
   requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
   location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type StudentCreateManyVerificationReviewedByInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  areaId: number
+  address: string
+  emergencyContact: string
+  whatsappNumber?: string | null
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber: string
+  verificationFileId?: string | null
+  verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationNote?: string | null
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StudentUpdateWithoutVerificationReviewedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
+  area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
+  verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUpdateOneWithoutStudentNestedInput
+}
+
+export type StudentUncheckedUpdateWithoutVerificationReviewedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  areaId?: Prisma.IntFieldUpdateOperationsInput | number
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requirements?: Prisma.TuitionRequirementUncheckedUpdateManyWithoutStudentNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutStudentNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutStudentNestedInput
+  location?: Prisma.StudentLocationUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type StudentUncheckedUpdateManyWithoutVerificationReviewedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  areaId?: Prisma.IntFieldUpdateOperationsInput | number
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StudentCreateManyAreaInput = {
@@ -1620,6 +2036,10 @@ export type StudentCreateManyAreaInput = {
   studentIdNumber: string
   verificationFileId?: string | null
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1637,12 +2057,16 @@ export type StudentUpdateWithoutAreaInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
   verificationFile?: Prisma.FileAssetUpdateOneWithoutStudentVerificationsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
@@ -1663,6 +2087,10 @@ export type StudentUncheckedUpdateWithoutAreaInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1687,6 +2115,10 @@ export type StudentUncheckedUpdateManyWithoutAreaInput = {
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1707,6 +2139,10 @@ export type StudentCreateManyVerificationFileInput = {
   phoneVerifiedAt?: Date | string | null
   studentIdNumber: string
   verificationStatus?: $Enums.VerificationStatus
+  verificationSubmittedAt?: Date | string | null
+  verificationDecidedAt?: Date | string | null
+  verificationReviewedById?: string | null
+  verificationNote?: string | null
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1724,12 +2160,16 @@ export type StudentUpdateWithoutVerificationFileInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneRequiredWithoutStudentNestedInput
   area?: Prisma.AreaUpdateOneRequiredWithoutStudentsNestedInput
+  verificationReviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedStudentsNestedInput
   requirements?: Prisma.TuitionRequirementUpdateManyWithoutStudentNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutStudentNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutStudentNestedInput
@@ -1750,6 +2190,10 @@ export type StudentUncheckedUpdateWithoutVerificationFileInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1774,6 +2218,10 @@ export type StudentUncheckedUpdateManyWithoutVerificationFileInput = {
   phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentIdNumber?: Prisma.StringFieldUpdateOperationsInput | string
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1844,6 +2292,10 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
+  verificationSubmittedAt?: boolean
+  verificationDecidedAt?: boolean
+  verificationReviewedById?: boolean
+  verificationNote?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
@@ -1851,6 +2303,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
   verificationFile?: boolean | Prisma.Student$verificationFileArgs<ExtArgs>
+  verificationReviewedBy?: boolean | Prisma.Student$verificationReviewedByArgs<ExtArgs>
   requirements?: boolean | Prisma.Student$requirementsArgs<ExtArgs>
   applications?: boolean | Prisma.Student$applicationsArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.Student$reviewsGivenArgs<ExtArgs>
@@ -1873,6 +2326,10 @@ export type StudentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
+  verificationSubmittedAt?: boolean
+  verificationDecidedAt?: boolean
+  verificationReviewedById?: boolean
+  verificationNote?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
@@ -1880,6 +2337,7 @@ export type StudentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
   verificationFile?: boolean | Prisma.Student$verificationFileArgs<ExtArgs>
+  verificationReviewedBy?: boolean | Prisma.Student$verificationReviewedByArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
 
 export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1897,6 +2355,10 @@ export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
+  verificationSubmittedAt?: boolean
+  verificationDecidedAt?: boolean
+  verificationReviewedById?: boolean
+  verificationNote?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
@@ -1904,6 +2366,7 @@ export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
   verificationFile?: boolean | Prisma.Student$verificationFileArgs<ExtArgs>
+  verificationReviewedBy?: boolean | Prisma.Student$verificationReviewedByArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
 
 export type StudentSelectScalar = {
@@ -1921,17 +2384,22 @@ export type StudentSelectScalar = {
   studentIdNumber?: boolean
   verificationFileId?: boolean
   verificationStatus?: boolean
+  verificationSubmittedAt?: boolean
+  verificationDecidedAt?: boolean
+  verificationReviewedById?: boolean
+  verificationNote?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "areaId" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "verificationFileId" | "verificationStatus" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
+export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "areaId" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "verificationFileId" | "verificationStatus" | "verificationSubmittedAt" | "verificationDecidedAt" | "verificationReviewedById" | "verificationNote" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
 export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
   verificationFile?: boolean | Prisma.Student$verificationFileArgs<ExtArgs>
+  verificationReviewedBy?: boolean | Prisma.Student$verificationReviewedByArgs<ExtArgs>
   requirements?: boolean | Prisma.Student$requirementsArgs<ExtArgs>
   applications?: boolean | Prisma.Student$applicationsArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.Student$reviewsGivenArgs<ExtArgs>
@@ -1942,11 +2410,13 @@ export type StudentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
   verificationFile?: boolean | Prisma.Student$verificationFileArgs<ExtArgs>
+  verificationReviewedBy?: boolean | Prisma.Student$verificationReviewedByArgs<ExtArgs>
 }
 export type StudentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
   verificationFile?: boolean | Prisma.Student$verificationFileArgs<ExtArgs>
+  verificationReviewedBy?: boolean | Prisma.Student$verificationReviewedByArgs<ExtArgs>
 }
 
 export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1955,6 +2425,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     account: Prisma.$AccountPayload<ExtArgs>
     area: Prisma.$AreaPayload<ExtArgs>
     verificationFile: Prisma.$FileAssetPayload<ExtArgs> | null
+    verificationReviewedBy: Prisma.$AdminUserPayload<ExtArgs> | null
     requirements: Prisma.$TuitionRequirementPayload<ExtArgs>[]
     applications: Prisma.$ApplicationPayload<ExtArgs>[]
     reviewsGiven: Prisma.$ReviewPayload<ExtArgs>[]
@@ -1975,6 +2446,10 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     studentIdNumber: string
     verificationFileId: string | null
     verificationStatus: $Enums.VerificationStatus
+    verificationSubmittedAt: Date | null
+    verificationDecidedAt: Date | null
+    verificationReviewedById: string | null
+    verificationNote: string | null
     ratingAvg: runtime.Decimal
     ratingCount: number
     createdAt: Date
@@ -2376,6 +2851,7 @@ export interface Prisma__StudentClient<T, Null = never, ExtArgs extends runtime.
   account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   area<T extends Prisma.AreaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AreaDefaultArgs<ExtArgs>>): Prisma.Prisma__AreaClient<runtime.Types.Result.GetResult<Prisma.$AreaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   verificationFile<T extends Prisma.Student$verificationFileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$verificationFileArgs<ExtArgs>>): Prisma.Prisma__FileAssetClient<runtime.Types.Result.GetResult<Prisma.$FileAssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  verificationReviewedBy<T extends Prisma.Student$verificationReviewedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$verificationReviewedByArgs<ExtArgs>>): Prisma.Prisma__AdminUserClient<runtime.Types.Result.GetResult<Prisma.$AdminUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   requirements<T extends Prisma.Student$requirementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$requirementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TuitionRequirementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   applications<T extends Prisma.Student$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsGiven<T extends Prisma.Student$reviewsGivenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$reviewsGivenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2423,6 +2899,10 @@ export interface StudentFieldRefs {
   readonly studentIdNumber: Prisma.FieldRef<"Student", 'String'>
   readonly verificationFileId: Prisma.FieldRef<"Student", 'String'>
   readonly verificationStatus: Prisma.FieldRef<"Student", 'VerificationStatus'>
+  readonly verificationSubmittedAt: Prisma.FieldRef<"Student", 'DateTime'>
+  readonly verificationDecidedAt: Prisma.FieldRef<"Student", 'DateTime'>
+  readonly verificationReviewedById: Prisma.FieldRef<"Student", 'String'>
+  readonly verificationNote: Prisma.FieldRef<"Student", 'String'>
   readonly ratingAvg: Prisma.FieldRef<"Student", 'Decimal'>
   readonly ratingCount: Prisma.FieldRef<"Student", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Student", 'DateTime'>
@@ -2844,6 +3324,25 @@ export type Student$verificationFileArgs<ExtArgs extends runtime.Types.Extension
    */
   include?: Prisma.FileAssetInclude<ExtArgs> | null
   where?: Prisma.FileAssetWhereInput
+}
+
+/**
+ * Student.verificationReviewedBy
+ */
+export type Student$verificationReviewedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminUser
+   */
+  select?: Prisma.AdminUserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminUser
+   */
+  omit?: Prisma.AdminUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
+  where?: Prisma.AdminUserWhereInput
 }
 
 /**

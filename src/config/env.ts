@@ -29,6 +29,9 @@ const schema = z.object({
   R2_BUCKET: z.string().optional(),
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
+  // Optional second bucket served from a public domain (R2_PUBLIC_URL_PREFIX). Without both,
+  // approved videos and blog covers are served through short-lived signed URLs instead.
+  R2_PUBLIC_BUCKET: z.string().optional(),
   R2_PUBLIC_URL_PREFIX: z.string().optional(),
 
   N8N_WEBHOOK_URL: z.string().optional(),

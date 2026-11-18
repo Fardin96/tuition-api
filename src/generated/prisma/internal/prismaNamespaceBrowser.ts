@@ -214,7 +214,9 @@ export const FileAssetScalarFieldEnum = {
   status: 'status',
   createdAt: 'createdAt',
   uploadedAt: 'uploadedAt',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  originalName: 'originalName',
+  publishedAt: 'publishedAt'
 } as const
 
 export type FileAssetScalarFieldEnum = (typeof FileAssetScalarFieldEnum)[keyof typeof FileAssetScalarFieldEnum]
@@ -235,6 +237,10 @@ export const StudentScalarFieldEnum = {
   studentIdNumber: 'studentIdNumber',
   verificationFileId: 'verificationFileId',
   verificationStatus: 'verificationStatus',
+  verificationSubmittedAt: 'verificationSubmittedAt',
+  verificationDecidedAt: 'verificationDecidedAt',
+  verificationReviewedById: 'verificationReviewedById',
+  verificationNote: 'verificationNote',
   ratingAvg: 'ratingAvg',
   ratingCount: 'ratingCount',
   createdAt: 'createdAt',

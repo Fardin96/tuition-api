@@ -45,6 +45,8 @@ export type FileAssetMinAggregateOutputType = {
   createdAt: Date | null
   uploadedAt: Date | null
   deletedAt: Date | null
+  originalName: string | null
+  publishedAt: Date | null
 }
 
 export type FileAssetMaxAggregateOutputType = {
@@ -58,6 +60,8 @@ export type FileAssetMaxAggregateOutputType = {
   createdAt: Date | null
   uploadedAt: Date | null
   deletedAt: Date | null
+  originalName: string | null
+  publishedAt: Date | null
 }
 
 export type FileAssetCountAggregateOutputType = {
@@ -71,6 +75,8 @@ export type FileAssetCountAggregateOutputType = {
   createdAt: number
   uploadedAt: number
   deletedAt: number
+  originalName: number
+  publishedAt: number
   _all: number
 }
 
@@ -94,6 +100,8 @@ export type FileAssetMinAggregateInputType = {
   createdAt?: true
   uploadedAt?: true
   deletedAt?: true
+  originalName?: true
+  publishedAt?: true
 }
 
 export type FileAssetMaxAggregateInputType = {
@@ -107,6 +115,8 @@ export type FileAssetMaxAggregateInputType = {
   createdAt?: true
   uploadedAt?: true
   deletedAt?: true
+  originalName?: true
+  publishedAt?: true
 }
 
 export type FileAssetCountAggregateInputType = {
@@ -120,6 +130,8 @@ export type FileAssetCountAggregateInputType = {
   createdAt?: true
   uploadedAt?: true
   deletedAt?: true
+  originalName?: true
+  publishedAt?: true
   _all?: true
 }
 
@@ -220,6 +232,8 @@ export type FileAssetGroupByOutputType = {
   createdAt: Date
   uploadedAt: Date | null
   deletedAt: Date | null
+  originalName: string | null
+  publishedAt: Date | null
   _count: FileAssetCountAggregateOutputType | null
   _avg: FileAssetAvgAggregateOutputType | null
   _sum: FileAssetSumAggregateOutputType | null
@@ -256,6 +270,8 @@ export type FileAssetWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"FileAsset"> | Date | string
   uploadedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
+  originalName?: Prisma.StringNullableFilter<"FileAsset"> | string | null
+  publishedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
   owner?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   studentVerifications?: Prisma.StudentListRelationFilter
   tutorVerifications?: Prisma.TutorVerificationListRelationFilter
@@ -275,6 +291,8 @@ export type FileAssetOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  originalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   owner?: Prisma.AccountOrderByWithRelationInput
   studentVerifications?: Prisma.StudentOrderByRelationAggregateInput
   tutorVerifications?: Prisma.TutorVerificationOrderByRelationAggregateInput
@@ -297,6 +315,8 @@ export type FileAssetWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"FileAsset"> | Date | string
   uploadedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
+  originalName?: Prisma.StringNullableFilter<"FileAsset"> | string | null
+  publishedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
   owner?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   studentVerifications?: Prisma.StudentListRelationFilter
   tutorVerifications?: Prisma.TutorVerificationListRelationFilter
@@ -316,6 +336,8 @@ export type FileAssetOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  originalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FileAssetCountOrderByAggregateInput
   _avg?: Prisma.FileAssetAvgOrderByAggregateInput
   _max?: Prisma.FileAssetMaxOrderByAggregateInput
@@ -337,6 +359,8 @@ export type FileAssetScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"FileAsset"> | Date | string
   uploadedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"FileAsset"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"FileAsset"> | Date | string | null
+  originalName?: Prisma.StringNullableWithAggregatesFilter<"FileAsset"> | string | null
+  publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"FileAsset"> | Date | string | null
 }
 
 export type FileAssetCreateInput = {
@@ -349,6 +373,8 @@ export type FileAssetCreateInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   owner: Prisma.AccountCreateNestedOneWithoutFilesInput
   studentVerifications?: Prisma.StudentCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutFileInput
@@ -368,6 +394,8 @@ export type FileAssetUncheckedCreateInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   studentVerifications?: Prisma.StudentUncheckedCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutFileInput
   credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutFileInput
@@ -385,6 +413,8 @@ export type FileAssetUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.AccountUpdateOneRequiredWithoutFilesNestedInput
   studentVerifications?: Prisma.StudentUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUpdateManyWithoutFileNestedInput
@@ -404,6 +434,8 @@ export type FileAssetUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentVerifications?: Prisma.StudentUncheckedUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutFileNestedInput
   credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutFileNestedInput
@@ -422,6 +454,8 @@ export type FileAssetCreateManyInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
 }
 
 export type FileAssetUpdateManyMutationInput = {
@@ -434,6 +468,8 @@ export type FileAssetUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileAssetUncheckedUpdateManyInput = {
@@ -447,6 +483,8 @@ export type FileAssetUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileAssetListRelationFilter = {
@@ -470,6 +508,8 @@ export type FileAssetCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
+  publishedAt?: Prisma.SortOrder
 }
 
 export type FileAssetAvgOrderByAggregateInput = {
@@ -487,6 +527,8 @@ export type FileAssetMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
+  publishedAt?: Prisma.SortOrder
 }
 
 export type FileAssetMinOrderByAggregateInput = {
@@ -500,6 +542,8 @@ export type FileAssetMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   uploadedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
+  publishedAt?: Prisma.SortOrder
 }
 
 export type FileAssetSumOrderByAggregateInput = {
@@ -650,6 +694,8 @@ export type FileAssetCreateWithoutOwnerInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   studentVerifications?: Prisma.StudentCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutFileInput
   credentials?: Prisma.TutorCredentialCreateNestedManyWithoutFileInput
@@ -667,6 +713,8 @@ export type FileAssetUncheckedCreateWithoutOwnerInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   studentVerifications?: Prisma.StudentUncheckedCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutFileInput
   credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutFileInput
@@ -714,6 +762,8 @@ export type FileAssetScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"FileAsset"> | Date | string
   uploadedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
+  originalName?: Prisma.StringNullableFilter<"FileAsset"> | string | null
+  publishedAt?: Prisma.DateTimeNullableFilter<"FileAsset"> | Date | string | null
 }
 
 export type FileAssetCreateWithoutStudentVerificationsInput = {
@@ -726,6 +776,8 @@ export type FileAssetCreateWithoutStudentVerificationsInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   owner: Prisma.AccountCreateNestedOneWithoutFilesInput
   tutorVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutFileInput
   credentials?: Prisma.TutorCredentialCreateNestedManyWithoutFileInput
@@ -744,6 +796,8 @@ export type FileAssetUncheckedCreateWithoutStudentVerificationsInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   tutorVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutFileInput
   credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutFileInput
   videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutFileInput
@@ -776,6 +830,8 @@ export type FileAssetUpdateWithoutStudentVerificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.AccountUpdateOneRequiredWithoutFilesNestedInput
   tutorVerifications?: Prisma.TutorVerificationUpdateManyWithoutFileNestedInput
   credentials?: Prisma.TutorCredentialUpdateManyWithoutFileNestedInput
@@ -794,6 +850,8 @@ export type FileAssetUncheckedUpdateWithoutStudentVerificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tutorVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutFileNestedInput
   credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutFileNestedInput
   videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutFileNestedInput
@@ -810,6 +868,8 @@ export type FileAssetCreateWithoutTutorVerificationsInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   owner: Prisma.AccountCreateNestedOneWithoutFilesInput
   studentVerifications?: Prisma.StudentCreateNestedManyWithoutVerificationFileInput
   credentials?: Prisma.TutorCredentialCreateNestedManyWithoutFileInput
@@ -828,6 +888,8 @@ export type FileAssetUncheckedCreateWithoutTutorVerificationsInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   studentVerifications?: Prisma.StudentUncheckedCreateNestedManyWithoutVerificationFileInput
   credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutFileInput
   videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutFileInput
@@ -860,6 +922,8 @@ export type FileAssetUpdateWithoutTutorVerificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.AccountUpdateOneRequiredWithoutFilesNestedInput
   studentVerifications?: Prisma.StudentUpdateManyWithoutVerificationFileNestedInput
   credentials?: Prisma.TutorCredentialUpdateManyWithoutFileNestedInput
@@ -878,6 +942,8 @@ export type FileAssetUncheckedUpdateWithoutTutorVerificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentVerifications?: Prisma.StudentUncheckedUpdateManyWithoutVerificationFileNestedInput
   credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutFileNestedInput
   videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutFileNestedInput
@@ -894,6 +960,8 @@ export type FileAssetCreateWithoutCredentialsInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   owner: Prisma.AccountCreateNestedOneWithoutFilesInput
   studentVerifications?: Prisma.StudentCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutFileInput
@@ -912,6 +980,8 @@ export type FileAssetUncheckedCreateWithoutCredentialsInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   studentVerifications?: Prisma.StudentUncheckedCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutFileInput
   videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutFileInput
@@ -944,6 +1014,8 @@ export type FileAssetUpdateWithoutCredentialsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.AccountUpdateOneRequiredWithoutFilesNestedInput
   studentVerifications?: Prisma.StudentUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUpdateManyWithoutFileNestedInput
@@ -962,6 +1034,8 @@ export type FileAssetUncheckedUpdateWithoutCredentialsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentVerifications?: Prisma.StudentUncheckedUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutFileNestedInput
   videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutFileNestedInput
@@ -978,6 +1052,8 @@ export type FileAssetCreateWithoutVideosInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   owner: Prisma.AccountCreateNestedOneWithoutFilesInput
   studentVerifications?: Prisma.StudentCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutFileInput
@@ -996,6 +1072,8 @@ export type FileAssetUncheckedCreateWithoutVideosInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   studentVerifications?: Prisma.StudentUncheckedCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutFileInput
   credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutFileInput
@@ -1028,6 +1106,8 @@ export type FileAssetUpdateWithoutVideosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.AccountUpdateOneRequiredWithoutFilesNestedInput
   studentVerifications?: Prisma.StudentUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUpdateManyWithoutFileNestedInput
@@ -1046,6 +1126,8 @@ export type FileAssetUncheckedUpdateWithoutVideosInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentVerifications?: Prisma.StudentUncheckedUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutFileNestedInput
   credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutFileNestedInput
@@ -1062,6 +1144,8 @@ export type FileAssetCreateWithoutBlogCoversInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   owner: Prisma.AccountCreateNestedOneWithoutFilesInput
   studentVerifications?: Prisma.StudentCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutFileInput
@@ -1080,6 +1164,8 @@ export type FileAssetUncheckedCreateWithoutBlogCoversInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
   studentVerifications?: Prisma.StudentUncheckedCreateNestedManyWithoutVerificationFileInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutFileInput
   credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutFileInput
@@ -1112,6 +1198,8 @@ export type FileAssetUpdateWithoutBlogCoversInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.AccountUpdateOneRequiredWithoutFilesNestedInput
   studentVerifications?: Prisma.StudentUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUpdateManyWithoutFileNestedInput
@@ -1130,6 +1218,8 @@ export type FileAssetUncheckedUpdateWithoutBlogCoversInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentVerifications?: Prisma.StudentUncheckedUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutFileNestedInput
   credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutFileNestedInput
@@ -1146,6 +1236,8 @@ export type FileAssetCreateManyOwnerInput = {
   createdAt?: Date | string
   uploadedAt?: Date | string | null
   deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
 }
 
 export type FileAssetUpdateWithoutOwnerInput = {
@@ -1158,6 +1250,8 @@ export type FileAssetUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentVerifications?: Prisma.StudentUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUpdateManyWithoutFileNestedInput
   credentials?: Prisma.TutorCredentialUpdateManyWithoutFileNestedInput
@@ -1175,6 +1269,8 @@ export type FileAssetUncheckedUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentVerifications?: Prisma.StudentUncheckedUpdateManyWithoutVerificationFileNestedInput
   tutorVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutFileNestedInput
   credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutFileNestedInput
@@ -1192,6 +1288,8 @@ export type FileAssetUncheckedUpdateManyWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1272,6 +1370,8 @@ export type FileAssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
+  originalName?: boolean
+  publishedAt?: boolean
   owner?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   studentVerifications?: boolean | Prisma.FileAsset$studentVerificationsArgs<ExtArgs>
   tutorVerifications?: boolean | Prisma.FileAsset$tutorVerificationsArgs<ExtArgs>
@@ -1292,6 +1392,8 @@ export type FileAssetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
+  originalName?: boolean
+  publishedAt?: boolean
   owner?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fileAsset"]>
 
@@ -1306,6 +1408,8 @@ export type FileAssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
+  originalName?: boolean
+  publishedAt?: boolean
   owner?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fileAsset"]>
 
@@ -1320,9 +1424,11 @@ export type FileAssetSelectScalar = {
   createdAt?: boolean
   uploadedAt?: boolean
   deletedAt?: boolean
+  originalName?: boolean
+  publishedAt?: boolean
 }
 
-export type FileAssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerAccountId" | "purpose" | "storageKey" | "contentType" | "sizeBytes" | "status" | "createdAt" | "uploadedAt" | "deletedAt", ExtArgs["result"]["fileAsset"]>
+export type FileAssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerAccountId" | "purpose" | "storageKey" | "contentType" | "sizeBytes" | "status" | "createdAt" | "uploadedAt" | "deletedAt" | "originalName" | "publishedAt", ExtArgs["result"]["fileAsset"]>
 export type FileAssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   studentVerifications?: boolean | Prisma.FileAsset$studentVerificationsArgs<ExtArgs>
@@ -1360,6 +1466,8 @@ export type $FileAssetPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     createdAt: Date
     uploadedAt: Date | null
     deletedAt: Date | null
+    originalName: string | null
+    publishedAt: Date | null
   }, ExtArgs["result"]["fileAsset"]>
   composites: {}
 }
@@ -1799,6 +1907,8 @@ export interface FileAssetFieldRefs {
   readonly createdAt: Prisma.FieldRef<"FileAsset", 'DateTime'>
   readonly uploadedAt: Prisma.FieldRef<"FileAsset", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"FileAsset", 'DateTime'>
+  readonly originalName: Prisma.FieldRef<"FileAsset", 'String'>
+  readonly publishedAt: Prisma.FieldRef<"FileAsset", 'DateTime'>
 }
     
 

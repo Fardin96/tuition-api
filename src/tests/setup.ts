@@ -6,6 +6,11 @@ if (process.env.TEST_DATABASE_URL) {
   process.env.DATABASE_POOL_URL = process.env.TEST_DATABASE_URL;
 }
 
+// Tests never reach a real bucket: storage is off unless a test installs createFakeStorage().
+for (const key of Object.keys(process.env)) {
+  if (key.startsWith("R2_")) delete process.env[key];
+}
+
 import { beforeAll, beforeEach } from "vitest";
 import type { PrismaClient } from "../generated/prisma/client.js";
 
@@ -22,6 +27,9 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  const { setStorageForTests } = await import("../lib/storage.js");
+  setStorageForTests(null);
+
   await prisma.$executeRawUnsafe(`
     TRUNCATE TABLE
       session,
