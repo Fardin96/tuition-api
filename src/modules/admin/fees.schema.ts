@@ -3,6 +3,7 @@ import {
   ApplicationStatus,
   FeeStatus,
   FeeType,
+  PaymentAttemptStatus,
   PaymentKind,
   PaymentMethod,
 } from "../../generated/prisma/enums.js";
@@ -148,9 +149,22 @@ export const adminFeeSchema = z
   .meta({ id: "AdminFee" });
 export type AdminFeeResponse = z.infer<typeof adminFeeSchema>;
 
+// Online (SSLCommerz) checkouts of this fee, newest first. Only the last 20 are sent.
+export const adminFeeAttemptSchema = z
+  .object({
+    tranId: z.string(),
+    status: z.nativeEnum(PaymentAttemptStatus),
+    totalAmount: z.string(),
+    failureReason: z.string().nullable(),
+    createdAt: z.date(),
+    settledAt: z.date().nullable(),
+  })
+  .meta({ id: "AdminFeeAttempt" });
+
 export const adminFeeDetailSchema = adminFeeSchema
   .extend({
     payments: z.array(adminFeePaymentSchema),
+    attempts: z.array(adminFeeAttemptSchema),
   })
   .meta({ id: "AdminFeeDetail" });
 export type AdminFeeDetailResponse = z.infer<typeof adminFeeDetailSchema>;

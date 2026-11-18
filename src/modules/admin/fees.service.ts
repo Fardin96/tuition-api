@@ -51,6 +51,18 @@ const detailInclude = {
       reversals: { select: { amount: true } },
     },
   },
+  attempts: {
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 20,
+    select: {
+      tranId: true,
+      status: true,
+      totalAmount: true,
+      failureReason: true,
+      createdAt: true,
+      settledAt: true,
+    },
+  },
 } satisfies Prisma.PlatformFeeInclude;
 
 type FeeRow = Prisma.PlatformFeeGetPayload<{ include: typeof feeInclude }>;
@@ -108,6 +120,14 @@ function toAdminFeeDetail(row: FeeDetailRow): AdminFeeDetailResponse {
       recordedByName: p.recordedBy?.name ?? null,
       reversesPaymentId: p.reversesPaymentId,
       reversedAmount: sumOf(p.reversals.map((r) => r.amount)).toFixed(2),
+    })),
+    attempts: row.attempts.map((a) => ({
+      tranId: a.tranId,
+      status: a.status,
+      totalAmount: a.totalAmount.toFixed(2),
+      failureReason: a.failureReason,
+      createdAt: a.createdAt,
+      settledAt: a.settledAt,
     })),
   };
 }

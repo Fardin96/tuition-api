@@ -490,6 +490,64 @@ describe("admin fees", () => {
       });
     });
 
+    it("lists the online attempts of the fee, newest first, with money as strings", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const setup = await setupApplication();
+      const fee = await makeFee(setup);
+      await prisma.paymentAttempt.create({
+        data: {
+          feeId: fee.id,
+          tutorId: setup.tutor.id,
+          tranId: "TATTEMPTOLD",
+          status: "FAILED",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          failureReason: "Gateway status FAILED",
+          createdAt: new Date("2031-01-01T00:00:00Z"),
+        },
+      });
+      await prisma.paymentAttempt.create({
+        data: {
+          feeId: fee.id,
+          tutorId: setup.tutor.id,
+          tranId: "TATTEMPTNEW",
+          status: "PENDING",
+          feeAmount: 1500,
+          chargeAmount: 37.5,
+          totalAmount: 1537.5,
+          createdAt: new Date("2031-01-02T00:00:00Z"),
+        },
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${FEES_URL}/${fee.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).attempts).toEqual([
+        {
+          tranId: "TATTEMPTNEW",
+          status: "PENDING",
+          totalAmount: "1537.50",
+          failureReason: null,
+          createdAt: "2031-01-02T00:00:00.000Z",
+          settledAt: null,
+        },
+        {
+          tranId: "TATTEMPTOLD",
+          status: "FAILED",
+          totalAmount: "1537.50",
+          failureReason: "Gateway status FAILED",
+          createdAt: "2031-01-01T00:00:00.000Z",
+          settledAt: null,
+        },
+      ]);
+    });
+
     it("unknown id returns 404", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });

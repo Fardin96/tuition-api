@@ -19,7 +19,7 @@ type Tx = Prisma.TransactionClient;
 
 const OPEN_STATUSES: FeeStatus[] = [FeeStatus.DUE, FeeStatus.PARTIAL];
 // Only these source states can move to SUCCEEDED. SUCCEEDED, REVIEW and UNAPPLIED are final here.
-const SETTLABLE: PaymentAttemptStatus[] = [
+export const SETTLABLE: PaymentAttemptStatus[] = [
   PaymentAttemptStatus.PENDING,
   PaymentAttemptStatus.FAILED,
   PaymentAttemptStatus.CANCELLED,
@@ -73,11 +73,11 @@ function apiUrl(path: string): string {
   return `${base}/api/v1/payments/sslcommerz/${path}`;
 }
 
-async function lockFee(tx: Tx, feeId: string) {
+export async function lockFee(tx: Tx, feeId: string) {
   await tx.$queryRaw`SELECT id FROM platform_fee WHERE id = ${feeId}::uuid FOR UPDATE`;
 }
 
-async function lockAttempt(tx: Tx, attemptId: string) {
+export async function lockAttempt(tx: Tx, attemptId: string) {
   await tx.$queryRaw`SELECT id FROM payment_attempt WHERE id = ${attemptId}::uuid FOR UPDATE`;
 }
 
@@ -305,7 +305,7 @@ function reviewReasons(v: GatewayTransaction, total: Prisma.Decimal): string[] {
 }
 
 // The same rules fee_payment_before_insert enforces, checked first so the attempt can be UNAPPLIED.
-async function ledgerBlock(
+export async function ledgerBlock(
   tx: Tx,
   fee: { status: FeeStatus; amountDue: Prisma.Decimal; amountPaid: Prisma.Decimal },
   feeAmount: Prisma.Decimal,

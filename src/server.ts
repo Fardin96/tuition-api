@@ -20,6 +20,7 @@ import { adminAreaRoutes } from "./modules/admin/areas.routes.js";
 import { adminAuditLogRoutes } from "./modules/admin/audit-logs.routes.js";
 import { adminFeeRoutes } from "./modules/admin/fees.routes.js";
 import { adminPackageRoutes } from "./modules/admin/packages.routes.js";
+import { adminPaymentRoutes } from "./modules/admin/payments.routes.js";
 import { adminSettingRoutes } from "./modules/admin/settings.routes.js";
 import { adminSubjectRoutes } from "./modules/admin/subjects.routes.js";
 import { adminZoneRequestRoutes } from "./modules/admin/zone-requests.routes.js";
@@ -137,6 +138,7 @@ export async function buildApp() {
   await app.register(adminApplicationRoutes, { prefix: "/api/v1/admin/applications" });
   // Full paths: /admin/fees/* and /admin/payments/:id/reverse.
   await app.register(adminFeeRoutes, { prefix: "/api/v1/admin" });
+  await app.register(adminPaymentRoutes, { prefix: "/api/v1/admin" });
   await app.register(adminPackageRoutes, { prefix: "/api/v1/admin/packages" });
   await app.register(adminSubjectRoutes, { prefix: "/api/v1/admin/subjects" });
   await app.register(adminAreaRoutes, { prefix: "/api/v1/admin/areas" });

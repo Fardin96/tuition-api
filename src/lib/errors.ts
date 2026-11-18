@@ -34,6 +34,7 @@ export const ERROR_CODES = {
   AreaExists: "AREA_EXISTS",
   PaymentsDisabled: "PAYMENTS_DISABLED",
   GatewayUnavailable: "GATEWAY_UNAVAILABLE",
+  InvalidPaymentState: "INVALID_PAYMENT_STATE",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;
