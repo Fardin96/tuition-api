@@ -33,7 +33,7 @@ const TRANSITIONS: {
     action: "confirm",
     summary: "Confirm an application",
     description:
-      "#63. The counterparty accepts. Other pending applications on the same listing are rejected, and a placement fee is created when a commission rate is set.",
+      "#63. The counterparty accepts. Other pending applications on the same listing are rejected, and a placement fee is created at commission_percent (40% unless an admin sets another rate; an explicit 0 creates none).",
     errors: [404, 409],
   },
   {

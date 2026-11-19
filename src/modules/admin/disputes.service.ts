@@ -117,7 +117,7 @@ export async function actOnDispute(
       after: {
         status: change.data.status,
         handledBy: admin.accountId,
-        ...(change.data.resolutionNote ? { note: change.data.resolutionNote } : {}),
+        ...(input.note ? { note: input.note } : {}),
       },
       ip,
     });

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "../../lib/prisma.js";
 import {
   createAccount,
@@ -180,6 +180,36 @@ describe("POST /reviews", () => {
       rating: 5,
     });
     expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("POST /reviews when the application is cancelled after the status check", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("answers 409 REVIEW_NOT_ALLOWED when review_guard rejects the insert", async () => {
+    const s = await setup();
+    await prisma.application.update({
+      where: { id: s.application.id },
+      data: { status: "CANCELLED" },
+    });
+    // The status check reads the application as it was before the cancellation.
+    vi.spyOn(prisma.application, "findUnique").mockResolvedValueOnce({
+      id: s.application.id,
+      status: "CONFIRMED",
+      tutor: { id: s.tutor.id, accountId: s.tutorAccount.id },
+      student: { id: s.student.id, accountId: s.studentAccount.id },
+    } as never);
+
+    const res = await post(s.studentHeaders, { applicationId: s.application.id, rating: 4 });
+
+    expect(res.statusCode).toBe(409);
+    expect(res.json()).toMatchObject({
+      code: "REVIEW_NOT_ALLOWED",
+      message: "You can review once the tuition is confirmed.",
+    });
+    expect(await prisma.review.count({ where: { studentId: s.student.id } })).toBe(0);
   });
 });
 
