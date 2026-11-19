@@ -20,10 +20,30 @@ beforeAll(async () => {
   const { prisma: client } = await import("../lib/prisma.js");
   prisma = client;
 
-  execSync("npx prisma migrate deploy", {
-    stdio: "ignore",
-    env: { ...process.env },
-  });
+  try {
+    execSync("npx prisma migrate deploy", {
+      stdio: "pipe",
+      encoding: "utf8",
+      env: { ...process.env },
+    });
+  } catch (err) {
+    const { stdout = "", stderr = "" } = err as { stdout?: string; stderr?: string };
+    const output = `${stdout}${stderr}`;
+    const dbName = new URL(process.env.DATABASE_URL ?? "").pathname;
+    if (!output.includes("P3005") || !dbName.includes("test")) {
+      throw new Error(`prisma migrate deploy failed:\n${output}`);
+    }
+    // The DB has tables but no migration history (P3005), so it is rebuilt from the migrations.
+    await prisma.$executeRawUnsafe("DROP SCHEMA public CASCADE");
+    await prisma.$executeRawUnsafe("CREATE SCHEMA public");
+    await prisma.$executeRawUnsafe("CREATE EXTENSION IF NOT EXISTS pg_trgm");
+    await prisma.$executeRawUnsafe("CREATE EXTENSION IF NOT EXISTS postgis");
+    execSync("npx prisma migrate deploy", {
+      stdio: "pipe",
+      encoding: "utf8",
+      env: { ...process.env },
+    });
+  }
 });
 
 beforeEach(async () => {
