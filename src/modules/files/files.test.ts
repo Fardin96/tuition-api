@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../lib/prisma.js";
-import { setStorageForTests } from "../../lib/storage.js";
+import { contentDisposition, setStorageForTests } from "../../lib/storage.js";
 import {
   createAccount,
   createAdmin,
@@ -11,6 +11,7 @@ import {
   fakeFileBytes,
   getAuthHeaders,
 } from "../../tests/helpers.js";
+import { cleanFileName, MAX_FILE_NAME } from "./file-policy.js";
 
 const PDF_SIZE = 64;
 const MB = 1024 * 1024;
@@ -87,7 +88,9 @@ describe("POST /api/v1/files/upload-url", () => {
     const row = await prisma.fileAsset.findUniqueOrThrow({ where: { id: body.file.id } });
     expect(row.status).toBe("PENDING_UPLOAD");
     expect(row.storageKey.startsWith(`credential/${account.id}/`)).toBe(true);
-    expect(fake.presignedPuts).toEqual([{ key: row.storageKey, contentType: "application/pdf" }]);
+    expect(fake.presignedPuts).toEqual([
+      { key: row.storageKey, contentType: "application/pdf", contentLength: PDF_SIZE },
+    ]);
   });
 
   it("answers 403 when a student asks for a tutor video", async () => {
@@ -182,6 +185,57 @@ describe("POST /api/v1/files/upload-url", () => {
     const res = await startUpload(app, headers, body);
     expect(res.statusCode).toBe(409);
     expect(res.json().code).toBe("UPLOAD_LIMIT_REACHED");
+  });
+
+  it("counts finished but unused uploads toward the limit, and not attached ones", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const { account, headers } = await tutorWithHeaders();
+    const tutor = await createTutorProfile(account.id);
+    const body = { purpose: "CREDENTIAL", contentType: "application/pdf", sizeBytes: PDF_SIZE };
+
+    const used = await Promise.all(
+      Array.from({ length: 3 }, () => createFileAsset(account.id, "CREDENTIAL")),
+    );
+    for (const file of used) {
+      await prisma.tutorCredential.create({
+        data: { tutorId: tutor.id, examLabel: "SSC", result: "A+", fileId: file.id },
+      });
+    }
+    for (let i = 0; i < 6; i++) await createFileAsset(account.id, "CREDENTIAL");
+    await createFileAsset(account.id, "CREDENTIAL", { status: "DELETED" });
+
+    // 6 unused uploaded + 3 pending = 9; the 3 attached and the deleted one do not count.
+    for (let i = 0; i < 3; i++) {
+      expect((await startUpload(app, headers, body)).statusCode).toBe(201);
+    }
+    expect((await startUpload(app, headers, body)).statusCode).toBe(201);
+    const res = await startUpload(app, headers, body);
+    expect(res.statusCode).toBe(409);
+    expect(res.json().code).toBe("UPLOAD_LIMIT_REACHED");
+  });
+
+  it("cleans the file name instead of refusing it", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const { headers } = await tutorWithHeaders();
+    const base = { purpose: "CREDENTIAL", contentType: "application/pdf", sizeBytes: PDF_SIZE };
+
+    const spoofed = await startUpload(app, headers, {
+      ...base,
+      fileName: "C:\\fakepath\\cert\u202Efdp.exe",
+    });
+    expect(spoofed.statusCode).toBe(201);
+    expect(spoofed.json().file.fileName).toBe("certfdp.exe");
+
+    const blank = await startUpload(app, headers, { ...base, fileName: "   " });
+    expect(blank.statusCode).toBe(201);
+    expect(blank.json().file.fileName).toBeNull();
+
+    const long = await startUpload(app, headers, { ...base, fileName: `${"a".repeat(400)}.pdf` });
+    expect(long.statusCode).toBe(201);
+    expect(long.json().file.fileName).toHaveLength(MAX_FILE_NAME);
+    expect(long.json().file.fileName.endsWith(".pdf")).toBe(true);
   });
 
   it("answers 503 STORAGE_UNAVAILABLE when storage is not configured", async () => {
@@ -429,5 +483,45 @@ describe("file routes need a signed-in account", () => {
       payload: { purpose: "CREDENTIAL", contentType: "application/pdf", sizeBytes: PDF_SIZE },
     });
     expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("cleanFileName", () => {
+  it("keeps an ordinary name, including non-Latin scripts", () => {
+    expect(cleanFileName("certificate.pdf")).toBe("certificate.pdf");
+    expect(cleanFileName("জাতীয় পরিচয়পত্র.jpg")).toBe("জাতীয় পরিচয়পত্র.jpg");
+  });
+
+  it("drops paths, control and direction characters, and folds whitespace", () => {
+    expect(cleanFileName("C:\\fakepath\\id.png")).toBe("id.png");
+    expect(cleanFileName("../../etc/passwd")).toBe("passwd");
+    expect(cleanFileName("my\u202Egnp.exe")).toBe("mygnp.exe");
+    expect(cleanFileName("a\u0000b\n c\t.pdf")).toBe("ab c.pdf");
+    expect(cleanFileName("\u200B \u00A0 ")).toBeNull();
+  });
+
+  it("shortens long names and keeps the extension", () => {
+    const name = cleanFileName(`${"x".repeat(500)}.webm`);
+    expect(name).toHaveLength(MAX_FILE_NAME);
+    expect(name?.endsWith(".webm")).toBe(true);
+    // Never splits a character made of two UTF-16 units.
+    const emoji = cleanFileName(`${"😀".repeat(300)}.png`) ?? "";
+    expect([...emoji]).toHaveLength(MAX_FILE_NAME);
+    expect(() => encodeURIComponent(emoji)).not.toThrow();
+  });
+});
+
+describe("contentDisposition", () => {
+  it("adds an RFC 5987 name so non-ASCII names survive", () => {
+    expect(contentDisposition("id.pdf")).toBe(`inline; filename="id.pdf"; filename*=UTF-8''id.pdf`);
+    const header = contentDisposition('জাতীয় "ID" (scan).pdf');
+    expect(header.startsWith("inline; filename=\"ID (scan).pdf\"; filename*=UTF-8''")).toBe(true);
+    const encoded = header.split("filename*=UTF-8''")[1] ?? "";
+    expect(encoded).not.toMatch(/[\s"'()]/);
+    expect(decodeURIComponent(encoded)).toBe('জাতীয় "ID" (scan).pdf');
+  });
+
+  it("falls back to a plain name when nothing ASCII is left", () => {
+    expect(contentDisposition("পরিচয়").startsWith('inline; filename="file";')).toBe(true);
   });
 });

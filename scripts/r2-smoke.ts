@@ -1,4 +1,5 @@
-// Round-trips one 64-byte PDF through the real R2 buckets: signed PUT, head, read, signed GET, and
+// Round-trips one 64-byte PDF through the real R2 buckets: signed PUT (and a refused PUT of the
+// wrong size), head, read, signed GET, and
 // (when R2_PUBLIC_BUCKET and R2_PUBLIC_URL_PREFIX are set) copy to the public bucket and fetch it.
 // Writes under smoke/ and deletes what it wrote. Run: yarn r2:smoke
 
@@ -21,8 +22,22 @@ function step(name: string, detail?: string) {
 }
 
 async function main() {
-  const putUrl = await storage.presignPut({ key, contentType: "application/pdf", expiresIn: 300 });
+  const putUrl = await storage.presignPut({
+    key,
+    contentType: "application/pdf",
+    contentLength: body.length,
+    expiresIn: 300,
+  });
   step("presign PUT");
+
+  // The signed Content-Length must make R2 refuse a body of another size.
+  const oversized = await fetch(putUrl, {
+    method: "PUT",
+    headers: { "Content-Type": "application/pdf" },
+    body: new Uint8Array(body.length + 1),
+  });
+  if (oversized.ok) throw new Error("R2 accepted a body larger than the signed size");
+  step("wrong size refused", `HTTP ${oversized.status}`);
 
   const put = await fetch(putUrl, {
     method: "PUT",

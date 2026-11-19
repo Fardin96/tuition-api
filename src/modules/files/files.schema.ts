@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { FilePurpose, FileStatus } from "../../generated/prisma/enums.js";
+import { cleanFileName } from "./file-policy.js";
 
 export const fileIdParamSchema = z.object({ id: z.string().uuid() });
 export type FileIdParam = z.infer<typeof fileIdParamSchema>;
@@ -23,7 +24,12 @@ export const createUploadUrlSchema = z
     purpose: z.nativeEnum(FilePurpose),
     contentType: z.string().trim().toLowerCase().min(1).max(100),
     sizeBytes: z.number().int().positive(),
-    fileName: z.string().trim().min(1).max(200).optional(),
+    // Cleaned and shortened rather than refused, so an odd name never blocks an upload.
+    fileName: z
+      .string()
+      .max(1000)
+      .optional()
+      .transform((name) => (name === undefined ? undefined : (cleanFileName(name) ?? undefined))),
   })
   .meta({ id: "CreateUploadUrl" });
 export type CreateUploadUrlInput = z.infer<typeof createUploadUrlSchema>;

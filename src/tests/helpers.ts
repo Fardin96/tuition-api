@@ -373,7 +373,7 @@ export function createFakeStorage(options: { publicBucket?: boolean } = {}) {
   const publicBucket = options.publicBucket ?? true;
   const objects = new Map<string, { bytes: Uint8Array; contentType: string }>();
   const publicObjects = new Map<string, { bytes: Uint8Array; contentType: string }>();
-  const presignedPuts: { key: string; contentType: string }[] = [];
+  const presignedPuts: { key: string; contentType: string; contentLength: number }[] = [];
   let nextFailure: Error | null = null;
 
   const maybeFail = () => {
@@ -385,9 +385,9 @@ export function createFakeStorage(options: { publicBucket?: boolean } = {}) {
   };
 
   const storage: ObjectStorage = {
-    async presignPut({ key, contentType, expiresIn }) {
+    async presignPut({ key, contentType, contentLength, expiresIn }) {
       maybeFail();
-      presignedPuts.push({ key, contentType });
+      presignedPuts.push({ key, contentType, contentLength });
       return `https://fake-r2.test/private/${key}?put&expires=${expiresIn}`;
     },
     async presignGet({ key, expiresIn }) {

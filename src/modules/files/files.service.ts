@@ -10,7 +10,7 @@ import {
   EMBED_URL_TTL,
   extensionFor,
   FILE_POLICY,
-  MAX_PENDING_UPLOADS,
+  MAX_UNUSED_UPLOADS,
   SNIFF_BYTES,
   sniffMatches,
   UPLOAD_URL_TTL,
@@ -70,15 +70,19 @@ export async function createUploadUrl(
   const storage = getStorage();
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const pending = await prisma.fileAsset.count({
-    where: { ownerAccountId, status: "PENDING_UPLOAD", createdAt: { gte: since } },
+  const unused = await prisma.fileAsset.count({
+    where: {
+      ownerAccountId,
+      createdAt: { gte: since },
+      OR: [{ status: "PENDING_UPLOAD" }, { status: "UPLOADED", ...unattachedFileWhere }],
+    },
   });
-  if (pending >= MAX_PENDING_UPLOADS) {
+  if (unused >= MAX_UNUSED_UPLOADS) {
     throw appError(
       "UploadLimitReached",
       409,
-      "Too many unfinished uploads. Finish or remove one, or try again tomorrow.",
-      { limit: MAX_PENDING_UPLOADS },
+      "Too many uploads that are not used yet. Use or remove one, or try again tomorrow.",
+      { limit: MAX_UNUSED_UPLOADS },
     );
   }
 
@@ -86,6 +90,7 @@ export async function createUploadUrl(
   const uploadUrl = await storage.presignPut({
     key,
     contentType: input.contentType,
+    contentLength: input.sizeBytes,
     expiresIn: UPLOAD_URL_TTL,
   });
   const row = await prisma.fileAsset.create({
