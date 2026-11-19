@@ -79,10 +79,10 @@ describe("admin platform settings", () => {
         "require_tutor_verification",
         "require_phone_verification",
       ]);
-      // commission_percent has no seeded row, so it reports the default with no timestamp.
+      // commission_percent has no seeded row, so it reports the 40% default with no timestamp.
       expect(body.settings[0]).toEqual({
         key: "commission_percent",
-        value: 0,
+        value: 40,
         updatedAt: null,
         updatedByName: null,
       });
@@ -452,7 +452,7 @@ describe("admin platform settings", () => {
       });
       expect(commission.entityType).toBe("platform_setting");
       expect(commission.actorAccountId).toBe(superAdmin.id);
-      expect(commission.before).toEqual({ value: 0 });
+      expect(commission.before).toEqual({ value: 40 });
       expect(commission.after).toEqual({ value: 5 });
 
       const verification = await prisma.auditLog.findFirstOrThrow({

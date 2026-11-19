@@ -425,6 +425,20 @@ describe("GET /api/v1/reports/mine", () => {
     expect(bad.statusCode).toBe(400);
   });
 
+  it("answers 400 VALIDATION_ERROR for a cursor whose id is not a uuid", async () => {
+    const p = await setup();
+    const cursor = Buffer.from(JSON.stringify(["2026-11-01T10:00:00.000Z", "not-a-uuid"])).toString(
+      "base64url",
+    );
+    const res = await p.app.inject({
+      method: "GET",
+      url: `${URL}/mine?cursor=${cursor}`,
+      headers: await getAuthHeaders(p.studentAccount),
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().code).toBe("VALIDATION_ERROR");
+  });
+
   it("requires a signed-in student or tutor", async () => {
     const p = await setup();
     const anonymous = await p.app.inject({ method: "GET", url: `${URL}/mine` });

@@ -9,6 +9,7 @@ import type {
 } from "../../generated/prisma/enums.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { COMMISSION_DEFAULT_PERCENT } from "../admin/settings.service.js";
 import type { AuthContext } from "../auth/auth.schema.js";
 import { computeAllowedActions, type Side, type TargetState } from "./application.read.service.js";
 import { type ApplicationAction, FEE_DUE_IN_DAYS } from "./application.schema.js";
@@ -424,14 +425,14 @@ export async function transitionApplication(
         }
 
         // Placement fee = commission_percent of target.salary: the monthly salary for a
-        // requirement, the TOTAL package price for a package. Skipped when there is no commission
-        // or no amount (salary null).
+        // requirement, the TOTAL package price for a package. A missing row (or null value) uses
+        // COMMISSION_DEFAULT_PERCENT; an explicit 0 is skipped, as is a null salary.
         const [setting] = await tx.$queryRaw<{ pct: Prisma.Decimal | null }[]>`
           SELECT (value #>> '{}')::numeric AS pct
           FROM platform_setting
           WHERE key = 'commission_percent'
         `;
-        const pct = Number(setting?.pct ?? 0);
+        const pct = Number(setting?.pct ?? COMMISSION_DEFAULT_PERCENT);
         if (target.salary !== null && pct > 0) {
           await tx.$executeRaw`
             INSERT INTO platform_fee (id, tutor_id, application_id, fee_type, amount_due, due_date, status, updated_at)

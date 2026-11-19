@@ -8,9 +8,12 @@ import {
   type SettingValue,
 } from "./settings.schema.js";
 
+// Placement fee rate used when no commission_percent row exists. An explicit stored 0 means no fee.
+export const COMMISSION_DEFAULT_PERCENT = 40;
+
 // Used when a key has no platform_setting row yet.
 const DEFAULTS: Record<SettingKey, SettingValue> = {
-  commission_percent: 0,
+  commission_percent: COMMISSION_DEFAULT_PERCENT,
   gateway_charge_percent: 0,
   online_payments_enabled: true,
   refund_window_days: 7,

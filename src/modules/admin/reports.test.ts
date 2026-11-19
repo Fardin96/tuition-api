@@ -283,7 +283,7 @@ describe("admin reports", () => {
         method: "PATCH",
         url: `${BASE}/${row.id}`,
         headers: await getAuthHeaders(admin),
-        payload: { action: "ASSIGN", note: "ignored" },
+        payload: { action: "ASSIGN", note: "Looking into it" },
       });
 
       expect(res.statusCode).toBe(200);
@@ -300,7 +300,13 @@ describe("admin reports", () => {
       });
       expect(audit.actorAccountId).toBe(admin.id);
       expect(audit.before).toEqual({ status: "OPEN", handledBy: null });
-      expect(audit.after).toEqual({ status: "UNDER_REVIEW", handledBy: admin.id });
+      expect(audit.after).toEqual({
+        status: "UNDER_REVIEW",
+        handledBy: admin.id,
+        note: "Looking into it",
+      });
+      const row2 = await prisma.report.findUniqueOrThrow({ where: { id: row.id } });
+      expect(row2.resolutionNote).toBeNull();
     });
 
     it("ASSIGN reassigns an UNDER_REVIEW report held by another admin, but not one held by me", async () => {

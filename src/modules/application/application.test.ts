@@ -456,8 +456,27 @@ describe("confirm (#63)", () => {
     expect(Number(fees[0].amountDue)).toBe(1500);
   });
 
-  it("creates no fee when the commission setting is absent", async () => {
+  it("creates a 40% placement fee when the commission setting is absent", async () => {
     const app = await createTestApp();
+    const { appA, studentActor } = await setupCompetingApplications();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/applications/${appA.id}/confirm`,
+      headers: studentActor.headers,
+    });
+
+    expect(res.statusCode).toBe(200);
+    const fees = await prisma.platformFee.findMany({ where: { applicationId: appA.id } });
+    expect(fees).toHaveLength(1);
+    expect(fees[0]).toMatchObject({ feeType: "PLACEMENT", status: "DUE" });
+    // salary 5000 x 40%, rounded to 2 decimals.
+    expect(Number(fees[0].amountDue)).toBe(Number((5000 * 0.4).toFixed(2)));
+  });
+
+  it("creates no fee when commission_percent is explicitly 0", async () => {
+    const app = await createTestApp();
+    await setCommission(0);
     const { appA, studentActor } = await setupCompetingApplications();
 
     const res = await app.inject({

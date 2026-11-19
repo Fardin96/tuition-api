@@ -243,13 +243,14 @@ describe("admin disputes", () => {
         method: "PATCH",
         url: `${BASE}/${row.id}`,
         headers: await getAuthHeaders(admin),
-        payload: { action: "ASSIGN" },
+        payload: { action: "ASSIGN", note: "Looking into it" },
       });
 
       expect(res.statusCode).toBe(200);
       expect(JSON.parse(res.body)).toMatchObject({
         status: "UNDER_REVIEW",
         resolvedAt: null,
+        resolutionNote: null,
         handledBy: { accountId: admin.id },
       });
       const audit = await prisma.auditLog.findFirstOrThrow({
@@ -258,7 +259,13 @@ describe("admin disputes", () => {
       expect(audit.actorAccountId).toBe(admin.id);
       expect(audit.entityType).toBe("dispute");
       expect(audit.before).toEqual({ status: "OPEN", handledBy: null });
-      expect(audit.after).toEqual({ status: "UNDER_REVIEW", handledBy: admin.id });
+      expect(audit.after).toEqual({
+        status: "UNDER_REVIEW",
+        handledBy: admin.id,
+        note: "Looking into it",
+      });
+      const stored = await prisma.dispute.findUniqueOrThrow({ where: { id: row.id } });
+      expect(stored.resolutionNote).toBeNull();
     });
 
     it("ASSIGN reassigns an UNDER_REVIEW dispute held by another admin, but not one held by me", async () => {

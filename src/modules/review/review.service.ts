@@ -77,6 +77,12 @@ function isReviewConflict(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }
 
+// review_guard raises this when the application was cancelled after the status check above.
+function isGuardViolation(error: unknown) {
+  const text = error instanceof Error ? error.message : "";
+  return text.includes("review requires a confirmed or completed application");
+}
+
 export async function createReview(
   account: AuthContext,
   input: CreateReviewInput,
@@ -105,6 +111,9 @@ export async function createReview(
     // Two requests raced past the check above.
     if (isReviewConflict(error)) {
       throw appError("ReviewExists", 409, "You already reviewed this person.");
+    }
+    if (isGuardViolation(error)) {
+      throw appError("ReviewNotAllowed", 409, "You can review once the tuition is confirmed.");
     }
     throw error;
   }

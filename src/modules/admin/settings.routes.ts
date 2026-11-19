@@ -48,7 +48,7 @@ export async function adminSettingRoutes(app: FastifyInstance) {
           tag: "Admin",
           summary: "Update a platform setting",
           description:
-            "Super admin only. commission_percent takes 0 to 100 and gateway_charge_percent takes 0 to 10, each with at most 2 decimals. The switches take true or false. Changing require_tutor_verification re-evaluates every tutor's listing.",
+            "Super admin only. commission_percent takes 0 to 100 (default 40) and gateway_charge_percent takes 0 to 10, each with at most 2 decimals. The switches take true or false. Changing require_tutor_verification re-evaluates every tutor's listing.",
           auth: "admin",
           rateLimit: "60/min per account",
         }),
