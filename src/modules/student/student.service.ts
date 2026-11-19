@@ -3,6 +3,7 @@ import { assertContactNumbersFree, mapContactNumberError } from "../../lib/conta
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { claimFile } from "../files/files.service.js";
+import { visibleNote } from "../files/upload-review.service.js";
 import {
   findOwnLocation,
   type OwnLocation,
@@ -28,6 +29,7 @@ function serializeStudent(
     whatsappVerifiedAt: Date | null;
     verificationStatus: string;
     verificationNote: string | null;
+    verificationNoteVisible: boolean;
     verificationSubmittedAt: Date | null;
     verificationDecidedAt: Date | null;
     ratingAvg: unknown;
@@ -37,8 +39,11 @@ function serializeStudent(
   },
   location: OwnLocation | null,
 ) {
+  // The admin's note reaches the student only when it was shared.
+  const { verificationNoteVisible, ...row } = student;
   return {
-    ...student,
+    ...row,
+    verificationNote: visibleNote(student.verificationNote, verificationNoteVisible),
     ratingAvg: toNumber(student.ratingAvg),
     whatsappVerifiedAt: student.whatsappVerifiedAt?.toISOString() ?? null,
     verificationSubmittedAt: student.verificationSubmittedAt?.toISOString() ?? null,

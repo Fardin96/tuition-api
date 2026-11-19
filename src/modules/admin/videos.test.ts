@@ -226,7 +226,7 @@ describe("admin tutor videos", () => {
       });
       expect(audit.actorAccountId).toBe(admin.id);
       expect(audit.before).toEqual({ status: "PENDING" });
-      expect(audit.after).toEqual({ status: "APPROVED", note: null });
+      expect(audit.after).toEqual({ status: "APPROVED", note: null, noteVisible: true });
     });
 
     it("returns 404 for an unknown id", async () => {
@@ -299,5 +299,172 @@ describe("admin tutor videos", () => {
 
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body).videos[0].url).toBeNull();
+  });
+});
+
+describe("admin tutor video moderation history", () => {
+  const issueRow = (
+    accountId: string,
+    action: "REJECTED" | "REVOKED" | "REMOVED" | "APPROVED",
+    createdAt?: Date,
+  ) =>
+    prisma.uploadReview.create({
+      data: {
+        accountId,
+        purpose: "TUTOR_VIDEO",
+        action,
+        note: action === "APPROVED" ? null : "Earlier problem with the upload",
+        noteVisible: true,
+        createdAt,
+      },
+    });
+
+  it("approve writes one upload history row and a VIDEO_APPROVED alert without a note", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const { account, file, video } = await uploadVideo();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/${video.id}/moderate`,
+      headers: await getAuthHeaders(admin),
+      payload: { decision: "APPROVE", noteVisible: false },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      moderationNote: null,
+      noteVisible: true,
+      tutor: { accountId: account.id },
+      uploadFlags: { recentIssues: 0, uploadsBlocked: false },
+    });
+    const reviews = await prisma.uploadReview.findMany({ where: { accountId: account.id } });
+    expect(reviews).toHaveLength(1);
+    expect(reviews[0]).toMatchObject({
+      action: "APPROVED",
+      fileId: file.id,
+      purpose: "TUTOR_VIDEO",
+      fileName: "intro.mp4",
+      note: null,
+      actorAccountId: admin.id,
+    });
+    const alerts = await prisma.appNotification.findMany({ where: { recipientId: account.id } });
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0]).toMatchObject({
+      kind: "VIDEO_APPROVED",
+      note: null,
+      filePurpose: "TUTOR_VIDEO",
+    });
+  });
+
+  it("a rejection with a hidden note keeps the note from the tutor", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const { account, video } = await uploadVideo();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/${video.id}/moderate`,
+      headers: await getAuthHeaders(admin),
+      payload: { decision: "REJECT", note: "Audio is not audible", noteVisible: false },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      status: "REJECTED",
+      moderationNote: "Audio is not audible",
+      noteVisible: false,
+    });
+    const row = await prisma.tutorVideo.findUniqueOrThrow({ where: { id: video.id } });
+    expect(row.noteVisible).toBe(false);
+    const review = await prisma.uploadReview.findFirstOrThrow({ where: { accountId: account.id } });
+    expect(review).toMatchObject({
+      action: "REJECTED",
+      note: "Audio is not audible",
+      noteVisible: false,
+    });
+    const alert = await prisma.appNotification.findFirstOrThrow({
+      where: { recipientId: account.id },
+    });
+    expect(alert).toMatchObject({ kind: "VIDEO_REJECTED", note: null });
+  });
+
+  it("a visible rejection note reaches the tutor's alert", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const { account, video } = await uploadVideo();
+
+    await app.inject({
+      method: "POST",
+      url: `${BASE}/${video.id}/moderate`,
+      headers: await getAuthHeaders(admin),
+      payload: { decision: "REJECT", note: "Audio is not audible" },
+    });
+
+    const alert = await prisma.appNotification.findFirstOrThrow({
+      where: { recipientId: account.id },
+    });
+    expect(alert).toMatchObject({ kind: "VIDEO_REJECTED", note: "Audio is not audible" });
+  });
+
+  it("each decision adds one history row, take-down included", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const headers = await getAuthHeaders(admin);
+    const { account, video } = await uploadVideo();
+
+    await app.inject({
+      method: "POST",
+      url: `${BASE}/${video.id}/moderate`,
+      headers,
+      payload: { decision: "APPROVE" },
+    });
+    await app.inject({
+      method: "POST",
+      url: `${BASE}/${video.id}/moderate`,
+      headers,
+      payload: { decision: "REJECT", note: "Off topic for the profile" },
+    });
+    await app.inject({
+      method: "POST",
+      url: `${BASE}/${video.id}/moderate`,
+      headers,
+      payload: { decision: "APPROVE" },
+    });
+
+    const reviews = await prisma.uploadReview.findMany({
+      where: { accountId: account.id },
+      orderBy: { createdAt: "asc" },
+    });
+    expect(reviews.map((r) => r.action)).toEqual(["APPROVED", "REJECTED", "APPROVED"]);
+    const alerts = await prisma.appNotification.count({ where: { recipientId: account.id } });
+    expect(alerts).toBe(3);
+  });
+
+  it("uploadFlags counts the tutor's issues from the last 30 days and an active block", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const { account } = await uploadVideo();
+    const old = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000);
+    await issueRow(account.id, "REJECTED");
+    await issueRow(account.id, "REVOKED");
+    await issueRow(account.id, "REMOVED");
+    await issueRow(account.id, "APPROVED");
+    await issueRow(account.id, "REJECTED", old);
+
+    const headers = await getAuthHeaders(admin);
+    const list = JSON.parse((await app.inject({ method: "GET", url: BASE, headers })).body);
+    expect(list.videos[0].uploadFlags).toEqual({ recentIssues: 3, uploadsBlocked: false });
+
+    await prisma.uploadBlock.create({
+      data: {
+        accountId: account.id,
+        blocksVideos: true,
+        blocksDocuments: false,
+        note: "Paused while we check the uploads",
+      },
+    });
+    const blocked = JSON.parse((await app.inject({ method: "GET", url: BASE, headers })).body);
+    expect(blocked.videos[0].uploadFlags).toEqual({ recentIssues: 3, uploadsBlocked: true });
   });
 });

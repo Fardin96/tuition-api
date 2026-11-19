@@ -50,6 +50,7 @@ export const ERROR_CODES = {
   VideoAlreadyModerated: "VIDEO_ALREADY_MODERATED",
   BlogSlugExists: "BLOG_SLUG_EXISTS",
   InvalidPostState: "INVALID_POST_STATE",
+  UploadsBlocked: "UPLOADS_BLOCKED",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

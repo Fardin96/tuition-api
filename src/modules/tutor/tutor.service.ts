@@ -12,6 +12,7 @@ import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { MAX_TUTOR_CREDENTIALS, MAX_TUTOR_VIDEOS } from "../files/file-policy.js";
 import { claimFile, discardFile, fileUrl, removeObjects } from "../files/files.service.js";
+import { visibleNote } from "../files/upload-review.service.js";
 import {
   findOwnLocation,
   getTutorNeedsReaddress,
@@ -313,11 +314,16 @@ export async function submitTutorVerification(accountId: string, fileId: string)
 export async function getTutorVerifications(accountId: string) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId } });
   if (!tutor) return null;
-  return prisma.tutorVerification.findMany({
+  const rows = await prisma.tutorVerification.findMany({
     where: { tutorId: tutor.id },
     orderBy: { submittedAt: "desc" },
     include: { file: { select: { id: true, status: true } } },
   });
+  // The admin's note reaches the tutor only when it was shared.
+  return rows.map(({ noteVisible, note, ...row }) => ({
+    ...row,
+    note: visibleNote(note, noteVisible),
+  }));
 }
 
 export async function searchTutors(filters: {
@@ -483,7 +489,8 @@ async function ownerVideoFields(video: VideoRow) {
   return {
     ...(await publicVideoFields(video)),
     status: video.status,
-    moderationNote: video.moderationNote,
+    // Hidden admin notes never reach the uploader.
+    moderationNote: visibleNote(video.moderationNote, video.noteVisible),
   };
 }
 

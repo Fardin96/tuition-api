@@ -33,6 +33,7 @@ export type TutorVerificationMinAggregateOutputType = {
   reviewedById: string | null
   decidedAt: Date | null
   note: string | null
+  noteVisible: boolean | null
 }
 
 export type TutorVerificationMaxAggregateOutputType = {
@@ -44,6 +45,7 @@ export type TutorVerificationMaxAggregateOutputType = {
   reviewedById: string | null
   decidedAt: Date | null
   note: string | null
+  noteVisible: boolean | null
 }
 
 export type TutorVerificationCountAggregateOutputType = {
@@ -56,6 +58,7 @@ export type TutorVerificationCountAggregateOutputType = {
   reviewedById: number
   decidedAt: number
   note: number
+  noteVisible: number
   _all: number
 }
 
@@ -69,6 +72,7 @@ export type TutorVerificationMinAggregateInputType = {
   reviewedById?: true
   decidedAt?: true
   note?: true
+  noteVisible?: true
 }
 
 export type TutorVerificationMaxAggregateInputType = {
@@ -80,6 +84,7 @@ export type TutorVerificationMaxAggregateInputType = {
   reviewedById?: true
   decidedAt?: true
   note?: true
+  noteVisible?: true
 }
 
 export type TutorVerificationCountAggregateInputType = {
@@ -92,6 +97,7 @@ export type TutorVerificationCountAggregateInputType = {
   reviewedById?: true
   decidedAt?: true
   note?: true
+  noteVisible?: true
   _all?: true
 }
 
@@ -177,6 +183,7 @@ export type TutorVerificationGroupByOutputType = {
   reviewedById: string | null
   decidedAt: Date | null
   note: string | null
+  noteVisible: boolean
   _count: TutorVerificationCountAggregateOutputType | null
   _min: TutorVerificationMinAggregateOutputType | null
   _max: TutorVerificationMaxAggregateOutputType | null
@@ -210,6 +217,7 @@ export type TutorVerificationWhereInput = {
   reviewedById?: Prisma.UuidNullableFilter<"TutorVerification"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"TutorVerification"> | Date | string | null
   note?: Prisma.StringNullableFilter<"TutorVerification"> | string | null
+  noteVisible?: Prisma.BoolFilter<"TutorVerification"> | boolean
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   file?: Prisma.XOR<Prisma.FileAssetScalarRelationFilter, Prisma.FileAssetWhereInput>
   reviewedBy?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
@@ -225,6 +233,7 @@ export type TutorVerificationOrderByWithRelationInput = {
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
   tutor?: Prisma.TutorOrderByWithRelationInput
   file?: Prisma.FileAssetOrderByWithRelationInput
   reviewedBy?: Prisma.AdminUserOrderByWithRelationInput
@@ -243,6 +252,7 @@ export type TutorVerificationWhereUniqueInput = Prisma.AtLeast<{
   reviewedById?: Prisma.UuidNullableFilter<"TutorVerification"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"TutorVerification"> | Date | string | null
   note?: Prisma.StringNullableFilter<"TutorVerification"> | string | null
+  noteVisible?: Prisma.BoolFilter<"TutorVerification"> | boolean
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   file?: Prisma.XOR<Prisma.FileAssetScalarRelationFilter, Prisma.FileAssetWhereInput>
   reviewedBy?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
@@ -258,6 +268,7 @@ export type TutorVerificationOrderByWithAggregationInput = {
   reviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   decidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
   _count?: Prisma.TutorVerificationCountOrderByAggregateInput
   _max?: Prisma.TutorVerificationMaxOrderByAggregateInput
   _min?: Prisma.TutorVerificationMinOrderByAggregateInput
@@ -276,6 +287,7 @@ export type TutorVerificationScalarWhereWithAggregatesInput = {
   reviewedById?: Prisma.UuidNullableWithAggregatesFilter<"TutorVerification"> | string | null
   decidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TutorVerification"> | Date | string | null
   note?: Prisma.StringNullableWithAggregatesFilter<"TutorVerification"> | string | null
+  noteVisible?: Prisma.BoolWithAggregatesFilter<"TutorVerification"> | boolean
 }
 
 export type TutorVerificationCreateInput = {
@@ -285,6 +297,7 @@ export type TutorVerificationCreateInput = {
   submittedAt?: Date | string
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
   tutor: Prisma.TutorCreateNestedOneWithoutVerificationsInput
   file: Prisma.FileAssetCreateNestedOneWithoutTutorVerificationsInput
   reviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedVerificationsInput
@@ -300,6 +313,7 @@ export type TutorVerificationUncheckedCreateInput = {
   reviewedById?: string | null
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationUpdateInput = {
@@ -309,6 +323,7 @@ export type TutorVerificationUpdateInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutor?: Prisma.TutorUpdateOneRequiredWithoutVerificationsNestedInput
   file?: Prisma.FileAssetUpdateOneRequiredWithoutTutorVerificationsNestedInput
   reviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedVerificationsNestedInput
@@ -324,6 +339,7 @@ export type TutorVerificationUncheckedUpdateInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationCreateManyInput = {
@@ -336,6 +352,7 @@ export type TutorVerificationCreateManyInput = {
   reviewedById?: string | null
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationUpdateManyMutationInput = {
@@ -345,6 +362,7 @@ export type TutorVerificationUpdateManyMutationInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationUncheckedUpdateManyInput = {
@@ -357,6 +375,7 @@ export type TutorVerificationUncheckedUpdateManyInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationListRelationFilter = {
@@ -379,6 +398,7 @@ export type TutorVerificationCountOrderByAggregateInput = {
   reviewedById?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
 }
 
 export type TutorVerificationMaxOrderByAggregateInput = {
@@ -390,6 +410,7 @@ export type TutorVerificationMaxOrderByAggregateInput = {
   reviewedById?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
 }
 
 export type TutorVerificationMinOrderByAggregateInput = {
@@ -401,6 +422,7 @@ export type TutorVerificationMinOrderByAggregateInput = {
   reviewedById?: Prisma.SortOrder
   decidedAt?: Prisma.SortOrder
   note?: Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
 }
 
 export type TutorVerificationCreateNestedManyWithoutReviewedByInput = {
@@ -536,6 +558,7 @@ export type TutorVerificationCreateWithoutReviewedByInput = {
   submittedAt?: Date | string
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
   tutor: Prisma.TutorCreateNestedOneWithoutVerificationsInput
   file: Prisma.FileAssetCreateNestedOneWithoutTutorVerificationsInput
 }
@@ -549,6 +572,7 @@ export type TutorVerificationUncheckedCreateWithoutReviewedByInput = {
   submittedAt?: Date | string
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationCreateOrConnectWithoutReviewedByInput = {
@@ -590,6 +614,7 @@ export type TutorVerificationScalarWhereInput = {
   reviewedById?: Prisma.UuidNullableFilter<"TutorVerification"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"TutorVerification"> | Date | string | null
   note?: Prisma.StringNullableFilter<"TutorVerification"> | string | null
+  noteVisible?: Prisma.BoolFilter<"TutorVerification"> | boolean
 }
 
 export type TutorVerificationCreateWithoutFileInput = {
@@ -599,6 +624,7 @@ export type TutorVerificationCreateWithoutFileInput = {
   submittedAt?: Date | string
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
   tutor: Prisma.TutorCreateNestedOneWithoutVerificationsInput
   reviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedVerificationsInput
 }
@@ -612,6 +638,7 @@ export type TutorVerificationUncheckedCreateWithoutFileInput = {
   reviewedById?: string | null
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationCreateOrConnectWithoutFileInput = {
@@ -647,6 +674,7 @@ export type TutorVerificationCreateWithoutTutorInput = {
   submittedAt?: Date | string
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
   file: Prisma.FileAssetCreateNestedOneWithoutTutorVerificationsInput
   reviewedBy?: Prisma.AdminUserCreateNestedOneWithoutReviewedVerificationsInput
 }
@@ -660,6 +688,7 @@ export type TutorVerificationUncheckedCreateWithoutTutorInput = {
   reviewedById?: string | null
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationCreateOrConnectWithoutTutorInput = {
@@ -697,6 +726,7 @@ export type TutorVerificationCreateManyReviewedByInput = {
   submittedAt?: Date | string
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationUpdateWithoutReviewedByInput = {
@@ -706,6 +736,7 @@ export type TutorVerificationUpdateWithoutReviewedByInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutor?: Prisma.TutorUpdateOneRequiredWithoutVerificationsNestedInput
   file?: Prisma.FileAssetUpdateOneRequiredWithoutTutorVerificationsNestedInput
 }
@@ -719,6 +750,7 @@ export type TutorVerificationUncheckedUpdateWithoutReviewedByInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationUncheckedUpdateManyWithoutReviewedByInput = {
@@ -730,6 +762,7 @@ export type TutorVerificationUncheckedUpdateManyWithoutReviewedByInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationCreateManyFileInput = {
@@ -741,6 +774,7 @@ export type TutorVerificationCreateManyFileInput = {
   reviewedById?: string | null
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationUpdateWithoutFileInput = {
@@ -750,6 +784,7 @@ export type TutorVerificationUpdateWithoutFileInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tutor?: Prisma.TutorUpdateOneRequiredWithoutVerificationsNestedInput
   reviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedVerificationsNestedInput
 }
@@ -763,6 +798,7 @@ export type TutorVerificationUncheckedUpdateWithoutFileInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationUncheckedUpdateManyWithoutFileInput = {
@@ -774,6 +810,7 @@ export type TutorVerificationUncheckedUpdateManyWithoutFileInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationCreateManyTutorInput = {
@@ -785,6 +822,7 @@ export type TutorVerificationCreateManyTutorInput = {
   reviewedById?: string | null
   decidedAt?: Date | string | null
   note?: string | null
+  noteVisible?: boolean
 }
 
 export type TutorVerificationUpdateWithoutTutorInput = {
@@ -794,6 +832,7 @@ export type TutorVerificationUpdateWithoutTutorInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   file?: Prisma.FileAssetUpdateOneRequiredWithoutTutorVerificationsNestedInput
   reviewedBy?: Prisma.AdminUserUpdateOneWithoutReviewedVerificationsNestedInput
 }
@@ -807,6 +846,7 @@ export type TutorVerificationUncheckedUpdateWithoutTutorInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type TutorVerificationUncheckedUpdateManyWithoutTutorInput = {
@@ -818,6 +858,7 @@ export type TutorVerificationUncheckedUpdateManyWithoutTutorInput = {
   reviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -832,6 +873,7 @@ export type TutorVerificationSelect<ExtArgs extends runtime.Types.Extensions.Int
   reviewedById?: boolean
   decidedAt?: boolean
   note?: boolean
+  noteVisible?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
   reviewedBy?: boolean | Prisma.TutorVerification$reviewedByArgs<ExtArgs>
@@ -847,6 +889,7 @@ export type TutorVerificationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   reviewedById?: boolean
   decidedAt?: boolean
   note?: boolean
+  noteVisible?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
   reviewedBy?: boolean | Prisma.TutorVerification$reviewedByArgs<ExtArgs>
@@ -862,6 +905,7 @@ export type TutorVerificationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   reviewedById?: boolean
   decidedAt?: boolean
   note?: boolean
+  noteVisible?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
   reviewedBy?: boolean | Prisma.TutorVerification$reviewedByArgs<ExtArgs>
@@ -877,9 +921,10 @@ export type TutorVerificationSelectScalar = {
   reviewedById?: boolean
   decidedAt?: boolean
   note?: boolean
+  noteVisible?: boolean
 }
 
-export type TutorVerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "fileId" | "ocrData" | "status" | "submittedAt" | "reviewedById" | "decidedAt" | "note", ExtArgs["result"]["tutorVerification"]>
+export type TutorVerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "fileId" | "ocrData" | "status" | "submittedAt" | "reviewedById" | "decidedAt" | "note" | "noteVisible", ExtArgs["result"]["tutorVerification"]>
 export type TutorVerificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
@@ -913,6 +958,7 @@ export type $TutorVerificationPayload<ExtArgs extends runtime.Types.Extensions.I
     reviewedById: string | null
     decidedAt: Date | null
     note: string | null
+    noteVisible: boolean
   }, ExtArgs["result"]["tutorVerification"]>
   composites: {}
 }
@@ -1348,6 +1394,7 @@ export interface TutorVerificationFieldRefs {
   readonly reviewedById: Prisma.FieldRef<"TutorVerification", 'String'>
   readonly decidedAt: Prisma.FieldRef<"TutorVerification", 'DateTime'>
   readonly note: Prisma.FieldRef<"TutorVerification", 'String'>
+  readonly noteVisible: Prisma.FieldRef<"TutorVerification", 'Boolean'>
 }
     
 

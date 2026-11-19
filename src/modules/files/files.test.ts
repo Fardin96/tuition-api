@@ -486,6 +486,134 @@ describe("file routes need a signed-in account", () => {
   });
 });
 
+describe("upload blocks", () => {
+  /** Blocks are written straight to the table here; the admin endpoints are tested in uploads.test.ts. */
+  function block(
+    accountId: string,
+    scope: { blocksVideos: boolean; blocksDocuments: boolean },
+    overrides: { noteVisible?: boolean } = {},
+  ) {
+    return prisma.uploadBlock.create({
+      data: {
+        accountId,
+        ...scope,
+        note: "Paused for review.",
+        noteVisible: overrides.noteVisible ?? true,
+      },
+    });
+  }
+
+  it("a video block stops video uploads with 403 and leaves documents open", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const { account, headers } = await tutorWithHeaders();
+    await block(account.id, { blocksVideos: true, blocksDocuments: false });
+
+    const video = await startUpload(app, headers, {
+      purpose: "TUTOR_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: PDF_SIZE,
+      fileName: "intro.mp4",
+    });
+    expect(video.statusCode).toBe(403);
+    expect(video.json()).toMatchObject({
+      code: "UPLOADS_BLOCKED",
+      details: { category: "VIDEOS", note: "Paused for review." },
+    });
+
+    const document = await startUpload(app, headers, {
+      purpose: "CREDENTIAL",
+      contentType: "application/pdf",
+      sizeBytes: PDF_SIZE,
+      fileName: "certificate.pdf",
+    });
+    expect(document.statusCode).toBe(201);
+  });
+
+  it("a document block stops ID and certificate uploads and hides a private note", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const { account, headers } = await tutorWithHeaders();
+    await block(account.id, { blocksVideos: false, blocksDocuments: true }, { noteVisible: false });
+
+    const document = await startUpload(app, headers, {
+      purpose: "CREDENTIAL",
+      contentType: "application/pdf",
+      sizeBytes: PDF_SIZE,
+      fileName: "certificate.pdf",
+    });
+    expect(document.statusCode).toBe(403);
+    expect(document.json()).toMatchObject({
+      code: "UPLOADS_BLOCKED",
+      details: { category: "DOCUMENTS", note: null },
+    });
+    expect(JSON.stringify(document.json())).not.toContain("Paused for review.");
+
+    const video = await startUpload(app, headers, {
+      purpose: "TUTOR_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: PDF_SIZE,
+      fileName: "intro.mp4",
+    });
+    expect(video.statusCode).toBe(201);
+  });
+
+  it("a block placed after the upload started stops attaching the file", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const { account, headers } = await tutorWithHeaders();
+    await createTutorProfile(account.id);
+    const file = await createFileAsset(account.id, "CREDENTIAL", { originalName: "cert.pdf" });
+    await block(account.id, { blocksVideos: false, blocksDocuments: true });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me/credentials",
+      headers,
+      payload: { examLabel: "IELTS", result: "7.5", fileId: file.id },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(res.json().code).toBe("UPLOADS_BLOCKED");
+    expect(await prisma.tutorCredential.count()).toBe(0);
+  });
+
+  it("a video block does not stop a certificate from being attached", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const { account, headers } = await tutorWithHeaders();
+    await createTutorProfile(account.id);
+    const file = await createFileAsset(account.id, "CREDENTIAL", { originalName: "cert.pdf" });
+    await block(account.id, { blocksVideos: true, blocksDocuments: false });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me/credentials",
+      headers,
+      payload: { examLabel: "IELTS", result: "7.5", fileId: file.id },
+    });
+
+    expect(res.statusCode).toBe(201);
+  });
+
+  it("blog covers are never blocked", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const admin = await createAdmin();
+    // Admins cannot be blocked through the API; a row written directly must still not stop a cover.
+    await block(admin.id, { blocksVideos: true, blocksDocuments: true });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/files/upload-url",
+      headers: await getAuthHeaders(admin),
+      payload: { purpose: "BLOG_COVER", contentType: "image/png", sizeBytes: PDF_SIZE },
+    });
+
+    expect(res.statusCode).toBe(201);
+  });
+});
+
 describe("cleanFileName", () => {
   it("keeps an ordinary name, including non-Latin scripts", () => {
     expect(cleanFileName("certificate.pdf")).toBe("certificate.pdf");

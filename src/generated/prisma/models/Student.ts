@@ -57,6 +57,7 @@ export type StudentMinAggregateOutputType = {
   verificationDecidedAt: Date | null
   verificationReviewedById: string | null
   verificationNote: string | null
+  verificationNoteVisible: boolean | null
   ratingAvg: runtime.Decimal | null
   ratingCount: number | null
   createdAt: Date | null
@@ -82,6 +83,7 @@ export type StudentMaxAggregateOutputType = {
   verificationDecidedAt: Date | null
   verificationReviewedById: string | null
   verificationNote: string | null
+  verificationNoteVisible: boolean | null
   ratingAvg: runtime.Decimal | null
   ratingCount: number | null
   createdAt: Date | null
@@ -107,6 +109,7 @@ export type StudentCountAggregateOutputType = {
   verificationDecidedAt: number
   verificationReviewedById: number
   verificationNote: number
+  verificationNoteVisible: number
   ratingAvg: number
   ratingCount: number
   createdAt: number
@@ -146,6 +149,7 @@ export type StudentMinAggregateInputType = {
   verificationDecidedAt?: true
   verificationReviewedById?: true
   verificationNote?: true
+  verificationNoteVisible?: true
   ratingAvg?: true
   ratingCount?: true
   createdAt?: true
@@ -171,6 +175,7 @@ export type StudentMaxAggregateInputType = {
   verificationDecidedAt?: true
   verificationReviewedById?: true
   verificationNote?: true
+  verificationNoteVisible?: true
   ratingAvg?: true
   ratingCount?: true
   createdAt?: true
@@ -196,6 +201,7 @@ export type StudentCountAggregateInputType = {
   verificationDecidedAt?: true
   verificationReviewedById?: true
   verificationNote?: true
+  verificationNoteVisible?: true
   ratingAvg?: true
   ratingCount?: true
   createdAt?: true
@@ -308,6 +314,7 @@ export type StudentGroupByOutputType = {
   verificationDecidedAt: Date | null
   verificationReviewedById: string | null
   verificationNote: string | null
+  verificationNoteVisible: boolean
   ratingAvg: runtime.Decimal
   ratingCount: number
   createdAt: Date
@@ -356,6 +363,7 @@ export type StudentWhereInput = {
   verificationDecidedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   verificationReviewedById?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationNote?: Prisma.StringNullableFilter<"Student"> | string | null
+  verificationNoteVisible?: Prisma.BoolFilter<"Student"> | boolean
   ratingAvg?: Prisma.DecimalFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFilter<"Student"> | number
   createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
@@ -389,6 +397,7 @@ export type StudentOrderByWithRelationInput = {
   verificationDecidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationReviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationNoteVisible?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -426,6 +435,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   verificationDecidedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   verificationReviewedById?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationNote?: Prisma.StringNullableFilter<"Student"> | string | null
+  verificationNoteVisible?: Prisma.BoolFilter<"Student"> | boolean
   ratingAvg?: Prisma.DecimalFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFilter<"Student"> | number
   createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
@@ -459,6 +469,7 @@ export type StudentOrderByWithAggregationInput = {
   verificationDecidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationReviewedById?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationNoteVisible?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -492,6 +503,7 @@ export type StudentScalarWhereWithAggregatesInput = {
   verificationDecidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
   verificationReviewedById?: Prisma.UuidNullableWithAggregatesFilter<"Student"> | string | null
   verificationNote?: Prisma.StringNullableWithAggregatesFilter<"Student"> | string | null
+  verificationNoteVisible?: Prisma.BoolWithAggregatesFilter<"Student"> | boolean
   ratingAvg?: Prisma.DecimalWithAggregatesFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntWithAggregatesFilter<"Student"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Student"> | Date | string
@@ -512,6 +524,7 @@ export type StudentCreateInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -545,6 +558,7 @@ export type StudentUncheckedCreateInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -569,6 +583,7 @@ export type StudentUpdateInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -602,6 +617,7 @@ export type StudentUncheckedUpdateInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -631,6 +647,7 @@ export type StudentCreateManyInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -651,6 +668,7 @@ export type StudentUpdateManyMutationInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -676,6 +694,7 @@ export type StudentUncheckedUpdateManyInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -721,6 +740,7 @@ export type StudentCountOrderByAggregateInput = {
   verificationDecidedAt?: Prisma.SortOrder
   verificationReviewedById?: Prisma.SortOrder
   verificationNote?: Prisma.SortOrder
+  verificationNoteVisible?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -752,6 +772,7 @@ export type StudentMaxOrderByAggregateInput = {
   verificationDecidedAt?: Prisma.SortOrder
   verificationReviewedById?: Prisma.SortOrder
   verificationNote?: Prisma.SortOrder
+  verificationNoteVisible?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -777,6 +798,7 @@ export type StudentMinOrderByAggregateInput = {
   verificationDecidedAt?: Prisma.SortOrder
   verificationReviewedById?: Prisma.SortOrder
   verificationNote?: Prisma.SortOrder
+  verificationNoteVisible?: Prisma.SortOrder
   ratingAvg?: Prisma.SortOrder
   ratingCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -1034,6 +1056,7 @@ export type StudentCreateWithoutAccountInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1064,6 +1087,7 @@ export type StudentUncheckedCreateWithoutAccountInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1104,6 +1128,7 @@ export type StudentUpdateWithoutAccountInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1134,6 +1159,7 @@ export type StudentUncheckedUpdateWithoutAccountInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1158,6 +1184,7 @@ export type StudentCreateWithoutVerificationReviewedByInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1189,6 +1216,7 @@ export type StudentUncheckedCreateWithoutVerificationReviewedByInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1247,6 +1275,7 @@ export type StudentScalarWhereInput = {
   verificationDecidedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   verificationReviewedById?: Prisma.UuidNullableFilter<"Student"> | string | null
   verificationNote?: Prisma.StringNullableFilter<"Student"> | string | null
+  verificationNoteVisible?: Prisma.BoolFilter<"Student"> | boolean
   ratingAvg?: Prisma.DecimalFilter<"Student"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFilter<"Student"> | number
   createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
@@ -1267,6 +1296,7 @@ export type StudentCreateWithoutAreaInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1298,6 +1328,7 @@ export type StudentUncheckedCreateWithoutAreaInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1348,6 +1379,7 @@ export type StudentCreateWithoutVerificationFileInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1379,6 +1411,7 @@ export type StudentUncheckedCreateWithoutVerificationFileInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1429,6 +1462,7 @@ export type StudentCreateWithoutLocationInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1461,6 +1495,7 @@ export type StudentUncheckedCreateWithoutLocationInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1500,6 +1535,7 @@ export type StudentUpdateWithoutLocationInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1532,6 +1568,7 @@ export type StudentUncheckedUpdateWithoutLocationInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1555,6 +1592,7 @@ export type StudentCreateWithoutRequirementsInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1587,6 +1625,7 @@ export type StudentUncheckedCreateWithoutRequirementsInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1626,6 +1665,7 @@ export type StudentUpdateWithoutRequirementsInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1658,6 +1698,7 @@ export type StudentUncheckedUpdateWithoutRequirementsInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1681,6 +1722,7 @@ export type StudentCreateWithoutApplicationsInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1713,6 +1755,7 @@ export type StudentUncheckedCreateWithoutApplicationsInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1752,6 +1795,7 @@ export type StudentUpdateWithoutApplicationsInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1784,6 +1828,7 @@ export type StudentUncheckedUpdateWithoutApplicationsInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1807,6 +1852,7 @@ export type StudentCreateWithoutReviewsGivenInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1839,6 +1885,7 @@ export type StudentUncheckedCreateWithoutReviewsGivenInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1878,6 +1925,7 @@ export type StudentUpdateWithoutReviewsGivenInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1910,6 +1958,7 @@ export type StudentUncheckedUpdateWithoutReviewsGivenInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1937,6 +1986,7 @@ export type StudentCreateManyVerificationReviewedByInput = {
   verificationSubmittedAt?: Date | string | null
   verificationDecidedAt?: Date | string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -1957,6 +2007,7 @@ export type StudentUpdateWithoutVerificationReviewedByInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1988,6 +2039,7 @@ export type StudentUncheckedUpdateWithoutVerificationReviewedByInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2016,6 +2068,7 @@ export type StudentUncheckedUpdateManyWithoutVerificationReviewedByInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2040,6 +2093,7 @@ export type StudentCreateManyAreaInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -2060,6 +2114,7 @@ export type StudentUpdateWithoutAreaInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2091,6 +2146,7 @@ export type StudentUncheckedUpdateWithoutAreaInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2119,6 +2175,7 @@ export type StudentUncheckedUpdateManyWithoutAreaInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2143,6 +2200,7 @@ export type StudentCreateManyVerificationFileInput = {
   verificationDecidedAt?: Date | string | null
   verificationReviewedById?: string | null
   verificationNote?: string | null
+  verificationNoteVisible?: boolean
   ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: number
   createdAt?: Date | string
@@ -2163,6 +2221,7 @@ export type StudentUpdateWithoutVerificationFileInput = {
   verificationSubmittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2194,6 +2253,7 @@ export type StudentUncheckedUpdateWithoutVerificationFileInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2222,6 +2282,7 @@ export type StudentUncheckedUpdateManyWithoutVerificationFileInput = {
   verificationDecidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verificationReviewedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationNoteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2296,6 +2357,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   verificationDecidedAt?: boolean
   verificationReviewedById?: boolean
   verificationNote?: boolean
+  verificationNoteVisible?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
@@ -2330,6 +2392,7 @@ export type StudentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   verificationDecidedAt?: boolean
   verificationReviewedById?: boolean
   verificationNote?: boolean
+  verificationNoteVisible?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
@@ -2359,6 +2422,7 @@ export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   verificationDecidedAt?: boolean
   verificationReviewedById?: boolean
   verificationNote?: boolean
+  verificationNoteVisible?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
@@ -2388,13 +2452,14 @@ export type StudentSelectScalar = {
   verificationDecidedAt?: boolean
   verificationReviewedById?: boolean
   verificationNote?: boolean
+  verificationNoteVisible?: boolean
   ratingAvg?: boolean
   ratingCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "areaId" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "verificationFileId" | "verificationStatus" | "verificationSubmittedAt" | "verificationDecidedAt" | "verificationReviewedById" | "verificationNote" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
+export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "role" | "name" | "areaId" | "address" | "emergencyContact" | "whatsappNumber" | "whatsappVerifiedAt" | "phoneNumber" | "phoneVerifiedAt" | "studentIdNumber" | "verificationFileId" | "verificationStatus" | "verificationSubmittedAt" | "verificationDecidedAt" | "verificationReviewedById" | "verificationNote" | "verificationNoteVisible" | "ratingAvg" | "ratingCount" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
 export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   area?: boolean | Prisma.AreaDefaultArgs<ExtArgs>
@@ -2450,6 +2515,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     verificationDecidedAt: Date | null
     verificationReviewedById: string | null
     verificationNote: string | null
+    verificationNoteVisible: boolean
     ratingAvg: runtime.Decimal
     ratingCount: number
     createdAt: Date
@@ -2903,6 +2969,7 @@ export interface StudentFieldRefs {
   readonly verificationDecidedAt: Prisma.FieldRef<"Student", 'DateTime'>
   readonly verificationReviewedById: Prisma.FieldRef<"Student", 'String'>
   readonly verificationNote: Prisma.FieldRef<"Student", 'String'>
+  readonly verificationNoteVisible: Prisma.FieldRef<"Student", 'Boolean'>
   readonly ratingAvg: Prisma.FieldRef<"Student", 'Decimal'>
   readonly ratingCount: Prisma.FieldRef<"Student", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Student", 'DateTime'>

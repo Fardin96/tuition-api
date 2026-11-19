@@ -1593,6 +1593,121 @@ describe("tutor routes", () => {
     });
   });
 
+  describe("admin notes shown to the tutor", () => {
+    it("hides a note the admin did not share from the verification list", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const admin = await createAdmin();
+      const hidden = await createFileAsset(account.id, "TUTOR_ID");
+      const visible = await createFileAsset(account.id, "TUTOR_ID");
+      await prisma.tutorVerification.create({
+        data: {
+          tutorId: tutor.id,
+          fileId: hidden.id,
+          status: "REJECTED",
+          reviewedById: admin.id,
+          decidedAt: new Date("2026-01-01T00:00:00Z"),
+          note: "Internal: name does not match the profile.",
+          noteVisible: false,
+          submittedAt: new Date("2026-01-01T00:00:00Z"),
+        },
+      });
+      await prisma.tutorVerification.create({
+        data: {
+          tutorId: tutor.id,
+          fileId: visible.id,
+          status: "REJECTED",
+          reviewedById: admin.id,
+          decidedAt: new Date("2026-01-02T00:00:00Z"),
+          note: "The photo is blurry.",
+          noteVisible: true,
+          submittedAt: new Date("2026-01-02T00:00:00Z"),
+        },
+      });
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/tutors/me/verifications",
+        headers,
+      });
+
+      expect(res.statusCode).toBe(200);
+      const [newest, older] = JSON.parse(res.body).verifications;
+      expect(newest.note).toBe("The photo is blurry.");
+      expect(older.note).toBeNull();
+      expect(JSON.stringify(JSON.parse(res.body))).not.toContain("Internal:");
+    });
+
+    it("hides a moderation note the admin did not share from the owner video list", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const hiddenFile = await createFileAsset(account.id, "TUTOR_VIDEO");
+      const shownFile = await createFileAsset(account.id, "TUTOR_VIDEO");
+      await prisma.tutorVideo.create({
+        data: {
+          tutorId: tutor.id,
+          fileId: hiddenFile.id,
+          title: "Hidden",
+          status: "REJECTED",
+          moderationNote: "Internal: looks like a stock clip.",
+          noteVisible: false,
+          sortOrder: 1,
+        },
+      });
+      await prisma.tutorVideo.create({
+        data: {
+          tutorId: tutor.id,
+          fileId: shownFile.id,
+          title: "Shown",
+          status: "REJECTED",
+          moderationNote: "Audio is too quiet to hear.",
+          noteVisible: true,
+          sortOrder: 2,
+        },
+      });
+      const headers = await getAuthHeaders(account);
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/tutors/me/videos", headers });
+
+      expect(res.statusCode).toBe(200);
+      const [hidden, shown] = JSON.parse(res.body).videos;
+      expect(hidden).toMatchObject({ title: "Hidden", moderationNote: null });
+      expect(shown).toMatchObject({
+        title: "Shown",
+        moderationNote: "Audio is too quiet to hear.",
+      });
+      expect(res.body).not.toContain("Internal:");
+    });
+
+    it("public video lists never carry a moderation note", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id);
+      const file = await createFileAsset(account.id, "TUTOR_VIDEO");
+      await prisma.tutorVideo.create({
+        data: {
+          tutorId: tutor.id,
+          fileId: file.id,
+          title: "Approved",
+          status: "APPROVED",
+          moderationNote: "Shared note",
+          noteVisible: true,
+        },
+      });
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/videos" });
+
+      expect(res.statusCode).toBe(200);
+      const [video] = JSON.parse(res.body).videos;
+      expect(video).toBeDefined();
+      expect(video).not.toHaveProperty("moderationNote");
+      expect(res.body).not.toContain("Shared note");
+    });
+  });
+
   describe("GET /api/v1/videos", () => {
     it("returns approved videos", async () => {
       const app = await createTestApp();

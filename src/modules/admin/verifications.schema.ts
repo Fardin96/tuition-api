@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { VerificationStatus } from "../../generated/prisma/enums.js";
 import { fileAssetSchema } from "../files/files.schema.js";
+import {
+  noteVisibleSchema,
+  reviewNoteSchema,
+  uploadFlagsSchema,
+} from "../files/upload-review.schema.js";
 
 // Review queues. PENDING is oldest first; APPROVED and REJECTED are newest first.
 const reviewStatus = z.enum(["PENDING", "APPROVED", "REJECTED"]);
@@ -22,7 +27,11 @@ export const adminTutorVerificationSchema = z
     submittedAt: z.date(),
     decidedAt: z.date().nullable(),
     note: z.string().nullable(),
+    noteVisible: z.boolean(),
     reviewedById: z.string().nullable(),
+    // True when this is the tutor's newest submission. Only the newest one can be decided.
+    isLatest: z.boolean(),
+    uploadFlags: uploadFlagsSchema,
     file: fileAssetSchema,
     tutor: z.object({
       id: z.string(),
@@ -51,7 +60,9 @@ export const adminStudentVerificationSchema = z
     submittedAt: z.date().nullable(),
     decidedAt: z.date().nullable(),
     note: z.string().nullable(),
+    noteVisible: z.boolean(),
     reviewedById: z.string().nullable(),
+    uploadFlags: uploadFlagsSchema,
     file: fileAssetSchema.nullable(),
     student: z.object({
       id: z.string(),
@@ -73,11 +84,13 @@ export type AdminStudentVerificationPageResponse = z.infer<
   typeof adminStudentVerificationPageSchema
 >;
 
-// Notes are required to reject, so the tutor or student can see why.
+// Notes are required to reject, so the tutor or student can see why. An approval may carry a note
+// too. noteVisible false keeps the note between admins: the user gets a generic message instead.
 export const decideVerificationSchema = z
   .object({
     decision: z.enum(["APPROVE", "REJECT"]),
-    note: z.string().trim().min(3).max(500).optional(),
+    note: reviewNoteSchema.optional(),
+    noteVisible: noteVisibleSchema,
   })
   .strict()
   .superRefine((v, ctx) => {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { FilePurpose, FileStatus } from "../../generated/prisma/enums.js";
 import { fileAssetSchema } from "../files/files.schema.js";
+import { noteVisibleSchema, reviewNoteSchema } from "../files/upload-review.schema.js";
 
 // Every uploaded file as admins see it: who owns it, whether it is public and whether a record uses it.
 export const adminFileSchema = fileAssetSchema
@@ -46,3 +47,14 @@ export type AdminFileStatsResponse = z.infer<typeof adminFileStatsSchema>;
 
 export const adminFileIdParamSchema = z.object({ id: z.string().uuid() });
 export type AdminFileIdParam = z.infer<typeof adminFileIdParamSchema>;
+
+// Takes an uploaded file down. The note goes to the uploader; unverify also rejects an approved ID.
+export const removeFileSchema = z
+  .object({
+    note: reviewNoteSchema,
+    noteVisible: noteVisibleSchema,
+    unverify: z.boolean().default(false),
+  })
+  .strict()
+  .meta({ id: "RemoveFile" });
+export type RemoveFileInput = z.infer<typeof removeFileSchema>;

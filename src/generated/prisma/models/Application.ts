@@ -842,10 +842,12 @@ export type ApplicationCreateNestedOneWithoutAlertsInput = {
   connect?: Prisma.ApplicationWhereUniqueInput
 }
 
-export type ApplicationUpdateOneRequiredWithoutAlertsNestedInput = {
+export type ApplicationUpdateOneWithoutAlertsNestedInput = {
   create?: Prisma.XOR<Prisma.ApplicationCreateWithoutAlertsInput, Prisma.ApplicationUncheckedCreateWithoutAlertsInput>
   connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutAlertsInput
   upsert?: Prisma.ApplicationUpsertWithoutAlertsInput
+  disconnect?: Prisma.ApplicationWhereInput | boolean
+  delete?: Prisma.ApplicationWhereInput | boolean
   connect?: Prisma.ApplicationWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutAlertsInput, Prisma.ApplicationUpdateWithoutAlertsInput>, Prisma.ApplicationUncheckedUpdateWithoutAlertsInput>
 }

@@ -35,6 +35,8 @@ beforeEach(async () => {
       session,
       admin_user,
       account_block,
+      upload_review,
+      upload_block,
       report,
       dispute,
       payment_refund,

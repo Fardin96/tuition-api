@@ -27,6 +27,7 @@ import { adminPromoCodeRoutes } from "./modules/admin/promo-codes.routes.js";
 import { adminRefundRoutes } from "./modules/admin/refunds.routes.js";
 import { adminSettingRoutes } from "./modules/admin/settings.routes.js";
 import { adminSubjectRoutes } from "./modules/admin/subjects.routes.js";
+import { adminUploadRoutes } from "./modules/admin/uploads.routes.js";
 import { adminVerificationRoutes } from "./modules/admin/verifications.routes.js";
 import { adminVideoRoutes } from "./modules/admin/videos.routes.js";
 import { adminZoneRequestRoutes } from "./modules/admin/zone-requests.routes.js";
@@ -145,6 +146,7 @@ export async function buildApp() {
   await app.register(adminZoneRequestRoutes, { prefix: "/api/v1/admin/zone-limit-requests" });
   await app.register(adminTeamRoutes, { prefix: "/api/v1/admin/admins" });
   await app.register(adminAccountRoutes, { prefix: "/api/v1/admin/accounts" });
+  await app.register(adminUploadRoutes, { prefix: "/api/v1/admin/accounts" });
   await app.register(adminApplicationRoutes, { prefix: "/api/v1/admin/applications" });
   // Full paths: /admin/fees/* and /admin/payments/:id/reverse.
   await app.register(adminFeeRoutes, { prefix: "/api/v1/admin" });

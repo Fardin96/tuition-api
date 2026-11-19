@@ -52,3 +52,14 @@ export type DownloadUrlResponse = z.infer<typeof downloadUrlSchema>;
 
 /** Body of every endpoint that attaches an uploaded file. */
 export const fileIdSchema = z.string().uuid();
+
+// The signed-in account's own upload pause. note is null unless the admin shared it.
+export const uploadStatusSchema = z
+  .object({
+    blocksVideos: z.boolean(),
+    blocksDocuments: z.boolean(),
+    note: z.string().nullable(),
+    blockedAt: z.date().nullable(),
+  })
+  .meta({ id: "UploadStatus" });
+export type UploadStatusResponse = z.infer<typeof uploadStatusSchema>;
