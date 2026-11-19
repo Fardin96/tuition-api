@@ -15,11 +15,11 @@ export type FilePolicy = {
 };
 
 export const FILE_POLICY: Record<FilePurpose, FilePolicy> = {
-  STUDENT_ID: { role: "STUDENT", contentTypes: DOCUMENT_TYPES, maxBytes: 10 * MB },
-  TUTOR_ID: { role: "TUTOR", contentTypes: DOCUMENT_TYPES, maxBytes: 10 * MB },
-  CREDENTIAL: { role: "TUTOR", contentTypes: DOCUMENT_TYPES, maxBytes: 10 * MB },
-  TUTOR_VIDEO: { role: "TUTOR", contentTypes: VIDEO_TYPES, maxBytes: 150 * MB },
-  BLOG_COVER: { role: "ADMIN", contentTypes: IMAGE_TYPES, maxBytes: 5 * MB },
+  STUDENT_ID: { role: "STUDENT", contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
+  TUTOR_ID: { role: "TUTOR", contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
+  CREDENTIAL: { role: "TUTOR", contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
+  TUTOR_VIDEO: { role: "TUTOR", contentTypes: VIDEO_TYPES, maxBytes: 2 * MB },
+  BLOG_COVER: { role: "ADMIN", contentTypes: IMAGE_TYPES, maxBytes: 2 * MB },
 };
 
 /** Signed upload URLs live this long (seconds). */

@@ -164,7 +164,7 @@ describe("POST /api/v1/files/upload-url", () => {
     const res = await startUpload(app, headers, {
       purpose: "CREDENTIAL",
       contentType: "application/pdf",
-      sizeBytes: 11 * MB,
+      sizeBytes: 2 * MB + 1,
     });
     expect(res.statusCode).toBe(400);
     expect(res.json().code).toBe("FILE_TOO_LARGE");
