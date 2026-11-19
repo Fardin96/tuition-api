@@ -54,7 +54,7 @@ export async function adminVideoRoutes(app: FastifyInstance) {
           tag: "Admin",
           summary: "Approve or reject a tutor video",
           description:
-            "APPROVE publishes the video to students. REJECT needs a note that tells the tutor why, and takes an approved video down. 409 VIDEO_ALREADY_MODERATED when the video already has that decision.",
+            "APPROVE publishes the video to students. REJECT needs a note that tells the tutor why, and takes an approved video down. noteVisible false keeps the note between admins: the tutor sees a generic message. Each decision is kept in the upload history and sends the tutor an alert. 409 VIDEO_ALREADY_MODERATED when the video already has that decision.",
           auth: "admin",
           errors: [404, 409],
           rateLimit: "60/min per account",

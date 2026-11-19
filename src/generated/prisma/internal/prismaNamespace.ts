@@ -402,6 +402,8 @@ export const ModelName = {
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
   AccountBlock: 'AccountBlock',
+  UploadReview: 'UploadReview',
+  UploadBlock: 'UploadBlock',
   Area: 'Area',
   Subject: 'Subject',
   FileAsset: 'FileAsset',
@@ -455,7 +457,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -826,6 +828,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AccountBlockCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AccountBlockCountAggregateOutputType> | number
+        }
+      }
+    }
+    UploadReview: {
+      payload: Prisma.$UploadReviewPayload<ExtArgs>
+      fields: Prisma.UploadReviewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UploadReviewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UploadReviewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>
+        }
+        findFirst: {
+          args: Prisma.UploadReviewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UploadReviewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>
+        }
+        findMany: {
+          args: Prisma.UploadReviewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>[]
+        }
+        create: {
+          args: Prisma.UploadReviewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>
+        }
+        createMany: {
+          args: Prisma.UploadReviewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UploadReviewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>[]
+        }
+        delete: {
+          args: Prisma.UploadReviewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>
+        }
+        update: {
+          args: Prisma.UploadReviewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>
+        }
+        deleteMany: {
+          args: Prisma.UploadReviewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UploadReviewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UploadReviewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>[]
+        }
+        upsert: {
+          args: Prisma.UploadReviewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadReviewPayload>
+        }
+        aggregate: {
+          args: Prisma.UploadReviewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUploadReview>
+        }
+        groupBy: {
+          args: Prisma.UploadReviewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UploadReviewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UploadReviewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UploadReviewCountAggregateOutputType> | number
+        }
+      }
+    }
+    UploadBlock: {
+      payload: Prisma.$UploadBlockPayload<ExtArgs>
+      fields: Prisma.UploadBlockFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UploadBlockFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UploadBlockFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>
+        }
+        findFirst: {
+          args: Prisma.UploadBlockFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UploadBlockFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>
+        }
+        findMany: {
+          args: Prisma.UploadBlockFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>[]
+        }
+        create: {
+          args: Prisma.UploadBlockCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>
+        }
+        createMany: {
+          args: Prisma.UploadBlockCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UploadBlockCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>[]
+        }
+        delete: {
+          args: Prisma.UploadBlockDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>
+        }
+        update: {
+          args: Prisma.UploadBlockUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>
+        }
+        deleteMany: {
+          args: Prisma.UploadBlockDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UploadBlockUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UploadBlockUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>[]
+        }
+        upsert: {
+          args: Prisma.UploadBlockUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UploadBlockPayload>
+        }
+        aggregate: {
+          args: Prisma.UploadBlockAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUploadBlock>
+        }
+        groupBy: {
+          args: Prisma.UploadBlockGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UploadBlockGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UploadBlockCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UploadBlockCountAggregateOutputType> | number
         }
       }
     }
@@ -3750,6 +3900,40 @@ export const AccountBlockScalarFieldEnum = {
 export type AccountBlockScalarFieldEnum = (typeof AccountBlockScalarFieldEnum)[keyof typeof AccountBlockScalarFieldEnum]
 
 
+export const UploadReviewScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  fileId: 'fileId',
+  purpose: 'purpose',
+  fileName: 'fileName',
+  contentType: 'contentType',
+  sizeBytes: 'sizeBytes',
+  action: 'action',
+  note: 'note',
+  noteVisible: 'noteVisible',
+  actorAccountId: 'actorAccountId',
+  createdAt: 'createdAt'
+} as const
+
+export type UploadReviewScalarFieldEnum = (typeof UploadReviewScalarFieldEnum)[keyof typeof UploadReviewScalarFieldEnum]
+
+
+export const UploadBlockScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  blocksVideos: 'blocksVideos',
+  blocksDocuments: 'blocksDocuments',
+  note: 'note',
+  noteVisible: 'noteVisible',
+  blockedById: 'blockedById',
+  blockedAt: 'blockedAt',
+  unblockedAt: 'unblockedAt',
+  unblockedById: 'unblockedById'
+} as const
+
+export type UploadBlockScalarFieldEnum = (typeof UploadBlockScalarFieldEnum)[keyof typeof UploadBlockScalarFieldEnum]
+
+
 export const AreaScalarFieldEnum = {
   id: 'id',
   division: 'division',
@@ -3809,6 +3993,7 @@ export const StudentScalarFieldEnum = {
   verificationDecidedAt: 'verificationDecidedAt',
   verificationReviewedById: 'verificationReviewedById',
   verificationNote: 'verificationNote',
+  verificationNoteVisible: 'verificationNoteVisible',
   ratingAvg: 'ratingAvg',
   ratingCount: 'ratingCount',
   createdAt: 'createdAt',
@@ -3902,7 +4087,8 @@ export const TutorVerificationScalarFieldEnum = {
   submittedAt: 'submittedAt',
   reviewedById: 'reviewedById',
   decidedAt: 'decidedAt',
-  note: 'note'
+  note: 'note',
+  noteVisible: 'noteVisible'
 } as const
 
 export type TutorVerificationScalarFieldEnum = (typeof TutorVerificationScalarFieldEnum)[keyof typeof TutorVerificationScalarFieldEnum]
@@ -3926,6 +4112,7 @@ export const TutorVideoScalarFieldEnum = {
   title: 'title',
   status: 'status',
   moderationNote: 'moderationNote',
+  noteVisible: 'noteVisible',
   sortOrder: 'sortOrder',
   createdAt: 'createdAt'
 } as const
@@ -4307,6 +4494,10 @@ export const AppNotificationScalarFieldEnum = {
   recipientId: 'recipientId',
   kind: 'kind',
   applicationId: 'applicationId',
+  note: 'note',
+  filePurpose: 'filePurpose',
+  blocksVideos: 'blocksVideos',
+  blocksDocuments: 'blocksDocuments',
   readAt: 'readAt',
   createdAt: 'createdAt'
 } as const
@@ -4536,6 +4727,20 @@ export type EnumFilePurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'FilePurpose[]'
  */
 export type ListEnumFilePurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FilePurpose[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UploadReviewAction'
+ */
+export type EnumUploadReviewActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UploadReviewAction'>
+    
+
+
+/**
+ * Reference to a field of type 'UploadReviewAction[]'
+ */
+export type ListEnumUploadReviewActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UploadReviewAction[]'>
     
 
 
@@ -5212,6 +5417,8 @@ export type GlobalOmitConfig = {
   adminUser?: Prisma.AdminUserOmit
   superAdminEmail?: Prisma.SuperAdminEmailOmit
   accountBlock?: Prisma.AccountBlockOmit
+  uploadReview?: Prisma.UploadReviewOmit
+  uploadBlock?: Prisma.UploadBlockOmit
   area?: Prisma.AreaOmit
   subject?: Prisma.SubjectOmit
   fileAsset?: Prisma.FileAssetOmit

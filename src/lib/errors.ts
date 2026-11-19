@@ -58,6 +58,7 @@ export const ERROR_CODES = {
   DisputeExists: "DISPUTE_EXISTS",
   DisputeNotAllowed: "DISPUTE_NOT_ALLOWED",
   InvalidCaseState: "INVALID_CASE_STATE",
+  UploadsBlocked: "UPLOADS_BLOCKED",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

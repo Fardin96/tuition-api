@@ -4,6 +4,12 @@ import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { fileUrl, publishFile, toFileAsset, unpublishFile } from "../files/files.service.js";
+import {
+  notifyUpload,
+  recordUploadReview,
+  type UploadFlags,
+  uploadFlagsFor,
+} from "../files/upload-review.service.js";
 import type {
   AdminVideoListQuery,
   AdminVideoPageResponse,
@@ -17,22 +23,26 @@ import type {
 
 const videoInclude = {
   file: true,
-  tutor: { select: { id: true, name: true, verificationStatus: true } },
+  tutor: { select: { id: true, accountId: true, name: true, verificationStatus: true } },
 } as const;
 
 type VideoRow = Prisma.TutorVideoGetPayload<{ include: typeof videoInclude }>;
 
-async function toAdminVideo(row: VideoRow): Promise<AdminVideoResponse> {
+const NO_FLAGS: UploadFlags = { recentIssues: 0, uploadsBlocked: false };
+
+async function toAdminVideo(row: VideoRow, flags: UploadFlags): Promise<AdminVideoResponse> {
   return {
     id: row.id,
     title: row.title,
     status: row.status,
     moderationNote: row.moderationNote,
+    noteVisible: row.noteVisible,
     sortOrder: row.sortOrder,
     createdAt: row.createdAt,
     url: await fileUrl(row.file),
     file: toFileAsset(row.file),
     tutor: row.tutor,
+    uploadFlags: flags,
   };
 }
 
@@ -64,9 +74,15 @@ export async function listAdminVideos(query: AdminVideoListQuery): Promise<Admin
   const hasMore = rows.length > query.limit;
   const page = hasMore ? rows.slice(0, query.limit) : rows;
   const last = page[page.length - 1];
+  const flags = await uploadFlagsFor(
+    prisma,
+    page.map((row) => row.tutor.accountId),
+  );
 
   return {
-    videos: await Promise.all(page.map(toAdminVideo)),
+    videos: await Promise.all(
+      page.map((row) => toAdminVideo(row, flags.get(row.tutor.accountId) ?? NO_FLAGS)),
+    ),
     nextCursor: hasMore && last ? encodeCursor({ createdAt: last.createdAt, id: last.id }) : null,
   };
 }
@@ -74,11 +90,13 @@ export async function listAdminVideos(query: AdminVideoListQuery): Promise<Admin
 async function getAdminVideo(id: string): Promise<AdminVideoResponse> {
   const row = await prisma.tutorVideo.findUnique({ where: { id }, include: videoInclude });
   if (!row) throw notFound("Video not found");
-  return toAdminVideo(row);
+  const flags = await uploadFlagsFor(prisma, [row.tutor.accountId]);
+  return toAdminVideo(row, flags.get(row.tutor.accountId) ?? NO_FLAGS);
 }
 
 // Approve publishes the file to the public bucket; reject (or any take-down) removes the copy.
 // Any other decision is allowed: a rejected video can be approved, an approved one taken down.
+// Each decision writes the audit row, one upload history row and one alert to the tutor.
 export async function moderateVideo(
   id: string,
   input: ModerateVideoInput,
@@ -89,7 +107,7 @@ export async function moderateVideo(
     await tx.$queryRaw`SELECT id FROM tutor_video WHERE id = ${id}::uuid FOR UPDATE`;
     const current = await tx.tutorVideo.findUnique({
       where: { id },
-      select: { status: true, fileId: true },
+      include: { file: true, tutor: { select: { accountId: true } } },
     });
     if (!current) throw notFound("Video not found");
 
@@ -98,8 +116,13 @@ export async function moderateVideo(
       throw appError("VideoAlreadyModerated", 409, "This video already has that decision.");
     }
 
+    // An approval has no note. A rejection keeps the admin's note and its visibility.
     const note = input.decision === "APPROVE" ? null : (input.note ?? null);
-    await tx.tutorVideo.update({ where: { id }, data: { status, moderationNote: note } });
+    const noteVisible = input.decision === "APPROVE" ? true : input.noteVisible;
+    await tx.tutorVideo.update({
+      where: { id },
+      data: { status, moderationNote: note, noteVisible },
+    });
 
     await writeAudit(tx, {
       actorAccountId: admin.accountId,
@@ -107,8 +130,23 @@ export async function moderateVideo(
       entityType: "tutor_video",
       entityId: id,
       before: { status: current.status },
-      after: { status, note },
+      after: { status, note, noteVisible },
       ip,
+    });
+    await recordUploadReview(tx, {
+      accountId: current.tutor.accountId,
+      file: current.file,
+      action: status,
+      note,
+      noteVisible,
+      actorAccountId: admin.accountId,
+    });
+    await notifyUpload(tx, {
+      recipientId: current.tutor.accountId,
+      kind: status === "APPROVED" ? "VIDEO_APPROVED" : "VIDEO_REJECTED",
+      note,
+      noteVisible,
+      filePurpose: "TUTOR_VIDEO",
     });
     return { fileId: current.fileId, status };
   });

@@ -553,6 +553,59 @@ describe("student routes", () => {
       expect(me.verificationDecidedAt).toBe("2026-01-03T03:04:05.000Z");
     });
 
+    it("hides a note the admin did not share from GET /me and the owner profile", async () => {
+      const { app, account, student, headers } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+      await prisma.student.update({
+        where: { id: student.id },
+        data: {
+          verificationFileId: file.id,
+          verificationStatus: "REJECTED",
+          verificationNote: "Internal: possible duplicate account.",
+          verificationNoteVisible: false,
+          verificationSubmittedAt: new Date("2026-01-02T03:04:05Z"),
+          verificationDecidedAt: new Date("2026-01-03T03:04:05Z"),
+        },
+      });
+
+      const me = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+      expect(me.statusCode).toBe(200);
+      const meStudent = JSON.parse(me.body).account.student;
+      expect(meStudent.verificationStatus).toBe("REJECTED");
+      expect(meStudent.verificationNote).toBeNull();
+      expect(meStudent.verificationDecidedAt).toBe("2026-01-03T03:04:05.000Z");
+      expect(me.body).not.toContain("Internal:");
+
+      const owner = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/students/me",
+        headers,
+        payload: { name: "Renamed Student" },
+      });
+      expect(owner.statusCode).toBe(200);
+      expect(JSON.parse(owner.body).verificationNote).toBeNull();
+      expect(owner.body).not.toContain("Internal:");
+    });
+
+    it("shows a note the admin shared on GET /me", async () => {
+      const { app, account, student, headers } = await setup();
+      const file = await createFileAsset(account.id, "STUDENT_ID");
+      await prisma.student.update({
+        where: { id: student.id },
+        data: {
+          verificationFileId: file.id,
+          verificationStatus: "REJECTED",
+          verificationNote: "Name does not match",
+          verificationNoteVisible: true,
+          verificationDecidedAt: new Date("2026-01-03T03:04:05Z"),
+        },
+      });
+
+      const res = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+
+      expect(JSON.parse(res.body).account.student.verificationNote).toBe("Name does not match");
+    });
+
     it("does not add the review fields to the public student profile", async () => {
       const { app, account, student } = await setup();
       const file = await createFileAsset(account.id, "STUDENT_ID");

@@ -3,6 +3,7 @@ import { privateNoStore } from "../../lib/admin.js";
 import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireAdmin, requireAuth, requireRole } from "../../plugins/auth.js";
+import { getUploadStatus } from "../admin/uploads.service.js";
 import { FILE_POLICY } from "./file-policy.js";
 import {
   type CreateUploadUrlInput,
@@ -11,6 +12,7 @@ import {
   type FileIdParam,
   fileAssetSchema,
   fileIdParamSchema,
+  uploadStatusSchema,
   uploadUrlSchema,
 } from "./files.schema.js";
 import { completeUpload, createUploadUrl, deleteFile, getDownloadUrl } from "./files.service.js";
@@ -19,6 +21,28 @@ import { completeUpload, createUploadUrl, deleteFile, getDownloadUrl } from "./f
 export async function fileRoutes(app: FastifyInstance) {
   // Signed URLs must not be cached by browsers or proxies.
   privateNoStore(app);
+
+  app.get(
+    "/upload-status",
+    {
+      config: accountRateLimit(300, "1 minute"),
+      schema: {
+        ...routeDocs({
+          tag: "Files",
+          summary: "Check whether my uploads are paused",
+          description:
+            "Whether an admin has paused video or document uploads for you, and the note when the admin shared it. All false and null when nothing is paused.",
+          auth: "any",
+          rateLimit: "300/min per account",
+        }),
+        response: { 200: uploadStatusSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireAuth(request);
+      return reply.send(await getUploadStatus(account.accountId));
+    },
+  );
 
   app.post(
     "/upload-url",

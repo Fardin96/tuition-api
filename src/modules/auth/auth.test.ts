@@ -860,6 +860,122 @@ describe("DELETE /api/v1/me/hard-delete", () => {
   });
 });
 
+describe("hard delete and upload moderation rows", () => {
+  it("removes the upload history and blocks addressed to the deleted user and keeps everyone else's", async () => {
+    const app = await createTestApp();
+    const area = await createArea();
+    const student = await createAccount({ role: "STUDENT" });
+    await createStudentProfile(student.id, area.id);
+    const otherStudent = await createAccount({ role: "STUDENT" });
+    await createStudentProfile(otherStudent.id, area.id);
+    const admin = await createAdmin();
+    const file = await createFileAsset(student.id, "STUDENT_ID");
+
+    await prisma.uploadReview.create({
+      data: {
+        accountId: student.id,
+        fileId: file.id,
+        purpose: "STUDENT_ID",
+        fileName: "id.pdf",
+        action: "REMOVED",
+        note: "Remove this file.",
+        noteVisible: true,
+        actorAccountId: admin.id,
+      },
+    });
+    await prisma.uploadBlock.create({
+      data: {
+        accountId: student.id,
+        blocksVideos: true,
+        blocksDocuments: false,
+        note: "Paused for review.",
+        noteVisible: true,
+        blockedById: admin.id,
+      },
+    });
+    const keptReview = await prisma.uploadReview.create({
+      data: {
+        accountId: otherStudent.id,
+        purpose: null,
+        action: "BLOCKED",
+        note: "Paused.",
+        noteVisible: true,
+        actorAccountId: admin.id,
+      },
+    });
+    const keptBlock = await prisma.uploadBlock.create({
+      data: {
+        accountId: otherStudent.id,
+        blocksVideos: false,
+        blocksDocuments: true,
+        note: "Paused.",
+        noteVisible: true,
+        blockedById: admin.id,
+      },
+    });
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers: await getAuthHeaders(student),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.uploadReview.count({ where: { accountId: student.id } })).toBe(0);
+    expect(await prisma.uploadBlock.count({ where: { accountId: student.id } })).toBe(0);
+    expect(await prisma.uploadReview.findUnique({ where: { id: keptReview.id } })).not.toBeNull();
+    expect(await prisma.uploadBlock.findUnique({ where: { id: keptBlock.id } })).not.toBeNull();
+  });
+
+  it("keeps the upload history a deleted admin wrote, with the actor cleared", async () => {
+    const app = await createTestApp();
+    const area = await createArea();
+    const student = await createAccount({ role: "STUDENT" });
+    await createStudentProfile(student.id, area.id);
+    const admin = await createAdmin();
+
+    const review = await prisma.uploadReview.create({
+      data: {
+        accountId: student.id,
+        purpose: null,
+        action: "UNBLOCKED",
+        note: null,
+        noteVisible: true,
+        actorAccountId: admin.id,
+      },
+    });
+    const block = await prisma.uploadBlock.create({
+      data: {
+        accountId: student.id,
+        blocksVideos: true,
+        blocksDocuments: true,
+        note: "Paused.",
+        noteVisible: true,
+        blockedById: admin.id,
+        unblockedById: admin.id,
+        unblockedAt: new Date(),
+      },
+    });
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers: await getAuthHeaders(admin),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.findUnique({ where: { id: admin.id } })).toBeNull();
+    const keptReview = await prisma.uploadReview.findUniqueOrThrow({ where: { id: review.id } });
+    expect(keptReview).toMatchObject({
+      action: "UNBLOCKED",
+      accountId: student.id,
+      actorAccountId: null,
+    });
+    const keptBlock = await prisma.uploadBlock.findUniqueOrThrow({ where: { id: block.id } });
+    expect(keptBlock).toMatchObject({ blockedById: null, unblockedById: null });
+  });
+});
+
 describe("blocked and deleted accounts lose access", () => {
   it("rejects a self-deleted account's token on a protected route", async () => {
     const app = await createTestApp();

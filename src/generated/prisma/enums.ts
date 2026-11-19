@@ -328,10 +328,29 @@ export const AppNotificationKind = {
   APPLICATION_CANCELLED: 'APPLICATION_CANCELLED',
   APPLICATION_COMPLETED: 'APPLICATION_COMPLETED',
   PACKAGE_UPDATED: 'PACKAGE_UPDATED',
-  PACKAGE_CLOSED: 'PACKAGE_CLOSED'
+  PACKAGE_CLOSED: 'PACKAGE_CLOSED',
+  ID_APPROVED: 'ID_APPROVED',
+  ID_REJECTED: 'ID_REJECTED',
+  VIDEO_APPROVED: 'VIDEO_APPROVED',
+  VIDEO_REJECTED: 'VIDEO_REJECTED',
+  FILE_REMOVED: 'FILE_REMOVED',
+  UPLOADS_BLOCKED: 'UPLOADS_BLOCKED',
+  UPLOADS_UNBLOCKED: 'UPLOADS_UNBLOCKED'
 } as const
 
 export type AppNotificationKind = (typeof AppNotificationKind)[keyof typeof AppNotificationKind]
+
+
+export const UploadReviewAction = {
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  REVOKED: 'REVOKED',
+  REMOVED: 'REMOVED',
+  BLOCKED: 'BLOCKED',
+  UNBLOCKED: 'UNBLOCKED'
+} as const
+
+export type UploadReviewAction = (typeof UploadReviewAction)[keyof typeof UploadReviewAction]
 
 
 export const NotificationStatus = {

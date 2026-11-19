@@ -10,7 +10,7 @@ import {
   EMBED_URL_TTL,
   extensionFor,
   FILE_POLICY,
-  MAX_PENDING_UPLOADS,
+  MAX_UNUSED_UPLOADS,
   SNIFF_BYTES,
   sniffMatches,
   UPLOAD_URL_TTL,
@@ -21,6 +21,7 @@ import type {
   FileAssetResponse,
   UploadUrlResponse,
 } from "./files.schema.js";
+import { assertUploadsAllowed } from "./upload-review.service.js";
 
 // Upload flow: createUploadUrl (row PENDING_UPLOAD + signed PUT) -> the browser PUTs to R2 ->
 // completeUpload checks the object and marks it UPLOADED -> a feature endpoint attaches it with
@@ -67,18 +68,23 @@ export async function createUploadUrl(
   input: CreateUploadUrlInput,
 ): Promise<UploadUrlResponse> {
   checkPolicy(input.purpose, input.contentType, input.sizeBytes);
+  await assertUploadsAllowed(prisma, ownerAccountId, input.purpose);
   const storage = getStorage();
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const pending = await prisma.fileAsset.count({
-    where: { ownerAccountId, status: "PENDING_UPLOAD", createdAt: { gte: since } },
+  const unused = await prisma.fileAsset.count({
+    where: {
+      ownerAccountId,
+      createdAt: { gte: since },
+      OR: [{ status: "PENDING_UPLOAD" }, { status: "UPLOADED", ...unattachedFileWhere }],
+    },
   });
-  if (pending >= MAX_PENDING_UPLOADS) {
+  if (unused >= MAX_UNUSED_UPLOADS) {
     throw appError(
       "UploadLimitReached",
       409,
-      "Too many unfinished uploads. Finish or remove one, or try again tomorrow.",
-      { limit: MAX_PENDING_UPLOADS },
+      "Too many uploads that are not used yet. Use or remove one, or try again tomorrow.",
+      { limit: MAX_UNUSED_UPLOADS },
     );
   }
 
@@ -86,6 +92,7 @@ export async function createUploadUrl(
   const uploadUrl = await storage.presignPut({
     key,
     contentType: input.contentType,
+    contentLength: input.sizeBytes,
     expiresIn: UPLOAD_URL_TTL,
   });
   const row = await prisma.fileAsset.create({
@@ -216,7 +223,8 @@ export const unattachedFileWhere = {
 /**
  * Locks an uploaded file for attaching to a record, inside the caller's transaction.
  * 400 INVALID_FILE when it is not the caller's, not uploaded, or the wrong purpose;
- * 409 FILE_IN_USE when another record already uses it.
+ * 409 FILE_IN_USE when another record already uses it; 403 UPLOADS_BLOCKED when an admin paused
+ * this kind of upload for the owner.
  */
 export async function claimFile(
   tx: Prisma.TransactionClient,
@@ -233,6 +241,7 @@ export async function claimFile(
   if (row.purpose !== input.purpose) {
     throw appError("InvalidFile", 400, "This file was uploaded for something else.");
   }
+  await assertUploadsAllowed(tx, input.ownerAccountId, input.purpose);
   if (await fileInUse(tx, row.id)) {
     throw appError("FileInUse", 409, "This file is already attached to something else.");
   }

@@ -55,7 +55,19 @@ lost() {
 # scan FILE HITS REASON: prints a warning with the matching lines
 scan() {
   [ -n "$2" ] || return 0
-  echo "WARN: $3"; echo "$2" | sed "s|^|  $1:|"; warnings=$((warnings + 1))
+  echo "WARN: $3"; echo "$2" | cut -c1-160 | sed "s|^|  $1:|"; warnings=$((warnings + 1))
+}
+# stmts FILE: one line per SQL statement as "LINE: text", comments dropped, so a clause on a later line
+# (NOT VALID) still counts. A statement under "-- squawk-ignore <rule>" keeps "[ignored: <rule>]".
+stmts() {
+  awk '{ line = $0
+    if (match(line, /squawk-ignore[ \t]+[a-z-]+/)) ig = ig " [ignored: " substr(line, RSTART + 14, RLENGTH - 14) "]"
+    sub(/--.*/, "", line)
+    if (line ~ /^[ \t]*$/) next
+    if (buf == "") start = NR
+    buf = buf " " line
+    if (line ~ /;[ \t]*$/) { gsub(/[ \t]+/, " ", buf); print start ":" buf ig; buf = ""; ig = "" } }
+    END { if (buf != "") print start ":" buf ig }' "$1"
 }
 check_failed() {
   local rows; rows=$(q "$1" "select migration_name || ': ' || coalesce(logs, '') from _prisma_migrations where finished_at is null and rolled_back_at is null")
@@ -118,8 +130,9 @@ if [ "$mode" = full ]; then
     scan "$f" "$(grep -inE 'DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM' "$f")" "data loss (DROP / TRUNCATE / DELETE)"
     scan "$f" "$(grep -inE 'ALTER COLUMN .* TYPE' "$f")" "table rewrite (ALTER COLUMN TYPE)"
     scan "$f" "$(grep -inE 'SET NOT NULL' "$f")" "SET NOT NULL scans the whole table under lock"
-    scan "$f" "$(grep -inE 'ADD CONSTRAINT.*(CHECK|FOREIGN KEY)' "$f" | grep -viE 'NOT VALID')" "constraint checks existing rows; add NOT VALID, then VALIDATE"
-    scan "$f" "$(grep -inE 'CREATE (UNIQUE )?INDEX' "$f" | grep -viE 'CONCURRENTLY')" "index build blocks writes; use CONCURRENTLY"
+    scan "$f" "$(stmts "$f" | grep -iE 'ADD CONSTRAINT.*(CHECK|FOREIGN KEY)' | grep -viE 'NOT VALID')" "constraint checks existing rows; add NOT VALID, then VALIDATE"
+    # Indexes on tables the same migration creates carry squawk-ignore require-concurrent-index-creation.
+    scan "$f" "$(stmts "$f" | grep -iE 'CREATE (UNIQUE )?INDEX' | grep -viE 'CONCURRENTLY|ignored: require-concurrent-index-creation')" "index build blocks writes; use CONCURRENTLY"
     if grep -qi 'ALTER TABLE' "$f" && ! grep -qi 'lock_timeout' "$f"; then
       scan "$f" "$(grep -inE 'ALTER TABLE' "$f")" "ALTER TABLE without lock_timeout (can queue behind a lock)"
     fi

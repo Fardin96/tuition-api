@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { ModerationStatus, VerificationStatus } from "../../generated/prisma/enums.js";
 import { fileAssetSchema } from "../files/files.schema.js";
+import {
+  noteVisibleSchema,
+  reviewNoteSchema,
+  uploadFlagsSchema,
+} from "../files/upload-review.schema.js";
 
 export const videoIdParamSchema = z.object({ id: z.string().uuid() });
 export type VideoIdParam = z.infer<typeof videoIdParamSchema>;
@@ -19,15 +24,18 @@ export const adminVideoSchema = z
     title: z.string(),
     status: z.nativeEnum(ModerationStatus),
     moderationNote: z.string().nullable(),
+    noteVisible: z.boolean(),
     sortOrder: z.number().int(),
     createdAt: z.date(),
     url: z.string().nullable(),
     file: fileAssetSchema,
     tutor: z.object({
       id: z.string(),
+      accountId: z.string(),
       name: z.string(),
       verificationStatus: z.nativeEnum(VerificationStatus),
     }),
+    uploadFlags: uploadFlagsSchema,
   })
   .meta({ id: "AdminVideo" });
 export type AdminVideoResponse = z.infer<typeof adminVideoSchema>;
@@ -43,7 +51,8 @@ export type AdminVideoPageResponse = z.infer<typeof adminVideoPageSchema>;
 export const moderateVideoSchema = z
   .object({
     decision: z.enum(["APPROVE", "REJECT"]),
-    note: z.string().trim().min(3).max(500).optional(),
+    note: reviewNoteSchema.optional(),
+    noteVisible: noteVisibleSchema,
   })
   .strict()
   .superRefine((v, ctx) => {

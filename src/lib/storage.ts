@@ -17,8 +17,16 @@ import { appError } from "./errors.js";
 export type ObjectHead = { size: number; contentType: string | null };
 
 export interface ObjectStorage {
-  /** Signed PUT to the private bucket. The browser must send the same Content-Type. */
-  presignPut(input: { key: string; contentType: string; expiresIn: number }): Promise<string>;
+  /**
+   * Signed PUT to the private bucket. Content-Type and Content-Length are signed, so R2 refuses
+   * (403) a body of another type or size.
+   */
+  presignPut(input: {
+    key: string;
+    contentType: string;
+    contentLength: number;
+    expiresIn: number;
+  }): Promise<string>;
   /** Signed GET from the private bucket. */
   presignGet(input: { key: string; expiresIn: number; fileName?: string | null }): Promise<string>;
   /** Size and type of a private object, or null when it does not exist. */
@@ -67,9 +75,23 @@ function isNotFound(err: unknown): boolean {
   return e?.name === "NotFound" || e?.name === "NoSuchKey" || e?.$metadata?.httpStatusCode === 404;
 }
 
-// RFC 6266 filename: strip quotes and control characters, keep it short.
-function dispositionName(fileName: string): string {
-  return fileName.replace(/["\\\r\n]/g, "").slice(0, 120);
+/**
+ * RFC 6266 Content-Disposition for a stored file name: an ASCII `filename` for old clients and
+ * an RFC 5987 `filename*` with the real (UTF-8) name. Without `filename*`, non-ASCII names such
+ * as Bangla arrive garbled.
+ */
+export function contentDisposition(fileName: string): string {
+  const fallback =
+    fileName
+      .normalize("NFKD")
+      .replace(/[^\x20-\x7e]/g, "")
+      .replace(/["\\]/g, "")
+      .trim() || "file";
+  const encoded = encodeURIComponent(fileName).replace(
+    /['()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
+  return `inline; filename="${fallback}"; filename*=UTF-8''${encoded}`;
 }
 
 function createR2Storage(): ObjectStorage {
@@ -88,11 +110,17 @@ function createR2Storage(): ObjectStorage {
   });
 
   return {
-    presignPut: ({ key, contentType, expiresIn }) =>
+    presignPut: ({ key, contentType, contentLength, expiresIn }) =>
       getSignedUrl(
         client,
-        new PutObjectCommand({ Bucket: privateBucket, Key: key, ContentType: contentType }),
-        { expiresIn },
+        new PutObjectCommand({
+          Bucket: privateBucket,
+          Key: key,
+          ContentType: contentType,
+          ContentLength: contentLength,
+        }),
+        // The presigner leaves content-length unsigned unless asked; R2 enforces it once signed.
+        { expiresIn, signableHeaders: new Set(["content-type", "content-length"]) },
       ),
 
     presignGet: ({ key, expiresIn, fileName }) =>
@@ -101,9 +129,7 @@ function createR2Storage(): ObjectStorage {
         new GetObjectCommand({
           Bucket: privateBucket,
           Key: key,
-          ...(fileName
-            ? { ResponseContentDisposition: `inline; filename="${dispositionName(fileName)}"` }
-            : {}),
+          ...(fileName ? { ResponseContentDisposition: contentDisposition(fileName) } : {}),
         }),
         { expiresIn },
       ),

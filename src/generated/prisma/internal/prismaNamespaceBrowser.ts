@@ -56,6 +56,8 @@ export const ModelName = {
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
   AccountBlock: 'AccountBlock',
+  UploadReview: 'UploadReview',
+  UploadBlock: 'UploadBlock',
   Area: 'Area',
   Subject: 'Subject',
   FileAsset: 'FileAsset',
@@ -182,6 +184,40 @@ export const AccountBlockScalarFieldEnum = {
 export type AccountBlockScalarFieldEnum = (typeof AccountBlockScalarFieldEnum)[keyof typeof AccountBlockScalarFieldEnum]
 
 
+export const UploadReviewScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  fileId: 'fileId',
+  purpose: 'purpose',
+  fileName: 'fileName',
+  contentType: 'contentType',
+  sizeBytes: 'sizeBytes',
+  action: 'action',
+  note: 'note',
+  noteVisible: 'noteVisible',
+  actorAccountId: 'actorAccountId',
+  createdAt: 'createdAt'
+} as const
+
+export type UploadReviewScalarFieldEnum = (typeof UploadReviewScalarFieldEnum)[keyof typeof UploadReviewScalarFieldEnum]
+
+
+export const UploadBlockScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  blocksVideos: 'blocksVideos',
+  blocksDocuments: 'blocksDocuments',
+  note: 'note',
+  noteVisible: 'noteVisible',
+  blockedById: 'blockedById',
+  blockedAt: 'blockedAt',
+  unblockedAt: 'unblockedAt',
+  unblockedById: 'unblockedById'
+} as const
+
+export type UploadBlockScalarFieldEnum = (typeof UploadBlockScalarFieldEnum)[keyof typeof UploadBlockScalarFieldEnum]
+
+
 export const AreaScalarFieldEnum = {
   id: 'id',
   division: 'division',
@@ -241,6 +277,7 @@ export const StudentScalarFieldEnum = {
   verificationDecidedAt: 'verificationDecidedAt',
   verificationReviewedById: 'verificationReviewedById',
   verificationNote: 'verificationNote',
+  verificationNoteVisible: 'verificationNoteVisible',
   ratingAvg: 'ratingAvg',
   ratingCount: 'ratingCount',
   createdAt: 'createdAt',
@@ -334,7 +371,8 @@ export const TutorVerificationScalarFieldEnum = {
   submittedAt: 'submittedAt',
   reviewedById: 'reviewedById',
   decidedAt: 'decidedAt',
-  note: 'note'
+  note: 'note',
+  noteVisible: 'noteVisible'
 } as const
 
 export type TutorVerificationScalarFieldEnum = (typeof TutorVerificationScalarFieldEnum)[keyof typeof TutorVerificationScalarFieldEnum]
@@ -358,6 +396,7 @@ export const TutorVideoScalarFieldEnum = {
   title: 'title',
   status: 'status',
   moderationNote: 'moderationNote',
+  noteVisible: 'noteVisible',
   sortOrder: 'sortOrder',
   createdAt: 'createdAt'
 } as const
@@ -739,6 +778,10 @@ export const AppNotificationScalarFieldEnum = {
   recipientId: 'recipientId',
   kind: 'kind',
   applicationId: 'applicationId',
+  note: 'note',
+  filePurpose: 'filePurpose',
+  blocksVideos: 'blocksVideos',
+  blocksDocuments: 'blocksDocuments',
   readAt: 'readAt',
   createdAt: 'createdAt'
 } as const

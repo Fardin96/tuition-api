@@ -7,6 +7,7 @@ import type { AccountModel } from "../../generated/prisma/models/Account.js";
 import { isNumberUsedByOtherAccount } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 import { removeObjects } from "../files/files.service.js";
+import { visibleNote } from "../files/upload-review.service.js";
 import { findOwnLocation } from "../location/location.service.js";
 
 const GOOGLE_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
@@ -431,6 +432,9 @@ export async function hardDeleteAccount(accountId: string) {
     await tx.session.deleteMany({ where: { accountId } });
     await tx.notificationLog.deleteMany({ where: { recipientId: accountId } });
     await tx.appNotification.deleteMany({ where: { recipientId: accountId } });
+    // Upload history and blocks are about this account; the admin side keeps its own rows (SET NULL).
+    await tx.uploadReview.deleteMany({ where: { accountId } });
+    await tx.uploadBlock.deleteMany({ where: { accountId } });
 
     // Account blocks, reports and disputes where this account is involved.
     await tx.accountBlock.deleteMany({
@@ -545,14 +549,21 @@ export async function hardDeleteAccount(accountId: string) {
   await removeObjects(files);
 }
 
+function omitVerificationVisibility<
+  T extends { verificationNote: string | null; verificationNoteVisible: boolean },
+>({ verificationNoteVisible, ...row }: T) {
+  return { ...row, verificationNote: visibleNote(row.verificationNote, verificationNoteVisible) };
+}
+
 export async function getMe(accountId: string) {
   const me = await prisma.account.findUnique({
     where: { id: accountId },
     include: { student: true, tutor: true, adminUser: true },
   });
   if (!me) return me;
+  // The admin's note reaches the student only when it was shared.
   const student = me.student && {
-    ...me.student,
+    ...omitVerificationVisibility(me.student),
     location: await findOwnLocation("student_location", me.student.id),
   };
   const tutor = me.tutor && {
