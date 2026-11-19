@@ -18,18 +18,25 @@ import { adminTeamRoutes } from "./modules/admin/admins.routes.js";
 import { adminApplicationRoutes } from "./modules/admin/applications.routes.js";
 import { adminAreaRoutes } from "./modules/admin/areas.routes.js";
 import { adminAuditLogRoutes } from "./modules/admin/audit-logs.routes.js";
+import { adminBlogRoutes } from "./modules/admin/blog.routes.js";
 import { adminFeeRoutes } from "./modules/admin/fees.routes.js";
+import { adminFileRoutes } from "./modules/admin/files.routes.js";
 import { adminPackageRoutes } from "./modules/admin/packages.routes.js";
 import { adminPaymentRoutes } from "./modules/admin/payments.routes.js";
 import { adminPromoCodeRoutes } from "./modules/admin/promo-codes.routes.js";
 import { adminRefundRoutes } from "./modules/admin/refunds.routes.js";
 import { adminSettingRoutes } from "./modules/admin/settings.routes.js";
 import { adminSubjectRoutes } from "./modules/admin/subjects.routes.js";
+import { adminUploadRoutes } from "./modules/admin/uploads.routes.js";
+import { adminVerificationRoutes } from "./modules/admin/verifications.routes.js";
+import { adminVideoRoutes } from "./modules/admin/videos.routes.js";
 import { adminZoneRequestRoutes } from "./modules/admin/zone-requests.routes.js";
 import { applicationRoutes } from "./modules/application/application.routes.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
+import { blogRoutes } from "./modules/blog/blog.routes.js";
 import { feeRoutes } from "./modules/fees/fee.routes.js";
+import { fileRoutes } from "./modules/files/files.routes.js";
 import { areaRoutes } from "./modules/lookups/areas.routes.js";
 import { lookupRoutes } from "./modules/lookups/lookups.routes.js";
 import { subjectRoutes } from "./modules/lookups/subjects.routes.js";
@@ -131,12 +138,15 @@ export async function buildApp() {
   // Browser redirects and server-to-server IPN from SSLCommerz; hidden from OpenAPI.
   await app.register(sslcommerzCallbackRoutes, { prefix: "/api/v1/payments/sslcommerz" });
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
+  await app.register(fileRoutes, { prefix: "/api/v1/files" });
+  await app.register(blogRoutes, { prefix: "/api/v1/blog" });
   await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
   await app.register(areaRoutes, { prefix: "/api/v1/areas" });
   await app.register(subjectRoutes, { prefix: "/api/v1/subjects" });
   await app.register(adminZoneRequestRoutes, { prefix: "/api/v1/admin/zone-limit-requests" });
   await app.register(adminTeamRoutes, { prefix: "/api/v1/admin/admins" });
   await app.register(adminAccountRoutes, { prefix: "/api/v1/admin/accounts" });
+  await app.register(adminUploadRoutes, { prefix: "/api/v1/admin/accounts" });
   await app.register(adminApplicationRoutes, { prefix: "/api/v1/admin/applications" });
   // Full paths: /admin/fees/* and /admin/payments/:id/reverse.
   await app.register(adminFeeRoutes, { prefix: "/api/v1/admin" });
@@ -148,6 +158,10 @@ export async function buildApp() {
   await app.register(adminAreaRoutes, { prefix: "/api/v1/admin/areas" });
   await app.register(adminSettingRoutes, { prefix: "/api/v1/admin/settings" });
   await app.register(adminAuditLogRoutes, { prefix: "/api/v1/admin/audit-logs" });
+  await app.register(adminVerificationRoutes, { prefix: "/api/v1/admin/verifications" });
+  await app.register(adminVideoRoutes, { prefix: "/api/v1/admin/videos" });
+  await app.register(adminFileRoutes, { prefix: "/api/v1/admin/files" });
+  await app.register(adminBlogRoutes, { prefix: "/api/v1/admin/blog" });
 
   return app;
 }

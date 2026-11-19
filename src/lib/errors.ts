@@ -39,6 +39,18 @@ export const ERROR_CODES = {
   PromoCodeExists: "PROMO_CODE_EXISTS",
   RefundNotAllowed: "REFUND_NOT_ALLOWED",
   InvalidRefundState: "INVALID_REFUND_STATE",
+  StorageUnavailable: "STORAGE_UNAVAILABLE",
+  FileTooLarge: "FILE_TOO_LARGE",
+  UnsupportedFileType: "UNSUPPORTED_FILE_TYPE",
+  UploadNotFound: "UPLOAD_NOT_FOUND",
+  InvalidFile: "INVALID_FILE",
+  FileInUse: "FILE_IN_USE",
+  UploadLimitReached: "UPLOAD_LIMIT_REACHED",
+  InvalidVerificationState: "INVALID_VERIFICATION_STATE",
+  VideoAlreadyModerated: "VIDEO_ALREADY_MODERATED",
+  BlogSlugExists: "BLOG_SLUG_EXISTS",
+  InvalidPostState: "INVALID_POST_STATE",
+  UploadsBlocked: "UPLOADS_BLOCKED",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

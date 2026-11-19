@@ -1,7 +1,9 @@
 import { unusableAreaIds } from "../../lib/areas.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
-import { appError } from "../../lib/errors.js";
+import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { claimFile } from "../files/files.service.js";
+import { visibleNote } from "../files/upload-review.service.js";
 import {
   findOwnLocation,
   type OwnLocation,
@@ -26,6 +28,10 @@ function serializeStudent(
     studentIdNumber: string;
     whatsappVerifiedAt: Date | null;
     verificationStatus: string;
+    verificationNote: string | null;
+    verificationNoteVisible: boolean;
+    verificationSubmittedAt: Date | null;
+    verificationDecidedAt: Date | null;
     ratingAvg: unknown;
     ratingCount: number;
     createdAt: Date;
@@ -33,10 +39,15 @@ function serializeStudent(
   },
   location: OwnLocation | null,
 ) {
+  // The admin's note reaches the student only when it was shared.
+  const { verificationNoteVisible, ...row } = student;
   return {
-    ...student,
+    ...row,
+    verificationNote: visibleNote(student.verificationNote, verificationNoteVisible),
     ratingAvg: toNumber(student.ratingAvg),
     whatsappVerifiedAt: student.whatsappVerifiedAt?.toISOString() ?? null,
+    verificationSubmittedAt: student.verificationSubmittedAt?.toISOString() ?? null,
+    verificationDecidedAt: student.verificationDecidedAt?.toISOString() ?? null,
     location,
     createdAt: student.createdAt.toISOString(),
     updatedAt: student.updatedAt.toISOString(),
@@ -126,6 +137,41 @@ export async function updateStudentProfile(
       await upsertLocation("student_location", updated.id, location, tx);
     }
     return updated;
+  });
+
+  return serializeStudent(student, await findOwnLocation("student_location", student.id));
+}
+
+// Sends the ID for review. Allowed when nothing is pending or approved (NOT_SUBMITTED or REJECTED).
+// The previous file stays until the cleanup cron removes it.
+export async function submitStudentVerification(accountId: string, fileId: string) {
+  const found = await prisma.student.findUnique({ where: { accountId }, select: { id: true } });
+  if (!found) throw notFound("Student profile not found");
+
+  const student = await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM student WHERE id = ${found.id}::uuid FOR UPDATE`;
+    const row = await tx.student.findUniqueOrThrow({ where: { id: found.id } });
+    if (row.verificationStatus === "PENDING" || row.verificationStatus === "APPROVED") {
+      throw appError(
+        "InvalidVerificationState",
+        409,
+        row.verificationStatus === "PENDING"
+          ? "Your ID is already under review."
+          : "Your ID is already verified.",
+      );
+    }
+    await claimFile(tx, { fileId, ownerAccountId: accountId, purpose: "STUDENT_ID" });
+    return tx.student.update({
+      where: { id: found.id },
+      data: {
+        verificationFileId: fileId,
+        verificationStatus: "PENDING",
+        verificationSubmittedAt: new Date(),
+        verificationDecidedAt: null,
+        verificationReviewedById: null,
+        verificationNote: null,
+      },
+    });
   });
 
   return serializeStudent(student, await findOwnLocation("student_location", student.id));

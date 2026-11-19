@@ -95,6 +95,8 @@ services:
       - key: R2_SECRET_ACCESS_KEY
         value: <r2-secret-access-key>
         type: SECRET
+      - key: R2_PUBLIC_BUCKET
+        value: <r2-public-bucket-or-empty>
       - key: R2_PUBLIC_URL_PREFIX
         value: <r2-public-url-or-empty>
       # n8n webhook for WhatsApp notifications
@@ -247,3 +249,48 @@ jobs:
         value: <api-public-url>
       - key: WEB_PUBLIC_URL
         value: <web-public-url>
+
+  # Removes abandoned uploads (unfinished after a day), unused files (uploaded, nothing attached,
+  # after a week) and purges deleted files after 30 days. 04:00 UTC is 10:00 in Dhaka.
+  - name: file-cleanup
+    kind: SCHEDULED
+    source_dir: /
+    github:
+      repo: fardin96/tuition-api
+      branch: main
+      deploy_on_push: true
+    build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
+    run_command: node dist/cron/file-cleanup.js
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    schedule:
+      cron: "0 4 * * *"
+      time_zone: UTC
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: <paste-direct-db-url-here>
+        type: SECRET
+      - key: DATABASE_POOL_URL
+        value: <paste-pool-url-here>?&pgbouncer=true&connection_limit=5
+        type: SECRET
+      - key: DATABASE_CA_CERT
+        value: <database-ca-cert-pem-content>
+        type: SECRET
+      - key: R2_ENDPOINT
+        value: <r2-endpoint>
+      - key: R2_REGION
+        value: auto
+      - key: R2_BUCKET
+        value: <r2-bucket>
+      - key: R2_ACCESS_KEY_ID
+        value: <r2-access-key-id>
+        type: SECRET
+      - key: R2_SECRET_ACCESS_KEY
+        value: <r2-secret-access-key>
+        type: SECRET
+      - key: R2_PUBLIC_BUCKET
+        value: <r2-public-bucket-or-empty>
+      - key: R2_PUBLIC_URL_PREFIX
+        value: <r2-public-url-or-empty>

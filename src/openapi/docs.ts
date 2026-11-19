@@ -17,6 +17,11 @@ export const TAGS = [
   { name: "Notifications", description: "In-app alerts for the dashboard bell." },
   { name: "Fees", description: "A tutor's platform fees and online payments (SSLCommerz)." },
   { name: "Videos", description: "Public tutor videos." },
+  {
+    name: "Files",
+    description: "Uploads to Cloudflare R2: signed upload URL, complete, signed read URL, delete.",
+  },
+  { name: "Blog", description: "Published blog posts." },
   { name: "Lookups", description: "Seeded reference data." },
   { name: "Admin", description: "Admin queues. Needs an ACTIVE admin_user row." },
 ] as const;

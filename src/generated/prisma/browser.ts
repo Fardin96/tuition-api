@@ -43,6 +43,16 @@ export type SuperAdminEmail = Prisma.SuperAdminEmailModel
  */
 export type AccountBlock = Prisma.AccountBlockModel
 /**
+ * Model UploadReview
+ * 
+ */
+export type UploadReview = Prisma.UploadReviewModel
+/**
+ * Model UploadBlock
+ * 
+ */
+export type UploadBlock = Prisma.UploadBlockModel
+/**
  * Model Area
  * 
  */

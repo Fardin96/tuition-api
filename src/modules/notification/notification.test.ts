@@ -18,6 +18,7 @@ import {
   setTutorLocation,
 } from "../../tests/helpers.js";
 import { hardDeleteAccount } from "../auth/auth.service.js";
+import { notifyUpload } from "../files/upload-review.service.js";
 
 const API = "/api/v1";
 const NOTIFY = `${API}/notifications`;
@@ -28,9 +29,13 @@ type Actor = { account: Account; headers: Record<string, string> };
 type AlertJson = {
   id: string;
   kind: string;
-  applicationId: string;
-  listingKind: "REQUIREMENT" | "PACKAGE";
-  counterpartName: string;
+  applicationId: string | null;
+  listingKind: "REQUIREMENT" | "PACKAGE" | null;
+  counterpartName: string | null;
+  note: string | null;
+  filePurpose: string | null;
+  blocksVideos: boolean | null;
+  blocksDocuments: boolean | null;
   readAt: string | null;
   createdAt: string;
 };
@@ -411,11 +416,15 @@ describe("GET /api/v1/notifications", () => {
     expect(Object.keys(row).sort()).toEqual(
       [
         "applicationId",
+        "blocksDocuments",
+        "blocksVideos",
         "counterpartName",
         "createdAt",
+        "filePurpose",
         "id",
         "kind",
         "listingKind",
+        "note",
         "readAt",
       ].sort(),
     );
@@ -655,6 +664,158 @@ describe("isolation", () => {
     expect(await unreadOf(app, actorA)).toBe(1);
     expect(await unreadOf(app, actorB)).toBe(1);
     expect(await unreadOf(app, tutorActor)).toBe(1);
+  });
+});
+
+// Upload alerts have no application. The note is stored only when the admin shared it.
+async function uploadAlert(
+  recipientId: string,
+  input: {
+    kind: Parameters<typeof notifyUpload>[1]["kind"];
+    note?: string | null;
+    noteVisible?: boolean;
+    filePurpose?: Parameters<typeof notifyUpload>[1]["filePurpose"];
+    blocksVideos?: boolean;
+    blocksDocuments?: boolean;
+  },
+) {
+  await prisma.$transaction((tx) =>
+    notifyUpload(tx, {
+      recipientId,
+      noteVisible: true,
+      note: null,
+      ...input,
+    }),
+  );
+}
+
+describe("upload alerts", () => {
+  it("list returns the upload alert with null application fields and the shared note", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    await uploadAlert(student.accountId, {
+      kind: "ID_REJECTED",
+      note: "The photo is blurry.",
+      filePurpose: "STUDENT_ID",
+    });
+
+    const body = await listAs(app, actor);
+
+    expect(body.notifications).toHaveLength(1);
+    expect(body.notifications[0]).toMatchObject({
+      kind: "ID_REJECTED",
+      applicationId: null,
+      listingKind: null,
+      counterpartName: null,
+      note: "The photo is blurry.",
+      filePurpose: "STUDENT_ID",
+      blocksVideos: null,
+      blocksDocuments: null,
+      readAt: null,
+    });
+  });
+
+  it("stores a hidden note as null so the user never receives it", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    await uploadAlert(student.accountId, {
+      kind: "VIDEO_REJECTED",
+      note: "Internal: duplicate of an earlier upload.",
+      noteVisible: false,
+      filePurpose: "TUTOR_VIDEO",
+    });
+
+    const [row] = (await listAs(app, actor)).notifications;
+    expect(row).toMatchObject({ kind: "VIDEO_REJECTED", note: null, filePurpose: "TUTOR_VIDEO" });
+    const stored = await prisma.appNotification.findFirstOrThrow({
+      where: { recipientId: student.accountId },
+    });
+    expect(stored.note).toBeNull();
+  });
+
+  it("block alerts carry which uploads are covered and no file purpose", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    await uploadAlert(student.accountId, {
+      kind: "UPLOADS_BLOCKED",
+      note: "Please wait for a call from our team.",
+      blocksVideos: true,
+      blocksDocuments: false,
+    });
+
+    const [row] = (await listAs(app, actor)).notifications;
+    expect(row).toMatchObject({
+      kind: "UPLOADS_BLOCKED",
+      applicationId: null,
+      listingKind: null,
+      counterpartName: null,
+      note: "Please wait for a call from our team.",
+      filePurpose: null,
+      blocksVideos: true,
+      blocksDocuments: false,
+    });
+  });
+
+  it("application alerts keep their values and get null upload fields", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    const { tutor } = await createTutor("Rahim Tutor");
+    const { application } = await requirementApplication(student.id, tutor.id);
+    await seedAlert(student.accountId, application.id, new Date());
+
+    const [row] = (await listAs(app, actor)).notifications;
+    expect(row).toMatchObject({
+      kind: "APPLICATION_RECEIVED",
+      applicationId: application.id,
+      listingKind: "REQUIREMENT",
+      counterpartName: "Rahim Tutor",
+      note: null,
+      filePurpose: null,
+      blocksVideos: null,
+      blocksDocuments: null,
+    });
+  });
+
+  it("upload alerts count toward the unread count and can be marked read", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    await uploadAlert(student.accountId, {
+      kind: "FILE_REMOVED",
+      note: "Removed.",
+      filePurpose: "CREDENTIAL",
+    });
+    await uploadAlert(student.accountId, { kind: "UPLOADS_UNBLOCKED", note: null });
+    expect(await unreadOf(app, actor)).toBe(2);
+
+    const [first] = (await listAs(app, actor)).notifications;
+    const res = await app.inject({
+      method: "POST",
+      url: `${NOTIFY}/${first.id}/read`,
+      headers: actor.headers,
+    });
+    expect(res.statusCode).toBe(204);
+    expect(await unreadOf(app, actor)).toBe(1);
+    const readRow = (await listAs(app, actor)).notifications.find((n) => n.id === first.id);
+    expect(readRow?.readAt).not.toBeNull();
+  });
+
+  it("read-all clears upload alerts too", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    await uploadAlert(student.accountId, {
+      kind: "UPLOADS_BLOCKED",
+      note: "Paused.",
+      blocksVideos: true,
+      blocksDocuments: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${NOTIFY}/read-all`,
+      headers: actor.headers,
+    });
+    expect(res.statusCode).toBe(204);
+    expect(await unreadOf(app, actor)).toBe(0);
   });
 });
 

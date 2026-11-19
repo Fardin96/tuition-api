@@ -231,6 +231,8 @@ export type AccountWhereInput = {
   alerts?: Prisma.AppNotificationListRelationFilter
   auditEntries?: Prisma.AuditLogListRelationFilter
   blocks?: Prisma.AccountBlockListRelationFilter
+  uploadReviews?: Prisma.UploadReviewListRelationFilter
+  uploadBlocks?: Prisma.UploadBlockListRelationFilter
   reportsMade?: Prisma.ReportListRelationFilter
   reportsAgainst?: Prisma.ReportListRelationFilter
   disputesRaised?: Prisma.DisputeListRelationFilter
@@ -258,6 +260,8 @@ export type AccountOrderByWithRelationInput = {
   alerts?: Prisma.AppNotificationOrderByRelationAggregateInput
   auditEntries?: Prisma.AuditLogOrderByRelationAggregateInput
   blocks?: Prisma.AccountBlockOrderByRelationAggregateInput
+  uploadReviews?: Prisma.UploadReviewOrderByRelationAggregateInput
+  uploadBlocks?: Prisma.UploadBlockOrderByRelationAggregateInput
   reportsMade?: Prisma.ReportOrderByRelationAggregateInput
   reportsAgainst?: Prisma.ReportOrderByRelationAggregateInput
   disputesRaised?: Prisma.DisputeOrderByRelationAggregateInput
@@ -289,6 +293,8 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   alerts?: Prisma.AppNotificationListRelationFilter
   auditEntries?: Prisma.AuditLogListRelationFilter
   blocks?: Prisma.AccountBlockListRelationFilter
+  uploadReviews?: Prisma.UploadReviewListRelationFilter
+  uploadBlocks?: Prisma.UploadBlockListRelationFilter
   reportsMade?: Prisma.ReportListRelationFilter
   reportsAgainst?: Prisma.ReportListRelationFilter
   disputesRaised?: Prisma.DisputeListRelationFilter
@@ -348,6 +354,8 @@ export type AccountCreateInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -375,6 +383,8 @@ export type AccountUncheckedCreateInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -402,6 +412,8 @@ export type AccountUpdateInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -429,6 +441,8 @@ export type AccountUncheckedUpdateInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -593,6 +607,34 @@ export type AccountUpdateOneRequiredWithoutBlocksNestedInput = {
   upsert?: Prisma.AccountUpsertWithoutBlocksInput
   connect?: Prisma.AccountWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutBlocksInput, Prisma.AccountUpdateWithoutBlocksInput>, Prisma.AccountUncheckedUpdateWithoutBlocksInput>
+}
+
+export type AccountCreateNestedOneWithoutUploadReviewsInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutUploadReviewsInput, Prisma.AccountUncheckedCreateWithoutUploadReviewsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutUploadReviewsInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneRequiredWithoutUploadReviewsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutUploadReviewsInput, Prisma.AccountUncheckedCreateWithoutUploadReviewsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutUploadReviewsInput
+  upsert?: Prisma.AccountUpsertWithoutUploadReviewsInput
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutUploadReviewsInput, Prisma.AccountUpdateWithoutUploadReviewsInput>, Prisma.AccountUncheckedUpdateWithoutUploadReviewsInput>
+}
+
+export type AccountCreateNestedOneWithoutUploadBlocksInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutUploadBlocksInput, Prisma.AccountUncheckedCreateWithoutUploadBlocksInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutUploadBlocksInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneRequiredWithoutUploadBlocksNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutUploadBlocksInput, Prisma.AccountUncheckedCreateWithoutUploadBlocksInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutUploadBlocksInput
+  upsert?: Prisma.AccountUpsertWithoutUploadBlocksInput
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutUploadBlocksInput, Prisma.AccountUpdateWithoutUploadBlocksInput>, Prisma.AccountUncheckedUpdateWithoutUploadBlocksInput>
 }
 
 export type AccountCreateNestedOneWithoutFilesInput = {
@@ -770,6 +812,8 @@ export type AccountCreateWithoutSessionsInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -796,6 +840,8 @@ export type AccountUncheckedCreateWithoutSessionsInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -838,6 +884,8 @@ export type AccountUpdateWithoutSessionsInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -864,6 +912,8 @@ export type AccountUncheckedUpdateWithoutSessionsInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -890,6 +940,8 @@ export type AccountCreateWithoutAdminUserInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -916,6 +968,8 @@ export type AccountUncheckedCreateWithoutAdminUserInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -958,6 +1012,8 @@ export type AccountUpdateWithoutAdminUserInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -984,6 +1040,8 @@ export type AccountUncheckedUpdateWithoutAdminUserInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -1010,6 +1068,8 @@ export type AccountCreateWithoutBlocksInput = {
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -1036,6 +1096,8 @@ export type AccountUncheckedCreateWithoutBlocksInput = {
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -1078,6 +1140,8 @@ export type AccountUpdateWithoutBlocksInput = {
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -1104,6 +1168,264 @@ export type AccountUncheckedUpdateWithoutBlocksInput = {
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+}
+
+export type AccountCreateWithoutUploadReviewsInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+}
+
+export type AccountUncheckedCreateWithoutUploadReviewsInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+}
+
+export type AccountCreateOrConnectWithoutUploadReviewsInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutUploadReviewsInput, Prisma.AccountUncheckedCreateWithoutUploadReviewsInput>
+}
+
+export type AccountUpsertWithoutUploadReviewsInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutUploadReviewsInput, Prisma.AccountUncheckedUpdateWithoutUploadReviewsInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutUploadReviewsInput, Prisma.AccountUncheckedCreateWithoutUploadReviewsInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutUploadReviewsInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutUploadReviewsInput, Prisma.AccountUncheckedUpdateWithoutUploadReviewsInput>
+}
+
+export type AccountUpdateWithoutUploadReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutUploadReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+}
+
+export type AccountCreateWithoutUploadBlocksInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+}
+
+export type AccountUncheckedCreateWithoutUploadBlocksInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+}
+
+export type AccountCreateOrConnectWithoutUploadBlocksInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutUploadBlocksInput, Prisma.AccountUncheckedCreateWithoutUploadBlocksInput>
+}
+
+export type AccountUpsertWithoutUploadBlocksInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutUploadBlocksInput, Prisma.AccountUncheckedUpdateWithoutUploadBlocksInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutUploadBlocksInput, Prisma.AccountUncheckedCreateWithoutUploadBlocksInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutUploadBlocksInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutUploadBlocksInput, Prisma.AccountUncheckedUpdateWithoutUploadBlocksInput>
+}
+
+export type AccountUpdateWithoutUploadBlocksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutUploadBlocksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -1130,6 +1452,8 @@ export type AccountCreateWithoutFilesInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -1156,6 +1480,8 @@ export type AccountUncheckedCreateWithoutFilesInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -1198,6 +1524,8 @@ export type AccountUpdateWithoutFilesInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -1224,6 +1552,8 @@ export type AccountUncheckedUpdateWithoutFilesInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -1250,6 +1580,8 @@ export type AccountCreateWithoutStudentInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -1276,6 +1608,8 @@ export type AccountUncheckedCreateWithoutStudentInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -1318,6 +1652,8 @@ export type AccountUpdateWithoutStudentInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -1344,6 +1680,8 @@ export type AccountUncheckedUpdateWithoutStudentInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -1370,6 +1708,8 @@ export type AccountCreateWithoutTutorInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -1396,6 +1736,8 @@ export type AccountUncheckedCreateWithoutTutorInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -1438,6 +1780,8 @@ export type AccountUpdateWithoutTutorInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -1464,6 +1808,8 @@ export type AccountUncheckedUpdateWithoutTutorInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -1491,6 +1837,8 @@ export type AccountCreateWithoutReportsMadeInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
@@ -1517,6 +1865,8 @@ export type AccountUncheckedCreateWithoutReportsMadeInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
@@ -1548,6 +1898,8 @@ export type AccountCreateWithoutReportsAgainstInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
@@ -1574,6 +1926,8 @@ export type AccountUncheckedCreateWithoutReportsAgainstInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
@@ -1616,6 +1970,8 @@ export type AccountUpdateWithoutReportsMadeInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
@@ -1642,6 +1998,8 @@ export type AccountUncheckedUpdateWithoutReportsMadeInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
@@ -1679,6 +2037,8 @@ export type AccountUpdateWithoutReportsAgainstInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
@@ -1705,6 +2065,8 @@ export type AccountUncheckedUpdateWithoutReportsAgainstInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
@@ -1731,6 +2093,8 @@ export type AccountCreateWithoutDisputesRaisedInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
@@ -1757,6 +2121,8 @@ export type AccountUncheckedCreateWithoutDisputesRaisedInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
@@ -1788,6 +2154,8 @@ export type AccountCreateWithoutDisputesAgainstInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -1814,6 +2182,8 @@ export type AccountUncheckedCreateWithoutDisputesAgainstInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -1856,6 +2226,8 @@ export type AccountUpdateWithoutDisputesRaisedInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
@@ -1882,6 +2254,8 @@ export type AccountUncheckedUpdateWithoutDisputesRaisedInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
@@ -1919,6 +2293,8 @@ export type AccountUpdateWithoutDisputesAgainstInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -1945,6 +2321,8 @@ export type AccountUncheckedUpdateWithoutDisputesAgainstInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -1971,6 +2349,8 @@ export type AccountCreateWithoutRefundRequestsInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -1997,6 +2377,8 @@ export type AccountUncheckedCreateWithoutRefundRequestsInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -2039,6 +2421,8 @@ export type AccountUpdateWithoutRefundRequestsInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -2065,6 +2449,8 @@ export type AccountUncheckedUpdateWithoutRefundRequestsInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -2090,6 +2476,8 @@ export type AccountCreateWithoutNotificationsInput = {
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -2116,6 +2504,8 @@ export type AccountUncheckedCreateWithoutNotificationsInput = {
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -2158,6 +2548,8 @@ export type AccountUpdateWithoutNotificationsInput = {
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -2184,6 +2576,8 @@ export type AccountUncheckedUpdateWithoutNotificationsInput = {
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -2210,6 +2604,8 @@ export type AccountCreateWithoutAlertsInput = {
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -2236,6 +2632,8 @@ export type AccountUncheckedCreateWithoutAlertsInput = {
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -2278,6 +2676,8 @@ export type AccountUpdateWithoutAlertsInput = {
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -2304,6 +2704,8 @@ export type AccountUncheckedUpdateWithoutAlertsInput = {
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -2330,6 +2732,8 @@ export type AccountCreateWithoutAuditEntriesInput = {
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
@@ -2356,6 +2760,8 @@ export type AccountUncheckedCreateWithoutAuditEntriesInput = {
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
   reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
@@ -2398,6 +2804,8 @@ export type AccountUpdateWithoutAuditEntriesInput = {
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
@@ -2424,6 +2832,8 @@ export type AccountUncheckedUpdateWithoutAuditEntriesInput = {
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
   reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
@@ -2443,6 +2853,8 @@ export type AccountCountOutputType = {
   alerts: number
   auditEntries: number
   blocks: number
+  uploadReviews: number
+  uploadBlocks: number
   reportsMade: number
   reportsAgainst: number
   disputesRaised: number
@@ -2457,6 +2869,8 @@ export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   alerts?: boolean | AccountCountOutputTypeCountAlertsArgs
   auditEntries?: boolean | AccountCountOutputTypeCountAuditEntriesArgs
   blocks?: boolean | AccountCountOutputTypeCountBlocksArgs
+  uploadReviews?: boolean | AccountCountOutputTypeCountUploadReviewsArgs
+  uploadBlocks?: boolean | AccountCountOutputTypeCountUploadBlocksArgs
   reportsMade?: boolean | AccountCountOutputTypeCountReportsMadeArgs
   reportsAgainst?: boolean | AccountCountOutputTypeCountReportsAgainstArgs
   disputesRaised?: boolean | AccountCountOutputTypeCountDisputesRaisedArgs
@@ -2519,6 +2933,20 @@ export type AccountCountOutputTypeCountBlocksArgs<ExtArgs extends runtime.Types.
 /**
  * AccountCountOutputType without action
  */
+export type AccountCountOutputTypeCountUploadReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UploadReviewWhereInput
+}
+
+/**
+ * AccountCountOutputType without action
+ */
+export type AccountCountOutputTypeCountUploadBlocksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UploadBlockWhereInput
+}
+
+/**
+ * AccountCountOutputType without action
+ */
 export type AccountCountOutputTypeCountReportsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ReportWhereInput
 }
@@ -2572,6 +3000,8 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   alerts?: boolean | Prisma.Account$alertsArgs<ExtArgs>
   auditEntries?: boolean | Prisma.Account$auditEntriesArgs<ExtArgs>
   blocks?: boolean | Prisma.Account$blocksArgs<ExtArgs>
+  uploadReviews?: boolean | Prisma.Account$uploadReviewsArgs<ExtArgs>
+  uploadBlocks?: boolean | Prisma.Account$uploadBlocksArgs<ExtArgs>
   reportsMade?: boolean | Prisma.Account$reportsMadeArgs<ExtArgs>
   reportsAgainst?: boolean | Prisma.Account$reportsAgainstArgs<ExtArgs>
   disputesRaised?: boolean | Prisma.Account$disputesRaisedArgs<ExtArgs>
@@ -2630,6 +3060,8 @@ export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   alerts?: boolean | Prisma.Account$alertsArgs<ExtArgs>
   auditEntries?: boolean | Prisma.Account$auditEntriesArgs<ExtArgs>
   blocks?: boolean | Prisma.Account$blocksArgs<ExtArgs>
+  uploadReviews?: boolean | Prisma.Account$uploadReviewsArgs<ExtArgs>
+  uploadBlocks?: boolean | Prisma.Account$uploadBlocksArgs<ExtArgs>
   reportsMade?: boolean | Prisma.Account$reportsMadeArgs<ExtArgs>
   reportsAgainst?: boolean | Prisma.Account$reportsAgainstArgs<ExtArgs>
   disputesRaised?: boolean | Prisma.Account$disputesRaisedArgs<ExtArgs>
@@ -2652,6 +3084,8 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     alerts: Prisma.$AppNotificationPayload<ExtArgs>[]
     auditEntries: Prisma.$AuditLogPayload<ExtArgs>[]
     blocks: Prisma.$AccountBlockPayload<ExtArgs>[]
+    uploadReviews: Prisma.$UploadReviewPayload<ExtArgs>[]
+    uploadBlocks: Prisma.$UploadBlockPayload<ExtArgs>[]
     reportsMade: Prisma.$ReportPayload<ExtArgs>[]
     reportsAgainst: Prisma.$ReportPayload<ExtArgs>[]
     disputesRaised: Prisma.$DisputePayload<ExtArgs>[]
@@ -3072,6 +3506,8 @@ export interface Prisma__AccountClient<T, Null = never, ExtArgs extends runtime.
   alerts<T extends Prisma.Account$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditEntries<T extends Prisma.Account$auditEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$auditEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   blocks<T extends Prisma.Account$blocksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$blocksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  uploadReviews<T extends Prisma.Account$uploadReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$uploadReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UploadReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  uploadBlocks<T extends Prisma.Account$uploadBlocksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$uploadBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UploadBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reportsMade<T extends Prisma.Account$reportsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$reportsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reportsAgainst<T extends Prisma.Account$reportsAgainstArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$reportsAgainstArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   disputesRaised<T extends Prisma.Account$disputesRaisedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$disputesRaisedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DisputePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3707,6 +4143,54 @@ export type Account$blocksArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AccountBlockScalarFieldEnum | Prisma.AccountBlockScalarFieldEnum[]
+}
+
+/**
+ * Account.uploadReviews
+ */
+export type Account$uploadReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UploadReview
+   */
+  select?: Prisma.UploadReviewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UploadReview
+   */
+  omit?: Prisma.UploadReviewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UploadReviewInclude<ExtArgs> | null
+  where?: Prisma.UploadReviewWhereInput
+  orderBy?: Prisma.UploadReviewOrderByWithRelationInput | Prisma.UploadReviewOrderByWithRelationInput[]
+  cursor?: Prisma.UploadReviewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UploadReviewScalarFieldEnum | Prisma.UploadReviewScalarFieldEnum[]
+}
+
+/**
+ * Account.uploadBlocks
+ */
+export type Account$uploadBlocksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UploadBlock
+   */
+  select?: Prisma.UploadBlockSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UploadBlock
+   */
+  omit?: Prisma.UploadBlockOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UploadBlockInclude<ExtArgs> | null
+  where?: Prisma.UploadBlockWhereInput
+  orderBy?: Prisma.UploadBlockOrderByWithRelationInput | Prisma.UploadBlockOrderByWithRelationInput[]
+  cursor?: Prisma.UploadBlockWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UploadBlockScalarFieldEnum | Prisma.UploadBlockScalarFieldEnum[]
 }
 
 /**

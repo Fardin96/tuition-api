@@ -1,0 +1,65 @@
+import { z } from "zod";
+import { FilePurpose, FileStatus } from "../../generated/prisma/enums.js";
+import { cleanFileName } from "./file-policy.js";
+
+export const fileIdParamSchema = z.object({ id: z.string().uuid() });
+export type FileIdParam = z.infer<typeof fileIdParamSchema>;
+
+export const fileAssetSchema = z
+  .object({
+    id: z.string(),
+    purpose: z.nativeEnum(FilePurpose),
+    contentType: z.string(),
+    sizeBytes: z.number().int(),
+    status: z.nativeEnum(FileStatus),
+    fileName: z.string().nullable(),
+    createdAt: z.date(),
+    uploadedAt: z.date().nullable(),
+  })
+  .meta({ id: "FileAsset" });
+export type FileAssetResponse = z.infer<typeof fileAssetSchema>;
+
+export const createUploadUrlSchema = z
+  .object({
+    purpose: z.nativeEnum(FilePurpose),
+    contentType: z.string().trim().toLowerCase().min(1).max(100),
+    sizeBytes: z.number().int().positive(),
+    // Cleaned and shortened rather than refused, so an odd name never blocks an upload.
+    fileName: z
+      .string()
+      .max(1000)
+      .optional()
+      .transform((name) => (name === undefined ? undefined : (cleanFileName(name) ?? undefined))),
+  })
+  .meta({ id: "CreateUploadUrl" });
+export type CreateUploadUrlInput = z.infer<typeof createUploadUrlSchema>;
+
+export const uploadUrlSchema = z
+  .object({
+    file: fileAssetSchema,
+    uploadUrl: z.string(),
+    method: z.literal("PUT"),
+    headers: z.object({ "Content-Type": z.string() }),
+    expiresAt: z.date(),
+  })
+  .meta({ id: "UploadUrl" });
+export type UploadUrlResponse = z.infer<typeof uploadUrlSchema>;
+
+export const downloadUrlSchema = z
+  .object({ url: z.string(), expiresAt: z.date() })
+  .meta({ id: "DownloadUrl" });
+export type DownloadUrlResponse = z.infer<typeof downloadUrlSchema>;
+
+/** Body of every endpoint that attaches an uploaded file. */
+export const fileIdSchema = z.string().uuid();
+
+// The signed-in account's own upload pause. note is null unless the admin shared it.
+export const uploadStatusSchema = z
+  .object({
+    blocksVideos: z.boolean(),
+    blocksDocuments: z.boolean(),
+    note: z.string().nullable(),
+    blockedAt: z.date().nullable(),
+  })
+  .meta({ id: "UploadStatus" });
+export type UploadStatusResponse = z.infer<typeof uploadStatusSchema>;

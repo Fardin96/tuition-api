@@ -1,16 +1,19 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireAuth, requireRole } from "../../plugins/auth.js";
 import {
   type StudentIdParam,
   type StudentProfileInput,
+  type SubmitVerificationInput,
   studentIdParamSchema,
   studentProfileSchema,
   studentPublicProfileSchema,
   studentResponseSchema,
   studentReviewListSchema,
+  submitVerificationSchema,
   type UpdateStudentProfileInput,
   updateStudentProfileSchema,
 } from "./student.schema.js";
@@ -19,6 +22,7 @@ import {
   getStudentById,
   getStudentReviews,
   hasSharedApplication,
+  submitStudentVerification,
   updateStudentProfile,
 } from "./student.service.js";
 
@@ -72,26 +76,29 @@ export async function studentRoutes(app: FastifyInstance) {
     },
   );
 
-  // Deferred: requires file upload / presigned URL flow.
   app.post(
     "/me/verification",
     {
+      config: accountRateLimit(10, "1 minute"),
       schema: {
         ...routeDocs({
           tag: "Students",
           summary: "Submit my ID for verification",
-          description: "Not built yet. Always answers 501 until the storage module lands.",
+          description:
+            "Sends an uploaded ID file for review. Allowed when no ID is pending or approved; a rejected ID can be sent again. The file must be yours, purpose STUDENT_ID and finished uploading. Clears the previous review note. Returns the profile.",
           auth: ["STUDENT"],
-          deferred: true,
+          errors: [404, 409],
+          rateLimit: "10/min per account",
         }),
+        body: submitVerificationSchema,
+        response: { 200: studentResponseSchema },
       },
     },
-    async () => {
-      throw appError(
-        "NotImplemented",
-        501,
-        "File upload endpoint deferred until the storage module is implemented",
-      );
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "STUDENT");
+      const { fileId } = request.body as SubmitVerificationInput;
+      const profile = await submitStudentVerification(account.accountId, fileId);
+      return reply.send(profile);
     },
   );
 

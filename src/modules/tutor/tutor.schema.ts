@@ -14,6 +14,7 @@ import {
   LEVEL_MIN,
   validateTutorCoverage,
 } from "../../lib/education.js";
+import { fileIdSchema } from "../files/files.schema.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
 const instituteNameSchema = z.string().trim().min(1).max(120);
@@ -189,19 +190,40 @@ export const tutorCredentialResponseSchema = z
   })
   .meta({ id: "TutorCredential" });
 
+export const createCredentialSchema = z
+  .object({
+    examLabel: z.string().trim().min(1).max(80),
+    result: z.string().trim().min(1).max(40),
+    fileId: fileIdSchema,
+  })
+  .meta({ id: "CreateCredential" });
+
+export type CreateCredentialInput = z.infer<typeof createCredentialSchema>;
+
 export const tutorCredentialListResponseSchema = z
   .object({
     credentials: z.array(tutorCredentialResponseSchema),
   })
   .meta({ id: "TutorCredentialList" });
 
+export const createVideoSchema = z
+  .object({
+    title: z.string().trim().min(1).max(100),
+    fileId: fileIdSchema,
+  })
+  .meta({ id: "CreateVideo" });
+
+export type CreateVideoInput = z.infer<typeof createVideoSchema>;
+
 export const tutorVideoResponseSchema = z
   .object({
     id: z.string(),
     title: z.string(),
     status: z.nativeEnum(ModerationStatus),
+    moderationNote: z.string().nullable(),
     sortOrder: z.number(),
     createdAt: z.string(),
+    url: z.string().nullable(),
     file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
   })
   .meta({ id: "TutorVideo" });
@@ -218,6 +240,7 @@ export const tutorPublicVideoResponseSchema = z
     title: z.string(),
     sortOrder: z.number(),
     createdAt: z.string(),
+    url: z.string().nullable(),
     tutor: z.object({ id: z.string(), name: z.string() }),
     file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
   })
@@ -252,6 +275,7 @@ export const tutorPublicProfileSchema = z
         title: z.string(),
         sortOrder: z.number(),
         createdAt: z.string(),
+        url: z.string().nullable(),
         file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
       }),
     ),
@@ -336,6 +360,13 @@ export const createTutorRequirementSchema = tutorRequirementBaseSchema
     }
     if (!daysPerWeekFits(v.daysPerWeek, v.availableDays)) {
       ctx.addIssue({ code: "custom", path: ["daysPerWeek"], message: DAYS_PER_WEEK_MESSAGE });
+    }
+    if (!v.teachesOnline && v.zoneIds.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["zoneIds"],
+        message: "Pick a zone or turn on online teaching",
+      });
     }
   })
   .meta({ id: "CreateTutorRequirement" });

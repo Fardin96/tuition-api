@@ -1,12 +1,21 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { appError, notFound } from "../../lib/errors.js";
+import { notFound } from "../../lib/errors.js";
+import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
 import { publicCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
 import {
+  type SubmitVerificationInput,
+  submitVerificationSchema,
+} from "../student/student.schema.js";
+import {
+  type CreateCredentialInput,
   type CreateTutorRequirementInput,
+  type CreateVideoInput,
+  createCredentialSchema,
   createTutorRequirementSchema,
+  createVideoSchema,
   type TutorAreasInput,
   type TutorIdParam,
   type TutorNearbyQuery,
@@ -17,6 +26,7 @@ import {
   tutorAreasResponseSchema,
   tutorAreasSchema,
   tutorCredentialListResponseSchema,
+  tutorCredentialResponseSchema,
   tutorIdParamSchema,
   tutorNearbyListResponseSchema,
   tutorNearbyQuerySchema,
@@ -34,7 +44,9 @@ import {
   tutorSubjectsResponseSchema,
   tutorSubjectsSchema,
   tutorVerificationListResponseSchema,
+  tutorVerificationResponseSchema,
   tutorVideoListResponseSchema,
+  tutorVideoResponseSchema,
   type UpdateTutorProfileInput,
   type UpdateTutorRequirementInput,
   updateTutorProfileSchema,
@@ -42,6 +54,8 @@ import {
 } from "./tutor.schema.js";
 import {
   addNearbyCardFields,
+  addTutorCredential,
+  addTutorVideo,
   archiveTutorRequirement,
   createTutorProfile,
   createTutorRequirement,
@@ -60,6 +74,7 @@ import {
   restoreTutorRequirement,
   searchTutors,
   setDefaultTutorRequirement,
+  submitTutorVerification,
   updateTutorProfile,
   updateTutorRequirement,
 } from "./tutor.service.js";
@@ -168,27 +183,34 @@ export async function tutorRoutes(app: FastifyInstance) {
     },
   );
 
-  // Deferred: requires file upload / presigned URL flow.
   app.post(
     "/me/verifications",
     {
+      config: accountRateLimit(10, "1 minute"),
       schema: {
         ...routeDocs({
           tag: "Tutors",
           summary: "Submit a verification",
           description:
-            "Not built yet: answers 501 until the storage module lands. Planned: the tutor uploads an ID file for review.",
+            "Sends an uploaded student ID file for review. Your profile needs a student ID number first (400). Refused while a submission is under review or once you are verified (409). The file must be yours, purpose TUTOR_ID and finished uploading. Returns the new submission.",
           auth: ["TUTOR"],
-          deferred: true,
+          errors: [404, 409],
+          rateLimit: "10/min per account",
         }),
+        body: submitVerificationSchema,
+        response: { 201: tutorVerificationResponseSchema },
       },
     },
-    async (_request: FastifyRequest, _reply: FastifyReply) => {
-      throw appError(
-        "NotImplemented",
-        501,
-        "File upload endpoint deferred until the storage module is implemented",
-      );
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { fileId } = request.body as SubmitVerificationInput;
+      const verification = await submitTutorVerification(account.accountId, fileId);
+      if (!verification) throw notFound("Tutor profile not found");
+      return reply.status(201).send({
+        ...verification,
+        submittedAt: verification.submittedAt.toISOString(),
+        decidedAt: verification.decidedAt?.toISOString() ?? null,
+      });
     },
   );
 
@@ -309,15 +331,7 @@ export async function tutorRoutes(app: FastifyInstance) {
       if (!tutor) {
         throw notFound("Tutor not found");
       }
-      return reply.send({
-        tutor: {
-          ...tutor,
-          videos: tutor.videos.map((v) => ({
-            ...v,
-            createdAt: v.createdAt.toISOString(),
-          })),
-        },
-      });
+      return reply.send({ tutor });
     },
   );
 
@@ -373,27 +387,30 @@ export async function tutorRoutes(app: FastifyInstance) {
     },
   );
 
-  // Deferred: requires file upload / presigned URL flow.
   app.post(
     "/me/credentials",
     {
+      config: accountRateLimit(30, "1 minute"),
       schema: {
         ...routeDocs({
           tag: "Tutors",
           summary: "Add a credential",
           description:
-            "Not built yet: answers 501 until the storage module lands. Planned: the tutor uploads a certificate file.",
+            "Adds a certificate file with its exam label and result. The file must be yours, purpose CREDENTIAL and finished uploading. A tutor can keep at most 20 credentials (409 UPLOAD_LIMIT_REACHED).",
           auth: ["TUTOR"],
-          deferred: true,
+          errors: [404, 409],
+          rateLimit: "30/min per account",
         }),
+        body: createCredentialSchema,
+        response: { 201: tutorCredentialResponseSchema },
       },
     },
-    async (_request: FastifyRequest, _reply: FastifyReply) => {
-      throw appError(
-        "NotImplemented",
-        501,
-        "File upload endpoint deferred until the storage module is implemented",
-      );
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const body = request.body as CreateCredentialInput;
+      const credential = await addTutorCredential(account.accountId, body);
+      if (!credential) throw notFound("Tutor profile not found");
+      return reply.status(201).send(credential);
     },
   );
 
@@ -404,7 +421,7 @@ export async function tutorRoutes(app: FastifyInstance) {
         ...routeDocs({
           tag: "Tutors",
           summary: "Remove a credential",
-          description: "Removes one of your credentials. Replies 204 with no body.",
+          description: "Removes one of your credentials and its file. Replies 204 with no body.",
           auth: ["TUTOR"],
           errors: [404],
           noContent: true,
@@ -443,36 +460,34 @@ export async function tutorRoutes(app: FastifyInstance) {
       if (!videos) {
         throw notFound("Tutor profile not found");
       }
-      return reply.send({
-        videos: videos.map((v) => ({
-          ...v,
-          createdAt: v.createdAt.toISOString(),
-        })),
-      });
+      return reply.send({ videos });
     },
   );
 
-  // Deferred: requires file upload / presigned URL flow.
   app.post(
     "/me/videos",
     {
+      config: accountRateLimit(10, "1 minute"),
       schema: {
         ...routeDocs({
           tag: "Tutors",
           summary: "Add a video",
           description:
-            "Not built yet: answers 501 until the storage module lands. Planned: the video is added as PENDING for moderation.",
+            "Adds an uploaded video as PENDING. It appears publicly only after an admin approves it. The file must be yours, purpose TUTOR_VIDEO and finished uploading. A tutor can keep at most 3 videos (409 UPLOAD_LIMIT_REACHED).",
           auth: ["TUTOR"],
-          deferred: true,
+          errors: [404, 409],
+          rateLimit: "10/min per account",
         }),
+        body: createVideoSchema,
+        response: { 201: tutorVideoResponseSchema },
       },
     },
-    async (_request: FastifyRequest, _reply: FastifyReply) => {
-      throw appError(
-        "NotImplemented",
-        501,
-        "File upload endpoint deferred until the storage module is implemented",
-      );
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const body = request.body as CreateVideoInput;
+      const video = await addTutorVideo(account.accountId, body);
+      if (!video) throw notFound("Tutor profile not found");
+      return reply.status(201).send(video);
     },
   );
 
@@ -483,7 +498,8 @@ export async function tutorRoutes(app: FastifyInstance) {
         ...routeDocs({
           tag: "Tutors",
           summary: "Remove a video",
-          description: "Removes one of your videos. Replies 204 with no body.",
+          description:
+            "Removes one of your videos and its file, public copy included. Replies 204 with no body.",
           auth: ["TUTOR"],
           errors: [404],
           noContent: true,
@@ -538,7 +554,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutor requirements",
           summary: "Create a requirement set",
           description:
-            "The first set becomes the default. syncProfileSubjects adds missing subjects to the profile in the same transaction. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile or a subject fails the foreign key check, and 400 VALIDATION_ERROR for an unknown subject.",
+            "The first set becomes the default. syncProfileSubjects adds missing subjects to the profile in the same transaction. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile or a subject fails the foreign key check, and 400 VALIDATION_ERROR for an unknown subject. A set needs a zone or teachesOnline (400 VALIDATION_ERROR on zoneIds).",
           auth: ["TUTOR"],
           errors: [400, 404, 409],
         }),
@@ -593,7 +609,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutor requirements",
           summary: "Update a requirement set",
           description:
-            "Send at least one field. Allowed on archived sets. Values are checked against the stored set: 400 INVALID_REQUIREMENT (details.fields) for an invalid combination, 400 VALIDATION_ERROR for an unknown subject, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile. Subjects and zones are diff-applied.",
+            "Send at least one field. Allowed on archived sets. Values are checked against the stored set: 400 INVALID_REQUIREMENT (details.fields) for an invalid combination, 400 VALIDATION_ERROR for an unknown subject, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile. Subjects and zones are diff-applied. The merged set still needs a zone or teachesOnline: 400 INVALID_REQUIREMENT with fields zoneIds otherwise.",
           auth: ["TUTOR"],
           errors: [400, 404],
         }),
@@ -715,12 +731,7 @@ export async function publicVideoRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       publicCache(request, reply, "public, max-age=300, stale-while-revalidate=600");
       const videos = await getApprovedVideos();
-      return reply.send({
-        videos: videos.map((v) => ({
-          ...v,
-          createdAt: v.createdAt.toISOString(),
-        })),
-      });
+      return reply.send({ videos });
     },
   );
 }

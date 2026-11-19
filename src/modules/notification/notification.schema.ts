@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AppNotificationKind } from "../../generated/prisma/enums.js";
+import { AppNotificationKind, FilePurpose } from "../../generated/prisma/enums.js";
 
 export const notificationIdParamSchema = z.object({ id: z.string().uuid() });
 export type NotificationIdParam = z.infer<typeof notificationIdParamSchema>;
@@ -14,11 +14,19 @@ export const appNotificationSchema = z
   .object({
     id: z.string(),
     kind: z.nativeEnum(AppNotificationKind),
-    applicationId: z.string(),
-    /** Picks the wording: a tuition (requirement) or a package. */
-    listingKind: z.enum(["REQUIREMENT", "PACKAGE"]),
-    /** The other party of the application, as the recipient sees them. */
-    counterpartName: z.string(),
+    /** Null for upload alerts, which are not about an application. */
+    applicationId: z.string().nullable(),
+    /** Picks the wording: a tuition (requirement) or a package. Null for upload alerts. */
+    listingKind: z.enum(["REQUIREMENT", "PACKAGE"]).nullable(),
+    /** The other party of the application, as the recipient sees them. Null for upload alerts. */
+    counterpartName: z.string().nullable(),
+    /** The admin's note, only when it was shared with the user. Null otherwise. */
+    note: z.string().nullable(),
+    /** The upload the alert is about (upload alerts only). */
+    filePurpose: z.nativeEnum(FilePurpose).nullable(),
+    /** Upload block alerts only: which uploads the block covers. */
+    blocksVideos: z.boolean().nullable(),
+    blocksDocuments: z.boolean().nullable(),
     readAt: z.date().nullable(),
     createdAt: z.date(),
   })

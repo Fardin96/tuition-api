@@ -757,6 +757,125 @@
         ],
         "additionalProperties": false
       },
+      "AdminBlogPost": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "ARCHIVED"
+            ]
+          },
+          "publishedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "fileId": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "fileId",
+                  "url"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "excerpt",
+          "body",
+          "status",
+          "publishedAt",
+          "createdAt",
+          "updatedAt",
+          "authorId",
+          "authorName",
+          "cover"
+        ],
+        "additionalProperties": false
+      },
+      "AdminBlogPostPage": {
+        "type": "object",
+        "properties": {
+          "posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminBlogPost"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "posts",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
       "AdminFee": {
         "type": "object",
         "properties": {
@@ -1260,6 +1379,162 @@
           "recordedByName",
           "reversesPaymentId",
           "reversedAmount"
+        ],
+        "additionalProperties": false
+      },
+      "AdminFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "STUDENT_ID",
+              "TUTOR_ID",
+              "CREDENTIAL",
+              "TUTOR_VIDEO",
+              "BLOG_COVER"
+            ]
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING_UPLOAD",
+              "UPLOADED",
+              "DELETED"
+            ]
+          },
+          "fileName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ownerAccountId": {
+            "type": "string"
+          },
+          "ownerEmail": {
+            "type": "string"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "inUse": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "purpose",
+          "contentType",
+          "sizeBytes",
+          "status",
+          "fileName",
+          "createdAt",
+          "uploadedAt",
+          "ownerAccountId",
+          "ownerEmail",
+          "published",
+          "inUse"
+        ],
+        "additionalProperties": false
+      },
+      "AdminFilePage": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFile"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "files",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "AdminFileStats": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "purpose": {
+                  "type": "string",
+                  "enum": [
+                    "STUDENT_ID",
+                    "TUTOR_ID",
+                    "CREDENTIAL",
+                    "TUTOR_VIDEO",
+                    "BLOG_COVER"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "PENDING_UPLOAD",
+                    "UPLOADED",
+                    "DELETED"
+                  ]
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "totalBytes": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "purpose",
+                "status",
+                "count",
+                "totalBytes"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "groups"
         ],
         "additionalProperties": false
       },
@@ -2758,6 +3033,132 @@
         ],
         "additionalProperties": false
       },
+      "AdminStudentVerification": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NOT_SUBMITTED",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "submittedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "noteVisible": {
+            "type": "boolean"
+          },
+          "reviewedById": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "uploadFlags": {
+            "$ref": "#/components/schemas/UploadFlags"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FileAsset"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "student": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "accountId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "studentIdNumber": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "accountId",
+              "name",
+              "studentIdNumber"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "studentId",
+          "status",
+          "submittedAt",
+          "decidedAt",
+          "note",
+          "noteVisible",
+          "reviewedById",
+          "uploadFlags",
+          "file",
+          "student"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStudentVerificationPage": {
+        "type": "object",
+        "properties": {
+          "verifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminStudentVerification"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "verifications",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
       "AdminSubject": {
         "type": "object",
         "properties": {
@@ -2917,6 +3318,257 @@
         ],
         "additionalProperties": false
       },
+      "AdminTutorVerification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NOT_SUBMITTED",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "noteVisible": {
+            "type": "boolean"
+          },
+          "reviewedById": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isLatest": {
+            "type": "boolean"
+          },
+          "uploadFlags": {
+            "$ref": "#/components/schemas/UploadFlags"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileAsset"
+          },
+          "tutor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "accountId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "instituteName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "studentIdNumber": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "verificationStatus": {
+                "type": "string",
+                "enum": [
+                  "NOT_SUBMITTED",
+                  "PENDING",
+                  "APPROVED",
+                  "REJECTED"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "accountId",
+              "name",
+              "instituteName",
+              "studentIdNumber",
+              "verificationStatus"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "submittedAt",
+          "decidedAt",
+          "note",
+          "noteVisible",
+          "reviewedById",
+          "isLatest",
+          "uploadFlags",
+          "file",
+          "tutor"
+        ],
+        "additionalProperties": false
+      },
+      "AdminTutorVerificationPage": {
+        "type": "object",
+        "properties": {
+          "verifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminTutorVerification"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "verifications",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "AdminVideo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "moderationNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "noteVisible": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileAsset"
+          },
+          "tutor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "accountId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "verificationStatus": {
+                "type": "string",
+                "enum": [
+                  "NOT_SUBMITTED",
+                  "PENDING",
+                  "APPROVED",
+                  "REJECTED"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "accountId",
+              "name",
+              "verificationStatus"
+            ],
+            "additionalProperties": false
+          },
+          "uploadFlags": {
+            "$ref": "#/components/schemas/UploadFlags"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status",
+          "moderationNote",
+          "noteVisible",
+          "sortOrder",
+          "createdAt",
+          "url",
+          "file",
+          "tutor",
+          "uploadFlags"
+        ],
+        "additionalProperties": false
+      },
+      "AdminVideoPage": {
+        "type": "object",
+        "properties": {
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminVideo"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "videos",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
       "AdminZoneRequest": {
         "type": "object",
         "properties": {
@@ -3034,21 +3686,76 @@
               "APPLICATION_CANCELLED",
               "APPLICATION_COMPLETED",
               "PACKAGE_UPDATED",
-              "PACKAGE_CLOSED"
+              "PACKAGE_CLOSED",
+              "ID_APPROVED",
+              "ID_REJECTED",
+              "VIDEO_APPROVED",
+              "VIDEO_REJECTED",
+              "FILE_REMOVED",
+              "UPLOADS_BLOCKED",
+              "UPLOADS_UNBLOCKED"
             ]
           },
           "applicationId": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "listingKind": {
-            "type": "string",
-            "enum": [
-              "REQUIREMENT",
-              "PACKAGE"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "REQUIREMENT",
+                  "PACKAGE"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "counterpartName": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "filePurpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "STUDENT_ID",
+                  "TUTOR_ID",
+                  "CREDENTIAL",
+                  "TUTOR_VIDEO",
+                  "BLOG_COVER"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "blocksVideos": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "blocksDocuments": {
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "readAt": {
             "anyOf": [
@@ -3072,6 +3779,10 @@
           "applicationId",
           "listingKind",
           "counterpartName",
+          "note",
+          "filePurpose",
+          "blocksVideos",
+          "blocksDocuments",
           "readAt",
           "createdAt"
         ],
@@ -4034,6 +4745,107 @@
         ],
         "additionalProperties": false
       },
+      "BlogPost": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "coverUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "title",
+          "excerpt",
+          "body",
+          "publishedAt",
+          "updatedAt",
+          "coverUrl"
+        ],
+        "additionalProperties": false
+      },
+      "BlogPostPage": {
+        "type": "object",
+        "properties": {
+          "posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BlogPostSummary"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "posts",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "BlogPostSummary": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "coverUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "title",
+          "excerpt",
+          "publishedAt",
+          "coverUrl"
+        ],
+        "additionalProperties": false
+      },
       "BrowseRequirement": {
         "type": "object",
         "properties": {
@@ -4431,6 +5243,86 @@
           "name"
         ],
         "additionalProperties": false
+      },
+      "CreateBlogPostInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 120,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "excerpt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50000
+          },
+          "coverFileId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED"
+            ]
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ],
+        "additionalProperties": false
+      },
+      "CreateCredentialInput": {
+        "type": "object",
+        "properties": {
+          "examLabel": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "result": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "fileId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "examLabel",
+          "result",
+          "fileId"
+        ]
       },
       "CreateFeeInput": {
         "type": "object",
@@ -5380,6 +6272,59 @@
         ],
         "additionalProperties": false
       },
+      "CreateUploadUrlInput": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "STUDENT_ID",
+              "TUTOR_ID",
+              "CREDENTIAL",
+              "TUTOR_VIDEO",
+              "BLOG_COVER"
+            ]
+          },
+          "contentType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "fileName": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "purpose",
+          "contentType",
+          "sizeBytes"
+        ]
+      },
+      "CreateVideoInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "fileId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "title",
+          "fileId"
+        ]
+      },
       "CreateZoneInput": {
         "type": "object",
         "properties": {
@@ -5442,6 +6387,31 @@
         ],
         "additionalProperties": false
       },
+      "DecideVerificationInput": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "noteVisible": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "additionalProperties": false
+      },
       "DecideZoneRequestInput": {
         "type": "object",
         "properties": {
@@ -5465,6 +6435,23 @@
         },
         "required": [
           "decision"
+        ],
+        "additionalProperties": false
+      },
+      "DownloadUrl": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "url",
+          "expiresAt"
         ],
         "additionalProperties": false
       },
@@ -5694,7 +6681,19 @@
           "PROMO_INVALID",
           "PROMO_CODE_EXISTS",
           "REFUND_NOT_ALLOWED",
-          "INVALID_REFUND_STATE"
+          "INVALID_REFUND_STATE",
+          "STORAGE_UNAVAILABLE",
+          "FILE_TOO_LARGE",
+          "UNSUPPORTED_FILE_TYPE",
+          "UPLOAD_NOT_FOUND",
+          "INVALID_FILE",
+          "FILE_IN_USE",
+          "UPLOAD_LIMIT_REACHED",
+          "INVALID_VERIFICATION_STATE",
+          "VIDEO_ALREADY_MODERATED",
+          "BLOG_SLUG_EXISTS",
+          "INVALID_POST_STATE",
+          "UPLOADS_BLOCKED"
         ],
         "description": "Machine-readable error code. Match on this."
       },
@@ -5779,6 +6778,72 @@
           "discountAmount",
           "originalAmount",
           "appliedAt"
+        ],
+        "additionalProperties": false
+      },
+      "FileAsset": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "STUDENT_ID",
+              "TUTOR_ID",
+              "CREDENTIAL",
+              "TUTOR_VIDEO",
+              "BLOG_COVER"
+            ]
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING_UPLOAD",
+              "UPLOADED",
+              "DELETED"
+            ]
+          },
+          "fileName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "purpose",
+          "contentType",
+          "sizeBytes",
+          "status",
+          "fileName",
+          "createdAt",
+          "uploadedAt"
         ],
         "additionalProperties": false
       },
@@ -6169,6 +7234,34 @@
               "REJECTED"
             ]
           },
+          "verificationNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verificationSubmittedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verificationDecidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "ratingAvg": {
             "type": "string",
             "description": "Decimal, serialized as a string"
@@ -6251,6 +7344,9 @@
           "studentIdNumber",
           "verificationFileId",
           "verificationStatus",
+          "verificationNote",
+          "verificationSubmittedAt",
+          "verificationDecidedAt",
           "ratingAvg",
           "ratingCount",
           "createdAt",
@@ -6473,6 +7569,31 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 500
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "additionalProperties": false
+      },
+      "ModerateVideoInput": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "noteVisible": {
+            "default": true,
+            "type": "boolean"
           }
         },
         "required": [
@@ -7221,6 +8342,28 @@
         ],
         "additionalProperties": false
       },
+      "RemoveFileInput": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "noteVisible": {
+            "default": true,
+            "type": "boolean"
+          },
+          "unverify": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "note"
+        ],
+        "additionalProperties": false
+      },
       "ReplaceTutorAreasInput": {
         "type": "object",
         "properties": {
@@ -7658,6 +8801,24 @@
               "REJECTED"
             ]
           },
+          "verificationNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verificationSubmittedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verificationDecidedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "ratingAvg": {
             "type": "number"
           },
@@ -7730,6 +8891,9 @@
           "whatsappNumber",
           "studentIdNumber",
           "verificationStatus",
+          "verificationNote",
+          "verificationSubmittedAt",
+          "verificationDecidedAt",
           "ratingAvg",
           "ratingCount",
           "location",
@@ -7874,6 +9038,19 @@
           "subjects"
         ],
         "additionalProperties": false
+      },
+      "SubmitVerificationInput": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "fileId"
+        ]
       },
       "TokenResponse": {
         "type": "object",
@@ -8787,6 +9964,12 @@
                 "createdAt": {
                   "type": "string"
                 },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "file": {
                   "type": "object",
                   "properties": {
@@ -8814,6 +9997,7 @@
                 "title",
                 "sortOrder",
                 "createdAt",
+                "url",
                 "file"
               ],
               "additionalProperties": false
@@ -8866,6 +10050,12 @@
           "createdAt": {
             "type": "string"
           },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "tutor": {
             "type": "object",
             "properties": {
@@ -8909,6 +10099,7 @@
           "title",
           "sortOrder",
           "createdAt",
+          "url",
           "tutor",
           "file"
         ],
@@ -9426,11 +10617,23 @@
               "REJECTED"
             ]
           },
+          "moderationNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "sortOrder": {
             "type": "number"
           },
           "createdAt": {
             "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "file": {
             "type": "object",
@@ -9458,8 +10661,10 @@
           "id",
           "title",
           "status",
+          "moderationNote",
           "sortOrder",
           "createdAt",
+          "url",
           "file"
         ],
         "additionalProperties": false
@@ -9503,6 +10708,58 @@
           },
           "isActive": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateBlogPostInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 120,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "excerpt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50000
+          },
+          "coverFileId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "ARCHIVED"
+            ]
           }
         },
         "additionalProperties": false
@@ -10222,6 +11479,20 @@
         },
         "additionalProperties": false
       },
+      "UpdateVideoInput": {
+        "type": "object",
+        "properties": {
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          }
+        },
+        "required": [
+          "sortOrder"
+        ],
+        "additionalProperties": false
+      },
       "UpdateZoneInput": {
         "type": "object",
         "properties": {
@@ -10270,6 +11541,331 @@
             ]
           }
         },
+        "additionalProperties": false
+      },
+      "UploadActor": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accountId",
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "UploadBlockView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "blocksVideos": {
+            "type": "boolean"
+          },
+          "blocksDocuments": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string"
+          },
+          "noteVisible": {
+            "type": "boolean"
+          },
+          "blockedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "blockedBy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UploadActor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "blocksVideos",
+          "blocksDocuments",
+          "note",
+          "noteVisible",
+          "blockedAt",
+          "blockedBy"
+        ],
+        "additionalProperties": false
+      },
+      "UploadFlags": {
+        "type": "object",
+        "properties": {
+          "recentIssues": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "uploadsBlocked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "recentIssues",
+          "uploadsBlocked"
+        ],
+        "additionalProperties": false
+      },
+      "UploadHistory": {
+        "type": "object",
+        "properties": {
+          "block": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UploadBlockView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "recentIssues": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "total": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "windowDays": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "threshold": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "recentIssues",
+              "total",
+              "windowDays",
+              "threshold"
+            ],
+            "additionalProperties": false
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UploadReviewEvent"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "block",
+          "summary",
+          "events",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "UploadReviewEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "REJECTED",
+              "REVOKED",
+              "REMOVED",
+              "BLOCKED",
+              "UNBLOCKED"
+            ]
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "STUDENT_ID",
+                  "TUTOR_ID",
+                  "CREDENTIAL",
+                  "TUTOR_VIDEO",
+                  "BLOG_COVER"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fileName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contentType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sizeBytes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fileId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fileAvailable": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "noteVisible": {
+            "type": "boolean"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UploadActor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "purpose",
+          "fileName",
+          "contentType",
+          "sizeBytes",
+          "fileId",
+          "fileAvailable",
+          "note",
+          "noteVisible",
+          "actor",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "UploadStatus": {
+        "type": "object",
+        "properties": {
+          "blocksVideos": {
+            "type": "boolean"
+          },
+          "blocksDocuments": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "blockedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "blocksVideos",
+          "blocksDocuments",
+          "note",
+          "blockedAt"
+        ],
+        "additionalProperties": false
+      },
+      "UploadUrl": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/FileAsset"
+          },
+          "uploadUrl": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "const": "PUT"
+          },
+          "headers": {
+            "type": "object",
+            "properties": {
+              "Content-Type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "Content-Type"
+            ],
+            "additionalProperties": false
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "file",
+          "uploadUrl",
+          "method",
+          "headers",
+          "expiresAt"
+        ],
         "additionalProperties": false
       },
       "Zone": {
@@ -11447,6 +13043,114 @@
         }
       }
     },
+    "/api/v1/students/me/verification": {
+      "post": {
+        "summary": "Submit my ID for verification",
+        "tags": [
+          "Students"
+        ],
+        "description": "Sends an uploaded ID file for review. Allowed when no ID is pending or approved; a rejected ID can be sent again. The file must be yours, purpose STUDENT_ID and finished uploading. Clears the previous review note. Returns the profile.\n\n**Who:** STUDENT.\n\n**Rate limit:** 10/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitVerificationInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT",
+        "x-rate-limit": "10/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/students/{id}": {
       "get": {
         "summary": "Get a student's public profile",
@@ -12042,6 +13746,112 @@
       }
     },
     "/api/v1/tutors/me/verifications": {
+      "post": {
+        "summary": "Submit a verification",
+        "tags": [
+          "Tutors"
+        ],
+        "description": "Sends an uploaded student ID file for review. Your profile needs a student ID number first (400). Refused while a submission is under review or once you are verified (409). The file must be yours, purpose TUTOR_ID and finished uploading. Returns the new submission.\n\n**Who:** TUTOR.\n\n**Rate limit:** 10/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitVerificationInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "10/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorVerification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "summary": "List my verification submissions",
         "tags": [
@@ -12544,6 +14354,112 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Add a credential",
+        "tags": [
+          "Tutors"
+        ],
+        "description": "Adds a certificate file with its exam label and result. The file must be yours, purpose CREDENTIAL and finished uploading. A tutor can keep at most 20 credentials (409 UPLOAD_LIMIT_REACHED).\n\n**Who:** TUTOR.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCredentialInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorCredential"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/tutors/me/credentials/{id}": {
@@ -12552,7 +14468,7 @@
         "tags": [
           "Tutors"
         ],
-        "description": "Removes one of your credentials. Replies 204 with no body.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "description": "Removes one of your credentials and its file. Replies 204 with no body.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
         "parameters": [
           {
             "schema": {
@@ -12713,6 +14629,112 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Add a video",
+        "tags": [
+          "Tutors"
+        ],
+        "description": "Adds an uploaded video as PENDING. It appears publicly only after an admin approves it. The file must be yours, purpose TUTOR_VIDEO and finished uploading. A tutor can keep at most 3 videos (409 UPLOAD_LIMIT_REACHED).\n\n**Who:** TUTOR.\n\n**Rate limit:** 10/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVideoInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "x-rate-limit": "10/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorVideo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/tutors/me/videos/{id}": {
@@ -12721,7 +14743,7 @@
         "tags": [
           "Tutors"
         ],
-        "description": "Removes one of your videos. Replies 204 with no body.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "description": "Removes one of your videos and its file, public copy included. Replies 204 with no body.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
         "parameters": [
           {
             "schema": {
@@ -12914,7 +14936,7 @@
         "tags": [
           "Tutor requirements"
         ],
-        "description": "The first set becomes the default. syncProfileSubjects adds missing subjects to the profile in the same transaction. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile or a subject fails the foreign key check, and 400 VALIDATION_ERROR for an unknown subject.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "description": "The first set becomes the default. syncProfileSubjects adds missing subjects to the profile in the same transaction. Fails with 409 REQUIREMENT_LIMIT_REACHED at 10 active sets, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile or a subject fails the foreign key check, and 400 VALIDATION_ERROR for an unknown subject. A set needs a zone or teachesOnline (400 VALIDATION_ERROR on zoneIds).\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
         "requestBody": {
           "required": true,
           "content": {
@@ -13118,7 +15140,7 @@
         "tags": [
           "Tutor requirements"
         ],
-        "description": "Send at least one field. Allowed on archived sets. Values are checked against the stored set: 400 INVALID_REQUIREMENT (details.fields) for an invalid combination, 400 VALIDATION_ERROR for an unknown subject, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile. Subjects and zones are diff-applied.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "description": "Send at least one field. Allowed on archived sets. Values are checked against the stored set: 400 INVALID_REQUIREMENT (details.fields) for an invalid combination, 400 VALIDATION_ERROR for an unknown subject, 400 INVALID_SUBJECT_OR_ZONE when a zone is not on the profile. Subjects and zones are diff-applied. The merged set still needs a zone or teachesOnline: 400 INVALID_REQUIREMENT with fields zoneIds otherwise.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
         "requestBody": {
           "required": true,
           "content": {
@@ -17955,6 +19977,627 @@
         }
       }
     },
+    "/api/v1/files/upload-status": {
+      "get": {
+        "summary": "Check whether my uploads are paused",
+        "tags": [
+          "Files"
+        ],
+        "description": "Whether an admin has paused video or document uploads for you, and the note when the admin shared it. All false and null when nothing is paused.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 300/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/upload-url": {
+      "post": {
+        "summary": "Start a file upload",
+        "tags": [
+          "Files"
+        ],
+        "description": "Reserves a file and returns a signed PUT URL valid for 10 minutes. Send the bytes to uploadUrl with the same Content-Type header, then call complete. Admin-only purposes need an active admin account.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadUrlInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadUrl"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/{id}/complete": {
+      "post": {
+        "summary": "Confirm an upload",
+        "tags": [
+          "Files"
+        ],
+        "description": "Call after the PUT to uploadUrl succeeded. Checks the stored size and file signature, then marks the file ready. Calling it again on a finished upload returns the same file.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileAsset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/{id}/download-url": {
+      "get": {
+        "summary": "Get a read link for a file",
+        "tags": [
+          "Files"
+        ],
+        "description": "A short-lived link (5 minutes) for the file's owner or an active admin. Admin views of personal documents are recorded in the audit log.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadUrl"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/{id}": {
+      "delete": {
+        "summary": "Delete a file",
+        "tags": [
+          "Files"
+        ],
+        "description": "Deletes a file that belongs to you (or any file, for an active admin). A file that a verification, credential, video or blog cover still uses cannot be deleted; remove it there first.\n\n**Who:** Any signed-in account.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Any signed-in account",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blog": {
+      "get": {
+        "summary": "List blog posts",
+        "tags": [
+          "Blog"
+        ],
+        "description": "Published posts only, newest first. Cursor-paginated (limit 1 to 100, default 20).\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {},
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogPostPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blog/{slug}": {
+      "get": {
+        "summary": "Get a blog post",
+        "tags": [
+          "Blog"
+        ],
+        "description": "One published post by slug. Drafts and archived posts answer 404.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "security": [
+          {},
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/lookups/education": {
       "get": {
         "summary": "Get education lookups",
@@ -19059,6 +21702,381 @@
           },
           "409": {
             "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/accounts/{accountId}/uploads": {
+      "get": {
+        "summary": "Upload history for an account",
+        "tags": [
+          "Files"
+        ],
+        "description": "The account's active upload block (or null), a summary and its upload history, newest first. A rejection, revocation or removal counts as an issue for 30 days; three or more issues show a repeated-problems warning. Admin views include hidden notes. Cursor-paginated (limit 1 to 100, default 25).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "accountId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadHistory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/accounts/{accountId}/upload-block": {
+      "put": {
+        "summary": "Pause uploads for an account",
+        "tags": [
+          "Files"
+        ],
+        "description": "Blocks video uploads, document uploads (IDs and certificates) or both, with a note. Creates the active block or updates it. The account is told, and the note shows to them only when noteVisible is true. Admin accounts cannot be blocked. Audited.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "blocksVideos": {
+                    "type": "boolean"
+                  },
+                  "blocksDocuments": {
+                    "type": "boolean"
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 500
+                  },
+                  "noteVisible": {
+                    "default": true,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "blocksVideos",
+                  "blocksDocuments",
+                  "note"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "accountId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadBlockView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/accounts/{accountId}/upload-block/lift": {
+      "post": {
+        "summary": "Lift an upload block",
+        "tags": [
+          "Files"
+        ],
+        "description": "Closes the account's active upload block. The note is optional; the account is told, and it shows to them only when a note is given and noteVisible is true. 404 when nothing is blocked. Audited. Replies 204 with no body.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "note": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 500
+                      },
+                      "noteVisible": {
+                        "default": true,
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "accountId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -23099,6 +26117,1777 @@
           }
         }
       }
+    },
+    "/api/v1/admin/verifications/tutors": {
+      "get": {
+        "summary": "List tutor ID submissions",
+        "tags": [
+          "Admin"
+        ],
+        "description": "status defaults to PENDING, the work queue, oldest first. APPROVED and REJECTED are newest first. Cursor-paginated (limit 1 to 100, default 25). Each row has isLatest (only the tutor's newest submission can be decided), noteVisible (false when the note is for admins only) and uploadFlags (rejections, revocations and removals in the last 30 days, and whether uploads are blocked).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "PENDING",
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminTutorVerificationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/verifications/tutors/{id}/decide": {
+      "post": {
+        "summary": "Approve or reject a tutor ID submission",
+        "tags": [
+          "Admin"
+        ],
+        "description": "The id is the verification (submission) id from the list. Only the tutor's newest submission can be decided. APPROVE sets it APPROVED and needs the file still uploaded. REJECT sets it REJECTED and needs a note that tells the tutor why. Allowed moves: PENDING to APPROVED or REJECTED, REJECTED to APPROVED, and APPROVED to REJECTED (a revocation, which also sets the tutor REJECTED). The note is shared with the tutor when noteVisible is true (the default); otherwise the tutor gets a generic alert. The decision is recorded in the upload history and sent as an alert. 409 INVALID_VERIFICATION_STATE when the submission is not the latest, already has that decision, or its file was removed.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideVerificationInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminTutorVerification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/verifications/students": {
+      "get": {
+        "summary": "List student ID submissions",
+        "tags": [
+          "Admin"
+        ],
+        "description": "status defaults to PENDING, the work queue, oldest submission first. APPROVED and REJECTED are newest first. Cursor-paginated (limit 1 to 100, default 25). Each row has noteVisible and uploadFlags.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "PENDING",
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStudentVerificationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/verifications/students/{id}/decide": {
+      "post": {
+        "summary": "Approve or reject a student ID submission",
+        "tags": [
+          "Admin"
+        ],
+        "description": "The id is the student id. APPROVE makes the student verified and needs the file still uploaded. REJECT needs a note that tells the student why. Allowed moves: PENDING to APPROVED or REJECTED, REJECTED to APPROVED, and APPROVED to REJECTED (a revocation). The note is shared with the student when noteVisible is true (the default); otherwise the student gets a generic alert. The decision is recorded in the upload history and sent as an alert. 409 INVALID_VERIFICATION_STATE when there is no submission, the decision is already set, or the file was removed.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideVerificationInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStudentVerification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/videos": {
+      "get": {
+        "summary": "List tutor videos for review",
+        "tags": [
+          "Admin"
+        ],
+        "description": "status defaults to PENDING, the work queue, oldest first. APPROVED and REJECTED are newest first. Cursor-paginated (limit 1 to 100, default 25).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "PENDING",
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminVideoPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/videos/{id}/moderate": {
+      "post": {
+        "summary": "Approve or reject a tutor video",
+        "tags": [
+          "Admin"
+        ],
+        "description": "APPROVE publishes the video to students. REJECT needs a note that tells the tutor why, and takes an approved video down. noteVisible false keeps the note between admins: the tutor sees a generic message. Each decision is kept in the upload history and sends the tutor an alert. 409 VIDEO_ALREADY_MODERATED when the video already has that decision.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModerateVideoInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminVideo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/videos/{id}": {
+      "patch": {
+        "summary": "Set a tutor video's display order",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Lower sortOrder shows first.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVideoInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminVideo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/files": {
+      "get": {
+        "summary": "List uploaded files",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Every upload, newest first. Filters: purpose, status, ownerAccountId, unattached=true for files no record uses (unattached=false for files in use). Each file says whether it is published and whether a record uses it. Cursor-paginated (limit 1 to 100, default 25).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STUDENT_ID",
+                "TUTOR_ID",
+                "CREDENTIAL",
+                "TUTOR_VIDEO",
+                "BLOG_COVER"
+              ]
+            },
+            "in": "query",
+            "name": "purpose",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING_UPLOAD",
+                "UPLOADED",
+                "DELETED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "ownerAccountId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "in": "query",
+            "name": "unattached",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFilePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/files/stats": {
+      "get": {
+        "summary": "Count uploaded files and their size",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Count and total bytes for each purpose and status.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFileStats"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/files/{id}/remove": {
+      "post": {
+        "summary": "Remove an uploaded file and tell its owner",
+        "tags": [
+          "Files"
+        ],
+        "description": "Takes a file down with a note for the owner (required). What changes depends on the file. An ID (tutor or student) that is pending is rejected; an approved ID is rejected only when unverify is true. Only a tutor's latest submission changes. A credential or video that uses the file is deleted. Files no record uses are just removed. The stored copies are deleted. noteVisible false keeps the note between admins: the owner sees a generic message. Each removal is audited, kept in the upload history and sent to the owner as an alert. Blog covers are removed from their post instead (400). 404 when the file is missing or already removed. Replies with the file.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveFileInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/files/{id}": {
+      "delete": {
+        "summary": "Delete an uploaded file",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Deletes any file and its stored copies. 409 FILE_IN_USE while a record uses it: remove the record first. Audited. Replies 204 with no body.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/blog": {
+      "get": {
+        "summary": "List blog posts",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Drafts, published and archived posts, most recently updated first. Optional status filter. Cursor-paginated (limit 1 to 100, default 20).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PUBLISHED",
+                "ARCHIVED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBlogPostPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a blog post",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Starts as a draft unless status is PUBLISHED. The slug comes from the title when omitted. coverFileId must be a cover image you uploaded (purpose BLOG_COVER). 409 BLOG_SLUG_EXISTS when the slug is taken.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlogPostInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBlogPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/blog/{id}": {
+      "get": {
+        "summary": "Get one blog post",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Any post, whatever its status.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBlogPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a blog post",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Any field can change. The first move to PUBLISHED sets publishedAt, which later edits keep. coverFileId null removes the cover; the old file is cleaned up later. 409 BLOG_SLUG_EXISTS when a new slug is taken.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBlogPostInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBlogPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a draft blog post",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Drafts only. Archive a published post instead. The cover file is deleted with the draft. Replies 204 with no body.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "tags": [
@@ -23153,6 +27942,14 @@
     {
       "name": "Videos",
       "description": "Public tutor videos."
+    },
+    {
+      "name": "Files",
+      "description": "Uploads to Cloudflare R2: signed upload URL, complete, signed read URL, delete."
+    },
+    {
+      "name": "Blog",
+      "description": "Published blog posts."
     },
     {
       "name": "Lookups",

@@ -821,14 +821,6 @@ export type TutorRequirementUpdateadmissionTargetsInput = {
   push?: $Enums.AdmissionTarget | $Enums.AdmissionTarget[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type TutorRequirementCreateNestedOneWithoutSubjectsInput = {
   create?: Prisma.XOR<Prisma.TutorRequirementCreateWithoutSubjectsInput, Prisma.TutorRequirementUncheckedCreateWithoutSubjectsInput>
   connectOrCreate?: Prisma.TutorRequirementCreateOrConnectWithoutSubjectsInput

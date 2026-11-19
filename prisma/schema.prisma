@@ -283,6 +283,24 @@ enum AppNotificationKind {
   APPLICATION_COMPLETED
   PACKAGE_UPDATED // the tutor edited a package the student has a pending or confirmed request on
   PACKAGE_CLOSED // the tutor closed a package; pending requests expired
+  // Upload moderation. These have no application; the note is set only when the admin shared it.
+  ID_APPROVED
+  ID_REJECTED
+  VIDEO_APPROVED
+  VIDEO_REJECTED
+  FILE_REMOVED // file_purpose says which upload
+  UPLOADS_BLOCKED // blocks_videos / blocks_documents say what is paused
+  UPLOADS_UNBLOCKED
+}
+
+// What an admin did to a user's upload, kept after the file itself is gone.
+enum UploadReviewAction {
+  APPROVED
+  REJECTED
+  REVOKED // an approved ID set back to rejected
+  REMOVED // the file was deleted from storage
+  BLOCKED // uploads paused (no file)
+  UNBLOCKED
 }
 
 enum NotificationStatus {
@@ -360,6 +378,8 @@ model Account {
   alerts          AppNotification[]
   auditEntries    AuditLog[]
   blocks          AccountBlock[]
+  uploadReviews   UploadReview[]
+  uploadBlocks    UploadBlock[]
   reportsMade     Report[]          @relation("ReportReporter")
   reportsAgainst  Report[]          @relation("ReportTarget")
   disputesRaised  Dispute[]         @relation("DisputeRaisedBy")
@@ -415,6 +435,7 @@ model AdminUser {
   removals   AdminUser[] @relation("AdminRemoval")
 
   reviewedVerifications TutorVerification[]
+  reviewedStudents      Student[]           @relation("StudentVerificationReviewer")
   recordedPayments      FeePayment[]
   createdPromoCodes     PromoCode[]
   decidedRefunds        PaymentRefund[]
@@ -422,6 +443,9 @@ model AdminUser {
   contentEdits          SiteContent[]
   blocksMade            AccountBlock[]      @relation("BlockedBy")
   unblocksMade          AccountBlock[]      @relation("UnblockedBy")
+  uploadReviewsMade     UploadReview[]
+  uploadBlocksMade      UploadBlock[]       @relation("UploadBlockedBy")
+  uploadUnblocksMade    UploadBlock[]       @relation("UploadUnblockedBy")
   handledReports        Report[]
   handledDisputes       Dispute[]
   zoneRequestsDecided   ZoneLimitRequest[]
@@ -456,6 +480,57 @@ model AccountBlock {
 
   @@index([accountId, blockedAt(sort: Desc)])
   @@map("account_block")
+}
+
+// Upload history per user: every admin decision on, or removal of, one of their uploads, and every
+// upload block. File details are copied in, so a row outlives the file (file_id is then null).
+// Append-only. Goes with the user's account; an admin's own deletion only clears actor_account_id.
+model UploadReview {
+  id             String             @id @default(uuid(7)) @db.Uuid
+  accountId      String             @map("account_id") @db.Uuid // the uploader
+  fileId         String?            @map("file_id") @db.Uuid
+  purpose        FilePurpose?
+  fileName       String?            @map("file_name")
+  contentType    String?            @map("content_type")
+  sizeBytes      Int?               @map("size_bytes")
+  action         UploadReviewAction
+  note           String?
+  noteVisible    Boolean            @default(true) @map("note_visible")
+  actorAccountId String?            @map("actor_account_id") @db.Uuid
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  account Account    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  file    FileAsset? @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  actor   AdminUser? @relation(fields: [actorAccountId], references: [accountId], onDelete: SetNull)
+
+  @@index([accountId, createdAt(sort: Desc)])
+  @@index([fileId])
+  @@index([actorAccountId])
+  @@map("upload_review")
+}
+
+// An admin pausing a user's uploads. At most one active row (unblocked_at null) per account
+// (partial unique index upload_block_one_active); lifting it sets unblocked_at, so rows are history.
+model UploadBlock {
+  id              String    @id @default(uuid(7)) @db.Uuid
+  accountId       String    @map("account_id") @db.Uuid
+  blocksVideos    Boolean   @map("blocks_videos")
+  blocksDocuments Boolean   @map("blocks_documents") // IDs and certificates (images and PDFs)
+  note            String
+  noteVisible     Boolean   @default(true) @map("note_visible")
+  blockedById     String?   @map("blocked_by") @db.Uuid
+  blockedAt       DateTime  @default(now()) @map("blocked_at") @db.Timestamptz(3)
+  unblockedAt     DateTime? @map("unblocked_at") @db.Timestamptz(3)
+  unblockedById   String?   @map("unblocked_by") @db.Uuid
+
+  account     Account    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  blockedBy   AdminUser? @relation("UploadBlockedBy", fields: [blockedById], references: [accountId], onDelete: SetNull)
+  unblockedBy AdminUser? @relation("UploadUnblockedBy", fields: [unblockedById], references: [accountId], onDelete: SetNull)
+
+  @@index([accountId, blockedAt(sort: Desc)])
+  @@index([blockedById])
+  @@index([unblockedById])
+  @@map("upload_block")
 }
 
 // ───────────────────────── lookups ─────────────────────────
@@ -501,6 +576,10 @@ model FileAsset {
   createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
   uploadedAt     DateTime?   @map("uploaded_at") @db.Timestamptz(3)
   deletedAt      DateTime?   @map("deleted_at") @db.Timestamptz(3)
+  // The name the uploader's device gave the file. Shown to admins; never used in the storage key.
+  originalName   String?     @map("original_name")
+  // Set while a copy sits in the public bucket under the same key (approved videos, blog covers).
+  publishedAt    DateTime?   @map("published_at") @db.Timestamptz(3)
 
   owner                Account             @relation(fields: [ownerAccountId], references: [id])
   studentVerifications Student[]           @relation("StudentVerificationFile")
@@ -508,6 +587,7 @@ model FileAsset {
   credentials          TutorCredential[]
   videos               TutorVideo[]
   blogCovers           BlogPost[]
+  reviews              UploadReview[]
 
   @@index([ownerAccountId])
   @@index([status, createdAt])
@@ -517,33 +597,41 @@ model FileAsset {
 // ───────────────────────── profiles ─────────────────────────
 
 model Student {
-  id                 String             @id @default(uuid(7)) @db.Uuid
-  accountId          String             @unique @map("account_id") @db.Uuid
-  role               Role               @default(STUDENT)
-  name               String
-  areaId             Int                @map("area_id")
-  address            String
-  emergencyContact   String             @map("emergency_contact")
-  whatsappNumber     String?            @unique @map("whatsapp_number") // E.164 text, never numeric; optional
-  whatsappVerifiedAt DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
-  phoneNumber        String             @unique @map("phone_number")
-  phoneVerifiedAt    DateTime?          @map("phone_verified_at") @db.Timestamptz(3)
-  studentIdNumber    String             @map("student_id_number")
-  verificationFileId String?            @map("verification_file_id") @db.Uuid
-  verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
+  id                       String             @id @default(uuid(7)) @db.Uuid
+  accountId                String             @unique @map("account_id") @db.Uuid
+  role                     Role               @default(STUDENT)
+  name                     String
+  areaId                   Int                @map("area_id")
+  address                  String
+  emergencyContact         String             @map("emergency_contact")
+  whatsappNumber           String?            @unique @map("whatsapp_number") // E.164 text, never numeric; optional
+  whatsappVerifiedAt       DateTime?          @map("whatsapp_verified_at") @db.Timestamptz(3)
+  phoneNumber              String             @unique @map("phone_number")
+  phoneVerifiedAt          DateTime?          @map("phone_verified_at") @db.Timestamptz(3)
+  studentIdNumber          String             @map("student_id_number")
+  verificationFileId       String?            @map("verification_file_id") @db.Uuid
+  verificationStatus       VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
+  // The latest ID submission's review. A resubmission clears the decision fields.
+  verificationSubmittedAt  DateTime?          @map("verification_submitted_at") @db.Timestamptz(3)
+  verificationDecidedAt    DateTime?          @map("verification_decided_at") @db.Timestamptz(3)
+  verificationReviewedById String?            @map("verification_reviewed_by") @db.Uuid
+  verificationNote         String?            @map("verification_note")
+  // False keeps the note between admins: the student sees a generic message instead.
+  verificationNoteVisible  Boolean            @default(true) @map("verification_note_visible")
   // Rating tutors give this student. Written only by the review trigger.
-  ratingAvg          Decimal            @default(0) @map("rating_avg") @db.Decimal(3, 2)
-  ratingCount        Int                @default(0) @map("rating_count")
-  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+  ratingAvg                Decimal            @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  ratingCount              Int                @default(0) @map("rating_count")
+  createdAt                DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  account          Account              @relation(fields: [accountId, role], references: [id, role])
-  area             Area                 @relation(fields: [areaId], references: [id])
-  verificationFile FileAsset?           @relation("StudentVerificationFile", fields: [verificationFileId], references: [id], onDelete: Restrict)
-  requirements     TuitionRequirement[]
-  applications     Application[]
-  reviewsGiven     Review[]             @relation("ReviewStudent")
-  location         StudentLocation?
+  account                Account              @relation(fields: [accountId, role], references: [id, role])
+  area                   Area                 @relation(fields: [areaId], references: [id])
+  verificationFile       FileAsset?           @relation("StudentVerificationFile", fields: [verificationFileId], references: [id], onDelete: Restrict)
+  verificationReviewedBy AdminUser?           @relation("StudentVerificationReviewer", fields: [verificationReviewedById], references: [accountId], onDelete: Restrict)
+  requirements           TuitionRequirement[]
+  applications           Application[]
+  reviewsGiven           Review[]             @relation("ReviewStudent")
+  location               StudentLocation?
 
   @@unique([accountId, role])
   @@index([areaId])
@@ -680,6 +768,8 @@ model TutorVerification {
   reviewedById String?            @map("reviewed_by") @db.Uuid
   decidedAt    DateTime?          @map("decided_at") @db.Timestamptz(3)
   note         String?
+  // False keeps the note between admins: the tutor sees a generic message instead.
+  noteVisible  Boolean            @default(true) @map("note_visible")
 
   tutor      Tutor      @relation(fields: [tutorId], references: [id])
   file       FileAsset  @relation(fields: [fileId], references: [id])
@@ -712,6 +802,8 @@ model TutorVideo {
   title          String
   status         ModerationStatus @default(PENDING)
   moderationNote String?          @map("moderation_note")
+  // False keeps the note between admins: the tutor sees a generic message instead.
+  noteVisible    Boolean          @default(true) @map("note_visible")
   sortOrder      Int              @default(0) @map("sort_order")
   createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
 
@@ -1296,16 +1388,22 @@ model NotificationLog {
 // same transaction as the status change. Names are joined at read time, so a
 // rename shows everywhere. read_at null = unread.
 
+// Application kinds carry application_id; upload kinds have none (CHECK app_notification_application_shape).
 model AppNotification {
-  id            String              @id @default(uuid(7)) @db.Uuid
-  recipientId   String              @map("recipient_account_id") @db.Uuid
-  kind          AppNotificationKind
-  applicationId String              @map("application_id") @db.Uuid
-  readAt        DateTime?           @map("read_at") @db.Timestamptz(3)
-  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  id              String              @id @default(uuid(7)) @db.Uuid
+  recipientId     String              @map("recipient_account_id") @db.Uuid
+  kind            AppNotificationKind
+  applicationId   String?             @map("application_id") @db.Uuid
+  // Upload kinds: the admin's note when it was shared with the user, else null.
+  note            String?
+  filePurpose     FilePurpose?        @map("file_purpose")
+  blocksVideos    Boolean?            @map("blocks_videos")
+  blocksDocuments Boolean?            @map("blocks_documents")
+  readAt          DateTime?           @map("read_at") @db.Timestamptz(3)
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  recipient   Account     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  recipient   Account      @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@index([recipientId, createdAt(sort: Desc)])
   @@index([applicationId])

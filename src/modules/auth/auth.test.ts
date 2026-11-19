@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "../../lib/prisma.js";
+import { setStorageForTests } from "../../lib/storage.js";
 import {
   createAccount,
+  createAdmin,
   createApplication,
   createArea,
+  createFakeStorage,
   createFileAsset,
   createRequirement,
   createSession,
@@ -12,6 +15,7 @@ import {
   createTestApp,
   createTuitionPackage,
   createTutorProfile,
+  fakeFileBytes,
   getAuthHeaders,
   setStudentLocation,
   setTutorLocation,
@@ -792,10 +796,183 @@ describe("DELETE /api/v1/me/hard-delete", () => {
     expect(body.account.email).toBe(studentAccount.email);
   });
 
+  it("removes the account's stored objects from storage", async () => {
+    const app = await createTestApp();
+    const fake = createFakeStorage();
+    setStorageForTests(fake.storage);
+
+    const area = await createArea();
+    const studentAccount = await createAccount({ role: "STUDENT" });
+    const studentProfile = await createStudentProfile(studentAccount.id, area.id);
+    const file = await createFileAsset(studentAccount.id, "STUDENT_ID", {
+      storageKey: `student_id/${studentAccount.id}/id.pdf`,
+    });
+    fake.put(file.storageKey, fakeFileBytes("application/pdf", 64), "application/pdf");
+    await prisma.student.update({
+      where: { id: studentProfile.id },
+      data: { verificationFileId: file.id, verificationStatus: "PENDING" },
+    });
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers: await getAuthHeaders(studentAccount),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(fake.objects.has(file.storageKey)).toBe(false);
+    expect(await prisma.fileAsset.count({ where: { id: file.id } })).toBe(0);
+  });
+
+  it("clears an admin's review on student ID checks so the admin can be deleted", async () => {
+    const app = await createTestApp();
+    const area = await createArea();
+    const studentAccount = await createAccount({ role: "STUDENT" });
+    const studentProfile = await createStudentProfile(studentAccount.id, area.id);
+    const admin = await createAdmin();
+    const file = await createFileAsset(studentAccount.id, "STUDENT_ID");
+    await prisma.student.update({
+      where: { id: studentProfile.id },
+      data: {
+        verificationFileId: file.id,
+        verificationStatus: "APPROVED",
+        verificationReviewedById: admin.id,
+        verificationDecidedAt: new Date(),
+      },
+    });
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers: await getAuthHeaders(admin),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.findUnique({ where: { id: admin.id } })).toBeNull();
+    const student = await prisma.student.findUniqueOrThrow({ where: { id: studentProfile.id } });
+    expect(student.verificationReviewedById).toBeNull();
+  });
+
   it("requires authentication", async () => {
     const app = await createTestApp();
     const res = await app.inject({ method: "DELETE", url: "/api/v1/me/hard-delete" });
     expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("hard delete and upload moderation rows", () => {
+  it("removes the upload history and blocks addressed to the deleted user and keeps everyone else's", async () => {
+    const app = await createTestApp();
+    const area = await createArea();
+    const student = await createAccount({ role: "STUDENT" });
+    await createStudentProfile(student.id, area.id);
+    const otherStudent = await createAccount({ role: "STUDENT" });
+    await createStudentProfile(otherStudent.id, area.id);
+    const admin = await createAdmin();
+    const file = await createFileAsset(student.id, "STUDENT_ID");
+
+    await prisma.uploadReview.create({
+      data: {
+        accountId: student.id,
+        fileId: file.id,
+        purpose: "STUDENT_ID",
+        fileName: "id.pdf",
+        action: "REMOVED",
+        note: "Remove this file.",
+        noteVisible: true,
+        actorAccountId: admin.id,
+      },
+    });
+    await prisma.uploadBlock.create({
+      data: {
+        accountId: student.id,
+        blocksVideos: true,
+        blocksDocuments: false,
+        note: "Paused for review.",
+        noteVisible: true,
+        blockedById: admin.id,
+      },
+    });
+    const keptReview = await prisma.uploadReview.create({
+      data: {
+        accountId: otherStudent.id,
+        purpose: null,
+        action: "BLOCKED",
+        note: "Paused.",
+        noteVisible: true,
+        actorAccountId: admin.id,
+      },
+    });
+    const keptBlock = await prisma.uploadBlock.create({
+      data: {
+        accountId: otherStudent.id,
+        blocksVideos: false,
+        blocksDocuments: true,
+        note: "Paused.",
+        noteVisible: true,
+        blockedById: admin.id,
+      },
+    });
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers: await getAuthHeaders(student),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.uploadReview.count({ where: { accountId: student.id } })).toBe(0);
+    expect(await prisma.uploadBlock.count({ where: { accountId: student.id } })).toBe(0);
+    expect(await prisma.uploadReview.findUnique({ where: { id: keptReview.id } })).not.toBeNull();
+    expect(await prisma.uploadBlock.findUnique({ where: { id: keptBlock.id } })).not.toBeNull();
+  });
+
+  it("keeps the upload history a deleted admin wrote, with the actor cleared", async () => {
+    const app = await createTestApp();
+    const area = await createArea();
+    const student = await createAccount({ role: "STUDENT" });
+    await createStudentProfile(student.id, area.id);
+    const admin = await createAdmin();
+
+    const review = await prisma.uploadReview.create({
+      data: {
+        accountId: student.id,
+        purpose: null,
+        action: "UNBLOCKED",
+        note: null,
+        noteVisible: true,
+        actorAccountId: admin.id,
+      },
+    });
+    const block = await prisma.uploadBlock.create({
+      data: {
+        accountId: student.id,
+        blocksVideos: true,
+        blocksDocuments: true,
+        note: "Paused.",
+        noteVisible: true,
+        blockedById: admin.id,
+        unblockedById: admin.id,
+        unblockedAt: new Date(),
+      },
+    });
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers: await getAuthHeaders(admin),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.findUnique({ where: { id: admin.id } })).toBeNull();
+    const keptReview = await prisma.uploadReview.findUniqueOrThrow({ where: { id: review.id } });
+    expect(keptReview).toMatchObject({
+      action: "UNBLOCKED",
+      accountId: student.id,
+      actorAccountId: null,
+    });
+    const keptBlock = await prisma.uploadBlock.findUniqueOrThrow({ where: { id: block.id } });
+    expect(keptBlock).toMatchObject({ blockedById: null, unblockedById: null });
   });
 });
 

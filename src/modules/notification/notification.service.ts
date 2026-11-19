@@ -25,14 +25,24 @@ type NotificationRow = Prisma.AppNotificationGetPayload<{ include: typeof notifi
 
 function toNotification(row: NotificationRow, accountId: string): AppNotificationResponse {
   const { application } = row;
-  // The recipient is either the tutor or the student on the application; the other one is the counterpart.
-  const recipientIsTutor = application.tutor.accountId === accountId;
+  // Upload alerts have no application. The recipient is either the tutor or the student on the
+  // application; the other one is the counterpart.
+  const recipientIsTutor = application?.tutor.accountId === accountId;
   return {
     id: row.id,
     kind: row.kind,
     applicationId: row.applicationId,
-    listingKind: application.requirementId ? "REQUIREMENT" : "PACKAGE",
-    counterpartName: recipientIsTutor ? application.student.name : application.tutor.name,
+    listingKind: application ? (application.requirementId ? "REQUIREMENT" : "PACKAGE") : null,
+    counterpartName: application
+      ? recipientIsTutor
+        ? application.student.name
+        : application.tutor.name
+      : null,
+    // Stored only when the admin shared it, so no visibility check is needed here.
+    note: row.note,
+    filePurpose: row.filePurpose,
+    blocksVideos: row.blocksVideos,
+    blocksDocuments: row.blocksDocuments,
     readAt: row.readAt,
     createdAt: row.createdAt,
   };

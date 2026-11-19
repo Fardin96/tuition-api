@@ -17,6 +17,7 @@ import {
   type RefundInput,
   type RefundQueryResult,
 } from "../lib/sslcommerz.js";
+import type { ObjectStorage } from "../lib/storage.js";
 import { generateRefreshToken, hashToken, signAccessToken } from "../modules/auth/auth.service.js";
 import { buildApp } from "../server.js";
 
@@ -310,19 +311,123 @@ export async function setStudentLocation(
 
 export async function createFileAsset(
   ownerAccountId: string,
-  purpose: "STUDENT_ID" | "TUTOR_ID" | "CREDENTIAL" | "TUTOR_VIDEO",
+  purpose: "STUDENT_ID" | "TUTOR_ID" | "CREDENTIAL" | "TUTOR_VIDEO" | "BLOG_COVER",
+  overrides: {
+    status?: "PENDING_UPLOAD" | "UPLOADED" | "DELETED";
+    contentType?: string;
+    sizeBytes?: number;
+    storageKey?: string;
+    createdAt?: Date;
+    uploadedAt?: Date | null;
+    deletedAt?: Date | null;
+    publishedAt?: Date | null;
+    originalName?: string | null;
+  } = {},
 ) {
+  const status = overrides.status ?? "UPLOADED";
   return prisma.fileAsset.create({
     data: {
       ownerAccountId,
       purpose,
-      storageKey: `test/${crypto.randomUUID()}`,
-      contentType: "application/pdf",
-      sizeBytes: 1024,
-      status: "UPLOADED",
-      uploadedAt: new Date(),
+      storageKey: overrides.storageKey ?? `test/${crypto.randomUUID()}`,
+      contentType: overrides.contentType ?? "application/pdf",
+      sizeBytes: overrides.sizeBytes ?? 1024,
+      status,
+      createdAt: overrides.createdAt,
+      uploadedAt:
+        overrides.uploadedAt !== undefined
+          ? overrides.uploadedAt
+          : status === "UPLOADED"
+            ? new Date()
+            : null,
+      deletedAt:
+        overrides.deletedAt !== undefined
+          ? overrides.deletedAt
+          : status === "DELETED"
+            ? new Date()
+            : null,
+      publishedAt: overrides.publishedAt ?? null,
+      originalName: overrides.originalName ?? null,
     },
   });
+}
+
+/** First bytes of a valid file per content type, for fake uploads that pass the sniff check. */
+export const FILE_SIGNATURES: Record<string, number[]> = {
+  "application/pdf": [0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x37],
+  "image/jpeg": [0xff, 0xd8, 0xff, 0xe0],
+  "image/png": [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+  "video/mp4": [0, 0, 0, 0x18, 0x66, 0x74, 0x79, 0x70, 0x6d, 0x70, 0x34, 0x32],
+};
+
+/** Bytes of `size` length starting with the signature for contentType. */
+export function fakeFileBytes(contentType: string, size: number): Uint8Array {
+  const bytes = new Uint8Array(size);
+  bytes.set((FILE_SIGNATURES[contentType] ?? []).slice(0, size));
+  return bytes;
+}
+
+// In-memory R2 stand-in. Install with setStorageForTests(fake.storage); `put` plays the browser's
+// upload; `objects` and `publicObjects` hold what is stored; `failNext` makes the next call throw.
+export function createFakeStorage(options: { publicBucket?: boolean } = {}) {
+  const publicBucket = options.publicBucket ?? true;
+  const objects = new Map<string, { bytes: Uint8Array; contentType: string }>();
+  const publicObjects = new Map<string, { bytes: Uint8Array; contentType: string }>();
+  const presignedPuts: { key: string; contentType: string; contentLength: number }[] = [];
+  let nextFailure: Error | null = null;
+
+  const maybeFail = () => {
+    if (nextFailure) {
+      const err = nextFailure;
+      nextFailure = null;
+      throw err;
+    }
+  };
+
+  const storage: ObjectStorage = {
+    async presignPut({ key, contentType, contentLength, expiresIn }) {
+      maybeFail();
+      presignedPuts.push({ key, contentType, contentLength });
+      return `https://fake-r2.test/private/${key}?put&expires=${expiresIn}`;
+    },
+    async presignGet({ key, expiresIn }) {
+      maybeFail();
+      return `https://fake-r2.test/private/${key}?get&expires=${expiresIn}`;
+    },
+    async head(key) {
+      maybeFail();
+      const obj = objects.get(key);
+      return obj ? { size: obj.bytes.length, contentType: obj.contentType } : null;
+    },
+    async readStart(key, bytes) {
+      maybeFail();
+      return (objects.get(key)?.bytes ?? new Uint8Array()).slice(0, bytes);
+    },
+    async delete(key, bucket = "private") {
+      maybeFail();
+      (bucket === "public" ? publicObjects : objects).delete(key);
+    },
+    async copyToPublic(key) {
+      maybeFail();
+      const obj = objects.get(key);
+      if (!obj) throw new Error(`NoSuchKey ${key}`);
+      publicObjects.set(key, obj);
+    },
+    publicUrl: (key) => (publicBucket ? `https://media.test/${key}` : null),
+  };
+
+  return {
+    storage,
+    objects,
+    publicObjects,
+    presignedPuts,
+    put(key: string, bytes: Uint8Array, contentType: string) {
+      objects.set(key, { bytes, contentType });
+    },
+    failNext(err: Error = new Error("R2 unavailable")) {
+      nextFailure = err;
+    },
+  };
 }
 
 export async function createTutorZone(

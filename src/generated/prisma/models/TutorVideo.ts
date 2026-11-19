@@ -41,6 +41,7 @@ export type TutorVideoMinAggregateOutputType = {
   title: string | null
   status: $Enums.ModerationStatus | null
   moderationNote: string | null
+  noteVisible: boolean | null
   sortOrder: number | null
   createdAt: Date | null
 }
@@ -52,6 +53,7 @@ export type TutorVideoMaxAggregateOutputType = {
   title: string | null
   status: $Enums.ModerationStatus | null
   moderationNote: string | null
+  noteVisible: boolean | null
   sortOrder: number | null
   createdAt: Date | null
 }
@@ -63,6 +65,7 @@ export type TutorVideoCountAggregateOutputType = {
   title: number
   status: number
   moderationNote: number
+  noteVisible: number
   sortOrder: number
   createdAt: number
   _all: number
@@ -84,6 +87,7 @@ export type TutorVideoMinAggregateInputType = {
   title?: true
   status?: true
   moderationNote?: true
+  noteVisible?: true
   sortOrder?: true
   createdAt?: true
 }
@@ -95,6 +99,7 @@ export type TutorVideoMaxAggregateInputType = {
   title?: true
   status?: true
   moderationNote?: true
+  noteVisible?: true
   sortOrder?: true
   createdAt?: true
 }
@@ -106,6 +111,7 @@ export type TutorVideoCountAggregateInputType = {
   title?: true
   status?: true
   moderationNote?: true
+  noteVisible?: true
   sortOrder?: true
   createdAt?: true
   _all?: true
@@ -204,6 +210,7 @@ export type TutorVideoGroupByOutputType = {
   title: string
   status: $Enums.ModerationStatus
   moderationNote: string | null
+  noteVisible: boolean
   sortOrder: number
   createdAt: Date
   _count: TutorVideoCountAggregateOutputType | null
@@ -238,6 +245,7 @@ export type TutorVideoWhereInput = {
   title?: Prisma.StringFilter<"TutorVideo"> | string
   status?: Prisma.EnumModerationStatusFilter<"TutorVideo"> | $Enums.ModerationStatus
   moderationNote?: Prisma.StringNullableFilter<"TutorVideo"> | string | null
+  noteVisible?: Prisma.BoolFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntFilter<"TutorVideo"> | number
   createdAt?: Prisma.DateTimeFilter<"TutorVideo"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
@@ -251,6 +259,7 @@ export type TutorVideoOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   tutor?: Prisma.TutorOrderByWithRelationInput
@@ -267,6 +276,7 @@ export type TutorVideoWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"TutorVideo"> | string
   status?: Prisma.EnumModerationStatusFilter<"TutorVideo"> | $Enums.ModerationStatus
   moderationNote?: Prisma.StringNullableFilter<"TutorVideo"> | string | null
+  noteVisible?: Prisma.BoolFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntFilter<"TutorVideo"> | number
   createdAt?: Prisma.DateTimeFilter<"TutorVideo"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
@@ -280,6 +290,7 @@ export type TutorVideoOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.TutorVideoCountOrderByAggregateInput
@@ -299,6 +310,7 @@ export type TutorVideoScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"TutorVideo"> | string
   status?: Prisma.EnumModerationStatusWithAggregatesFilter<"TutorVideo"> | $Enums.ModerationStatus
   moderationNote?: Prisma.StringNullableWithAggregatesFilter<"TutorVideo"> | string | null
+  noteVisible?: Prisma.BoolWithAggregatesFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntWithAggregatesFilter<"TutorVideo"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TutorVideo"> | Date | string
 }
@@ -308,6 +320,7 @@ export type TutorVideoCreateInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutVideosInput
@@ -321,6 +334,7 @@ export type TutorVideoUncheckedCreateInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
 }
@@ -330,6 +344,7 @@ export type TutorVideoUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutVideosNestedInput
@@ -343,6 +358,7 @@ export type TutorVideoUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -354,6 +370,7 @@ export type TutorVideoCreateManyInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
 }
@@ -363,6 +380,7 @@ export type TutorVideoUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -374,6 +392,7 @@ export type TutorVideoUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -395,6 +414,7 @@ export type TutorVideoCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationNote?: Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -410,6 +430,7 @@ export type TutorVideoMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationNote?: Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -421,6 +442,7 @@ export type TutorVideoMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationNote?: Prisma.SortOrder
+  noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -522,6 +544,7 @@ export type TutorVideoCreateWithoutFileInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutVideosInput
@@ -533,6 +556,7 @@ export type TutorVideoUncheckedCreateWithoutFileInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
 }
@@ -573,6 +597,7 @@ export type TutorVideoScalarWhereInput = {
   title?: Prisma.StringFilter<"TutorVideo"> | string
   status?: Prisma.EnumModerationStatusFilter<"TutorVideo"> | $Enums.ModerationStatus
   moderationNote?: Prisma.StringNullableFilter<"TutorVideo"> | string | null
+  noteVisible?: Prisma.BoolFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntFilter<"TutorVideo"> | number
   createdAt?: Prisma.DateTimeFilter<"TutorVideo"> | Date | string
 }
@@ -582,6 +607,7 @@ export type TutorVideoCreateWithoutTutorInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
   file: Prisma.FileAssetCreateNestedOneWithoutVideosInput
@@ -593,6 +619,7 @@ export type TutorVideoUncheckedCreateWithoutTutorInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
 }
@@ -629,6 +656,7 @@ export type TutorVideoCreateManyFileInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
 }
@@ -638,6 +666,7 @@ export type TutorVideoUpdateWithoutFileInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutVideosNestedInput
@@ -649,6 +678,7 @@ export type TutorVideoUncheckedUpdateWithoutFileInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -659,6 +689,7 @@ export type TutorVideoUncheckedUpdateManyWithoutFileInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -669,6 +700,7 @@ export type TutorVideoCreateManyTutorInput = {
   title: string
   status?: $Enums.ModerationStatus
   moderationNote?: string | null
+  noteVisible?: boolean
   sortOrder?: number
   createdAt?: Date | string
 }
@@ -678,6 +710,7 @@ export type TutorVideoUpdateWithoutTutorInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   file?: Prisma.FileAssetUpdateOneRequiredWithoutVideosNestedInput
@@ -689,6 +722,7 @@ export type TutorVideoUncheckedUpdateWithoutTutorInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -699,6 +733,7 @@ export type TutorVideoUncheckedUpdateManyWithoutTutorInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumModerationStatusFieldUpdateOperationsInput | $Enums.ModerationStatus
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -712,6 +747,7 @@ export type TutorVideoSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   title?: boolean
   status?: boolean
   moderationNote?: boolean
+  noteVisible?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
@@ -725,6 +761,7 @@ export type TutorVideoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   title?: boolean
   status?: boolean
   moderationNote?: boolean
+  noteVisible?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
@@ -738,6 +775,7 @@ export type TutorVideoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   title?: boolean
   status?: boolean
   moderationNote?: boolean
+  noteVisible?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
@@ -751,11 +789,12 @@ export type TutorVideoSelectScalar = {
   title?: boolean
   status?: boolean
   moderationNote?: boolean
+  noteVisible?: boolean
   sortOrder?: boolean
   createdAt?: boolean
 }
 
-export type TutorVideoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "fileId" | "title" | "status" | "moderationNote" | "sortOrder" | "createdAt", ExtArgs["result"]["tutorVideo"]>
+export type TutorVideoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "fileId" | "title" | "status" | "moderationNote" | "noteVisible" | "sortOrder" | "createdAt", ExtArgs["result"]["tutorVideo"]>
 export type TutorVideoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
@@ -782,6 +821,7 @@ export type $TutorVideoPayload<ExtArgs extends runtime.Types.Extensions.Internal
     title: string
     status: $Enums.ModerationStatus
     moderationNote: string | null
+    noteVisible: boolean
     sortOrder: number
     createdAt: Date
   }, ExtArgs["result"]["tutorVideo"]>
@@ -1215,6 +1255,7 @@ export interface TutorVideoFieldRefs {
   readonly title: Prisma.FieldRef<"TutorVideo", 'String'>
   readonly status: Prisma.FieldRef<"TutorVideo", 'ModerationStatus'>
   readonly moderationNote: Prisma.FieldRef<"TutorVideo", 'String'>
+  readonly noteVisible: Prisma.FieldRef<"TutorVideo", 'Boolean'>
   readonly sortOrder: Prisma.FieldRef<"TutorVideo", 'Int'>
   readonly createdAt: Prisma.FieldRef<"TutorVideo", 'DateTime'>
 }

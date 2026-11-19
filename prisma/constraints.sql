@@ -830,5 +830,25 @@ CREATE TRIGGER student_phone_guard_trg BEFORE INSERT OR UPDATE OF phone_number, 
 CREATE TRIGGER tutor_phone_guard_trg BEFORE INSERT OR UPDATE OF phone_number, whatsapp_number ON tutor
   FOR EACH ROW EXECUTE FUNCTION contact_number_guard();
 
+-- ═════════ 23. Upload moderation ══════════════════════════════════════════
+-- Migrations 20261126000100_upload_moderation and 20261126000200_upload_moderation_validate.
+-- Application kinds name an application; upload kinds (ID_*, VIDEO_*, FILE_REMOVED, UPLOADS_*) do not.
+ALTER TABLE app_notification ADD CONSTRAINT app_notification_application_shape CHECK (
+  (application_id IS NOT NULL) = (kind::text IN (
+    'APPLICATION_RECEIVED', 'PACKAGE_REQUESTED', 'APPLICATION_ACCEPTED', 'APPLICATION_DECLINED',
+    'LISTING_FILLED', 'APPLICATION_WITHDRAWN', 'APPLICATION_REOPENED', 'APPLICATION_CANCELLED',
+    'APPLICATION_COMPLETED', 'PACKAGE_UPDATED', 'PACKAGE_CLOSED')));
+-- Every history row but an approval or a lifted block says why; block rows have no file.
+ALTER TABLE upload_review
+  ADD CONSTRAINT upload_review_note_present CHECK (
+    action IN ('APPROVED', 'UNBLOCKED') OR (note IS NOT NULL AND length(btrim(note)) > 0)),
+  ADD CONSTRAINT upload_review_file_shape CHECK (
+    (action IN ('BLOCKED', 'UNBLOCKED')) = (purpose IS NULL));
+ALTER TABLE upload_block
+  ADD CONSTRAINT upload_block_scope CHECK (blocks_videos OR blocks_documents),
+  ADD CONSTRAINT upload_block_note_present CHECK (length(btrim(note)) > 0);
+-- At most one active block per account. Protected: never accept a DROP INDEX for it.
+CREATE UNIQUE INDEX upload_block_one_active ON upload_block (account_id) WHERE unblocked_at IS NULL;
+
 -- ═════════ 21. Seed (run once, from your seed script, not the migration) ═
 -- INSERT INTO super_admin_email (slot, email) VALUES (1, 'first@example.com'), (2, 'second@example.com');

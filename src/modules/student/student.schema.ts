@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { VerificationStatus } from "../../generated/prisma/enums.js";
+import { fileIdSchema } from "../files/files.schema.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
 
 export const studentProfileSchema = z
@@ -33,6 +34,13 @@ export const updateStudentProfileSchema = studentProfileSchema
 
 export type UpdateStudentProfileInput = z.infer<typeof updateStudentProfileSchema>;
 
+// Body of every endpoint that submits an uploaded file for review (students and tutors).
+export const submitVerificationSchema = z
+  .object({ fileId: fileIdSchema })
+  .meta({ id: "SubmitVerification" });
+
+export type SubmitVerificationInput = z.infer<typeof submitVerificationSchema>;
+
 export const studentIdParamSchema = z.object({ id: z.string().uuid() });
 
 export type StudentIdParam = z.infer<typeof studentIdParamSchema>;
@@ -50,6 +58,9 @@ export const studentResponseSchema = z
     studentIdNumber: z.string(),
     whatsappVerifiedAt: z.string().nullable().optional(),
     verificationStatus: z.nativeEnum(VerificationStatus),
+    verificationNote: z.string().nullable(),
+    verificationSubmittedAt: z.string().nullable(),
+    verificationDecidedAt: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     location: ownLocationResponseSchema,
