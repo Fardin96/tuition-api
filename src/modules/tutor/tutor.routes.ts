@@ -5,6 +5,7 @@ import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
 import { publicCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
+import { type ReviewPageQuery, reviewPageQuerySchema } from "../review/review.schema.js";
 import {
   type SubmitVerificationInput,
   submitVerificationSchema,
@@ -342,23 +343,29 @@ export async function tutorRoutes(app: FastifyInstance) {
         ...routeDocs({
           tag: "Tutors",
           summary: "List a tutor's reviews",
-          description: "Visible reviews written by students, newest first.",
+          description:
+            "Visible reviews written by students, newest first, cursor-paginated (limit 1 to 100, default 25). summary has the average, the count and the 1 to 5 star breakdown. 404 when the tutor does not exist.",
           auth: "optional",
+          errors: [404],
         }),
         params: tutorIdParamSchema,
+        querystring: reviewPageQuerySchema,
         response: { 200: tutorReviewListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       publicCache(request, reply, "public, max-age=300, stale-while-revalidate=600");
       const { id } = request.params as TutorIdParam;
-      const reviews = await getTutorReviews(id);
+      const page = await getTutorReviews(id, request.query as ReviewPageQuery);
+      if (!page) throw notFound("Tutor not found");
       return reply.send({
-        reviews: reviews.map((r) => ({
+        reviews: page.reviews.map((r) => ({
           ...r,
           comment: r.comment ?? null,
           createdAt: r.createdAt.toISOString(),
         })),
+        nextCursor: page.nextCursor,
+        summary: page.summary,
       });
     },
   );

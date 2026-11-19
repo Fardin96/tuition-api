@@ -9,6 +9,7 @@ import {
   type SaveLocationInput,
   upsertLocation,
 } from "../location/location.service.js";
+import { pageVisibleReviews, reviewSummary } from "../review/review.service.js";
 
 function toNumber(value: unknown) {
   return Number(value);
@@ -194,14 +195,29 @@ export async function hasSharedApplication(tutorId: string, studentId: string) {
   return count > 0;
 }
 
-export async function getStudentReviews(studentId: string) {
-  return prisma.review.findMany({
-    where: {
-      studentId,
-      direction: "TUTOR_TO_STUDENT",
-      status: "VISIBLE",
-    },
-    orderBy: { createdAt: "desc" },
-    include: { tutor: { select: { id: true, name: true } } },
+// One page of visible reviews tutors wrote about the student, with the rating summary. Null when there is no such student.
+export async function getStudentReviews(
+  studentId: string,
+  query: { cursor?: string; limit: number },
+) {
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    select: { ratingAvg: true, ratingCount: true },
   });
+  if (!student) return null;
+
+  const base = { studentId, direction: "TUTOR_TO_STUDENT" } as const;
+  const { rows, nextCursor } = await pageVisibleReviews(base, query, (where, take) =>
+    prisma.review.findMany({
+      where,
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take,
+      include: { tutor: { select: { id: true, name: true } } },
+    }),
+  );
+  return {
+    reviews: rows,
+    nextCursor,
+    summary: await reviewSummary(base, student.ratingAvg, student.ratingCount),
+  };
 }
