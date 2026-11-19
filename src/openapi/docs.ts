@@ -15,6 +15,9 @@ export const TAGS = [
     description: "Tutor applications to requirements and student requests for packages.",
   },
   { name: "Notifications", description: "In-app alerts for the dashboard bell." },
+  { name: "Reviews", description: "Reviews students and tutors write after a confirmed tuition." },
+  { name: "Reports", description: "Reports about another account." },
+  { name: "Disputes", description: "Disputes inside a confirmed or completed tuition." },
   { name: "Fees", description: "A tutor's platform fees and online payments (SSLCommerz)." },
   { name: "Videos", description: "Public tutor videos." },
   {

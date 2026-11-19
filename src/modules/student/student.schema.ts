@@ -2,6 +2,7 @@ import { z } from "zod";
 import { VerificationStatus } from "../../generated/prisma/enums.js";
 import { fileIdSchema } from "../files/files.schema.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
+import { reviewSummarySchema } from "../review/review.schema.js";
 
 export const studentProfileSchema = z
   .object({
@@ -91,5 +92,9 @@ export const studentReviewSchema = z
   .meta({ id: "StudentReview" });
 
 export const studentReviewListSchema = z
-  .object({ reviews: z.array(studentReviewSchema) })
+  .object({
+    reviews: z.array(studentReviewSchema),
+    nextCursor: z.string().nullable(),
+    summary: reviewSummarySchema,
+  })
   .meta({ id: "StudentReviewList" });

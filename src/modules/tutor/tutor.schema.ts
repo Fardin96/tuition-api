@@ -16,6 +16,7 @@ import {
 } from "../../lib/education.js";
 import { fileIdSchema } from "../files/files.schema.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
+import { reviewSummarySchema } from "../review/review.schema.js";
 
 const instituteNameSchema = z.string().trim().min(1).max(120);
 
@@ -301,6 +302,8 @@ export const tutorReviewResponseSchema = z
 export const tutorReviewListResponseSchema = z
   .object({
     reviews: z.array(tutorReviewResponseSchema),
+    nextCursor: z.string().nullable(),
+    summary: reviewSummarySchema,
   })
   .meta({ id: "TutorReviewList" });
 

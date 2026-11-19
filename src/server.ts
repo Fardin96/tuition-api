@@ -19,12 +19,15 @@ import { adminApplicationRoutes } from "./modules/admin/applications.routes.js";
 import { adminAreaRoutes } from "./modules/admin/areas.routes.js";
 import { adminAuditLogRoutes } from "./modules/admin/audit-logs.routes.js";
 import { adminBlogRoutes } from "./modules/admin/blog.routes.js";
+import { adminDisputeRoutes } from "./modules/admin/disputes.routes.js";
 import { adminFeeRoutes } from "./modules/admin/fees.routes.js";
 import { adminFileRoutes } from "./modules/admin/files.routes.js";
 import { adminPackageRoutes } from "./modules/admin/packages.routes.js";
 import { adminPaymentRoutes } from "./modules/admin/payments.routes.js";
 import { adminPromoCodeRoutes } from "./modules/admin/promo-codes.routes.js";
 import { adminRefundRoutes } from "./modules/admin/refunds.routes.js";
+import { adminReportRoutes } from "./modules/admin/reports.routes.js";
+import { adminReviewRoutes } from "./modules/admin/reviews.routes.js";
 import { adminSettingRoutes } from "./modules/admin/settings.routes.js";
 import { adminSubjectRoutes } from "./modules/admin/subjects.routes.js";
 import { adminUploadRoutes } from "./modules/admin/uploads.routes.js";
@@ -35,6 +38,7 @@ import { applicationRoutes } from "./modules/application/application.routes.js";
 import { authRoutes, meRoutes } from "./modules/auth/auth.routes.js";
 import { verifyAccessToken } from "./modules/auth/auth.service.js";
 import { blogRoutes } from "./modules/blog/blog.routes.js";
+import { disputeRoutes } from "./modules/dispute/dispute.routes.js";
 import { feeRoutes } from "./modules/fees/fee.routes.js";
 import { fileRoutes } from "./modules/files/files.routes.js";
 import { areaRoutes } from "./modules/lookups/areas.routes.js";
@@ -44,7 +48,9 @@ import { notificationRoutes } from "./modules/notification/notification.routes.j
 import { packageRoutes } from "./modules/package/package.routes.js";
 import { paymentRoutes } from "./modules/payment/payment.routes.js";
 import { sslcommerzCallbackRoutes } from "./modules/payment/sslcommerz.callbacks.js";
+import { reportRoutes } from "./modules/report/report.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
+import { reviewRoutes } from "./modules/review/review.routes.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
 import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
 import { zoneRoutes } from "./modules/zone/zone.routes.js";
@@ -132,6 +138,9 @@ export async function buildApp() {
   // Full paths: /requirements/:id/applications, /packages/:id/applications and /applications/*.
   await app.register(applicationRoutes, { prefix: "/api/v1" });
   await app.register(notificationRoutes, { prefix: "/api/v1/notifications" });
+  await app.register(reviewRoutes, { prefix: "/api/v1/reviews" });
+  await app.register(reportRoutes, { prefix: "/api/v1/reports" });
+  await app.register(disputeRoutes, { prefix: "/api/v1/disputes" });
   // Full paths: /fees/mine, /fees/:id, /fees/:id/checkout and /fees/:id/attempts/:tranId.
   await app.register(feeRoutes, { prefix: "/api/v1/fees" });
   await app.register(paymentRoutes, { prefix: "/api/v1/fees" });
@@ -162,6 +171,9 @@ export async function buildApp() {
   await app.register(adminVideoRoutes, { prefix: "/api/v1/admin/videos" });
   await app.register(adminFileRoutes, { prefix: "/api/v1/admin/files" });
   await app.register(adminBlogRoutes, { prefix: "/api/v1/admin/blog" });
+  await app.register(adminReviewRoutes, { prefix: "/api/v1/admin/reviews" });
+  await app.register(adminReportRoutes, { prefix: "/api/v1/admin/reports" });
+  await app.register(adminDisputeRoutes, { prefix: "/api/v1/admin/disputes" });
 
   return app;
 }

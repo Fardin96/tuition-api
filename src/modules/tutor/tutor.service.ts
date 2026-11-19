@@ -20,6 +20,7 @@ import {
   type SaveLocationInput,
   upsertLocation,
 } from "../location/location.service.js";
+import { pageVisibleReviews, reviewSummary } from "../review/review.service.js";
 import type {
   CreateCredentialInput,
   CreateTutorRequirementInput,
@@ -397,12 +398,28 @@ export async function addNearbyCardFields<T extends { id: string }>(tutors: T[])
   });
 }
 
-export async function getTutorReviews(tutorId: string) {
-  return prisma.review.findMany({
-    where: { tutorId, direction: "STUDENT_TO_TUTOR", status: "VISIBLE" },
-    orderBy: { createdAt: "desc" },
-    include: { student: { select: { id: true, name: true } } },
+// One page of visible reviews students wrote about the tutor, with the rating summary. Null when there is no such tutor.
+export async function getTutorReviews(tutorId: string, query: { cursor?: string; limit: number }) {
+  const tutor = await prisma.tutor.findUnique({
+    where: { id: tutorId },
+    select: { ratingAvg: true, ratingCount: true },
   });
+  if (!tutor) return null;
+
+  const base = { tutorId, direction: "STUDENT_TO_TUTOR" } as const;
+  const { rows, nextCursor } = await pageVisibleReviews(base, query, (where, take) =>
+    prisma.review.findMany({
+      where,
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take,
+      include: { student: { select: { id: true, name: true } } },
+    }),
+  );
+  return {
+    reviews: rows,
+    nextCursor,
+    summary: await reviewSummary(base, tutor.ratingAvg, tutor.ratingCount),
+  };
 }
 
 export async function getTutorCredentials(accountId: string) {
