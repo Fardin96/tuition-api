@@ -3,7 +3,7 @@ import { notFound } from "../../lib/errors.js";
 import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
-import { publicCache } from "../../plugins/cache.js";
+import { privateCache, publicCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
 import { type ReviewPageQuery, reviewPageQuerySchema } from "../review/review.schema.js";
 import {
@@ -317,7 +317,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutors",
           summary: "Get a tutor's public profile",
           description:
-            "Name, gender, rating, areas, subjects, credentials and approved videos. Contact details and address are never included.",
+            "Name, gender, rating, areas, subjects, credentials and approved videos. Contact details and address are never included. An unlisted tutor (isListed false) answers 200 only to that tutor, to an ACTIVE admin, and to a student with an application with this tutor; anyone else gets the same 404 as an unknown id. Unlisted responses, 404s included, send Cache-Control: private, no-store.",
           auth: "optional",
           errors: [404],
         }),
@@ -326,13 +326,19 @@ export async function tutorRoutes(app: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      publicCache(request, reply, "public, max-age=60, stale-while-revalidate=300");
       const { id } = request.params as TutorIdParam;
-      const tutor = await getPublicTutorProfile(id);
-      if (!tutor) {
+      const found = await getPublicTutorProfile(id, request.account);
+      // Only a listed profile may sit in a shared cache. Unlisted, hidden and unknown ids all get
+      // private, no-store, so the headers never reveal whether an unlisted tutor exists.
+      if (found?.isListed) {
+        publicCache(request, reply, "public, max-age=60, stale-while-revalidate=300");
+      } else {
+        privateCache(reply);
+      }
+      if (!found) {
         throw notFound("Tutor not found");
       }
-      return reply.send({ tutor });
+      return reply.send({ tutor: found.profile });
     },
   );
 

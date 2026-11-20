@@ -10,6 +10,7 @@ import { toDistrictCode } from "../../lib/districts.js";
 import { validateTutorCoverage } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import type { AuthContext } from "../auth/auth.schema.js";
 import { MAX_TUTOR_CREDENTIALS, MAX_TUTOR_VIDEOS } from "../files/file-policy.js";
 import { claimFile, discardFile, fileUrl, removeObjects } from "../files/files.service.js";
 import { visibleNote } from "../files/upload-review.service.js";
@@ -349,11 +350,39 @@ export async function searchTutors(filters: {
   });
 }
 
-export async function getPublicTutorProfile(tutorId: string) {
-  const tutor = await prisma.tutor.findUnique({
+// Unlisted profiles are shown only to the tutor themself, to an ACTIVE admin, and to a student
+// who has an application with this tutor. Everyone else gets the same answer as an unknown id.
+async function canSeeUnlistedTutor(
+  tutor: { id: string; accountId: string },
+  viewer: AuthContext | undefined,
+) {
+  if (!viewer) return false;
+  if (viewer.accountId === tutor.accountId) return true;
+  if (viewer.role === "ADMIN") {
+    const admin = await prisma.adminUser.findUnique({
+      where: { accountId: viewer.accountId },
+      select: { status: true },
+    });
+    if (admin?.status === "ACTIVE") return true;
+  }
+  if (viewer.role === "STUDENT") {
+    const application = await prisma.application.findFirst({
+      where: { tutorId: tutor.id, student: { accountId: viewer.accountId } },
+      select: { id: true },
+    });
+    return application !== null;
+  }
+  return false;
+}
+
+// Returns null when the tutor does not exist or the viewer may not see an unlisted profile.
+// isListed tells the route which Cache-Control to send.
+export async function getPublicTutorProfile(tutorId: string, viewer?: AuthContext) {
+  const row = await prisma.tutor.findUnique({
     where: { id: tutorId },
     select: {
       ...tutorPublicSelect,
+      accountId: true,
       credentials: { include: { file: { select: { id: true, status: true } } } },
       videos: {
         where: { status: "APPROVED" },
@@ -362,16 +391,23 @@ export async function getPublicTutorProfile(tutorId: string) {
       },
     },
   });
-  if (!tutor) return null;
+  if (!row) return null;
+  const { accountId, ...tutor } = row;
+  if (!tutor.isListed && !(await canSeeUnlistedTutor({ id: tutor.id, accountId }, viewer))) {
+    return null;
+  }
   return {
-    ...tutor,
-    ratingAvg: toNumber(tutor.ratingAvg),
-    createdAt: tutor.createdAt.toISOString(),
-    updatedAt: tutor.updatedAt.toISOString(),
-    needsReaddress: await getTutorNeedsReaddress(tutor.id),
-    areas: tutor.areas.map((a) => a.area),
-    subjects: tutor.subjects.map((s) => s.subject),
-    videos: await Promise.all(tutor.videos.map(publicVideoFields)),
+    isListed: tutor.isListed,
+    profile: {
+      ...tutor,
+      ratingAvg: toNumber(tutor.ratingAvg),
+      createdAt: tutor.createdAt.toISOString(),
+      updatedAt: tutor.updatedAt.toISOString(),
+      needsReaddress: await getTutorNeedsReaddress(tutor.id),
+      areas: tutor.areas.map((a) => a.area),
+      subjects: tutor.subjects.map((s) => s.subject),
+      videos: await Promise.all(tutor.videos.map(publicVideoFields)),
+    },
   };
 }
 
