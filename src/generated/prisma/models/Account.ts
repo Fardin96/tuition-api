@@ -238,6 +238,7 @@ export type AccountWhereInput = {
   disputesRaised?: Prisma.DisputeListRelationFilter
   disputesAgainst?: Prisma.DisputeListRelationFilter
   refundRequests?: Prisma.PaymentRefundListRelationFilter
+  phoneOtps?: Prisma.PhoneOtpListRelationFilter
 }
 
 export type AccountOrderByWithRelationInput = {
@@ -267,6 +268,7 @@ export type AccountOrderByWithRelationInput = {
   disputesRaised?: Prisma.DisputeOrderByRelationAggregateInput
   disputesAgainst?: Prisma.DisputeOrderByRelationAggregateInput
   refundRequests?: Prisma.PaymentRefundOrderByRelationAggregateInput
+  phoneOtps?: Prisma.PhoneOtpOrderByRelationAggregateInput
 }
 
 export type AccountWhereUniqueInput = Prisma.AtLeast<{
@@ -300,6 +302,7 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   disputesRaised?: Prisma.DisputeListRelationFilter
   disputesAgainst?: Prisma.DisputeListRelationFilter
   refundRequests?: Prisma.PaymentRefundListRelationFilter
+  phoneOtps?: Prisma.PhoneOtpListRelationFilter
 }, "id" | "googleSub" | "email" | "id_role">
 
 export type AccountOrderByWithAggregationInput = {
@@ -361,6 +364,7 @@ export type AccountCreateInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateInput = {
@@ -390,6 +394,7 @@ export type AccountUncheckedCreateInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUpdateInput = {
@@ -419,6 +424,7 @@ export type AccountUpdateInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateInput = {
@@ -448,6 +454,7 @@ export type AccountUncheckedUpdateInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateManyInput = {
@@ -749,6 +756,20 @@ export type AccountUpdateOneRequiredWithoutRefundRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutRefundRequestsInput, Prisma.AccountUpdateWithoutRefundRequestsInput>, Prisma.AccountUncheckedUpdateWithoutRefundRequestsInput>
 }
 
+export type AccountCreateNestedOneWithoutPhoneOtpsInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutPhoneOtpsInput, Prisma.AccountUncheckedCreateWithoutPhoneOtpsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutPhoneOtpsInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneRequiredWithoutPhoneOtpsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutPhoneOtpsInput, Prisma.AccountUncheckedCreateWithoutPhoneOtpsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutPhoneOtpsInput
+  upsert?: Prisma.AccountUpsertWithoutPhoneOtpsInput
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutPhoneOtpsInput, Prisma.AccountUpdateWithoutPhoneOtpsInput>, Prisma.AccountUncheckedUpdateWithoutPhoneOtpsInput>
+}
+
 export type AccountCreateNestedOneWithoutNotificationsInput = {
   create?: Prisma.XOR<Prisma.AccountCreateWithoutNotificationsInput, Prisma.AccountUncheckedCreateWithoutNotificationsInput>
   connectOrCreate?: Prisma.AccountCreateOrConnectWithoutNotificationsInput
@@ -819,6 +840,7 @@ export type AccountCreateWithoutSessionsInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutSessionsInput = {
@@ -847,6 +869,7 @@ export type AccountUncheckedCreateWithoutSessionsInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutSessionsInput = {
@@ -891,6 +914,7 @@ export type AccountUpdateWithoutSessionsInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutSessionsInput = {
@@ -919,6 +943,7 @@ export type AccountUncheckedUpdateWithoutSessionsInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutAdminUserInput = {
@@ -947,6 +972,7 @@ export type AccountCreateWithoutAdminUserInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutAdminUserInput = {
@@ -975,6 +1001,7 @@ export type AccountUncheckedCreateWithoutAdminUserInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutAdminUserInput = {
@@ -1019,6 +1046,7 @@ export type AccountUpdateWithoutAdminUserInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutAdminUserInput = {
@@ -1047,6 +1075,7 @@ export type AccountUncheckedUpdateWithoutAdminUserInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutBlocksInput = {
@@ -1075,6 +1104,7 @@ export type AccountCreateWithoutBlocksInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutBlocksInput = {
@@ -1103,6 +1133,7 @@ export type AccountUncheckedCreateWithoutBlocksInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutBlocksInput = {
@@ -1147,6 +1178,7 @@ export type AccountUpdateWithoutBlocksInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutBlocksInput = {
@@ -1175,6 +1207,7 @@ export type AccountUncheckedUpdateWithoutBlocksInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutUploadReviewsInput = {
@@ -1203,6 +1236,7 @@ export type AccountCreateWithoutUploadReviewsInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutUploadReviewsInput = {
@@ -1231,6 +1265,7 @@ export type AccountUncheckedCreateWithoutUploadReviewsInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutUploadReviewsInput = {
@@ -1275,6 +1310,7 @@ export type AccountUpdateWithoutUploadReviewsInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutUploadReviewsInput = {
@@ -1303,6 +1339,7 @@ export type AccountUncheckedUpdateWithoutUploadReviewsInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutUploadBlocksInput = {
@@ -1331,6 +1368,7 @@ export type AccountCreateWithoutUploadBlocksInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutUploadBlocksInput = {
@@ -1359,6 +1397,7 @@ export type AccountUncheckedCreateWithoutUploadBlocksInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutUploadBlocksInput = {
@@ -1403,6 +1442,7 @@ export type AccountUpdateWithoutUploadBlocksInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutUploadBlocksInput = {
@@ -1431,6 +1471,7 @@ export type AccountUncheckedUpdateWithoutUploadBlocksInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutFilesInput = {
@@ -1459,6 +1500,7 @@ export type AccountCreateWithoutFilesInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutFilesInput = {
@@ -1487,6 +1529,7 @@ export type AccountUncheckedCreateWithoutFilesInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutFilesInput = {
@@ -1531,6 +1574,7 @@ export type AccountUpdateWithoutFilesInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutFilesInput = {
@@ -1559,6 +1603,7 @@ export type AccountUncheckedUpdateWithoutFilesInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutStudentInput = {
@@ -1587,6 +1632,7 @@ export type AccountCreateWithoutStudentInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutStudentInput = {
@@ -1615,6 +1661,7 @@ export type AccountUncheckedCreateWithoutStudentInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutStudentInput = {
@@ -1659,6 +1706,7 @@ export type AccountUpdateWithoutStudentInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutStudentInput = {
@@ -1687,6 +1735,7 @@ export type AccountUncheckedUpdateWithoutStudentInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutTutorInput = {
@@ -1715,6 +1764,7 @@ export type AccountCreateWithoutTutorInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutTutorInput = {
@@ -1743,6 +1793,7 @@ export type AccountUncheckedCreateWithoutTutorInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutTutorInput = {
@@ -1787,6 +1838,7 @@ export type AccountUpdateWithoutTutorInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutTutorInput = {
@@ -1815,6 +1867,7 @@ export type AccountUncheckedUpdateWithoutTutorInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutReportsMadeInput = {
@@ -1843,6 +1896,7 @@ export type AccountCreateWithoutReportsMadeInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutReportsMadeInput = {
@@ -1871,6 +1925,7 @@ export type AccountUncheckedCreateWithoutReportsMadeInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutReportsMadeInput = {
@@ -1904,6 +1959,7 @@ export type AccountCreateWithoutReportsAgainstInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutReportsAgainstInput = {
@@ -1932,6 +1988,7 @@ export type AccountUncheckedCreateWithoutReportsAgainstInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutReportsAgainstInput = {
@@ -1976,6 +2033,7 @@ export type AccountUpdateWithoutReportsMadeInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutReportsMadeInput = {
@@ -2004,6 +2062,7 @@ export type AccountUncheckedUpdateWithoutReportsMadeInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUpsertWithoutReportsAgainstInput = {
@@ -2043,6 +2102,7 @@ export type AccountUpdateWithoutReportsAgainstInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutReportsAgainstInput = {
@@ -2071,6 +2131,7 @@ export type AccountUncheckedUpdateWithoutReportsAgainstInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutDisputesRaisedInput = {
@@ -2099,6 +2160,7 @@ export type AccountCreateWithoutDisputesRaisedInput = {
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutDisputesRaisedInput = {
@@ -2127,6 +2189,7 @@ export type AccountUncheckedCreateWithoutDisputesRaisedInput = {
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutDisputesRaisedInput = {
@@ -2160,6 +2223,7 @@ export type AccountCreateWithoutDisputesAgainstInput = {
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutDisputesAgainstInput = {
@@ -2188,6 +2252,7 @@ export type AccountUncheckedCreateWithoutDisputesAgainstInput = {
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutDisputesAgainstInput = {
@@ -2232,6 +2297,7 @@ export type AccountUpdateWithoutDisputesRaisedInput = {
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutDisputesRaisedInput = {
@@ -2260,6 +2326,7 @@ export type AccountUncheckedUpdateWithoutDisputesRaisedInput = {
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUpsertWithoutDisputesAgainstInput = {
@@ -2299,6 +2366,7 @@ export type AccountUpdateWithoutDisputesAgainstInput = {
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutDisputesAgainstInput = {
@@ -2327,6 +2395,7 @@ export type AccountUncheckedUpdateWithoutDisputesAgainstInput = {
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutRefundRequestsInput = {
@@ -2355,6 +2424,7 @@ export type AccountCreateWithoutRefundRequestsInput = {
   reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutRefundRequestsInput = {
@@ -2383,6 +2453,7 @@ export type AccountUncheckedCreateWithoutRefundRequestsInput = {
   reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutRefundRequestsInput = {
@@ -2427,6 +2498,7 @@ export type AccountUpdateWithoutRefundRequestsInput = {
   reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutRefundRequestsInput = {
@@ -2455,6 +2527,139 @@ export type AccountUncheckedUpdateWithoutRefundRequestsInput = {
   reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountCreateWithoutPhoneOtpsInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+}
+
+export type AccountUncheckedCreateWithoutPhoneOtpsInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+}
+
+export type AccountCreateOrConnectWithoutPhoneOtpsInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutPhoneOtpsInput, Prisma.AccountUncheckedCreateWithoutPhoneOtpsInput>
+}
+
+export type AccountUpsertWithoutPhoneOtpsInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutPhoneOtpsInput, Prisma.AccountUncheckedUpdateWithoutPhoneOtpsInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutPhoneOtpsInput, Prisma.AccountUncheckedCreateWithoutPhoneOtpsInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutPhoneOtpsInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutPhoneOtpsInput, Prisma.AccountUncheckedUpdateWithoutPhoneOtpsInput>
+}
+
+export type AccountUpdateWithoutPhoneOtpsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutPhoneOtpsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
 }
 
 export type AccountCreateWithoutNotificationsInput = {
@@ -2483,6 +2688,7 @@ export type AccountCreateWithoutNotificationsInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutNotificationsInput = {
@@ -2511,6 +2717,7 @@ export type AccountUncheckedCreateWithoutNotificationsInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutNotificationsInput = {
@@ -2555,6 +2762,7 @@ export type AccountUpdateWithoutNotificationsInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutNotificationsInput = {
@@ -2583,6 +2791,7 @@ export type AccountUncheckedUpdateWithoutNotificationsInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutAlertsInput = {
@@ -2611,6 +2820,7 @@ export type AccountCreateWithoutAlertsInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutAlertsInput = {
@@ -2639,6 +2849,7 @@ export type AccountUncheckedCreateWithoutAlertsInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutAlertsInput = {
@@ -2683,6 +2894,7 @@ export type AccountUpdateWithoutAlertsInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutAlertsInput = {
@@ -2711,6 +2923,7 @@ export type AccountUncheckedUpdateWithoutAlertsInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutAuditEntriesInput = {
@@ -2739,6 +2952,7 @@ export type AccountCreateWithoutAuditEntriesInput = {
   disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutAuditEntriesInput = {
@@ -2767,6 +2981,7 @@ export type AccountUncheckedCreateWithoutAuditEntriesInput = {
   disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
   disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
   refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutAuditEntriesInput = {
@@ -2811,6 +3026,7 @@ export type AccountUpdateWithoutAuditEntriesInput = {
   disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutAuditEntriesInput = {
@@ -2839,6 +3055,7 @@ export type AccountUncheckedUpdateWithoutAuditEntriesInput = {
   disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
   disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
   refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 
@@ -2860,6 +3077,7 @@ export type AccountCountOutputType = {
   disputesRaised: number
   disputesAgainst: number
   refundRequests: number
+  phoneOtps: number
 }
 
 export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2876,6 +3094,7 @@ export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   disputesRaised?: boolean | AccountCountOutputTypeCountDisputesRaisedArgs
   disputesAgainst?: boolean | AccountCountOutputTypeCountDisputesAgainstArgs
   refundRequests?: boolean | AccountCountOutputTypeCountRefundRequestsArgs
+  phoneOtps?: boolean | AccountCountOutputTypeCountPhoneOtpsArgs
 }
 
 /**
@@ -2979,6 +3198,13 @@ export type AccountCountOutputTypeCountRefundRequestsArgs<ExtArgs extends runtim
   where?: Prisma.PaymentRefundWhereInput
 }
 
+/**
+ * AccountCountOutputType without action
+ */
+export type AccountCountOutputTypeCountPhoneOtpsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PhoneOtpWhereInput
+}
+
 
 export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3007,6 +3233,7 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   disputesRaised?: boolean | Prisma.Account$disputesRaisedArgs<ExtArgs>
   disputesAgainst?: boolean | Prisma.Account$disputesAgainstArgs<ExtArgs>
   refundRequests?: boolean | Prisma.Account$refundRequestsArgs<ExtArgs>
+  phoneOtps?: boolean | Prisma.Account$phoneOtpsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -3067,6 +3294,7 @@ export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   disputesRaised?: boolean | Prisma.Account$disputesRaisedArgs<ExtArgs>
   disputesAgainst?: boolean | Prisma.Account$disputesAgainstArgs<ExtArgs>
   refundRequests?: boolean | Prisma.Account$refundRequestsArgs<ExtArgs>
+  phoneOtps?: boolean | Prisma.Account$phoneOtpsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3091,6 +3319,7 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     disputesRaised: Prisma.$DisputePayload<ExtArgs>[]
     disputesAgainst: Prisma.$DisputePayload<ExtArgs>[]
     refundRequests: Prisma.$PaymentRefundPayload<ExtArgs>[]
+    phoneOtps: Prisma.$PhoneOtpPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3513,6 +3742,7 @@ export interface Prisma__AccountClient<T, Null = never, ExtArgs extends runtime.
   disputesRaised<T extends Prisma.Account$disputesRaisedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$disputesRaisedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DisputePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   disputesAgainst<T extends Prisma.Account$disputesAgainstArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$disputesAgainstArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DisputePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   refundRequests<T extends Prisma.Account$refundRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$refundRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRefundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  phoneOtps<T extends Prisma.Account$phoneOtpsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$phoneOtpsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhoneOtpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4311,6 +4541,30 @@ export type Account$refundRequestsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.PaymentRefundScalarFieldEnum | Prisma.PaymentRefundScalarFieldEnum[]
+}
+
+/**
+ * Account.phoneOtps
+ */
+export type Account$phoneOtpsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PhoneOtp
+   */
+  select?: Prisma.PhoneOtpSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PhoneOtp
+   */
+  omit?: Prisma.PhoneOtpOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PhoneOtpInclude<ExtArgs> | null
+  where?: Prisma.PhoneOtpWhereInput
+  orderBy?: Prisma.PhoneOtpOrderByWithRelationInput | Prisma.PhoneOtpOrderByWithRelationInput[]
+  cursor?: Prisma.PhoneOtpWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PhoneOtpScalarFieldEnum | Prisma.PhoneOtpScalarFieldEnum[]
 }
 
 /**

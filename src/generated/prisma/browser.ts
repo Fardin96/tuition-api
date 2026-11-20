@@ -203,6 +203,11 @@ export type PaymentAttempt = Prisma.PaymentAttemptModel
  */
 export type PaymentRefund = Prisma.PaymentRefundModel
 /**
+ * Model PhoneOtp
+ * 
+ */
+export type PhoneOtp = Prisma.PhoneOtpModel
+/**
  * Model PromoCode
  * 
  */

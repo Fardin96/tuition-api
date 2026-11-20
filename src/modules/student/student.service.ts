@@ -10,6 +10,12 @@ import {
   type SaveLocationInput,
   upsertLocation,
 } from "../location/location.service.js";
+import {
+  assertPhoneVerifiedForSignup,
+  consumeOtp,
+  findVerifiedOtp,
+  isPhoneVerificationRequired,
+} from "../phone-verification/phone-verification.policy.js";
 import { pageVisibleReviews, reviewSummary } from "../review/review.service.js";
 
 function toNumber(value: unknown) {
@@ -82,12 +88,16 @@ export async function createStudentProfile(
 
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
+  const otp = await assertPhoneVerifiedForSignup(prisma, "STUDENT", accountId, data.phoneNumber);
 
   const { location, ...profileData } = data;
   const student = await prisma.$transaction(async (tx) => {
     const created = await tx.student
-      .create({ data: { accountId, ...profileData } })
+      .create({
+        data: { accountId, ...profileData, phoneVerifiedAt: otp?.verifiedAt ?? null },
+      })
       .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+    if (otp) await consumeOtp(tx, otp.id);
     if (location) {
       await upsertLocation("student_location", created.id, location, tx);
     }
@@ -127,13 +137,24 @@ export async function updateStudentProfile(
   const { location, ...profileData } = data;
   const whatsappChanged =
     data.whatsappNumber !== undefined && data.whatsappNumber !== existing.whatsappNumber;
+  const newPhone = data.phoneNumber !== existing.phoneNumber ? data.phoneNumber : undefined;
   const student = await prisma.$transaction(async (tx) => {
+    // A new number is saved verified only with a code verified for it; otherwise the trigger clears the timestamp.
+    const otp = newPhone === undefined ? null : await findVerifiedOtp(tx, accountId, newPhone);
+    if (newPhone !== undefined && !otp && (await isPhoneVerificationRequired("STUDENT", tx))) {
+      throw appError("PhoneVerificationRequired", 403, "Verify the new number before saving it.");
+    }
     const updated = await tx.student
       .update({
         where: { accountId },
-        data: whatsappChanged ? { ...profileData, whatsappVerifiedAt: null } : profileData,
+        data: {
+          ...profileData,
+          ...(whatsappChanged ? { whatsappVerifiedAt: null } : {}),
+          ...(otp ? { phoneVerifiedAt: otp.verifiedAt } : {}),
+        },
       })
       .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+    if (otp) await consumeOtp(tx, otp.id);
     if (location) {
       await upsertLocation("student_location", updated.id, location, tx);
     }

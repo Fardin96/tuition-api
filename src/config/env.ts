@@ -50,6 +50,13 @@ const schema = z.object({
   API_PUBLIC_URL: z.string().url().optional(),
   // Public base of the web app the browser returns to (e.g. http://localhost:3000).
   WEB_PUBLIC_URL: z.string().url().optional(),
+
+  // SMS provider for phone OTP (sms.net.bd). Without a key, or with SMS_DRY_RUN=true, messages are
+  // logged instead of sent (see src/lib/sms.ts). Outside development, no key means sending fails.
+  // SMS_DRY_RUN=true is refused in production, where codes must be delivered.
+  SMS_KEY: z.string().optional(),
+  SMS_BASE_URL: z.string().url().default("https://api.sms.net.bd"),
+  SMS_DRY_RUN: z.enum(["true", "false"]).optional(),
 });
 
 export const env = schema
@@ -59,6 +66,14 @@ export const env = schema
         code: "custom",
         path: ["SSLC_IS_LIVE"],
         message: "SSLC_IS_LIVE=true is only allowed when NODE_ENV=production",
+      });
+    }
+    if (value.SMS_DRY_RUN === "true" && value.NODE_ENV === "production") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["SMS_DRY_RUN"],
+        message:
+          "SMS_DRY_RUN=true is not allowed when NODE_ENV=production (codes would never be sent)",
       });
     }
   })

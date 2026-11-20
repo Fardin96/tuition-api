@@ -434,6 +434,7 @@ export const ModelName = {
   FeePayment: 'FeePayment',
   PaymentAttempt: 'PaymentAttempt',
   PaymentRefund: 'PaymentRefund',
+  PhoneOtp: 'PhoneOtp',
   PromoCode: 'PromoCode',
   PromoRedemption: 'PromoRedemption',
   NotificationLog: 'NotificationLog',
@@ -457,7 +458,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3199,6 +3200,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PhoneOtp: {
+      payload: Prisma.$PhoneOtpPayload<ExtArgs>
+      fields: Prisma.PhoneOtpFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhoneOtpFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhoneOtpFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+        }
+        findFirst: {
+          args: Prisma.PhoneOtpFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhoneOtpFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+        }
+        findMany: {
+          args: Prisma.PhoneOtpFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>[]
+        }
+        create: {
+          args: Prisma.PhoneOtpCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+        }
+        createMany: {
+          args: Prisma.PhoneOtpCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhoneOtpCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>[]
+        }
+        delete: {
+          args: Prisma.PhoneOtpDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+        }
+        update: {
+          args: Prisma.PhoneOtpUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+        }
+        deleteMany: {
+          args: Prisma.PhoneOtpDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhoneOtpUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhoneOtpUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>[]
+        }
+        upsert: {
+          args: Prisma.PhoneOtpUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhoneOtpPayload>
+        }
+        aggregate: {
+          args: Prisma.PhoneOtpAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhoneOtp>
+        }
+        groupBy: {
+          args: Prisma.PhoneOtpGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhoneOtpGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhoneOtpCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhoneOtpCountAggregateOutputType> | number
+        }
+      }
+    }
     PromoCode: {
       payload: Prisma.$PromoCodePayload<ExtArgs>
       fields: Prisma.PromoCodeFieldRefs
@@ -4432,6 +4507,22 @@ export const PaymentRefundScalarFieldEnum = {
 export type PaymentRefundScalarFieldEnum = (typeof PaymentRefundScalarFieldEnum)[keyof typeof PaymentRefundScalarFieldEnum]
 
 
+export const PhoneOtpScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  phoneNumber: 'phoneNumber',
+  codeHash: 'codeHash',
+  attempts: 'attempts',
+  expiresAt: 'expiresAt',
+  verifiedAt: 'verifiedAt',
+  consumedAt: 'consumedAt',
+  providerRequestId: 'providerRequestId',
+  createdAt: 'createdAt'
+} as const
+
+export type PhoneOtpScalarFieldEnum = (typeof PhoneOtpScalarFieldEnum)[keyof typeof PhoneOtpScalarFieldEnum]
+
+
 export const PromoCodeScalarFieldEnum = {
   id: 'id',
   code: 'code',
@@ -5449,6 +5540,7 @@ export type GlobalOmitConfig = {
   feePayment?: Prisma.FeePaymentOmit
   paymentAttempt?: Prisma.PaymentAttemptOmit
   paymentRefund?: Prisma.PaymentRefundOmit
+  phoneOtp?: Prisma.PhoneOtpOmit
   promoCode?: Prisma.PromoCodeOmit
   promoRedemption?: Prisma.PromoRedemptionOmit
   notificationLog?: Prisma.NotificationLogOmit

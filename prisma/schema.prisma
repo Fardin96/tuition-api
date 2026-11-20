@@ -352,7 +352,7 @@ enum AdmissionTarget {
 
 // ───────────────────────── accounts & admin ─────────────────────────
 // Login = short-lived access token + a refresh token kept in `session` (hash
-// only). OTP state lives with the OTP provider. Consent is two columns on
+// only). OTP codes live hashed in phone_otp. Consent is two columns on
 // account, not a log table.
 // One account = one role = at most one profile: each profile row carries a
 // fixed `role` and a composite FK (account_id, role) -> account (id, role).
@@ -385,6 +385,7 @@ model Account {
   disputesRaised  Dispute[]         @relation("DisputeRaisedBy")
   disputesAgainst Dispute[]         @relation("DisputeAgainst")
   refundRequests  PaymentRefund[]
+  phoneOtps       PhoneOtp[]
 
   @@unique([id, role]) // target of the profile composite FKs
   @@map("account")
@@ -1302,6 +1303,27 @@ model PaymentRefund {
   @@map("payment_refund")
 }
 
+// One phone verification code. Only an HMAC of the code is stored. TTL, attempts, cooldown and send caps live in the
+// service; the phone format and attempt range are CHECKs in constraints.sql.
+model PhoneOtp {
+  id                String    @id @default(uuid(7)) @db.Uuid
+  accountId         String    @map("account_id") @db.Uuid
+  phoneNumber       String    @map("phone_number")
+  codeHash          String    @map("code_hash")
+  attempts          Int       @default(0) @db.SmallInt // 0..5, CHECK in constraints.sql
+  expiresAt         DateTime  @map("expires_at") @db.Timestamptz(3)
+  verifiedAt        DateTime? @map("verified_at") @db.Timestamptz(3)
+  consumedAt        DateTime? @map("consumed_at") @db.Timestamptz(3)
+  providerRequestId String?   @map("provider_request_id")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, phoneNumber, createdAt])
+  @@index([phoneNumber, createdAt])
+  @@map("phone_otp")
+}
+
 // A discount code a super admin creates for tutor fees. Discount terms never change after creation.
 // Table rules (code format, value ranges, window) live in prisma/constraints.sql.
 model PromoCode {
@@ -1445,8 +1467,8 @@ model SiteContent {
 }
 
 // Admin-switchable platform flags and numbers. Values are validated per key by a CHECK in constraints.sql.
-// Keys: require_tutor_verification (bool), require_phone_verification (bool), commission_percent (0..100),
-// gateway_charge_percent (0..10), online_payments_enabled (bool).
+// Keys: require_tutor_verification (bool), require_tutor_phone_verification (bool), require_student_phone_verification (bool),
+// commission_percent (0..100), gateway_charge_percent (0..10), online_payments_enabled (bool), refund_window_days (0..90).
 model PlatformSetting {
   key         String   @id
   value       Json

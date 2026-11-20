@@ -11,8 +11,8 @@ import type {
 } from "./accounts.schema.js";
 
 const summaryInclude = {
-  student: { select: { name: true, phoneNumber: true } },
-  tutor: { select: { name: true, phoneNumber: true } },
+  student: { select: { name: true, phoneNumber: true, phoneVerifiedAt: true } },
+  tutor: { select: { name: true, phoneNumber: true, phoneVerifiedAt: true } },
   adminUser: { select: { name: true } },
 } satisfies Prisma.AccountInclude;
 
@@ -24,6 +24,7 @@ const detailInclude = {
       id: true,
       name: true,
       phoneNumber: true,
+      phoneVerifiedAt: true,
       whatsappNumber: true,
       verificationStatus: true,
     },
@@ -33,6 +34,7 @@ const detailInclude = {
       id: true,
       name: true,
       phoneNumber: true,
+      phoneVerifiedAt: true,
       whatsappNumber: true,
       verificationStatus: true,
       isListed: true,
@@ -58,6 +60,13 @@ function contactValue(value: string | null | undefined): string | null {
   return value;
 }
 
+// Null without a profile or a usable number, so a tombstoned number never reads as verified.
+function phoneVerifiedAt(row: SummarySource): Date | null {
+  const profile = row.student ?? row.tutor;
+  if (!profile || contactValue(profile.phoneNumber) === null) return null;
+  return profile.phoneVerifiedAt;
+}
+
 function toSummary(row: SummarySource): AdminAccountSummary {
   return {
     id: row.id,
@@ -66,6 +75,7 @@ function toSummary(row: SummarySource): AdminAccountSummary {
     status: row.status,
     name: row.student?.name ?? row.tutor?.name ?? row.adminUser?.name ?? null,
     phoneNumber: contactValue(row.student?.phoneNumber ?? row.tutor?.phoneNumber),
+    phoneVerifiedAt: phoneVerifiedAt(row),
     createdAt: row.createdAt,
     lastLoginAt: row.lastLoginAt,
     deletedAt: row.deletedAt,

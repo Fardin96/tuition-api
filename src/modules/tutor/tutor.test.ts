@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 import { setStorageForTests } from "../../lib/storage.js";
@@ -20,6 +20,7 @@ import {
   createTutorZone,
   fakeFileBytes,
   getAuthHeaders,
+  setPlatformSetting,
   setStudentLocation,
   setTutorLocation,
 } from "../../tests/helpers.js";
@@ -3246,5 +3247,271 @@ describe("tutor routes", () => {
         expect(JSON.parse(res.body).code).toBe("INVALID_REQUIREMENT");
       });
     });
+  });
+});
+
+// A code verified for this account and number, as the OTP flow leaves it before the profile exists.
+function verifiedOtp(accountId: string, phoneNumber: string, verifiedAt = new Date()) {
+  return prisma.phoneOtp.create({
+    data: {
+      accountId,
+      phoneNumber,
+      codeHash: "test-hash",
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      verifiedAt,
+    },
+  });
+}
+
+describe("phone verification at tutor sign-up", () => {
+  beforeEach(async () => {
+    await setPlatformSetting("require_student_phone_verification", false);
+    await setPlatformSetting("require_tutor_phone_verification", false);
+  });
+
+  it("creates an unverified profile when the tutor switch is off", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: tutorPayload(),
+    });
+
+    expect(res.statusCode).toBe(201);
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.phoneVerifiedAt).toBeNull();
+  });
+
+  it("stamps the profile with a verified code and spends it when the switch is off", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const payload = tutorPayload();
+    const otp = await verifiedOtp(account.id, payload.phoneNumber);
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload,
+    });
+
+    expect(res.statusCode).toBe(201);
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.phoneVerifiedAt).toEqual(otp.verifiedAt);
+    const spent = await prisma.phoneOtp.findUniqueOrThrow({ where: { id: otp.id } });
+    expect(spent.consumedAt).not.toBeNull();
+  });
+
+  describe("with the tutor switch on", () => {
+    beforeEach(async () => {
+      await setPlatformSetting("require_tutor_phone_verification", true);
+    });
+
+    it("refuses a profile without a verified code and creates nothing", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload(),
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(JSON.parse(res.body).code).toBe("PHONE_VERIFICATION_REQUIRED");
+      expect(await prisma.tutor.findUnique({ where: { accountId: account.id } })).toBeNull();
+    });
+
+    it("accepts a code verified for this number", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const payload = tutorPayload();
+      const otp = await verifiedOtp(account.id, payload.phoneNumber);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload,
+      });
+
+      expect(res.statusCode).toBe(201);
+      const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+      expect(row.phoneVerifiedAt).toEqual(otp.verifiedAt);
+      const spent = await prisma.phoneOtp.findUniqueOrThrow({ where: { id: otp.id } });
+      expect(spent.consumedAt).not.toBeNull();
+    });
+
+    it("refuses a code verified for a different number", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      await verifiedOtp(account.id, phone());
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload(),
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(JSON.parse(res.body).code).toBe("PHONE_VERIFICATION_REQUIRED");
+      expect(await prisma.tutor.findUnique({ where: { accountId: account.id } })).toBeNull();
+    });
+
+    it("refuses a code verified more than 30 minutes ago", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "TUTOR" });
+      const payload = tutorPayload();
+      await verifiedOtp(account.id, payload.phoneNumber, new Date(Date.now() - 31 * 60 * 1000));
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload,
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(JSON.parse(res.body).code).toBe("PHONE_VERIFICATION_REQUIRED");
+      expect(await prisma.tutor.findUnique({ where: { accountId: account.id } })).toBeNull();
+    });
+
+    it("does not block student sign-up", async () => {
+      const app = await createTestApp();
+      const account = await createAccount({ role: "STUDENT" });
+      const area = await createArea();
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/students/me",
+        headers: await getAuthHeaders(account),
+        payload: {
+          name: "Student Name",
+          areaId: area.id,
+          address: "Student Address",
+          emergencyContact: "+8801700000001",
+          phoneNumber: phone(),
+          studentIdNumber: `STU-${crypto.randomUUID()}`,
+        },
+      });
+
+      expect(res.statusCode).toBe(201);
+    });
+  });
+});
+
+describe("phone verification when the tutor changes the number", () => {
+  beforeEach(async () => {
+    await setPlatformSetting("require_student_phone_verification", false);
+    await setPlatformSetting("require_tutor_phone_verification", false);
+  });
+
+  // A verified profile, so a number change has a timestamp to lose.
+  async function verifiedTutor() {
+    const account = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(account.id);
+    const verifiedAt = new Date(Date.now() - 60 * 1000);
+    await prisma.tutor.update({
+      where: { accountId: account.id },
+      data: { phoneVerifiedAt: verifiedAt },
+    });
+    return { account, verifiedAt };
+  }
+
+  async function patchTutor(
+    account: Awaited<ReturnType<typeof createAccount>>,
+    payload: Record<string, unknown>,
+  ) {
+    const app = await createTestApp();
+    return app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload,
+    });
+  }
+
+  it("saves a new number verified when the switch is off and a code was verified for it", async () => {
+    const { account } = await verifiedTutor();
+    const newPhone = phone();
+    const otp = await verifiedOtp(account.id, newPhone);
+
+    const res = await patchTutor(account, { phoneNumber: newPhone });
+
+    expect(res.statusCode).toBe(200);
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.phoneNumber).toBe(newPhone);
+    expect(row.phoneVerifiedAt).toEqual(otp.verifiedAt);
+    const spent = await prisma.phoneOtp.findUniqueOrThrow({ where: { id: otp.id } });
+    expect(spent.consumedAt).not.toBeNull();
+  });
+
+  it("changes the number unverified when the switch is off and no code was verified", async () => {
+    const { account } = await verifiedTutor();
+    const newPhone = phone();
+
+    const res = await patchTutor(account, { phoneNumber: newPhone });
+
+    expect(res.statusCode).toBe(200);
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.phoneNumber).toBe(newPhone);
+    expect(row.phoneVerifiedAt).toBeNull();
+  });
+
+  it("refuses a new number without a verified code when the switch is on", async () => {
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    const { account, verifiedAt } = await verifiedTutor();
+    const before = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+
+    const res = await patchTutor(account, { phoneNumber: phone() });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body).code).toBe("PHONE_VERIFICATION_REQUIRED");
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.phoneNumber).toBe(before.phoneNumber);
+    expect(row.phoneVerifiedAt).toEqual(verifiedAt);
+  });
+
+  it("saves a new number verified when the switch is on and a code was verified for it", async () => {
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    const { account } = await verifiedTutor();
+    const newPhone = phone();
+    const otp = await verifiedOtp(account.id, newPhone);
+
+    const res = await patchTutor(account, { phoneNumber: newPhone });
+
+    expect(res.statusCode).toBe(200);
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.phoneNumber).toBe(newPhone);
+    expect(row.phoneVerifiedAt).toEqual(otp.verifiedAt);
+  });
+
+  it("keeps the verification when the same number is sent again", async () => {
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    const { account, verifiedAt } = await verifiedTutor();
+    const current = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+
+    const res = await patchTutor(account, { phoneNumber: current.phoneNumber });
+
+    expect(res.statusCode).toBe(200);
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.phoneVerifiedAt).toEqual(verifiedAt);
+  });
+
+  it("leaves the verification alone when the body has no phone number, even with the switch on", async () => {
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    const { account, verifiedAt } = await verifiedTutor();
+
+    const res = await patchTutor(account, { name: "Renamed Tutor" });
+
+    expect(res.statusCode).toBe(200);
+    const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
+    expect(row.name).toBe("Renamed Tutor");
+    expect(row.phoneVerifiedAt).toEqual(verifiedAt);
   });
 });

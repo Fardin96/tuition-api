@@ -48,6 +48,7 @@ import { notificationRoutes } from "./modules/notification/notification.routes.j
 import { packageRoutes } from "./modules/package/package.routes.js";
 import { paymentRoutes } from "./modules/payment/payment.routes.js";
 import { sslcommerzCallbackRoutes } from "./modules/payment/sslcommerz.callbacks.js";
+import { phoneVerificationRoutes } from "./modules/phone-verification/phone-verification.routes.js";
 import { reportRoutes } from "./modules/report/report.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { reviewRoutes } from "./modules/review/review.routes.js";
@@ -139,6 +140,7 @@ export async function buildApp() {
   await app.register(applicationRoutes, { prefix: "/api/v1" });
   await app.register(notificationRoutes, { prefix: "/api/v1/notifications" });
   await app.register(reviewRoutes, { prefix: "/api/v1/reviews" });
+  await app.register(phoneVerificationRoutes, { prefix: "/api/v1/phone-verification" });
   await app.register(reportRoutes, { prefix: "/api/v1/reports" });
   await app.register(disputeRoutes, { prefix: "/api/v1/disputes" });
   // Full paths: /fees/mine, /fees/:id, /fees/:id/checkout and /fees/:id/attempts/:tranId.

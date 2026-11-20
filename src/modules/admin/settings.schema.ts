@@ -7,7 +7,8 @@ export const SETTING_KEYS = [
   "online_payments_enabled",
   "refund_window_days",
   "require_tutor_verification",
-  "require_phone_verification",
+  "require_tutor_phone_verification",
+  "require_student_phone_verification",
 ] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 

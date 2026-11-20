@@ -12,6 +12,7 @@ import {
   createTutorProfile,
   createTutorRequirement,
   getAuthHeaders,
+  setPlatformSetting,
   setTutorLocation,
 } from "../../tests/helpers.js";
 
@@ -164,6 +165,33 @@ describe("POST /requirements/:id/applications (apply, #57)", () => {
     expect(error.code).toBe("PROFILE_INCOMPLETE");
     expect(error.details).toEqual({ missing: ["default_requirement"] });
     expect(await prisma.application.count({ where: { tutorId: tutor.id } })).toBe(0);
+  });
+
+  it("returns 403 PROFILE_INCOMPLETE with phone_verification when the tutor switch is on and the phone is unverified, and passes once verified", async () => {
+    const app = await createTestApp();
+    const { student } = await createStudent();
+    const requirement = await createRequirement({ studentId: student.id });
+    const { tutor, actor } = await createReadyTutor();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+
+    const blocked = await app.inject({
+      method: "POST",
+      url: `${BASE}/requirements/${requirement.id}/applications`,
+      headers: actor.headers,
+    });
+    expect(blocked.statusCode).toBe(403);
+    const error = JSON.parse(blocked.body);
+    expect(error.code).toBe("PROFILE_INCOMPLETE");
+    expect(error.details.missing).toContain("phone_verification");
+
+    await prisma.tutor.update({ where: { id: tutor.id }, data: { phoneVerifiedAt: new Date() } });
+
+    const passed = await app.inject({
+      method: "POST",
+      url: `${BASE}/requirements/${requirement.id}/applications`,
+      headers: actor.headers,
+    });
+    expect(passed.statusCode).toBe(201);
   });
 
   it("lists every missing piece when the tutor has no pin and no area", async () => {

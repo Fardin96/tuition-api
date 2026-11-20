@@ -733,10 +733,13 @@ ALTER TABLE application ADD CONSTRAINT app_match_score_range
 -- [v6] a bad value can never break the ::boolean / ::numeric casts in the functions below
 -- [payments] online_payments_enabled and gateway_charge_percent added by migration 20261121000100_payment_attempts
 -- (validated by 20261121000200_payment_attempts_validate).
+-- [phone OTP] require_phone_verification split into require_tutor_phone_verification and
+-- require_student_phone_verification (migration 20261127000100_phone_otp, validated by 20261127000200_phone_otp_validate).
 ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
   CASE key
     WHEN 'require_tutor_verification' THEN jsonb_typeof(value) = 'boolean'
-    WHEN 'require_phone_verification' THEN jsonb_typeof(value) = 'boolean'
+    WHEN 'require_tutor_phone_verification' THEN jsonb_typeof(value) = 'boolean'
+    WHEN 'require_student_phone_verification' THEN jsonb_typeof(value) = 'boolean'
     WHEN 'online_payments_enabled' THEN jsonb_typeof(value) = 'boolean'
     WHEN 'commission_percent' THEN
       CASE WHEN jsonb_typeof(value) = 'number' THEN (value #>> '{}')::numeric BETWEEN 0 AND 100 ELSE false END
@@ -753,7 +756,8 @@ ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
 -- [v6] seeds (run in the migration)
 INSERT INTO platform_setting (key, value) VALUES
   ('require_tutor_verification', 'false'::jsonb),
-  ('require_phone_verification', 'false'::jsonb)   -- flip to true when the OTP feature ships
+  ('require_tutor_phone_verification', 'false'::jsonb),
+  ('require_student_phone_verification', 'false'::jsonb)
 ON CONFLICT (key) DO NOTHING;
 
 -- ═════════ 20. Listing + apply-gate functions ═══════════════════════════════
@@ -780,7 +784,7 @@ LANGUAGE sql STABLE AS $$
     CASE WHEN NOT EXISTS (SELECT 1 FROM tutor_area ta WHERE ta.tutor_id = t.id) THEN 'area' END,
     CASE WHEN t.phone_number IS NULL OR t.phone_number LIKE 'deleted:%' THEN 'phone_number' END,
     CASE WHEN COALESCE((SELECT (value #>> '{}')::boolean FROM platform_setting
-                        WHERE key = 'require_phone_verification'), false)
+                        WHERE key = 'require_tutor_phone_verification'), false)
               AND t.phone_verified_at IS NULL THEN 'phone_verification' END,
     CASE WHEN NOT EXISTS (
            SELECT 1 FROM tutor_requirement r
@@ -849,6 +853,25 @@ ALTER TABLE upload_block
   ADD CONSTRAINT upload_block_note_present CHECK (length(btrim(note)) > 0);
 -- At most one active block per account. Protected: never accept a DROP INDEX for it.
 CREATE UNIQUE INDEX upload_block_one_active ON upload_block (account_id) WHERE unblocked_at IS NULL;
+
+-- ═════════ 24. Phone OTP ═══════════════════════════════════════════════════
+-- Migrations 20261127000100_phone_otp and 20261127000200_phone_otp_validate.
+-- Codes are stored as an HMAC only. Expiry, attempts, cooldown and send caps are enforced by the service.
+ALTER TABLE phone_otp ADD CONSTRAINT phone_otp_phone_format CHECK (phone_number ~ '^\+8801[3-9][0-9]{8}$');
+ALTER TABLE phone_otp ADD CONSTRAINT phone_otp_attempts_range CHECK (attempts BETWEEN 0 AND 5);
+-- A changed number is unverified until the new number is verified (an UPDATE that also sets phone_verified_at keeps it).
+CREATE OR REPLACE FUNCTION phone_verified_reset() RETURNS trigger AS $$
+BEGIN
+  IF NEW.phone_number IS DISTINCT FROM OLD.phone_number
+     AND NEW.phone_verified_at IS NOT DISTINCT FROM OLD.phone_verified_at THEN
+    NEW.phone_verified_at := NULL;
+  END IF;
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+CREATE TRIGGER student_phone_verified_reset_trg BEFORE UPDATE OF phone_number ON student
+  FOR EACH ROW EXECUTE FUNCTION phone_verified_reset();
+CREATE TRIGGER tutor_phone_verified_reset_trg BEFORE UPDATE OF phone_number ON tutor
+  FOR EACH ROW EXECUTE FUNCTION phone_verified_reset();
 
 -- ═════════ 21. Seed (run once, from your seed script, not the migration) ═
 -- INSERT INTO super_admin_email (slot, email) VALUES (1, 'first@example.com'), (2, 'second@example.com');

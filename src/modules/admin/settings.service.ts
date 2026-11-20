@@ -18,7 +18,8 @@ const DEFAULTS: Record<SettingKey, SettingValue> = {
   online_payments_enabled: true,
   refund_window_days: 7,
   require_tutor_verification: false,
-  require_phone_verification: false,
+  require_tutor_phone_verification: false,
+  require_student_phone_verification: false,
 };
 
 // Number settings and their allowed range. Decimals: at most 2 places (none for WHOLE_NUMBER_KEYS).

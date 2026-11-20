@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch --env-file=.env src/server.ts",
-    "build": "tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts src/cron/payment-reconcile.ts src/cron/file-cleanup.ts --format esm --out-dir dist --clean",
+    "build": "tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts src/cron/payment-reconcile.ts src/cron/file-cleanup.ts src/cron/phone-otp-cleanup.ts --format esm --out-dir dist --clean",
     "start": "node dist/server.js",
     "db:migrate:create": "prisma migrate dev --create-only",
     "db:migrate": "prisma migrate dev",
@@ -31,7 +31,9 @@
     "cron:payment-reconcile": "tsx --env-file-if-exists=.env src/cron/payment-reconcile.ts",
     "sslc:smoke": "tsx --env-file-if-exists=.env scripts/sslc-smoke.ts",
     "cron:file-cleanup": "tsx --env-file-if-exists=.env src/cron/file-cleanup.ts",
+    "cron:phone-otp-cleanup": "tsx --env-file-if-exists=.env src/cron/phone-otp-cleanup.ts",
     "r2:smoke": "tsx --env-file-if-exists=.env scripts/r2-smoke.ts",
+    "sms:smoke": "tsx --env-file-if-exists=.env scripts/sms-smoke.ts",
     "prepare": "husky || true"
   },
   "dependencies": {
