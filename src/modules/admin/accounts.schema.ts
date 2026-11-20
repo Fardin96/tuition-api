@@ -26,6 +26,7 @@ const summaryShape = {
   status: z.nativeEnum(AccountStatus),
   name: z.string().nullable(),
   phoneNumber: z.string().nullable(),
+  phoneVerifiedAt: z.date().nullable(),
   createdAt: z.date(),
   lastLoginAt: z.date().nullable(),
   deletedAt: z.date().nullable(),

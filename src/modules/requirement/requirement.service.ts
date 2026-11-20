@@ -4,6 +4,7 @@ import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import { validateStudentEducation } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { isPhoneVerificationRequired } from "../phone-verification/phone-verification.policy.js";
 import type { CreateRequirementInput, UpdateRequirementInput } from "./requirement.schema.js";
 
 const withSubjects = { subjects: { orderBy: { subjectId: "asc" } } } as const;
@@ -46,6 +47,17 @@ async function assertAreaUsable(areaId: number) {
   }
 }
 
+// Posting (status OPEN) needs a verified phone when the student switch is on. Drafts never do.
+async function assertPhoneVerifiedToPost(studentId: string) {
+  if (!(await isPhoneVerificationRequired("STUDENT"))) return;
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    select: { phoneVerifiedAt: true },
+  });
+  if (student?.phoneVerifiedAt) return;
+  throw appError("PhoneVerificationRequired", 403, "Verify your phone number before posting.");
+}
+
 async function notFoundOrConflict(
   id: string,
   studentId: string,
@@ -71,6 +83,10 @@ export async function createRequirement(accountId: string, data: CreateRequireme
   }
 
   const { subjectIds, ...requirementData } = data;
+
+  if (data.status !== "DRAFT") {
+    await assertPhoneVerifiedToPost(studentId);
+  }
 
   const timeOfDayDate = data.timeOfDay ? new Date(`1970-01-01T${data.timeOfDay}:00Z`) : null;
   const hireByDate = data.hireByDate ? new Date(data.hireByDate) : null;
@@ -154,6 +170,11 @@ export async function updateRequirement(
     const err = new Error("Cannot modify requirement in current status");
     Object.assign(err, { statusCode: 409 });
     throw err;
+  }
+
+  // DRAFT -> OPEN is a publish; editing an OPEN requirement is not gated again.
+  if (existing.status === "DRAFT" && (data.status ?? existing.status) === "OPEN") {
+    await assertPhoneVerifiedToPost(studentId);
   }
 
   // An area the requirement already has may be inactive; only a newly chosen one is checked.

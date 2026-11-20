@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "../../lib/prisma.js";
 import {
   createAccount,
@@ -8,6 +8,7 @@ import {
   createSubject,
   createTestApp,
   getAuthHeaders,
+  setPlatformSetting,
 } from "../../tests/helpers.js";
 
 const sorted = (ids: number[]) => [...ids].sort((a, b) => a - b);
@@ -1470,5 +1471,156 @@ describe("requirement module", () => {
       expect(response.statusCode).toBe(200);
       expect(response.json()).toMatchObject({ availableDays: 7, daysPerWeek: 2 });
     });
+  });
+});
+
+describe("student phone verification gate on requirements", () => {
+  beforeEach(async () => {
+    await setPlatformSetting("require_student_phone_verification", true);
+    await setPlatformSetting("require_tutor_phone_verification", false);
+  });
+
+  const openPayload = (areaId: number, subjectId: number) => ({
+    areaId,
+    subjectIds: [subjectId],
+    curriculum: "BANGLA_MEDIUM",
+    levelCode: 10,
+    timeOfDay: "10:00",
+    daysPerWeek: 3,
+    salary: 5000,
+    hireByDate: "2024-12-31",
+    tuitionType: "Home Tutoring Solo",
+  });
+
+  async function unverifiedStudent() {
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const subject = await createSubject();
+    const student = await createStudentProfile(account.id, area.id);
+    return { account, area, subject, student, headers: await getAuthHeaders(account) };
+  }
+
+  it("refuses to create an OPEN requirement until the phone is verified", async () => {
+    const app = await createTestApp();
+    const { area, subject, student, headers } = await unverifiedStudent();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers,
+      payload: openPayload(area.id, subject.id),
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body).code).toBe("PHONE_VERIFICATION_REQUIRED");
+    expect(await prisma.tuitionRequirement.count({ where: { studentId: student.id } })).toBe(0);
+  });
+
+  it("allows creating a DRAFT requirement before the phone is verified", async () => {
+    const app = await createTestApp();
+    const { area, subject, headers } = await unverifiedStudent();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers,
+      payload: { status: "DRAFT", areaId: area.id, subjectIds: [subject.id] },
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(JSON.parse(res.body).status).toBe("DRAFT");
+  });
+
+  it("refuses publishing a DRAFT (DRAFT -> OPEN) until the phone is verified", async () => {
+    const app = await createTestApp();
+    const { area, subject, student, headers } = await unverifiedStudent();
+    const requirement = await createRequirement({
+      studentId: student.id,
+      areaId: area.id,
+      subjectId: subject.id,
+      status: "DRAFT",
+    });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers,
+      payload: { status: "OPEN" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body).code).toBe("PHONE_VERIFICATION_REQUIRED");
+    const row = await prisma.tuitionRequirement.findUniqueOrThrow({
+      where: { id: requirement.id },
+    });
+    expect(row.status).toBe("DRAFT");
+  });
+
+  it("still allows editing a requirement that is already OPEN", async () => {
+    const app = await createTestApp();
+    const { area, subject, student, headers } = await unverifiedStudent();
+    const requirement = await createRequirement({
+      studentId: student.id,
+      areaId: area.id,
+      subjectId: subject.id,
+      status: "OPEN",
+    });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${requirement.id}`,
+      headers,
+      payload: { salary: 6000 },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).salary).toBe(6000);
+  });
+
+  it("lets a verified student create and publish", async () => {
+    const app = await createTestApp();
+    const { area, subject, student, headers } = await unverifiedStudent();
+    await prisma.student.update({
+      where: { id: student.id },
+      data: { phoneVerifiedAt: new Date() },
+    });
+    const draft = await createRequirement({
+      studentId: student.id,
+      areaId: area.id,
+      subjectId: subject.id,
+      status: "DRAFT",
+    });
+
+    const created = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers,
+      payload: openPayload(area.id, subject.id),
+    });
+    expect(created.statusCode).toBe(201);
+
+    const published = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/requirements/${draft.id}`,
+      headers,
+      payload: { status: "OPEN" },
+    });
+    expect(published.statusCode).toBe(200);
+    expect(JSON.parse(published.body).status).toBe("OPEN");
+  });
+
+  it("does not gate students when the switch is off", async () => {
+    await setPlatformSetting("require_student_phone_verification", false);
+    const app = await createTestApp();
+    const { area, subject, headers } = await unverifiedStudent();
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/requirements/",
+      headers,
+      payload: openPayload(area.id, subject.id),
+    });
+
+    expect(res.statusCode).toBe(201);
   });
 });

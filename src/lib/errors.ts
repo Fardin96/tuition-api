@@ -59,6 +59,14 @@ export const ERROR_CODES = {
   DisputeNotAllowed: "DISPUTE_NOT_ALLOWED",
   InvalidCaseState: "INVALID_CASE_STATE",
   UploadsBlocked: "UPLOADS_BLOCKED",
+  PhoneVerificationRequired: "PHONE_VERIFICATION_REQUIRED",
+  PhoneAlreadyVerified: "PHONE_ALREADY_VERIFIED",
+  OtpCooldown: "OTP_COOLDOWN",
+  OtpSendLimit: "OTP_SEND_LIMIT",
+  OtpInvalid: "OTP_INVALID",
+  OtpExpired: "OTP_EXPIRED",
+  OtpTooManyAttempts: "OTP_TOO_MANY_ATTEMPTS",
+  SmsUnavailable: "SMS_UNAVAILABLE",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

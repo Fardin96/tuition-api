@@ -88,6 +88,7 @@ export const ModelName = {
   FeePayment: 'FeePayment',
   PaymentAttempt: 'PaymentAttempt',
   PaymentRefund: 'PaymentRefund',
+  PhoneOtp: 'PhoneOtp',
   PromoCode: 'PromoCode',
   PromoRedemption: 'PromoRedemption',
   NotificationLog: 'NotificationLog',
@@ -714,6 +715,22 @@ export const PaymentRefundScalarFieldEnum = {
 } as const
 
 export type PaymentRefundScalarFieldEnum = (typeof PaymentRefundScalarFieldEnum)[keyof typeof PaymentRefundScalarFieldEnum]
+
+
+export const PhoneOtpScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  phoneNumber: 'phoneNumber',
+  codeHash: 'codeHash',
+  attempts: 'attempts',
+  expiresAt: 'expiresAt',
+  verifiedAt: 'verifiedAt',
+  consumedAt: 'consumedAt',
+  providerRequestId: 'providerRequestId',
+  createdAt: 'createdAt'
+} as const
+
+export type PhoneOtpScalarFieldEnum = (typeof PhoneOtpScalarFieldEnum)[keyof typeof PhoneOtpScalarFieldEnum]
 
 
 export const PromoCodeScalarFieldEnum = {

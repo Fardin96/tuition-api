@@ -4,6 +4,10 @@ export const TAGS = [
   { name: "Health", description: "Liveness and database check." },
   { name: "Auth", description: "Google sign-in, token refresh, sessions and consent." },
   { name: "Account", description: "The signed-in account (/me)." },
+  {
+    name: "Phone verification",
+    description: "SMS codes that verify a student's or tutor's phone number.",
+  },
   { name: "Students", description: "Student profiles." },
   { name: "Tutors", description: "Tutor profiles, search, credentials and videos." },
   { name: "Tutor requirements", description: "A tutor's requirement sets." },

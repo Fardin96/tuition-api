@@ -102,6 +102,17 @@
               "null"
             ]
           },
+          "phoneVerifiedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -282,6 +293,7 @@
           "status",
           "name",
           "phoneNumber",
+          "phoneVerifiedAt",
           "createdAt",
           "lastLoginAt",
           "deletedAt",
@@ -362,6 +374,17 @@
               "null"
             ]
           },
+          "phoneVerifiedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -396,6 +419,7 @@
           "status",
           "name",
           "phoneNumber",
+          "phoneVerifiedAt",
           "createdAt",
           "lastLoginAt",
           "deletedAt"
@@ -7534,7 +7558,15 @@
           "DISPUTE_EXISTS",
           "DISPUTE_NOT_ALLOWED",
           "INVALID_CASE_STATE",
-          "UPLOADS_BLOCKED"
+          "UPLOADS_BLOCKED",
+          "PHONE_VERIFICATION_REQUIRED",
+          "PHONE_ALREADY_VERIFIED",
+          "OTP_COOLDOWN",
+          "OTP_SEND_LIMIT",
+          "OTP_INVALID",
+          "OTP_EXPIRED",
+          "OTP_TOO_MANY_ATTEMPTS",
+          "SMS_UNAVAILABLE"
         ],
         "description": "Machine-readable error code. Match on this."
       },
@@ -9438,6 +9470,104 @@
         ],
         "additionalProperties": false
       },
+      "PendingPhoneVerification": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          },
+          "verifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "phoneNumber",
+          "verifiedAt"
+        ],
+        "additionalProperties": false
+      },
+      "PhoneOtpSent": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resendAfter": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "phoneNumber",
+          "expiresAt",
+          "resendAfter"
+        ],
+        "additionalProperties": false
+      },
+      "PhoneVerificationStatus": {
+        "type": "object",
+        "properties": {
+          "required": {
+            "type": "boolean"
+          },
+          "phoneNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verifiedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pendingVerification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PendingPhoneVerification"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "required",
+          "phoneNumber",
+          "verifiedAt",
+          "pendingVerification"
+        ],
+        "additionalProperties": false
+      },
+      "PhoneVerified": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          },
+          "verifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "phoneNumber",
+          "verifiedAt"
+        ],
+        "additionalProperties": false
+      },
       "PlatformSettingItem": {
         "type": "object",
         "properties": {
@@ -9449,7 +9579,8 @@
               "online_payments_enabled",
               "refund_window_days",
               "require_tutor_verification",
-              "require_phone_verification"
+              "require_tutor_phone_verification",
+              "require_student_phone_verification"
             ]
           },
           "value": {
@@ -9958,6 +10089,18 @@
           "breakdown"
         ],
         "additionalProperties": false
+      },
+      "SendPhoneOtpInput": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "pattern": "^\\+8801[3-9]\\d{8}$"
+          }
+        },
+        "required": [
+          "phoneNumber"
+        ]
       },
       "Session": {
         "type": "object",
@@ -13176,6 +13319,23 @@
           "expiresAt"
         ],
         "additionalProperties": false
+      },
+      "VerifyPhoneOtpInput": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "pattern": "^\\+8801[3-9]\\d{8}$"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$"
+          }
+        },
+        "required": [
+          "phoneNumber",
+          "code"
+        ]
       },
       "Zone": {
         "type": "object",
@@ -20850,6 +21010,280 @@
         }
       }
     },
+    "/api/v1/phone-verification": {
+      "get": {
+        "summary": "Get my phone verification status",
+        "tags": [
+          "Phone verification"
+        ],
+        "description": "required is the switch for my role (students and tutors have separate switches). phoneNumber and verifiedAt come from my profile and are null when I have no profile yet. Without a profile, pendingVerification is the latest code I verified in the last 30 minutes that no profile has used yet (null otherwise), so onboarding can resume after a reload.\n\n**Who:** STUDENT, TUTOR.\n\n**Rate limit:** 120/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT, TUTOR",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneVerificationStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/phone-verification/send": {
+      "post": {
+        "summary": "Send a verification code by SMS",
+        "tags": [
+          "Phone verification"
+        ],
+        "description": "Sends a 6-digit code that expires in 5 minutes. Limits: one code per 60 seconds per number (429 OTP_COOLDOWN with details.retryAfterSeconds), 5 codes per number and 10 per account in a rolling hour (429 OTP_SEND_LIMIT). 409 PHONE_IN_USE when another account has the number, 409 PHONE_ALREADY_VERIFIED when it is already verified on my profile. 503 SMS_UNAVAILABLE when the SMS provider fails.\n\n**Who:** STUDENT, TUTOR.\n\n**Rate limit:** 10/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendPhoneOtpInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT, TUTOR",
+        "x-rate-limit": "10/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneOtpSent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/phone-verification/verify": {
+      "post": {
+        "summary": "Verify the code I received",
+        "tags": [
+          "Phone verification"
+        ],
+        "description": "A wrong code gives 400 OTP_INVALID with details.attemptsLeft. After 5 wrong codes the code is locked (429 OTP_TOO_MANY_ATTEMPTS) until a new one is sent. An expired code gives 400 OTP_EXPIRED. Once a newer code has been sent, an older one no longer matches (400 OTP_INVALID). When I have a profile, verifying also sets its phone number to this one and marks it verified. Without a profile, the verification is kept for 30 minutes and used when I create the profile.\n\n**Who:** STUDENT, TUTOR.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyPhoneOtpInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT, TUTOR",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneVerified"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/reports": {
       "post": {
         "summary": "Report an account",
@@ -28052,7 +28486,8 @@
                 "online_payments_enabled",
                 "refund_window_days",
                 "require_tutor_verification",
-                "require_phone_verification"
+                "require_tutor_phone_verification",
+                "require_student_phone_verification"
               ]
             },
             "in": "path",
@@ -31043,6 +31478,10 @@
     {
       "name": "Account",
       "description": "The signed-in account (/me)."
+    },
+    {
+      "name": "Phone verification",
+      "description": "SMS codes that verify a student's or tutor's phone number."
     },
     {
       "name": "Students",

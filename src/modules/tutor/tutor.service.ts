@@ -21,6 +21,12 @@ import {
   type SaveLocationInput,
   upsertLocation,
 } from "../location/location.service.js";
+import {
+  assertPhoneVerifiedForSignup,
+  consumeOtp,
+  findVerifiedOtp,
+  isPhoneVerificationRequired,
+} from "../phone-verification/phone-verification.policy.js";
 import { pageVisibleReviews, reviewSummary } from "../review/review.service.js";
 import type {
   CreateCredentialInput,
@@ -105,12 +111,16 @@ export async function createTutorProfile(
 
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
+  const otp = await assertPhoneVerifiedForSignup(prisma, "TUTOR", accountId, data.phoneNumber);
 
   const { location, ...profileData } = data;
   const tutor = await prisma.$transaction(async (tx) => {
     const created = await tx.tutor
-      .create({ data: { accountId, ...profileData } })
+      .create({
+        data: { accountId, ...profileData, phoneVerifiedAt: otp?.verifiedAt ?? null },
+      })
       .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+    if (otp) await consumeOtp(tx, otp.id);
     if (location) {
       await upsertLocation("tutor_location", created.id, location, tx);
     }
@@ -145,16 +155,33 @@ export async function updateTutorProfile(
   const { location, ...profileData } = data;
   const whatsappChanged =
     data.whatsappNumber !== undefined && data.whatsappNumber !== existing.whatsappNumber;
-  const tutor = await prisma.tutor
-    .update({
-      where: { accountId },
-      data: whatsappChanged ? { ...profileData, whatsappVerifiedAt: null } : profileData,
-    })
-    .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
-
-  if (location) {
-    await upsertLocation("tutor_location", tutor.id, location);
-  }
+  const newPhone = data.phoneNumber !== existing.phoneNumber ? data.phoneNumber : undefined;
+  const tutor = await prisma.$transaction(async (tx) => {
+    // A new number is saved verified only with a code verified for it; otherwise the trigger clears the timestamp.
+    const otp = newPhone === undefined ? null : await findVerifiedOtp(tx, accountId, newPhone);
+    if (newPhone !== undefined && !otp && (await isPhoneVerificationRequired("TUTOR", tx))) {
+      throw appError("PhoneVerificationRequired", 403, "Verify the new number before saving it.");
+    }
+    const updated = await tx.tutor
+      .update({
+        where: { accountId },
+        data: {
+          ...profileData,
+          ...(whatsappChanged ? { whatsappVerifiedAt: null } : {}),
+          ...(otp ? { phoneVerifiedAt: otp.verifiedAt } : {}),
+        },
+      })
+      .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
+    if (otp) await consumeOtp(tx, otp.id);
+    // The phone rule is part of the listing check, so a changed number can flip is_listed.
+    if (newPhone !== undefined) {
+      await tx.$executeRaw`SELECT recompute_is_listed(${updated.id}::uuid)`;
+    }
+    if (location) {
+      await upsertLocation("tutor_location", updated.id, location, tx);
+    }
+    return updated;
+  });
 
   return serializeTutor(tutor, await findOwnLocation("tutor_location", tutor.id));
 }

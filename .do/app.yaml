@@ -120,6 +120,11 @@ services:
         value: <api-public-url>
       - key: WEB_PUBLIC_URL
         value: <web-public-url>
+      # sms.net.bd key for phone verification codes (non-masking, no sender ID). Never set
+      # SMS_DRY_RUN in production: the app refuses to boot with it.
+      - key: SMS_KEY
+        value: <sms-net-bd-api-key>
+        type: SECRET
 
 jobs:
   # Database migrations run as a PRE_DEPLOY job so a failed migration fails the
@@ -294,3 +299,32 @@ jobs:
         value: <r2-public-bucket-or-empty>
       - key: R2_PUBLIC_URL_PREFIX
         value: <r2-public-url-or-empty>
+
+  # Deletes phone_otp rows older than 24 hours (codes live 5 minutes; the hourly send caps
+  # need one hour of history). 04:30 UTC is 10:30 in Dhaka.
+  - name: phone-otp-cleanup
+    kind: SCHEDULED
+    source_dir: /
+    github:
+      repo: fardin96/tuition-api
+      branch: main
+      deploy_on_push: true
+    build_command: yarn install --frozen-lockfile && yarn db:generate && yarn build
+    run_command: node dist/cron/phone-otp-cleanup.js
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    schedule:
+      cron: "30 4 * * *"
+      time_zone: UTC
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: <paste-direct-db-url-here>
+        type: SECRET
+      - key: DATABASE_POOL_URL
+        value: <paste-pool-url-here>?&pgbouncer=true&connection_limit=5
+        type: SECRET
+      - key: DATABASE_CA_CERT
+        value: <database-ca-cert-pem-content>
+        type: SECRET

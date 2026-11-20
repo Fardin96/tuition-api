@@ -331,6 +331,36 @@ describe("admin accounts", () => {
       });
     });
 
+    it("shows when a verified phone was verified and null for an unverified one", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const area = await createArea();
+      const verifiedAccount = await createAccount({ role: "STUDENT" });
+      const verifiedAt = new Date("2026-11-10T08:30:00Z");
+      const student = await createStudentProfile(verifiedAccount.id, area.id);
+      await prisma.student.update({
+        where: { id: student.id },
+        data: { phoneVerifiedAt: verifiedAt },
+      });
+      const unverifiedAccount = await createAccount({ role: "TUTOR" });
+      await createTutorProfile(unverifiedAccount.id);
+      const headers = await getAuthHeaders(admin);
+
+      const verifiedRes = await app.inject({
+        method: "GET",
+        url: `${LIST_URL}/${verifiedAccount.id}`,
+        headers,
+      });
+      const unverifiedRes = await app.inject({
+        method: "GET",
+        url: `${LIST_URL}/${unverifiedAccount.id}`,
+        headers,
+      });
+
+      expect(JSON.parse(verifiedRes.body).phoneVerifiedAt).toBe(verifiedAt.toISOString());
+      expect(JSON.parse(unverifiedRes.body).phoneVerifiedAt).toBeNull();
+    });
+
     it("shows null instead of a deleted account's phone tombstone", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });

@@ -55,6 +55,7 @@ beforeEach(async () => {
       session,
       admin_user,
       account_block,
+      phone_otp,
       upload_review,
       upload_block,
       report,
@@ -101,7 +102,8 @@ beforeEach(async () => {
   await prisma.$executeRawUnsafe(`
     INSERT INTO platform_setting (key, value, updated_at) VALUES
       ('require_tutor_verification', 'false'::jsonb, now()),
-      ('require_phone_verification', 'false'::jsonb, now())
+      ('require_tutor_phone_verification', 'false'::jsonb, now()),
+      ('require_student_phone_verification', 'false'::jsonb, now())
     ON CONFLICT (key) DO NOTHING;
   `);
 });

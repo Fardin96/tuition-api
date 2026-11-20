@@ -72,7 +72,7 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
 | Script                             | Purpose                                                                  |
 | ---------------------------------- | ------------------------------------------------------------------------ |
 | `yarn dev`                         | Start dev server with watch                                              |
-| `yarn build`                       | Build production bundle to `dist/` (tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts src/cron/payment-reconcile.ts src/cron/file-cleanup.ts) |
+| `yarn build`                       | Build production bundle to `dist/` (tsup src/server.ts src/cron/weekly-location-expiry.ts src/cron/fee-reminders.ts src/cron/payment-reconcile.ts src/cron/file-cleanup.ts src/cron/phone-otp-cleanup.ts) |
 | `yarn start`                       | Run production bundle (env vars injected by host)                        |
 | `yarn db:migrate:create`           | Create a new empty migration                                             |
 | `yarn db:migrate`                  | Apply migrations in dev                                                  |
@@ -89,7 +89,9 @@ See [Migrations Reference](docs/migrations.md) for the full procedure.
 | `yarn cron:weekly-location-expiry` | Run the weekly location-expiry cron manually                             |
 | `yarn cron:fee-reminders`          | Run the daily fee-reminder cron manually                                 |
 | `yarn cron:file-cleanup`           | Run the file-cleanup cron manually (does nothing without R2 env)         |
+| `yarn cron:phone-otp-cleanup`      | Delete phone OTP rows older than a day (manual run)                      |
 | `yarn r2:smoke`                    | Round-trip a test file through the R2 buckets (see Cloudflare R2)        |
+| `yarn sms:smoke`                   | Check the SMS provider: prints the balance; sends one SMS when `SMS_SMOKE_TO` is set (see SMS) |
 
 ## Cloudflare R2 (file uploads)
 
@@ -129,6 +131,18 @@ Environment variables:
 Check the setup with `yarn r2:smoke` after the variables are in `.env`. It uploads a 64-byte PDF under `smoke/`, reads it back, fetches a signed link, copies it to the public bucket when both public variables are set and fetches that URL, then deletes what it wrote. It prints each step and exits 1 on failure.
 
 The daily `file-cleanup` job (`src/cron/file-cleanup.ts`, 04:00 UTC) removes abandoned uploads and files that no record uses.
+
+## SMS (phone verification)
+
+Students and tutors verify their phone number with a 6-digit SMS code. Messages go through sms.net.bd. Without a key, outside production, nothing is sent; the message is only logged in development. Codes expire after 5 minutes. The daily `phone-otp-cleanup` job deletes rows older than a day (see the launch checklist).
+
+Environment variables:
+
+- `SMS_KEY`: the sms.net.bd API key. Never commit it.
+- `SMS_BASE_URL`: optional; defaults to `https://api.sms.net.bd`.
+- `SMS_DRY_RUN`: `true` logs instead of sending, in any environment. The app refuses to start with `true` when `NODE_ENV=production`.
+
+Check the account with `yarn sms:smoke` after `SMS_KEY` is in `.env`. It prints the balance. Set `SMS_SMOKE_TO` to your own number (`+8801...`) to also send one real SMS, which uses credit. It prints each step and exits 1 on failure.
 
 ## Deploy to DigitalOcean App Platform
 

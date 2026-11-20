@@ -59,7 +59,7 @@ describe("admin platform settings", () => {
       expect(res.statusCode).toBe(403);
     });
 
-    it("lists the six known settings in order, with defaults for missing rows", async () => {
+    it("lists the seven known settings in order, with defaults for missing rows", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
 
@@ -77,7 +77,8 @@ describe("admin platform settings", () => {
         "online_payments_enabled",
         "refund_window_days",
         "require_tutor_verification",
-        "require_phone_verification",
+        "require_tutor_phone_verification",
+        "require_student_phone_verification",
       ]);
       // commission_percent has no seeded row, so it reports the 40% default with no timestamp.
       expect(body.settings[0]).toEqual({
@@ -86,7 +87,7 @@ describe("admin platform settings", () => {
         updatedAt: null,
         updatedByName: null,
       });
-      expect(body.settings.slice(1).map((s) => s.value)).toEqual([0, true, 7, false, false]);
+      expect(body.settings.slice(1).map((s) => s.value)).toEqual([0, true, 7, false, false, false]);
     });
 
     it("sends Cache-Control private, no-store", async () => {
@@ -161,8 +162,10 @@ describe("admin platform settings", () => {
       ["online_payments_enabled", 1],
       ["online_payments_enabled", "true"],
       ["require_tutor_verification", 1],
-      ["require_phone_verification", 50],
-      ["require_phone_verification", "yes"],
+      ["require_tutor_phone_verification", 50],
+      ["require_tutor_phone_verification", "yes"],
+      ["require_student_phone_verification", 1],
+      ["require_student_phone_verification", "yes"],
     ])("rejects %s set to %j with 400", async (key, value) => {
       const app = await createTestApp();
       const superAdmin = await createSuperAdmin();
@@ -382,6 +385,44 @@ describe("admin platform settings", () => {
       });
       const commission = JSON.parse(list.body).settings[0];
       expect(commission.value).toBe(7.25);
+    });
+
+    it("saves the two phone switches independently", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+
+      const tutor = await app.inject({
+        method: "PUT",
+        url: `${URL}/require_tutor_phone_verification`,
+        headers,
+        payload: { value: true },
+      });
+      expect(tutor.statusCode).toBe(200);
+      expect(JSON.parse(tutor.body).value).toBe(true);
+
+      const list = await app.inject({ method: "GET", url: URL, headers });
+      const settings = JSON.parse(list.body).settings as Setting[];
+      expect(settings.slice(4).map((s) => [s.key, s.value])).toEqual([
+        ["require_tutor_verification", false],
+        ["require_tutor_phone_verification", true],
+        ["require_student_phone_verification", false],
+      ]);
+    });
+
+    it("rejects the retired require_phone_verification key with 400", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+
+      const res = await app.inject({
+        method: "PUT",
+        url: `${URL}/require_phone_verification`,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { value: true },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
     });
 
     it("unlists a tutor with verification NOT_SUBMITTED when require_tutor_verification turns on", async () => {
