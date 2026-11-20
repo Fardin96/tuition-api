@@ -1131,6 +1131,114 @@ describe("tutor routes", () => {
       });
       expect(res.statusCode).toBe(404);
     });
+
+    describe("unlisted tutors", () => {
+      const unlistedCache = "private, no-store";
+
+      it("answers 404 with no-store to an anonymous caller", async () => {
+        const app = await createTestApp();
+        const account = await createAccount({ role: "TUTOR" });
+        const tutor = await createTutorProfile(account.id, { isListed: false });
+
+        const res = await app.inject({ method: "GET", url: `/api/v1/tutors/${tutor.id}` });
+
+        expect(res.statusCode).toBe(404);
+        expect(JSON.parse(res.body).message).toBe("Tutor not found");
+        expect(res.headers["cache-control"]).toBe(unlistedCache);
+      });
+
+      it("answers 200 with no-store to the tutor who owns it", async () => {
+        const app = await createTestApp();
+        const account = await createAccount({ role: "TUTOR" });
+        const tutor = await createTutorProfile(account.id, { isListed: false });
+        const headers = await getAuthHeaders(account);
+
+        const res = await app.inject({
+          method: "GET",
+          url: `/api/v1/tutors/${tutor.id}`,
+          headers,
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(JSON.parse(res.body).tutor.id).toBe(tutor.id);
+        expect(res.headers["cache-control"]).toBe(unlistedCache);
+        expect(res.headers.vary).toBe("Authorization");
+      });
+
+      it("answers 200 to an ACTIVE admin", async () => {
+        const app = await createTestApp();
+        const account = await createAccount({ role: "TUTOR" });
+        const tutor = await createTutorProfile(account.id, { isListed: false });
+        const admin = await createAdmin();
+        const headers = await getAuthHeaders(admin);
+
+        const res = await app.inject({
+          method: "GET",
+          url: `/api/v1/tutors/${tutor.id}`,
+          headers,
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.headers["cache-control"]).toBe(unlistedCache);
+      });
+
+      it("answers 404 to a student with no application to the tutor", async () => {
+        const app = await createTestApp();
+        const area = await createArea();
+        const account = await createAccount({ role: "TUTOR" });
+        const tutor = await createTutorProfile(account.id, { isListed: false });
+        const studentAccount = await createAccount({ role: "STUDENT" });
+        await createStudentProfile(studentAccount.id, area.id);
+        const headers = await getAuthHeaders(studentAccount);
+
+        const res = await app.inject({
+          method: "GET",
+          url: `/api/v1/tutors/${tutor.id}`,
+          headers,
+        });
+
+        expect(res.statusCode).toBe(404);
+        expect(res.headers["cache-control"]).toBe(unlistedCache);
+      });
+
+      it("answers 200 to a student who has an application with the tutor", async () => {
+        const app = await createTestApp();
+        const area = await createArea();
+        const account = await createAccount({ role: "TUTOR" });
+        const tutor = await createTutorProfile(account.id, { isListed: false });
+        const studentAccount = await createAccount({ role: "STUDENT" });
+        const student = await createStudentProfile(studentAccount.id, area.id);
+        const requirement = await createRequirement({ studentId: student.id });
+        await createApplication({
+          requirementId: requirement.id,
+          tutorId: tutor.id,
+          studentId: student.id,
+          initiatedBy: "STUDENT",
+        });
+        const headers = await getAuthHeaders(studentAccount);
+
+        const res = await app.inject({
+          method: "GET",
+          url: `/api/v1/tutors/${tutor.id}`,
+          headers,
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.headers["cache-control"]).toBe(unlistedCache);
+      });
+
+      it("keeps the public cache header for a listed tutor", async () => {
+        const app = await createTestApp();
+        const account = await createAccount({ role: "TUTOR" });
+        const tutor = await createTutorProfile(account.id, { isListed: true });
+
+        const res = await app.inject({ method: "GET", url: `/api/v1/tutors/${tutor.id}` });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.headers["cache-control"]).toBe("public, max-age=60, stale-while-revalidate=300");
+        expect(res.headers.vary).toBe("Authorization");
+      });
+    });
   });
 
   describe("GET /api/v1/tutors/:id/reviews", () => {
