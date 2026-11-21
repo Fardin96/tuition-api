@@ -69,6 +69,7 @@ export const ERROR_CODES = {
   SmsUnavailable: "SMS_UNAVAILABLE",
   InviteExists: "INVITE_EXISTS",
   InviteLimitReached: "INVITE_LIMIT_REACHED",
+  RequirementDuplicate: "REQUIREMENT_DUPLICATE",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;
