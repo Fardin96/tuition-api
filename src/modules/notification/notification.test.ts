@@ -426,6 +426,7 @@ describe("GET /api/v1/notifications", () => {
         "listingKind",
         "note",
         "readAt",
+        "requirementId",
       ].sort(),
     );
     expect(row).toMatchObject({

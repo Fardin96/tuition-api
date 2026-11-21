@@ -9,7 +9,8 @@ import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import type { AuthContext } from "../auth/auth.schema.js";
-import { setMatchesRequirementSql } from "../requirement/set-match.js";
+import { bestSetForPair } from "../matching/match.service.js";
+import { getMatchingConfig } from "../matching/matching-config.js";
 import {
   type ApplicationAction,
   type ApplicationDetailResponse,
@@ -299,26 +300,12 @@ async function findTutorSet(
   };
 }
 
-// The tutor's active set that covers the requirement: default first, then most shared subjects,
-// then newest. One query, using the same four-rule filter as the browse (setMatchesRequirementSql).
+// The tutor's best active set for the requirement, when it passes (MATCH). Otherwise null, and the
+// caller falls back to the default set (DEFAULT). Same engine as the browse and the student's list.
 async function matchedSetIdOf(requirementId: string, tutorId: string): Promise<string | null> {
-  const rows = await prisma.$queryRaw<{ id: string }[]>`
-    SELECT tr.id
-    FROM tutor_requirement tr
-    JOIN tuition_requirement r ON r.id = ${requirementId}::uuid
-    LEFT JOIN student_location sl ON sl.student_id = r.student_id
-    WHERE tr.tutor_id = ${tutorId}::uuid
-      AND tr.is_active
-      AND ${setMatchesRequirementSql()}
-    ORDER BY tr.is_default DESC,
-             (SELECT count(*)
-              FROM tutor_requirement_subject trs
-              JOIN requirement_subject rs ON rs.subject_id = trs.subject_id
-              WHERE trs.requirement_id = tr.id AND rs.requirement_id = r.id) DESC,
-             tr.created_at DESC
-    LIMIT 1
-  `;
-  return rows[0]?.id ?? null;
+  const cfg = await getMatchingConfig();
+  const best = await bestSetForPair(prisma, cfg, requirementId, tutorId);
+  return best?.passes ? best.setId : null;
 }
 
 // The set behind a requirement application: a matching set (MATCH), else the default set

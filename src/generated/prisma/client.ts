@@ -172,6 +172,16 @@ export type TuitionRequirement = Prisma.TuitionRequirementModel
  */
 export type RequirementSubject = Prisma.RequirementSubjectModel
 /**
+ * Model RequirementInvite
+ * 
+ */
+export type RequirementInvite = Prisma.RequirementInviteModel
+/**
+ * Model City
+ * 
+ */
+export type City = Prisma.CityModel
+/**
  * Model TuitionPackage
  * 
  */

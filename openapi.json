@@ -919,6 +919,54 @@
         ],
         "additionalProperties": false
       },
+      "AdminCity": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "districtCode": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "areaKm2": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "districtCode",
+          "isActive",
+          "areaKm2",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "AdminCityList": {
+        "type": "object",
+        "properties": {
+          "cities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCity"
+            }
+          }
+        },
+        "required": [
+          "cities"
+        ],
+        "additionalProperties": false
+      },
       "AdminDispute": {
         "type": "object",
         "properties": {
@@ -4428,10 +4476,17 @@
               "VIDEO_REJECTED",
               "FILE_REMOVED",
               "UPLOADS_BLOCKED",
-              "UPLOADS_UNBLOCKED"
+              "UPLOADS_UNBLOCKED",
+              "REQUIREMENT_INVITED"
             ]
           },
           "applicationId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requirementId": {
             "type": [
               "string",
               "null"
@@ -4512,6 +4567,7 @@
           "id",
           "kind",
           "applicationId",
+          "requirementId",
           "listingKind",
           "counterpartName",
           "note",
@@ -5736,6 +5792,45 @@
                 "type": "null"
               }
             ]
+          },
+          "invitedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "match": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "score": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/MatchReason"
+                    }
+                  }
+                },
+                "required": [
+                  "score",
+                  "reasons"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -5759,7 +5854,9 @@
           "createdAt",
           "distanceKm",
           "closed",
-          "myApplication"
+          "myApplication",
+          "invitedAt",
+          "match"
         ],
         "additionalProperties": false
       },
@@ -5780,12 +5877,52 @@
           },
           "noServiceArea": {
             "type": "boolean"
+          },
+          "matchVersion": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gaps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "WIDER_LEVEL",
+                    "OTHER_SUBJECTS",
+                    "TEACH_ONLINE"
+                  ]
+                },
+                "requirements": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "code",
+                "requirements"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
           "requirements",
           "nextCursor",
-          "noServiceArea"
+          "noServiceArea",
+          "matchVersion",
+          "gaps"
         ],
         "additionalProperties": false
       },
@@ -5880,6 +6017,144 @@
           "feeAmount",
           "chargeAmount",
           "totalAmount"
+        ],
+        "additionalProperties": false
+      },
+      "CityUpdateInput": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isActive"
+        ],
+        "additionalProperties": false
+      },
+      "CityUpsertInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 60
+          },
+          "districtCode": {
+            "type": "string",
+            "enum": [
+              "bagerhat",
+              "bandarban",
+              "barguna",
+              "barishal",
+              "bhola",
+              "bogura",
+              "brahmanbaria",
+              "chandpur",
+              "chapainawabganj",
+              "chattogram",
+              "chuadanga",
+              "coxsbazar",
+              "cumilla",
+              "dhaka",
+              "dinajpur",
+              "faridpur",
+              "feni",
+              "gaibandha",
+              "gazipur",
+              "gopalganj",
+              "habiganj",
+              "jamalpur",
+              "jashore",
+              "jhalokathi",
+              "jhenaidah",
+              "joypurhat",
+              "khagrachhari",
+              "khulna",
+              "kishoreganj",
+              "kurigram",
+              "kushtia",
+              "lakshmipur",
+              "lalmonirhat",
+              "madaripur",
+              "magura",
+              "manikganj",
+              "meherpur",
+              "moulvibazar",
+              "munshiganj",
+              "mymensingh",
+              "naogaon",
+              "narail",
+              "narayanganj",
+              "narsingdi",
+              "natore",
+              "netrokona",
+              "nilphamari",
+              "noakhali",
+              "pabna",
+              "panchagarh",
+              "patuakhali",
+              "pirojpur",
+              "rajbari",
+              "rajshahi",
+              "rangamati",
+              "rangpur",
+              "satkhira",
+              "shariatpur",
+              "sherpur",
+              "sirajganj",
+              "sunamganj",
+              "sylhet",
+              "tangail",
+              "thakurgaon"
+            ]
+          },
+          "boundary": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "Polygon"
+                  },
+                  "coordinates": {
+                    "type": "array",
+                    "items": {}
+                  }
+                },
+                "required": [
+                  "type",
+                  "coordinates"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "MultiPolygon"
+                  },
+                  "coordinates": {
+                    "type": "array",
+                    "items": {}
+                  }
+                },
+                "required": [
+                  "type",
+                  "coordinates"
+                ]
+              }
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "districtCode",
+          "boundary"
         ],
         "additionalProperties": false
       },
@@ -7566,7 +7841,10 @@
           "OTP_INVALID",
           "OTP_EXPIRED",
           "OTP_TOO_MANY_ATTEMPTS",
-          "SMS_UNAVAILABLE"
+          "SMS_UNAVAILABLE",
+          "INVITE_EXISTS",
+          "INVITE_LIMIT_REACHED",
+          "REQUIREMENT_DUPLICATE"
         ],
         "description": "Machine-readable error code. Match on this."
       },
@@ -7626,6 +7904,64 @@
           "error",
           "code",
           "message"
+        ],
+        "additionalProperties": false
+      },
+      "ExplainSet": {
+        "type": "object",
+        "properties": {
+          "setId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "studentCity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "inZone": {
+            "type": "boolean"
+          },
+          "distanceKm": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "isOnline": {
+            "type": "boolean"
+          },
+          "sharedSubjects": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "totalSubjects": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "parts": {
+            "$ref": "#/components/schemas/MatchParts"
+          }
+        },
+        "required": [
+          "setId",
+          "name",
+          "isDefault",
+          "studentCity",
+          "inZone",
+          "distanceKm",
+          "isOnline",
+          "sharedSubjects",
+          "totalSubjects",
+          "parts"
         ],
         "additionalProperties": false
       },
@@ -7779,6 +8115,1156 @@
             "minLength": 1
           }
         }
+      },
+      "MatchParts": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "score": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "passes": {
+            "type": "boolean"
+          },
+          "reach": {
+            "type": "boolean"
+          },
+          "rules": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "curriculum",
+                "level",
+                "subject",
+                "groupTarget",
+                "location",
+                "gender",
+                "salary",
+                "schedule",
+                "capacity",
+                "quality",
+                "recency"
+              ]
+            },
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RuleResult"
+            },
+            "required": [
+              "curriculum",
+              "level",
+              "subject",
+              "groupTarget",
+              "location",
+              "gender",
+              "salary",
+              "schedule",
+              "capacity",
+              "quality",
+              "recency"
+            ]
+          }
+        },
+        "required": [
+          "version",
+          "score",
+          "passes",
+          "reach",
+          "rules"
+        ],
+        "additionalProperties": false
+      },
+      "MatchReason": {
+        "type": "object",
+        "properties": {
+          "rule": {
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule",
+          "ok",
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "MatchingConfigInput": {
+        "type": "object",
+        "properties": {
+          "rules": {
+            "type": "object",
+            "properties": {
+              "curriculum": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "level": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "slack": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight",
+                  "slack"
+                ]
+              },
+              "subject": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "requireAll": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight",
+                  "requireAll"
+                ]
+              },
+              "groupTarget": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "location": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "gender": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "salary": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "schedule": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "capacity": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "quality": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              },
+              "recency": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ]
+              }
+            },
+            "required": [
+              "curriculum",
+              "level",
+              "subject",
+              "groupTarget",
+              "location",
+              "gender",
+              "salary",
+              "schedule",
+              "capacity",
+              "quality",
+              "recency"
+            ]
+          },
+          "cityEdgeKm": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "multipleOf": 0.5
+          },
+          "outsideCityKm": {
+            "type": "number",
+            "minimum": 0.5,
+            "maximum": 3,
+            "multipleOf": 0.5
+          },
+          "distanceScoreKm": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "admissionIgnoresCurriculum": {
+            "type": "boolean"
+          },
+          "curriculumEquivalents": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "minItems": 2,
+              "maxItems": 7,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "BANGLA_MEDIUM",
+                  "ENGLISH_VERSION",
+                  "EM_CAMBRIDGE",
+                  "EM_EDEXCEL",
+                  "EM_IB",
+                  "EM_AMERICAN",
+                  "MADRASAH"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "rules",
+          "cityEdgeKm",
+          "outsideCityKm",
+          "distanceScoreKm",
+          "admissionIgnoresCurriculum",
+          "curriculumEquivalents"
+        ]
+      },
+      "MatchingConfigRecord": {
+        "type": "object",
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/MatchingConfigValue"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/MatchingConfigValue"
+          },
+          "ruleModes": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "curriculum",
+                "level",
+                "subject",
+                "groupTarget",
+                "location",
+                "gender",
+                "salary",
+                "schedule",
+                "capacity",
+                "quality",
+                "recency"
+              ]
+            },
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "REQUIRED",
+                  "RANK",
+                  "OFF"
+                ]
+              }
+            },
+            "required": [
+              "curriculum",
+              "level",
+              "subject",
+              "groupTarget",
+              "location",
+              "gender",
+              "salary",
+              "schedule",
+              "capacity",
+              "quality",
+              "recency"
+            ]
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedByName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "config",
+          "defaults",
+          "ruleModes",
+          "updatedAt",
+          "updatedByName"
+        ],
+        "additionalProperties": false
+      },
+      "MatchingConfigValue": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "rules": {
+            "type": "object",
+            "properties": {
+              "curriculum": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "level": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "slack": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight",
+                  "slack"
+                ],
+                "additionalProperties": false
+              },
+              "subject": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "requireAll": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight",
+                  "requireAll"
+                ],
+                "additionalProperties": false
+              },
+              "groupTarget": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "location": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "gender": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "salary": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "schedule": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "capacity": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "quality": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              },
+              "recency": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "REQUIRED",
+                      "RANK",
+                      "OFF"
+                    ]
+                  },
+                  "weight": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  }
+                },
+                "required": [
+                  "mode",
+                  "weight"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "curriculum",
+              "level",
+              "subject",
+              "groupTarget",
+              "location",
+              "gender",
+              "salary",
+              "schedule",
+              "capacity",
+              "quality",
+              "recency"
+            ],
+            "additionalProperties": false
+          },
+          "cityEdgeKm": {
+            "type": "number"
+          },
+          "outsideCityKm": {
+            "type": "number"
+          },
+          "distanceScoreKm": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "admissionIgnoresCurriculum": {
+            "type": "boolean"
+          },
+          "curriculumEquivalents": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "BANGLA_MEDIUM",
+                  "ENGLISH_VERSION",
+                  "EM_CAMBRIDGE",
+                  "EM_EDEXCEL",
+                  "EM_IB",
+                  "EM_AMERICAN",
+                  "MADRASAH"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "version",
+          "rules",
+          "cityEdgeKm",
+          "outsideCityKm",
+          "distanceScoreKm",
+          "admissionIgnoresCurriculum",
+          "curriculumEquivalents"
+        ],
+        "additionalProperties": false
+      },
+      "MatchingExplain": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "requirement": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "curriculum": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "BANGLA_MEDIUM",
+                      "ENGLISH_VERSION",
+                      "EM_CAMBRIDGE",
+                      "EM_EDEXCEL",
+                      "EM_IB",
+                      "EM_AMERICAN",
+                      "MADRASAH"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "levelCode": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "tuitionType": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "curriculum",
+              "levelCode",
+              "tuitionType",
+              "status"
+            ],
+            "additionalProperties": false
+          },
+          "tutor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "isListed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "isListed"
+            ],
+            "additionalProperties": false
+          },
+          "sets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExplainSet"
+            }
+          }
+        },
+        "required": [
+          "version",
+          "requirement",
+          "tutor",
+          "sets"
+        ],
+        "additionalProperties": false
+      },
+      "MatchingPreview": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "openRequirements": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "requirementsWithNoTutor": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "requirementsWithFewTutors": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "requirementsWithManyTutors": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "listedTutors": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "tutorsWithAMatch": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "blockers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rule": {
+                  "type": "string",
+                  "enum": [
+                    "reach",
+                    "curriculum",
+                    "level",
+                    "subject",
+                    "groupTarget",
+                    "location",
+                    "gender",
+                    "salary",
+                    "schedule",
+                    "capacity",
+                    "quality",
+                    "recency"
+                  ]
+                },
+                "requirements": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "rule",
+                "requirements"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "version",
+          "openRequirements",
+          "requirementsWithNoTutor",
+          "requirementsWithFewTutors",
+          "requirementsWithManyTutors",
+          "listedTutors",
+          "tutorsWithAMatch",
+          "blockers"
+        ],
+        "additionalProperties": false
+      },
+      "MatchingPreviewPair": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/MatchingPreview"
+          },
+          "draft": {
+            "$ref": "#/components/schemas/MatchingPreview"
+          }
+        },
+        "required": [
+          "current",
+          "draft"
+        ],
+        "additionalProperties": false
+      },
+      "MatchingPreviewRequestInput": {
+        "type": "object",
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/MatchingConfigInput"
+          }
+        },
+        "required": [
+          "config"
+        ],
+        "additionalProperties": false
+      },
+      "MatchingUnmatched": {
+        "type": "object",
+        "properties": {
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "studentName": {
+                  "type": "string"
+                },
+                "curriculum": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "BANGLA_MEDIUM",
+                        "ENGLISH_VERSION",
+                        "EM_CAMBRIDGE",
+                        "EM_EDEXCEL",
+                        "EM_IB",
+                        "EM_AMERICAN",
+                        "MADRASAH"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "levelCode": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "subjectIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "areaId": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "tuitionType": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "blockers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "reach",
+                      "curriculum",
+                      "level",
+                      "subject",
+                      "groupTarget",
+                      "location",
+                      "gender",
+                      "salary",
+                      "schedule",
+                      "capacity",
+                      "quality",
+                      "recency"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "createdAt",
+                "studentName",
+                "curriculum",
+                "levelCode",
+                "subjectIds",
+                "areaId",
+                "tuitionType",
+                "blockers"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "requirements"
+        ],
+        "additionalProperties": false
       },
       "Me": {
         "type": "object",
@@ -9630,6 +11116,219 @@
         ],
         "additionalProperties": false
       },
+      "RecommendedTutorPage": {
+        "type": "object",
+        "properties": {
+          "tutors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tutor": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "instituteName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "gender": {
+                      "type": "string",
+                      "enum": [
+                        "MALE",
+                        "FEMALE",
+                        "OTHER"
+                      ]
+                    },
+                    "ratingAvg": {
+                      "type": "number"
+                    },
+                    "ratingCount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "verificationStatus": {
+                      "type": "string",
+                      "enum": [
+                        "NOT_SUBMITTED",
+                        "PENDING",
+                        "APPROVED",
+                        "REJECTED"
+                      ]
+                    },
+                    "areas": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "subjects": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "instituteName",
+                    "gender",
+                    "ratingAvg",
+                    "ratingCount",
+                    "verificationStatus",
+                    "areas",
+                    "subjects"
+                  ],
+                  "additionalProperties": false
+                },
+                "reasons": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MatchReason"
+                  }
+                },
+                "invitedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "application": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "CONFIRMED",
+                            "COMPLETED",
+                            "REJECTED",
+                            "WITHDRAWN",
+                            "CANCELLED",
+                            "EXPIRED"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "tutor",
+                "reasons",
+                "invitedAt",
+                "application"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "page": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "matchVersion": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "ALLOW_ONLINE",
+                    "ANY_GENDER"
+                  ]
+                },
+                "extraTutors": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "code",
+                "extraTutors"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "tutors",
+          "total",
+          "page",
+          "hasMore",
+          "matchVersion",
+          "suggestions"
+        ],
+        "additionalProperties": false
+      },
       "RecordPaymentInput": {
         "type": "object",
         "properties": {
@@ -9951,6 +11650,31 @@
         ],
         "additionalProperties": false
       },
+      "RequirementInvite": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "requirementId": {
+            "type": "string"
+          },
+          "tutorId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "requirementId",
+          "tutorId",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
       "RequirementList": {
         "type": "object",
         "properties": {
@@ -10087,6 +11811,31 @@
           "ratingAvg",
           "ratingCount",
           "breakdown"
+        ],
+        "additionalProperties": false
+      },
+      "RuleResult": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "REQUIRED",
+              "RANK",
+              "OFF"
+            ]
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "part": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "mode",
+          "pass",
+          "part"
         ],
         "additionalProperties": false
       },
@@ -17711,7 +19460,7 @@
         "tags": [
           "Requirements"
         ],
-        "description": "Creates an OPEN requirement, or a DRAFT when status is DRAFT (levelCode and curriculum may be null on drafts). 400 for an unknown area or subject, or for invalid education fields. 404 when the student has no profile.\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
+        "description": "Creates an OPEN requirement, or a DRAFT when status is DRAFT (levelCode and curriculum may be null on drafts). 400 for an unknown area or subject, or for invalid education fields. 404 when the student has no profile. 409 REQUIREMENT_DUPLICATE (details.requirementId) when posting OPEN and the student already has an OPEN requirement with no hired tutor for the same level, curriculum, academic group, admission targets, area and subjects; drafts are never checked.\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
         "requestBody": {
           "required": true,
           "content": {
@@ -17779,6 +19528,16 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limit hit",
             "content": {
@@ -17806,7 +19565,7 @@
         "tags": [
           "Requirements"
         ],
-        "description": "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. scope=set lists requirements that match one of the tutor's own active sets (setId, required) by curriculum, level, subject and area; the manual filters are ignored in that mode. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
+        "description": "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. scope=set lists the requirements that the matching engine pairs with one of the tutor's own active sets (setId, required); each row carries match {score, reasons}, and matchVersion is the config version. sort=newest (default) keeps newest first with a keyset cursor; sort=match (scope=set only) ranks by score, best first, then newest, capped at 300 with an offset cursor. scope=invited lists the OPEN requirements the tutor was invited to, newest invite first. The manual filters (curriculum, levelCode, subjectId, areaId) apply to nearby and all only. Every row has invitedAt. gaps explains an empty set page. noServiceArea is true when the tutor has no zones and no areas.\n\n**Who:** TUTOR.\n\n**Rate limit:** 300/min per account.",
         "parameters": [
           {
             "schema": {
@@ -17815,11 +19574,25 @@
               "enum": [
                 "nearby",
                 "all",
-                "set"
+                "set",
+                "invited"
               ]
             },
             "in": "query",
             "name": "scope",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": "newest",
+              "type": "string",
+              "enum": [
+                "newest",
+                "match"
+              ]
+            },
+            "in": "query",
+            "name": "sort",
             "required": false
           },
           {
@@ -17979,13 +19752,264 @@
         }
       }
     },
+    "/api/v1/requirements/{id}/tutors": {
+      "get": {
+        "summary": "Tutors who match my requirement",
+        "tags": [
+          "Requirements"
+        ],
+        "description": "Listed tutors whose best active set matches the requirement, best match first, 20 per page (page 1 to 15, at most 300 tutors). Each tutor has match reasons for the student and no numeric score. invitedAt is set when this student invited the tutor; application is the tutor's application here, any status. suggestions appear when fewer than 3 tutors match: allowing online tuition or any tutor gender would add tutors. 404 when the requirement is not the caller's; 409 LISTING_NOT_OPEN when it is not OPEN.\n\n**Who:** STUDENT.\n\n**Rate limit:** 120/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 15
+            },
+            "in": "query",
+            "name": "page",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendedTutorPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/requirements/{id}/invites": {
+      "post": {
+        "summary": "Invite a tutor to my requirement",
+        "tags": [
+          "Requirements"
+        ],
+        "description": "Invites a listed tutor to an OPEN requirement. The tutor gets a REQUIREMENT_INVITED alert. No match is needed. 404 when the requirement is not the caller's or the tutor is not listed; 409 LISTING_NOT_OPEN, APPLICATION_CLOSED, ALREADY_APPLIED (the tutor has an application here), INVITE_EXISTS, or INVITE_LIMIT_REACHED (20 invites per requirement).\n\n**Who:** STUDENT.\n\n**Rate limit:** 30/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tutorId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "tutorId"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT",
+        "x-rate-limit": "30/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequirementInvite"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/requirements/mine": {
       "get": {
         "summary": "List my requirements",
         "tags": [
           "Requirements"
         ],
-        "description": "Newest first. Empty when the student has no profile yet.\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
+        "description": "Newest first. Empty when the student has no profile yet. status reads FILLED while the requirement has a CONFIRMED or COMPLETED application, whatever the stored status.\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
         "security": [
           {
             "bearerAuth": []
@@ -18052,7 +20076,7 @@
         "tags": [
           "Requirements"
         ],
-        "description": "Only the owning student can read it.\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
+        "description": "Only the owning student can read it. status reads FILLED while it has a CONFIRMED or COMPLETED application.\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
         "parameters": [
           {
             "schema": {
@@ -18149,7 +20173,7 @@
         "tags": [
           "Requirements"
         ],
-        "description": "Send any subset of fields. The merged values are checked against the education rules (400 INVALID_REQUIREMENT with details.fields). 409 when the requirement is not DRAFT or OPEN. Publishing (status OPEN) also needs every field set (400).\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
+        "description": "Send any subset of fields. The merged values are checked against the education rules (400 INVALID_REQUIREMENT with details.fields). 409 when the requirement is not DRAFT or OPEN, or has a hired tutor (a CONFIRMED or COMPLETED application). 409 REQUIREMENT_DUPLICATE (details.requirementId) when the result is OPEN and matches another of the student's OPEN, unhired requirements. Publishing (status OPEN) also needs every field set (400).\n\n**Who:** STUDENT.\n\n**Rate limit:** global 100/min.",
         "requestBody": {
           "required": true,
           "content": {
@@ -28566,6 +30590,730 @@
         }
       }
     },
+    "/api/v1/admin/matching/config": {
+      "get": {
+        "summary": "Get the matching rules",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "The saved rules with their version, the defaults, and the modes each rule accepts. A config nobody has saved yet shows the defaults at version 0.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** global 100/min.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchingConfigRecord"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Save the matching rules",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "Super admin only. Every save bumps the version; match responses and applications carry it. 400 VALIDATION_ERROR when a rule has a mode it cannot take, a curriculum is in two equivalence groups, or every ranked rule has weight 0.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchingConfigInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchingConfigRecord"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/matching/preview": {
+      "post": {
+        "summary": "Preview a draft config",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "Counts open requirements and listed tutors under the saved config (current) and under the posted one (draft). Nothing is saved. Both share the saved version number.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 10/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchingPreviewRequestInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "10/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchingPreviewPair"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/matching/explain": {
+      "get": {
+        "summary": "Explain one requirement and tutor pair",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "Every active set of the tutor against the requirement, best first, with each rule's mode, pass and part. Ignores whether the tutor is listed, so it also explains an unlisted tutor. 404 when the requirement or the tutor does not exist.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** global 100/min.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "requirementId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "tutorId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchingExplain"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/matching/unmatched": {
+      "get": {
+        "summary": "List open requirements with no matching tutor",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "OPEN requirements older than olderThanHours with no listed tutor that matches, oldest first. blockers names the rules that alone keep each one empty; empty when it needs more than one change.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** global 100/min.",
+        "parameters": [
+          {
+            "schema": {
+              "default": 24,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 720
+            },
+            "in": "query",
+            "name": "olderThanHours",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchingUnmatched"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/cities": {
+      "get": {
+        "summary": "List cities",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "Every city, inactive ones included, with the area of its boundary in km2. Dhaka is seeded by migration.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** global 100/min.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCityList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/cities/{slug}": {
+      "put": {
+        "summary": "Create or replace a city",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "Super admin only. The boundary is GeoJSON Polygon or MultiPolygon in lng/lat. 400 VALIDATION_ERROR (path boundary) when it is not a valid polygon, crosses itself, or covers less than 5 or more than 2000 km2. isActive is kept when omitted.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 20/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CityUpsertInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,39}$"
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "20/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Activate or deactivate a city",
+        "tags": [
+          "Admin Matching"
+        ],
+        "description": "Super admin only. An inactive city is not used for the city limit. 404 when the city does not exist.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 20/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CityUpdateInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,39}$"
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "20/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/audit-logs": {
       "get": {
         "summary": "List audit log entries",
@@ -31550,6 +34298,10 @@
     {
       "name": "Admin",
       "description": "Admin queues. Needs an ACTIVE admin_user row."
+    },
+    {
+      "name": "Admin Matching",
+      "description": "Global matching rules, the preview and explain tools, and the city boundaries."
     }
   ]
 }

@@ -750,6 +750,8 @@ ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
       CASE WHEN jsonb_typeof(value) = 'number'
         THEN (value #>> '{}')::numeric BETWEEN 0 AND 90 AND (value #>> '{}')::numeric = trunc((value #>> '{}')::numeric)
         ELSE false END
+    -- [matching] a JSON object validated by the API (migration 20261128000100_matching)
+    WHEN 'matching_config' THEN jsonb_typeof(value) = 'object'
     ELSE false
   END);
 
@@ -842,6 +844,10 @@ ALTER TABLE app_notification ADD CONSTRAINT app_notification_application_shape C
     'APPLICATION_RECEIVED', 'PACKAGE_REQUESTED', 'APPLICATION_ACCEPTED', 'APPLICATION_DECLINED',
     'LISTING_FILLED', 'APPLICATION_WITHDRAWN', 'APPLICATION_REOPENED', 'APPLICATION_CANCELLED',
     'APPLICATION_COMPLETED', 'PACKAGE_UPDATED', 'PACKAGE_CLOSED')));
+-- [matching] Invite alerts name a requirement; no other kind does (migrations 20261128000100_matching and
+-- 20261128000200_matching_validate).
+ALTER TABLE app_notification ADD CONSTRAINT app_notification_requirement_shape CHECK (
+  (requirement_id IS NOT NULL) = (kind::text = 'REQUIREMENT_INVITED'));
 -- Every history row but an approval or a lifted block says why; block rows have no file.
 ALTER TABLE upload_review
   ADD CONSTRAINT upload_review_note_present CHECK (
@@ -875,3 +881,10 @@ CREATE TRIGGER tutor_phone_verified_reset_trg BEFORE UPDATE OF phone_number ON t
 
 -- ═════════ 21. Seed (run once, from your seed script, not the migration) ═
 -- INSERT INTO super_admin_email (slot, email) VALUES (1, 'first@example.com'), (2, 'second@example.com');
+
+-- ───────────────────────── [matching] cities ─────────────────────────
+-- Migration 20261128000100_matching. The city table is created there (Prisma cannot model GEOGRAPHY
+-- polygons); these are its checks and the boundary GIST index. Dhaka is seeded by the migration.
+ALTER TABLE city ADD CONSTRAINT city_slug_format CHECK (slug ~ '^[a-z][a-z0-9-]{1,39}$');
+ALTER TABLE city ADD CONSTRAINT city_name_len CHECK (length(btrim(name)) BETWEEN 2 AND 60);
+CREATE INDEX IF NOT EXISTS city_boundary_gix ON city USING GIST (boundary);

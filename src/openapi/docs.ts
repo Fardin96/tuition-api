@@ -31,6 +31,10 @@ export const TAGS = [
   { name: "Blog", description: "Published blog posts." },
   { name: "Lookups", description: "Seeded reference data." },
   { name: "Admin", description: "Admin queues. Needs an ACTIVE admin_user row." },
+  {
+    name: "Admin Matching",
+    description: "Global matching rules, the preview and explain tools, and the city boundaries.",
+  },
 ] as const;
 
 export type Tag = (typeof TAGS)[number]["name"];

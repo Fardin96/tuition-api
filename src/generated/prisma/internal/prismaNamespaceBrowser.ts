@@ -77,6 +77,8 @@ export const ModelName = {
   ZoneLimitRequest: 'ZoneLimitRequest',
   TuitionRequirement: 'TuitionRequirement',
   RequirementSubject: 'RequirementSubject',
+  RequirementInvite: 'RequirementInvite',
+  City: 'City',
   TuitionPackage: 'TuitionPackage',
   PackageSubject: 'PackageSubject',
   PackageZone: 'PackageZone',
@@ -514,6 +516,29 @@ export const RequirementSubjectScalarFieldEnum = {
 export type RequirementSubjectScalarFieldEnum = (typeof RequirementSubjectScalarFieldEnum)[keyof typeof RequirementSubjectScalarFieldEnum]
 
 
+export const RequirementInviteScalarFieldEnum = {
+  id: 'id',
+  requirementId: 'requirementId',
+  tutorId: 'tutorId',
+  studentId: 'studentId',
+  createdAt: 'createdAt'
+} as const
+
+export type RequirementInviteScalarFieldEnum = (typeof RequirementInviteScalarFieldEnum)[keyof typeof RequirementInviteScalarFieldEnum]
+
+
+export const CityScalarFieldEnum = {
+  slug: 'slug',
+  name: 'name',
+  districtCode: 'districtCode',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CityScalarFieldEnum = (typeof CityScalarFieldEnum)[keyof typeof CityScalarFieldEnum]
+
+
 export const TuitionPackageScalarFieldEnum = {
   id: 'id',
   tutorId: 'tutorId',
@@ -795,6 +820,7 @@ export const AppNotificationScalarFieldEnum = {
   recipientId: 'recipientId',
   kind: 'kind',
   applicationId: 'applicationId',
+  requirementId: 'requirementId',
   note: 'note',
   filePurpose: 'filePurpose',
   blocksVideos: 'blocksVideos',

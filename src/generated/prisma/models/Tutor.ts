@@ -369,6 +369,7 @@ export type TutorWhereInput = {
   paymentAttempts?: Prisma.PaymentAttemptListRelationFilter
   promoRedemptions?: Prisma.PromoRedemptionListRelationFilter
   refunds?: Prisma.PaymentRefundListRelationFilter
+  invites?: Prisma.RequirementInviteListRelationFilter
 }
 
 export type TutorOrderByWithRelationInput = {
@@ -410,6 +411,7 @@ export type TutorOrderByWithRelationInput = {
   paymentAttempts?: Prisma.PaymentAttemptOrderByRelationAggregateInput
   promoRedemptions?: Prisma.PromoRedemptionOrderByRelationAggregateInput
   refunds?: Prisma.PaymentRefundOrderByRelationAggregateInput
+  invites?: Prisma.RequirementInviteOrderByRelationAggregateInput
 }
 
 export type TutorWhereUniqueInput = Prisma.AtLeast<{
@@ -455,6 +457,7 @@ export type TutorWhereUniqueInput = Prisma.AtLeast<{
   paymentAttempts?: Prisma.PaymentAttemptListRelationFilter
   promoRedemptions?: Prisma.PromoRedemptionListRelationFilter
   refunds?: Prisma.PaymentRefundListRelationFilter
+  invites?: Prisma.RequirementInviteListRelationFilter
 }, "id" | "accountId" | "whatsappNumber" | "phoneNumber" | "accountId_role">
 
 export type TutorOrderByWithAggregationInput = {
@@ -550,6 +553,7 @@ export type TutorCreateInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateInput = {
@@ -590,6 +594,7 @@ export type TutorUncheckedCreateInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUpdateInput = {
@@ -629,6 +634,7 @@ export type TutorUpdateInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateInput = {
@@ -669,6 +675,7 @@ export type TutorUncheckedUpdateInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateManyInput = {
@@ -1002,6 +1009,20 @@ export type TutorUpdateOneRequiredWithoutZoneLimitRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TutorUpdateToOneWithWhereWithoutZoneLimitRequestsInput, Prisma.TutorUpdateWithoutZoneLimitRequestsInput>, Prisma.TutorUncheckedUpdateWithoutZoneLimitRequestsInput>
 }
 
+export type TutorCreateNestedOneWithoutInvitesInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutInvitesInput, Prisma.TutorUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutInvitesInput
+  connect?: Prisma.TutorWhereUniqueInput
+}
+
+export type TutorUpdateOneRequiredWithoutInvitesNestedInput = {
+  create?: Prisma.XOR<Prisma.TutorCreateWithoutInvitesInput, Prisma.TutorUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.TutorCreateOrConnectWithoutInvitesInput
+  upsert?: Prisma.TutorUpsertWithoutInvitesInput
+  connect?: Prisma.TutorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TutorUpdateToOneWithWhereWithoutInvitesInput, Prisma.TutorUpdateWithoutInvitesInput>, Prisma.TutorUncheckedUpdateWithoutInvitesInput>
+}
+
 export type TutorCreateNestedOneWithoutPackagesInput = {
   create?: Prisma.XOR<Prisma.TutorCreateWithoutPackagesInput, Prisma.TutorUncheckedCreateWithoutPackagesInput>
   connectOrCreate?: Prisma.TutorCreateOrConnectWithoutPackagesInput
@@ -1136,6 +1157,7 @@ export type TutorCreateWithoutAccountInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutAccountInput = {
@@ -1174,6 +1196,7 @@ export type TutorUncheckedCreateWithoutAccountInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutAccountInput = {
@@ -1228,6 +1251,7 @@ export type TutorUpdateWithoutAccountInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutAccountInput = {
@@ -1266,6 +1290,7 @@ export type TutorUncheckedUpdateWithoutAccountInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutLocationInput = {
@@ -1304,6 +1329,7 @@ export type TutorCreateWithoutLocationInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutLocationInput = {
@@ -1343,6 +1369,7 @@ export type TutorUncheckedCreateWithoutLocationInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutLocationInput = {
@@ -1397,6 +1424,7 @@ export type TutorUpdateWithoutLocationInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutLocationInput = {
@@ -1436,6 +1464,7 @@ export type TutorUncheckedUpdateWithoutLocationInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutAreasInput = {
@@ -1474,6 +1503,7 @@ export type TutorCreateWithoutAreasInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutAreasInput = {
@@ -1513,6 +1543,7 @@ export type TutorUncheckedCreateWithoutAreasInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutAreasInput = {
@@ -1567,6 +1598,7 @@ export type TutorUpdateWithoutAreasInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutAreasInput = {
@@ -1606,6 +1638,7 @@ export type TutorUncheckedUpdateWithoutAreasInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutSubjectsInput = {
@@ -1644,6 +1677,7 @@ export type TutorCreateWithoutSubjectsInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutSubjectsInput = {
@@ -1683,6 +1717,7 @@ export type TutorUncheckedCreateWithoutSubjectsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutSubjectsInput = {
@@ -1737,6 +1772,7 @@ export type TutorUpdateWithoutSubjectsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutSubjectsInput = {
@@ -1776,6 +1812,7 @@ export type TutorUncheckedUpdateWithoutSubjectsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutVerificationsInput = {
@@ -1814,6 +1851,7 @@ export type TutorCreateWithoutVerificationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutVerificationsInput = {
@@ -1853,6 +1891,7 @@ export type TutorUncheckedCreateWithoutVerificationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutVerificationsInput = {
@@ -1907,6 +1946,7 @@ export type TutorUpdateWithoutVerificationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutVerificationsInput = {
@@ -1946,6 +1986,7 @@ export type TutorUncheckedUpdateWithoutVerificationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutCredentialsInput = {
@@ -1984,6 +2025,7 @@ export type TutorCreateWithoutCredentialsInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutCredentialsInput = {
@@ -2023,6 +2065,7 @@ export type TutorUncheckedCreateWithoutCredentialsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutCredentialsInput = {
@@ -2077,6 +2120,7 @@ export type TutorUpdateWithoutCredentialsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutCredentialsInput = {
@@ -2116,6 +2160,7 @@ export type TutorUncheckedUpdateWithoutCredentialsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutVideosInput = {
@@ -2154,6 +2199,7 @@ export type TutorCreateWithoutVideosInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutVideosInput = {
@@ -2193,6 +2239,7 @@ export type TutorUncheckedCreateWithoutVideosInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutVideosInput = {
@@ -2247,6 +2294,7 @@ export type TutorUpdateWithoutVideosInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutVideosInput = {
@@ -2286,6 +2334,7 @@ export type TutorUncheckedUpdateWithoutVideosInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutRequirementsInput = {
@@ -2324,6 +2373,7 @@ export type TutorCreateWithoutRequirementsInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutRequirementsInput = {
@@ -2363,6 +2413,7 @@ export type TutorUncheckedCreateWithoutRequirementsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutRequirementsInput = {
@@ -2417,6 +2468,7 @@ export type TutorUpdateWithoutRequirementsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutRequirementsInput = {
@@ -2456,6 +2508,7 @@ export type TutorUncheckedUpdateWithoutRequirementsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutZonesInput = {
@@ -2494,6 +2547,7 @@ export type TutorCreateWithoutZonesInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutZonesInput = {
@@ -2533,6 +2587,7 @@ export type TutorUncheckedCreateWithoutZonesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutZonesInput = {
@@ -2587,6 +2642,7 @@ export type TutorUpdateWithoutZonesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutZonesInput = {
@@ -2626,6 +2682,7 @@ export type TutorUncheckedUpdateWithoutZonesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutZoneLimitRequestsInput = {
@@ -2664,6 +2721,7 @@ export type TutorCreateWithoutZoneLimitRequestsInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutZoneLimitRequestsInput = {
@@ -2703,6 +2761,7 @@ export type TutorUncheckedCreateWithoutZoneLimitRequestsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutZoneLimitRequestsInput = {
@@ -2757,6 +2816,7 @@ export type TutorUpdateWithoutZoneLimitRequestsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutZoneLimitRequestsInput = {
@@ -2793,6 +2853,181 @@ export type TutorUncheckedUpdateWithoutZoneLimitRequestsInput = {
   location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
   requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
   zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
+  promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorCreateWithoutInvitesInput = {
+  id?: string
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber?: string | null
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  instituteName?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutTutorInput
+  areas?: Prisma.TutorAreaCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
+  paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
+  promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+}
+
+export type TutorUncheckedCreateWithoutInvitesInput = {
+  id?: string
+  accountId: string
+  role?: $Enums.Role
+  name: string
+  address: string
+  emergencyContact?: string | null
+  whatsappNumber?: string | null
+  whatsappVerifiedAt?: Date | string | null
+  phoneNumber: string
+  phoneVerifiedAt?: Date | string | null
+  studentIdNumber?: string | null
+  gender: $Enums.Gender
+  parentsInfo?: string | null
+  instituteName?: string | null
+  zoneLimit?: number
+  verificationStatus?: $Enums.VerificationStatus
+  isListed?: boolean
+  ratingAvg?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  areas?: Prisma.TutorAreaUncheckedCreateNestedManyWithoutTutorInput
+  subjects?: Prisma.TutorSubjectUncheckedCreateNestedManyWithoutTutorInput
+  verifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutTutorInput
+  credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutTutorInput
+  videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutTutorInput
+  packages?: Prisma.TuitionPackageUncheckedCreateNestedManyWithoutTutorInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutTutorInput
+  fees?: Prisma.PlatformFeeUncheckedCreateNestedManyWithoutTutorInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutTutorInput
+  location?: Prisma.TutorLocationUncheckedCreateNestedOneWithoutTutorInput
+  requirements?: Prisma.TutorRequirementUncheckedCreateNestedManyWithoutTutorInput
+  zones?: Prisma.TutorZoneUncheckedCreateNestedManyWithoutTutorInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
+  paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
+  promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+}
+
+export type TutorCreateOrConnectWithoutInvitesInput = {
+  where: Prisma.TutorWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutorCreateWithoutInvitesInput, Prisma.TutorUncheckedCreateWithoutInvitesInput>
+}
+
+export type TutorUpsertWithoutInvitesInput = {
+  update: Prisma.XOR<Prisma.TutorUpdateWithoutInvitesInput, Prisma.TutorUncheckedUpdateWithoutInvitesInput>
+  create: Prisma.XOR<Prisma.TutorCreateWithoutInvitesInput, Prisma.TutorUncheckedCreateWithoutInvitesInput>
+  where?: Prisma.TutorWhereInput
+}
+
+export type TutorUpdateToOneWithWhereWithoutInvitesInput = {
+  where?: Prisma.TutorWhereInput
+  data: Prisma.XOR<Prisma.TutorUpdateWithoutInvitesInput, Prisma.TutorUncheckedUpdateWithoutInvitesInput>
+}
+
+export type TutorUpdateWithoutInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutTutorNestedInput
+  areas?: Prisma.TutorAreaUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
+  paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
+  promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+}
+
+export type TutorUncheckedUpdateWithoutInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentIdNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  parentsInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instituteName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  zoneLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  isListed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ratingAvg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ratingCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  areas?: Prisma.TutorAreaUncheckedUpdateManyWithoutTutorNestedInput
+  subjects?: Prisma.TutorSubjectUncheckedUpdateManyWithoutTutorNestedInput
+  verifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutTutorNestedInput
+  credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutTutorNestedInput
+  videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutTutorNestedInput
+  packages?: Prisma.TuitionPackageUncheckedUpdateManyWithoutTutorNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutTutorNestedInput
+  fees?: Prisma.PlatformFeeUncheckedUpdateManyWithoutTutorNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutTutorNestedInput
+  location?: Prisma.TutorLocationUncheckedUpdateOneWithoutTutorNestedInput
+  requirements?: Prisma.TutorRequirementUncheckedUpdateManyWithoutTutorNestedInput
+  zones?: Prisma.TutorZoneUncheckedUpdateManyWithoutTutorNestedInput
+  zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
@@ -2834,6 +3069,7 @@ export type TutorCreateWithoutPackagesInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutPackagesInput = {
@@ -2873,6 +3109,7 @@ export type TutorUncheckedCreateWithoutPackagesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutPackagesInput = {
@@ -2927,6 +3164,7 @@ export type TutorUpdateWithoutPackagesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutPackagesInput = {
@@ -2966,6 +3204,7 @@ export type TutorUncheckedUpdateWithoutPackagesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutApplicationsInput = {
@@ -3004,6 +3243,7 @@ export type TutorCreateWithoutApplicationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutApplicationsInput = {
@@ -3043,6 +3283,7 @@ export type TutorUncheckedCreateWithoutApplicationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutApplicationsInput = {
@@ -3097,6 +3338,7 @@ export type TutorUpdateWithoutApplicationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutApplicationsInput = {
@@ -3136,6 +3378,7 @@ export type TutorUncheckedUpdateWithoutApplicationsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutReviewsInput = {
@@ -3174,6 +3417,7 @@ export type TutorCreateWithoutReviewsInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutReviewsInput = {
@@ -3213,6 +3457,7 @@ export type TutorUncheckedCreateWithoutReviewsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutReviewsInput = {
@@ -3267,6 +3512,7 @@ export type TutorUpdateWithoutReviewsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutReviewsInput = {
@@ -3306,6 +3552,7 @@ export type TutorUncheckedUpdateWithoutReviewsInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutFeesInput = {
@@ -3344,6 +3591,7 @@ export type TutorCreateWithoutFeesInput = {
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutFeesInput = {
@@ -3383,6 +3631,7 @@ export type TutorUncheckedCreateWithoutFeesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutFeesInput = {
@@ -3437,6 +3686,7 @@ export type TutorUpdateWithoutFeesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutFeesInput = {
@@ -3476,6 +3726,7 @@ export type TutorUncheckedUpdateWithoutFeesInput = {
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutPaymentAttemptsInput = {
@@ -3514,6 +3765,7 @@ export type TutorCreateWithoutPaymentAttemptsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutPaymentAttemptsInput = {
@@ -3553,6 +3805,7 @@ export type TutorUncheckedCreateWithoutPaymentAttemptsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutPaymentAttemptsInput = {
@@ -3607,6 +3860,7 @@ export type TutorUpdateWithoutPaymentAttemptsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutPaymentAttemptsInput = {
@@ -3646,6 +3900,7 @@ export type TutorUncheckedUpdateWithoutPaymentAttemptsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutRefundsInput = {
@@ -3684,6 +3939,7 @@ export type TutorCreateWithoutRefundsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutRefundsInput = {
@@ -3723,6 +3979,7 @@ export type TutorUncheckedCreateWithoutRefundsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutRefundsInput = {
@@ -3777,6 +4034,7 @@ export type TutorUpdateWithoutRefundsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutRefundsInput = {
@@ -3816,6 +4074,7 @@ export type TutorUncheckedUpdateWithoutRefundsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   promoRedemptions?: Prisma.PromoRedemptionUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorCreateWithoutPromoRedemptionsInput = {
@@ -3854,6 +4113,7 @@ export type TutorCreateWithoutPromoRedemptionsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestCreateNestedManyWithoutTutorInput
   paymentAttempts?: Prisma.PaymentAttemptCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteCreateNestedManyWithoutTutorInput
 }
 
 export type TutorUncheckedCreateWithoutPromoRedemptionsInput = {
@@ -3893,6 +4153,7 @@ export type TutorUncheckedCreateWithoutPromoRedemptionsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedCreateNestedManyWithoutTutorInput
   paymentAttempts?: Prisma.PaymentAttemptUncheckedCreateNestedManyWithoutTutorInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutTutorInput
+  invites?: Prisma.RequirementInviteUncheckedCreateNestedManyWithoutTutorInput
 }
 
 export type TutorCreateOrConnectWithoutPromoRedemptionsInput = {
@@ -3947,6 +4208,7 @@ export type TutorUpdateWithoutPromoRedemptionsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUpdateManyWithoutTutorNestedInput
   paymentAttempts?: Prisma.PaymentAttemptUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUpdateManyWithoutTutorNestedInput
 }
 
 export type TutorUncheckedUpdateWithoutPromoRedemptionsInput = {
@@ -3986,6 +4248,7 @@ export type TutorUncheckedUpdateWithoutPromoRedemptionsInput = {
   zoneLimitRequests?: Prisma.ZoneLimitRequestUncheckedUpdateManyWithoutTutorNestedInput
   paymentAttempts?: Prisma.PaymentAttemptUncheckedUpdateManyWithoutTutorNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutTutorNestedInput
+  invites?: Prisma.RequirementInviteUncheckedUpdateManyWithoutTutorNestedInput
 }
 
 
@@ -4009,6 +4272,7 @@ export type TutorCountOutputType = {
   paymentAttempts: number
   promoRedemptions: number
   refunds: number
+  invites: number
 }
 
 export type TutorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4027,6 +4291,7 @@ export type TutorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   paymentAttempts?: boolean | TutorCountOutputTypeCountPaymentAttemptsArgs
   promoRedemptions?: boolean | TutorCountOutputTypeCountPromoRedemptionsArgs
   refunds?: boolean | TutorCountOutputTypeCountRefundsArgs
+  invites?: boolean | TutorCountOutputTypeCountInvitesArgs
 }
 
 /**
@@ -4144,6 +4409,13 @@ export type TutorCountOutputTypeCountRefundsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.PaymentRefundWhereInput
 }
 
+/**
+ * TutorCountOutputType without action
+ */
+export type TutorCountOutputTypeCountInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RequirementInviteWhereInput
+}
+
 
 export type TutorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -4184,6 +4456,7 @@ export type TutorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   paymentAttempts?: boolean | Prisma.Tutor$paymentAttemptsArgs<ExtArgs>
   promoRedemptions?: boolean | Prisma.Tutor$promoRedemptionsArgs<ExtArgs>
   refunds?: boolean | Prisma.Tutor$refundsArgs<ExtArgs>
+  invites?: boolean | Prisma.Tutor$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.TutorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tutor"]>
 
@@ -4280,6 +4553,7 @@ export type TutorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   paymentAttempts?: boolean | Prisma.Tutor$paymentAttemptsArgs<ExtArgs>
   promoRedemptions?: boolean | Prisma.Tutor$promoRedemptionsArgs<ExtArgs>
   refunds?: boolean | Prisma.Tutor$refundsArgs<ExtArgs>
+  invites?: boolean | Prisma.Tutor$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.TutorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TutorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4309,6 +4583,7 @@ export type $TutorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     paymentAttempts: Prisma.$PaymentAttemptPayload<ExtArgs>[]
     promoRedemptions: Prisma.$PromoRedemptionPayload<ExtArgs>[]
     refunds: Prisma.$PaymentRefundPayload<ExtArgs>[]
+    invites: Prisma.$RequirementInvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4743,6 +5018,7 @@ export interface Prisma__TutorClient<T, Null = never, ExtArgs extends runtime.Ty
   paymentAttempts<T extends Prisma.Tutor$paymentAttemptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$paymentAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   promoRedemptions<T extends Prisma.Tutor$promoRedemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$promoRedemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromoRedemptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   refunds<T extends Prisma.Tutor$refundsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$refundsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRefundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invites<T extends Prisma.Tutor$invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tutor$invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RequirementInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5570,6 +5846,30 @@ export type Tutor$refundsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.PaymentRefundScalarFieldEnum | Prisma.PaymentRefundScalarFieldEnum[]
+}
+
+/**
+ * Tutor.invites
+ */
+export type Tutor$invitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RequirementInvite
+   */
+  select?: Prisma.RequirementInviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RequirementInvite
+   */
+  omit?: Prisma.RequirementInviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RequirementInviteInclude<ExtArgs> | null
+  where?: Prisma.RequirementInviteWhereInput
+  orderBy?: Prisma.RequirementInviteOrderByWithRelationInput | Prisma.RequirementInviteOrderByWithRelationInput[]
+  cursor?: Prisma.RequirementInviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RequirementInviteScalarFieldEnum | Prisma.RequirementInviteScalarFieldEnum[]
 }
 
 /**

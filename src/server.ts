@@ -22,6 +22,7 @@ import { adminBlogRoutes } from "./modules/admin/blog.routes.js";
 import { adminDisputeRoutes } from "./modules/admin/disputes.routes.js";
 import { adminFeeRoutes } from "./modules/admin/fees.routes.js";
 import { adminFileRoutes } from "./modules/admin/files.routes.js";
+import { adminMatchingRoutes } from "./modules/admin/matching.routes.js";
 import { adminPackageRoutes } from "./modules/admin/packages.routes.js";
 import { adminPaymentRoutes } from "./modules/admin/payments.routes.js";
 import { adminPromoCodeRoutes } from "./modules/admin/promo-codes.routes.js";
@@ -168,6 +169,8 @@ export async function buildApp() {
   await app.register(adminSubjectRoutes, { prefix: "/api/v1/admin/subjects" });
   await app.register(adminAreaRoutes, { prefix: "/api/v1/admin/areas" });
   await app.register(adminSettingRoutes, { prefix: "/api/v1/admin/settings" });
+  // Full paths: /admin/matching/* and /admin/cities/*.
+  await app.register(adminMatchingRoutes, { prefix: "/api/v1/admin" });
   await app.register(adminAuditLogRoutes, { prefix: "/api/v1/admin/audit-logs" });
   await app.register(adminVerificationRoutes, { prefix: "/api/v1/admin/verifications" });
   await app.register(adminVideoRoutes, { prefix: "/api/v1/admin/videos" });

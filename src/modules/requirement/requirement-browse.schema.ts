@@ -2,13 +2,18 @@ import { z } from "zod";
 import { ACADEMIC_GROUPS, ADMISSION_TARGETS, CURRICULA } from "../../lib/education.js";
 import { myApplicationSchema } from "../package/package.schema.js";
 import { tutorGenderPrefSchema } from "./requirement.schema.js";
+import { matchReasonSchema } from "./requirement-match.schema.js";
 
 // Requirement-only: packages keep the shared browseScopeSchema (nearby | all).
-export const requirementBrowseScopeSchema = z.enum(["nearby", "all", "set"]);
+// set: the tutor's own set, through the matching engine. invited: requirements the tutor was invited to.
+export const requirementBrowseScopeSchema = z.enum(["nearby", "all", "set", "invited"]);
+export const requirementBrowseSortSchema = z.enum(["newest", "match"]);
 
 export const requirementBrowseQuerySchema = z
   .object({
     scope: requirementBrowseScopeSchema.default("nearby"),
+    // newest (default) or match (best score first). match needs scope=set.
+    sort: requirementBrowseSortSchema.default("newest"),
     // The tutor's own active requirement set. Only read when scope=set.
     setId: z.string().uuid().optional(),
     curriculum: z.enum(CURRICULA).optional(),
@@ -21,6 +26,10 @@ export const requirementBrowseQuerySchema = z
   .refine((q) => q.scope !== "set" || q.setId !== undefined, {
     message: "setId is required when scope is set",
     path: ["setId"],
+  })
+  .refine((q) => q.sort !== "match" || q.scope === "set", {
+    message: "sort=match needs scope=set",
+    path: ["sort"],
   });
 export type RequirementBrowseQuery = z.infer<typeof requirementBrowseQuerySchema>;
 
@@ -52,6 +61,10 @@ export const browseRequirementSchema = z
     /** Already has a CONFIRMED or COMPLETED application: shown as "Application closed". */
     closed: z.boolean(),
     myApplication: myApplicationSchema.nullable(),
+    /** When the student invited this tutor to the requirement, else null. */
+    invitedAt: z.date().nullable(),
+    /** scope=set only: the set's score and reasons for this requirement. Null otherwise. */
+    match: z.object({ score: z.number().int(), reasons: z.array(matchReasonSchema) }).nullable(),
   })
   .meta({ id: "BrowseRequirement" });
 export type BrowseRequirementResponse = z.infer<typeof browseRequirementSchema>;
@@ -62,6 +75,18 @@ export const browseRequirementPageSchema = z
     nextCursor: z.string().nullable(),
     /** The tutor has no zones and no areas, so `nearby` can match nothing. */
     noServiceArea: z.boolean(),
+    /** scope=set: the matching config version the scores were computed under. Null otherwise. */
+    matchVersion: z.number().int().nullable(),
+    /**
+     * scope=set, first page, when nothing matches: what one change to the set would show more
+     * open requirements. Empty otherwise.
+     */
+    gaps: z.array(
+      z.object({
+        code: z.enum(["WIDER_LEVEL", "OTHER_SUBJECTS", "TEACH_ONLINE"]),
+        requirements: z.number().int(),
+      }),
+    ),
   })
   .meta({ id: "BrowseRequirementPage" });
 export type BrowseRequirementPageResponse = z.infer<typeof browseRequirementPageSchema>;

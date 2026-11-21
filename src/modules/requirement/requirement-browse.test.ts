@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../lib/prisma.js";
 import {
@@ -315,23 +316,35 @@ async function requirementAt(
     levelCode?: number;
     curriculum?: "BANGLA_MEDIUM" | "ENGLISH_VERSION";
     areaId?: number;
+    tuitionType?: string;
   },
 ) {
   const { student } = await createStudentAt({ pin, areaId: data.areaId });
   return createRequirement({ studentId: student.id, ...data });
 }
 
+// Inside Dhaka city, about 8 km south of TUTOR_PIN (outside a 2 km zone around it).
+const SOUTH_IN_CITY = { lat: 23.7383, lng: 90.4125 };
+
 // A set of the tutor's own. The subjects must be on the tutor's profile first (composite FK).
+// teachesOnline is not a factory option, so it is set after the row exists.
 async function createSet(
   tutorId: string,
   subjectIds: number[],
-  overrides: Parameters<typeof createTutorRequirement>[1] = {},
+  overrides: Parameters<typeof createTutorRequirement>[1] & { teachesOnline?: boolean } = {},
 ) {
+  const { teachesOnline, ...factory } = overrides;
   await prisma.tutorSubject.createMany({
     data: subjectIds.map((subjectId) => ({ tutorId, subjectId })),
     skipDuplicates: true,
   });
-  return createTutorRequirement(tutorId, { subjectIds, ...overrides });
+  const set = await createTutorRequirement(tutorId, { subjectIds, ...factory });
+  if (teachesOnline === undefined) return set;
+  return prisma.tutorRequirement.update({ where: { id: set.id }, data: { teachesOnline } });
+}
+
+function matchOf(body: { requirements: { id: string; match: unknown }[] }, id: string) {
+  return body.requirements.find((r) => r.id === id)?.match;
 }
 
 describe("GET /requirements scope=set (tutor requirement sets)", () => {
@@ -411,21 +424,271 @@ describe("GET /requirements scope=set (tutor requirement sets)", () => {
     expect(idsOf(res.body)).toEqual([match.id]);
   });
 
-  it("a set without zones uses the nearby rule: a tutor zone around the pin, or the tutor's area", async () => {
+  it("a set without zones that is not online-only: a pin is matched by the tutor's zones, no pin by the tutor's areas", async () => {
     const { tutor, headers } = await createBrowsingTutor();
     await createTutorZone(tutor.id, { radiusM: 5000 });
     const served = await createArea();
     await prisma.tutorArea.create({ data: { tutorId: tutor.id, areaId: served.id } });
     const math = await createSubject();
-    const set = await createSet(tutor.id, [math.id], { isDefault: true });
+    // Without zones, a set that teaches online is online-only and never reaches home tuition.
+    const set = await createSet(tutor.id, [math.id], { isDefault: true, teachesOnline: false });
 
     const inZone = await requirementAt(TUTOR_PIN, { subjectIds: [math.id] });
-    const inArea = await requirementAt(FAR, { subjectIds: [math.id], areaId: served.id });
+    const inArea = await requirementAt(null, { subjectIds: [math.id], areaId: served.id });
     const elsewhere = await requirementAt(FAR, { subjectIds: [math.id] });
 
     const res = await browse(headers, { scope: "set", setId: set.id });
+    expect(res.status).toBe(200);
     expect(idsOf(res.body)).toEqual(expect.arrayContaining([inZone.id, inArea.id]));
     expect(idsOf(res.body)).not.toContain(elsewhere.id);
+  });
+
+  it("a set without zones that teaches online is online-only: it lists no home tuition", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], { isDefault: true, teachesOnline: true });
+    const home = await requirementAt(TUTOR_PIN, { subjectIds: [math.id] });
+
+    const res = await browse(headers, { scope: "set", setId: set.id });
+    expect(idsOf(res.body)).not.toContain(home.id);
+  });
+
+  it("location is ranked, not required: a pin inside the city but outside the set's zones still matches", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 2000 });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], { isDefault: true, zoneIds: [zoneId] });
+    const outsideZone = await requirementAt(SOUTH_IN_CITY, { subjectIds: [math.id] });
+
+    const res = await browse(headers, { scope: "set", setId: set.id });
+    expect(idsOf(res.body)).toEqual([outsideZone.id]);
+  });
+
+  it("a pin outside the city matches only with a zone or home within 2 km of it", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], { isDefault: true, zoneIds: [zoneId] });
+    const far = await requirementAt(FAR, { subjectIds: [math.id] });
+
+    const hidden = await browse(headers, { scope: "set", setId: set.id });
+    expect(idsOf(hidden.body)).not.toContain(far.id);
+
+    // A zone of the set one kilometre from the student's pin brings the requirement back.
+    const nearZone = await createTutorZone(tutor.id, { lat: FAR.lat, lng: FAR.lng, radiusM: 1000 });
+    await prisma.tutorRequirementZone.create({
+      data: { requirementId: set.id, tutorId: tutor.id, zoneId: nearZone },
+    });
+    const shown = await browse(headers, { scope: "set", setId: set.id });
+    expect(idsOf(shown.body)).toContain(far.id);
+  });
+
+  it("an online requirement matches a set that teaches online, even when the student is outside Dhaka", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const online = await requirementAt(FAR, { subjectIds: [math.id], tuitionType: "Online" });
+
+    const teaching = await createSet(tutor.id, [math.id], {
+      name: "Teaches online",
+      zoneIds: [zoneId],
+      teachesOnline: true,
+    });
+    const listed = await browse(headers, { scope: "set", setId: teaching.id });
+    expect(idsOf(listed.body)).toEqual([online.id]);
+
+    const notOnline = await createSet(tutor.id, [math.id], {
+      name: "No online",
+      zoneIds: [zoneId],
+      teachesOnline: false,
+    });
+    const hidden = await browse(headers, { scope: "set", setId: notOnline.id });
+    expect(idsOf(hidden.body)).not.toContain(online.id);
+  });
+
+  it("returns match score and reasons for each row in set mode, and null match elsewhere", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], { isDefault: true, zoneIds: [zoneId] });
+    const req = await requirementAt(TUTOR_PIN, { subjectIds: [math.id] });
+
+    const inSet = await browse(headers, { scope: "set", setId: set.id });
+    expect(inSet.body.matchVersion).toBe(0);
+    const match = matchOf(inSet.body, req.id) as { score: number; reasons: unknown[] };
+    expect(match.score).toBeGreaterThan(0);
+    expect(match.score).toBeLessThanOrEqual(100);
+    expect(match.reasons.length).toBeGreaterThan(0);
+    expect(match.reasons[0]).toEqual({
+      rule: expect.any(String),
+      ok: expect.any(Boolean),
+      label: expect.any(String),
+    });
+    expect(inSet.body.gaps).toEqual([]);
+
+    const all = await browse(headers, { scope: "all" });
+    expect(all.body.matchVersion).toBeNull();
+    expect(all.body.gaps).toEqual([]);
+    expect(matchOf(all.body, req.id)).toBeNull();
+  });
+
+  it("sort=match orders by score: a requirement inside the zone ranks above one 8 km away", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 2000 });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], { isDefault: true, zoneIds: [zoneId] });
+    const far = await requirementAt(SOUTH_IN_CITY, { subjectIds: [math.id] });
+    const inside = await requirementAt(TUTOR_PIN, { subjectIds: [math.id] });
+
+    const res = await browse(headers, { scope: "set", setId: set.id, sort: "match" });
+    expect(res.status).toBe(200);
+    expect(idsOf(res.body)).toEqual([inside.id, far.id]);
+    const scores = res.body.requirements.map((r: { match: { score: number } }) => r.match.score);
+    expect(scores[0]).toBeGreaterThan(scores[1]);
+    expect(res.body.nextCursor).toBeNull();
+  });
+
+  it("sort=match pages with an offset cursor, and a cursor from an older config version restarts at 0", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], { isDefault: true, zoneIds: [zoneId] });
+    const { student } = await createStudentAt({ pin: TUTOR_PIN });
+    const ids: string[] = [];
+    for (let i = 0; i < 3; i++) {
+      const req = await createRequirement({ studentId: student.id, subjectIds: [math.id] });
+      await prisma.tuitionRequirement.update({
+        where: { id: req.id },
+        data: { createdAt: new Date(Date.UTC(2026, 0, 1 + i)) },
+      });
+      ids.push(req.id);
+    }
+    // Equal scores: the tie goes to the newest requirement.
+    const newestFirst = [...ids].reverse();
+
+    const first = await browse(headers, { scope: "set", setId: set.id, sort: "match", limit: 2 });
+    expect(idsOf(first.body)).toEqual(newestFirst.slice(0, 2));
+    expect(first.body.nextCursor).toEqual(expect.any(String));
+
+    const second = await browse(headers, {
+      scope: "set",
+      setId: set.id,
+      sort: "match",
+      limit: 2,
+      cursor: first.body.nextCursor,
+    });
+    expect(idsOf(second.body)).toEqual([newestFirst[2]]);
+    expect(second.body.nextCursor).toBeNull();
+
+    const stale = Buffer.from(JSON.stringify({ o: 2, v: 999 })).toString("base64url");
+    const restarted = await browse(headers, {
+      scope: "set",
+      setId: set.id,
+      sort: "match",
+      limit: 2,
+      cursor: stale,
+    });
+    expect(idsOf(restarted.body)).toEqual(newestFirst.slice(0, 2));
+
+    const malformed = await browse(headers, {
+      scope: "set",
+      setId: set.id,
+      sort: "match",
+      cursor: "!!!",
+    });
+    expect(malformed.status).toBe(400);
+    expect(malformed.body.code).toBe("VALIDATION_ERROR");
+    expect(malformed.body.issues[0].path).toEqual(["cursor"]);
+  });
+
+  it("sort=match needs scope=set: 400 on sort for any other scope", async () => {
+    const { headers } = await createBrowsingTutor();
+    for (const scope of ["nearby", "all", "invited"]) {
+      const res = await browse(headers, { scope, sort: "match" });
+      expect(res.status).toBe(400);
+      expect(res.body.code).toBe("VALIDATION_ERROR");
+      expect(res.body.issues[0].path).toEqual(["sort"]);
+    }
+  });
+
+  it("gaps explain an empty set page: a wider level range would show the requirement", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const zoneId = await createTutorZone(tutor.id, { radiusM: 5000 });
+    const math = await createSubject();
+    const set = await createSet(tutor.id, [math.id], {
+      isDefault: true,
+      zoneIds: [zoneId],
+      curricula: ["BANGLA_MEDIUM"],
+      levelMin: 1,
+      levelMax: 3,
+    });
+    await requirementAt(TUTOR_PIN, {
+      subjectIds: [math.id],
+      levelCode: 5,
+      curriculum: "BANGLA_MEDIUM",
+    });
+
+    const res = await browse(headers, { scope: "set", setId: set.id });
+    expect(res.body.requirements).toEqual([]);
+    expect(res.body.gaps).toEqual([{ code: "WIDER_LEVEL", requirements: 1 }]);
+
+    // Gaps come with the first page only.
+    const withCursor = await browse(headers, {
+      scope: "set",
+      setId: set.id,
+      cursor: Buffer.from(JSON.stringify(["2026-01-01T00:00:00.000Z", randomUUID()])).toString(
+        "base64url",
+      ),
+    });
+    expect(withCursor.body.gaps).toEqual([]);
+  });
+
+  it("scope=invited lists only the OPEN requirements the tutor was invited to, newest invite first", async () => {
+    const { tutor, headers } = await createBrowsingTutor();
+    const { tutor: rival } = await createBrowsingTutor();
+    const { student } = await createStudentAt({ pin: FAR });
+    const earlier = await createRequirement({ studentId: student.id });
+    const later = await createRequirement({ studentId: student.id });
+    const uninvited = await createRequirement({ studentId: student.id });
+    const closedReq = await createRequirement({ studentId: student.id, status: "CLOSED" });
+
+    const earlierAt = new Date("2026-03-01T10:00:00.000Z");
+    const laterAt = new Date("2026-03-02T10:00:00.000Z");
+    await prisma.requirementInvite.createMany({
+      data: [
+        {
+          requirementId: earlier.id,
+          tutorId: tutor.id,
+          studentId: student.id,
+          createdAt: earlierAt,
+        },
+        { requirementId: later.id, tutorId: tutor.id, studentId: student.id, createdAt: laterAt },
+        { requirementId: closedReq.id, tutorId: tutor.id, studentId: student.id },
+        { requirementId: uninvited.id, tutorId: rival.id, studentId: student.id },
+      ],
+    });
+
+    const res = await browse(headers, { scope: "invited", curriculum: "ENGLISH_VERSION" });
+    expect(res.status).toBe(200);
+    expect(idsOf(res.body)).toEqual([later.id, earlier.id]);
+    expect(res.body.requirements[0].invitedAt).toBe(laterAt.toISOString());
+    expect(res.body.requirements[1].invitedAt).toBe(earlierAt.toISOString());
+    expect(res.body.matchVersion).toBeNull();
+
+    const paged = await browse(headers, { scope: "invited", limit: 1 });
+    expect(idsOf(paged.body)).toEqual([later.id]);
+    const next = await browse(headers, {
+      scope: "invited",
+      limit: 1,
+      cursor: paged.body.nextCursor,
+    });
+    expect(idsOf(next.body)).toEqual([earlier.id]);
+    expect(next.body.nextCursor).toBeNull();
+
+    const all = await browse(headers, { scope: "all" });
+    const plain = all.body.requirements.find((r: { id: string }) => r.id === uninvited.id);
+    expect(plain.invitedAt).toBeNull();
   });
 
   it("returns 404 for another tutor's set and for an archived set of your own", async () => {

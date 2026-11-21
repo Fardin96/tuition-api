@@ -19,6 +19,8 @@ const notificationInclude = {
       student: { select: { accountId: true, name: true } },
     },
   },
+  // REQUIREMENT_INVITED alerts: the student who sent the invite is the counterpart.
+  requirement: { select: { student: { select: { name: true } } } },
 } satisfies Prisma.AppNotificationInclude;
 
 type NotificationRow = Prisma.AppNotificationGetPayload<{ include: typeof notificationInclude }>;
@@ -26,18 +28,26 @@ type NotificationRow = Prisma.AppNotificationGetPayload<{ include: typeof notifi
 function toNotification(row: NotificationRow, accountId: string): AppNotificationResponse {
   const { application } = row;
   // Upload alerts have no application. The recipient is either the tutor or the student on the
-  // application; the other one is the counterpart.
+  // application; the other one is the counterpart. An invite's counterpart is the student.
   const recipientIsTutor = application?.tutor.accountId === accountId;
+  const inviteStudent = row.requirement?.student.name ?? null;
   return {
     id: row.id,
     kind: row.kind,
     applicationId: row.applicationId,
-    listingKind: application ? (application.requirementId ? "REQUIREMENT" : "PACKAGE") : null,
+    requirementId: row.requirementId,
+    listingKind: application
+      ? application.requirementId
+        ? "REQUIREMENT"
+        : "PACKAGE"
+      : row.requirementId
+        ? "REQUIREMENT"
+        : null,
     counterpartName: application
       ? recipientIsTutor
         ? application.student.name
         : application.tutor.name
-      : null,
+      : inviteStudent,
     // Stored only when the admin shared it, so no visibility check is needed here.
     note: row.note,
     filePurpose: row.filePurpose,
