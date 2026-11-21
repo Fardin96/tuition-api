@@ -243,10 +243,20 @@ export type AppNotification = Prisma.AppNotificationModel
  */
 export type BlogPost = Prisma.BlogPostModel
 /**
+ * Model Story
+ * 
+ */
+export type Story = Prisma.StoryModel
+/**
  * Model SiteContent
  * 
  */
 export type SiteContent = Prisma.SiteContentModel
+/**
+ * Model SiteContentFile
+ * 
+ */
+export type SiteContentFile = Prisma.SiteContentFileModel
 /**
  * Model PlatformSetting
  * 

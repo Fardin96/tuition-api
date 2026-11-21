@@ -7,6 +7,7 @@ import {
   createAdmin,
   createFakeStorage,
   createFileAsset,
+  createLandingRow,
   createTestApp,
   createTutorProfile,
   fakeFileBytes,
@@ -466,5 +467,37 @@ describe("admin tutor video moderation history", () => {
     });
     const blocked = JSON.parse((await app.inject({ method: "GET", url: BASE, headers })).body);
     expect(blocked.videos[0].uploadFlags).toEqual({ recentIssues: 3, uploadsBlocked: true });
+  });
+});
+
+describe("rejecting a video that is on the landing page", () => {
+  it("takes the card off the landing page in the same decision", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const { file, video } = await uploadVideo({ status: "APPROVED" });
+    await prisma.tutorVideo.update({
+      where: { id: video.id },
+      data: { landingConsentAt: new Date() },
+    });
+    await createLandingRow("showcase", [
+      {
+        kind: "video",
+        name: "Rafi",
+        subject: "Maths",
+        thumbnail: "/assets/showcase/one.png",
+        video: `file:${file.id}`,
+        source: { kind: "tutor_video", id: video.id },
+      },
+    ]);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/${video.id}/moderate`,
+      headers: await getAuthHeaders(admin),
+      payload: { decision: "REJECT", note: "The sound is too low.", noteVisible: true },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(await prisma.siteContent.count({ where: { key: "showcase" } })).toBe(0);
   });
 });

@@ -10,6 +10,7 @@ import {
   createArea,
   createFakeStorage,
   createFileAsset,
+  createLandingRow,
   createRequirement,
   createStudentProfile,
   createSubject,
@@ -3513,5 +3514,119 @@ describe("phone verification when the tutor changes the number", () => {
     const row = await prisma.tutor.findUniqueOrThrow({ where: { accountId: account.id } });
     expect(row.name).toBe("Renamed Tutor");
     expect(row.phoneVerifiedAt).toEqual(verifiedAt);
+  });
+});
+
+describe("home page consent for my videos", () => {
+  async function approvedVideo() {
+    const account = await createAccount({ role: "TUTOR" });
+    const tutor = await createTutorProfile(account.id);
+    const file = await createFileAsset(account.id, "TUTOR_VIDEO", { contentType: "video/mp4" });
+    const video = await prisma.tutorVideo.create({
+      data: { tutorId: tutor.id, fileId: file.id, title: "Algebra", status: "APPROVED" },
+    });
+    return { account, video, file };
+  }
+
+  async function patch(
+    app: Awaited<ReturnType<typeof createTestApp>>,
+    account: Parameters<typeof getAuthHeaders>[0],
+    id: string,
+    showOnHomePage: boolean,
+  ) {
+    return app.inject({
+      method: "PATCH",
+      url: `/api/v1/tutors/me/videos/${id}`,
+      headers: await getAuthHeaders(account),
+      payload: { showOnHomePage },
+    });
+  }
+
+  it("shows showOnHomePage on my videos and sets it with PATCH", async () => {
+    const app = await createTestApp();
+    const { account, video } = await approvedVideo();
+
+    const before = await app.inject({
+      method: "GET",
+      url: "/api/v1/tutors/me/videos",
+      headers: await getAuthHeaders(account),
+    });
+    expect(JSON.parse(before.body).videos[0].showOnHomePage).toBe(false);
+
+    const on = await patch(app, account, video.id, true);
+    expect(on.statusCode).toBe(200);
+    expect(JSON.parse(on.body)).toMatchObject({ id: video.id, showOnHomePage: true });
+    expect(
+      (await prisma.tutorVideo.findUniqueOrThrow({ where: { id: video.id } })).landingConsentAt,
+    ).not.toBeNull();
+
+    const off = await patch(app, account, video.id, false);
+    expect(JSON.parse(off.body).showOnHomePage).toBe(false);
+  });
+
+  it("withdrawing consent takes the video off the landing page", async () => {
+    const app = await createTestApp();
+    const { account, video, file } = await approvedVideo();
+    await prisma.tutorVideo.update({
+      where: { id: video.id },
+      data: { landingConsentAt: new Date() },
+    });
+    await createLandingRow("showcase", [
+      {
+        kind: "video",
+        name: "Rafi",
+        subject: "Maths",
+        thumbnail: "/assets/showcase/one.png",
+        video: `file:${file.id}`,
+        source: { kind: "tutor_video", id: video.id },
+      },
+    ]);
+
+    const res = await patch(app, account, video.id, false);
+
+    expect(res.statusCode).toBe(200);
+    expect(await prisma.siteContent.count({ where: { key: "showcase" } })).toBe(0);
+    expect(
+      (await prisma.tutorVideo.findUniqueOrThrow({ where: { id: video.id } })).landingConsentAt,
+    ).toBeNull();
+  });
+
+  it("answers 404 for another tutor's video", async () => {
+    const app = await createTestApp();
+    const { video } = await approvedVideo();
+    const other = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(other.id);
+
+    const res = await patch(app, other, video.id, true);
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("deleting a video takes its card off the landing page first", async () => {
+    const app = await createTestApp();
+    const { account, video, file } = await approvedVideo();
+    await prisma.tutorVideo.update({
+      where: { id: video.id },
+      data: { landingConsentAt: new Date() },
+    });
+    await createLandingRow("showcase", [
+      {
+        kind: "video",
+        name: "Rafi",
+        subject: "Maths",
+        thumbnail: "/assets/showcase/one.png",
+        video: `file:${file.id}`,
+        source: { kind: "tutor_video", id: video.id },
+      },
+    ]);
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: `/api/v1/tutors/me/videos/${video.id}`,
+      headers: await getAuthHeaders(account),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.siteContent.count({ where: { key: "showcase" } })).toBe(0);
   });
 });

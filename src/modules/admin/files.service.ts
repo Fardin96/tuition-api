@@ -5,6 +5,8 @@ import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { discardFile, removeObjects, unattachedFileWhere } from "../files/files.service.js";
 import { notifyUpload, recordUploadReview } from "../files/upload-review.service.js";
+import type { CardSource } from "../site-content/site-content.schema.js";
+import { removeSourceFromLanding } from "../site-content/site-content.service.js";
 import type {
   AdminFileListQuery,
   AdminFileResponse,
@@ -22,6 +24,9 @@ const adminFileInclude = {
       credentials: true,
       videos: true,
       blogCovers: true,
+      siteContentUses: true,
+      storyImages: true,
+      storyVideos: true,
     },
   },
 } as const;
@@ -43,7 +48,15 @@ function toAdminFile(row: AdminFileRow): AdminFileResponse {
     ownerEmail: row.owner.email,
     published: row.publishedAt !== null,
     inUse:
-      c.studentVerifications + c.tutorVerifications + c.credentials + c.videos + c.blogCovers > 0,
+      c.studentVerifications +
+        c.tutorVerifications +
+        c.credentials +
+        c.videos +
+        c.blogCovers +
+        c.siteContentUses +
+        c.storyImages +
+        c.storyVideos >
+      0,
   };
 }
 
@@ -188,10 +201,28 @@ async function removeStudentIdFile(
 }
 
 /**
+ * The story or tutor video a file belongs to, if any. A plain read: the caller locks the source row
+ * next and checks again through removeSourceFromLanding.
+ */
+async function sourceOfFile(tx: Tx, fileId: string): Promise<CardSource | null> {
+  const story = await tx.story.findFirst({
+    where: { OR: [{ imageFileId: fileId }, { videoFileId: fileId }] },
+    select: { id: true },
+  });
+  if (story) return { kind: "story", id: story.id };
+  const video = await tx.tutorVideo.findUnique({ where: { fileId }, select: { id: true } });
+  return video ? { kind: "tutor_video", id: video.id } : null;
+}
+
+/**
  * Takes an uploaded file down for its owner, in one transaction: the record that uses it is
  * changed or removed, the file is marked DELETED, and the change is audited, kept in the upload
  * history and sent to the owner as an alert. The stored copies are removed after the commit.
- * 404 when the file is missing or already removed; 400 for a blog cover (remove it from its post).
+ * 404 when the file is missing or already removed; 400 for a blog cover (remove it from its post)
+ * or site media (replace it in Site content).
+ *
+ * A story or tutor video file takes its card off the landing page first. A story goes with all its
+ * files. Lock order: the source row, the landing lists, then the file row.
  */
 export async function removeFile(
   fileId: string,
@@ -205,14 +236,27 @@ export async function removeFile(
     unverify: input.unverify,
   };
   const removed = await prisma.$transaction(async (tx) => {
+    const source = await sourceOfFile(tx, fileId);
+    if (source?.kind === "story") {
+      await tx.$queryRaw`SELECT id FROM story WHERE id = ${source.id}::uuid FOR UPDATE`;
+    } else if (source) {
+      await tx.$queryRaw`SELECT id FROM tutor_video WHERE id = ${source.id}::uuid FOR UPDATE`;
+    }
+    if (source) await removeSourceFromLanding(tx, source, admin.accountId);
+
     await tx.$queryRaw`SELECT id FROM file_asset WHERE id = ${fileId}::uuid FOR UPDATE`;
     const row: FileAsset | null = await tx.fileAsset.findUnique({ where: { id: fileId } });
     if (!row || row.status === "DELETED") throw notFound("File not found");
     if (row.purpose === "BLOG_COVER") {
       throw appError("InvalidFile", 400, "Remove a blog cover from its post.");
     }
+    if (row.purpose === "SITE_IMAGE" || row.purpose === "SITE_VIDEO") {
+      throw appError("InvalidFile", 400, "Replace this file in Site content first.");
+    }
 
     let verificationStatus: VerificationStatus | null = null;
+    // Files that go with the removed record, besides this one.
+    const alsoRemoved: FileAsset[] = [];
     if (row.purpose === "TUTOR_ID") {
       verificationStatus = await removeTutorIdFile(tx, row.id, admin, decision);
     } else if (row.purpose === "STUDENT_ID") {
@@ -221,6 +265,18 @@ export async function removeFile(
       await tx.tutorCredential.deleteMany({ where: { fileId: row.id } });
     } else if (row.purpose === "TUTOR_VIDEO") {
       await tx.tutorVideo.deleteMany({ where: { fileId: row.id } });
+    } else if (row.purpose === "STORY_IMAGE" || row.purpose === "STORY_VIDEO") {
+      const story = await tx.story.findFirst({
+        where: { OR: [{ imageFileId: row.id }, { videoFileId: row.id }] },
+      });
+      if (story) {
+        await tx.story.delete({ where: { id: story.id } });
+        for (const other of [story.imageFileId, story.videoFileId]) {
+          if (!other || other === row.id) continue;
+          const file = await discardFile(tx, other);
+          if (file) alsoRemoved.push(file);
+        }
+      }
     }
 
     const file = await discardFile(tx, row.id);
@@ -254,10 +310,10 @@ export async function removeFile(
       noteVisible: input.noteVisible,
       filePurpose: row.purpose,
     });
-    return file;
+    return [file, ...alsoRemoved];
   });
 
   // Best-effort: a failed delete is logged and the file-cleanup cron retries it.
-  await removeObjects([removed]);
+  await removeObjects(removed);
   return getAdminFile(fileId);
 }

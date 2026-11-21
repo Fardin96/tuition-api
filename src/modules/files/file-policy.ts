@@ -7,19 +7,26 @@ const MB = 1024 * 1024;
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 const DOCUMENT_TYPES = [...IMAGE_TYPES, "application/pdf"] as const;
 const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"] as const;
+// Site and story videos play on the landing page in any browser, so no QuickTime.
+const WEB_VIDEO_TYPES = ["video/mp4", "video/webm"] as const;
 
 export type FilePolicy = {
-  role: Role;
+  /** Who may start an upload of this purpose. ADMIN means an ACTIVE admin. */
+  roles: readonly Role[];
   contentTypes: readonly string[];
   maxBytes: number;
 };
 
 export const FILE_POLICY: Record<FilePurpose, FilePolicy> = {
-  STUDENT_ID: { role: "STUDENT", contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
-  TUTOR_ID: { role: "TUTOR", contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
-  CREDENTIAL: { role: "TUTOR", contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
-  TUTOR_VIDEO: { role: "TUTOR", contentTypes: VIDEO_TYPES, maxBytes: 2 * MB },
-  BLOG_COVER: { role: "ADMIN", contentTypes: IMAGE_TYPES, maxBytes: 2 * MB },
+  STUDENT_ID: { roles: ["STUDENT"], contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
+  TUTOR_ID: { roles: ["TUTOR"], contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
+  CREDENTIAL: { roles: ["TUTOR"], contentTypes: DOCUMENT_TYPES, maxBytes: 2 * MB },
+  TUTOR_VIDEO: { roles: ["TUTOR"], contentTypes: VIDEO_TYPES, maxBytes: 2 * MB },
+  BLOG_COVER: { roles: ["ADMIN"], contentTypes: IMAGE_TYPES, maxBytes: 2 * MB },
+  SITE_IMAGE: { roles: ["ADMIN"], contentTypes: IMAGE_TYPES, maxBytes: 5 * MB },
+  SITE_VIDEO: { roles: ["ADMIN"], contentTypes: WEB_VIDEO_TYPES, maxBytes: 25 * MB },
+  STORY_IMAGE: { roles: ["STUDENT", "TUTOR"], contentTypes: IMAGE_TYPES, maxBytes: 5 * MB },
+  STORY_VIDEO: { roles: ["STUDENT"], contentTypes: WEB_VIDEO_TYPES, maxBytes: 25 * MB },
 };
 
 /** Signed upload URLs live this long (seconds). */

@@ -28,6 +28,7 @@ import {
   isPhoneVerificationRequired,
 } from "../phone-verification/phone-verification.policy.js";
 import { pageVisibleReviews, reviewSummary } from "../review/review.service.js";
+import { removeSourceFromLanding } from "../site-content/site-content.service.js";
 import type {
   CreateCredentialInput,
   CreateTutorRequirementInput,
@@ -569,6 +570,7 @@ async function ownerVideoFields(video: VideoRow) {
   return {
     ...(await publicVideoFields(video)),
     status: video.status,
+    showOnHomePage: video.landingConsentAt !== null,
     // Hidden admin notes never reach the uploader.
     moderationNote: visibleNote(video.moderationNote, video.noteVisible),
   };
@@ -621,16 +623,57 @@ export async function addTutorVideo(accountId: string, input: CreateVideoInput) 
   return ownerVideoFields(video);
 }
 
+// The tutor agrees (true) or withdraws (false) showing an approved video on the home page. Withdrawing
+// takes the video off the landing page in the same transaction. 404 when the video is not the tutor's.
+export async function setVideoHomePage(
+  accountId: string,
+  videoId: string,
+  showOnHomePage: boolean,
+) {
+  const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
+  if (!tutor) return null;
+
+  const video = await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM tutor_video WHERE id = ${videoId}::uuid AND tutor_id = ${tutor.id}::uuid FOR UPDATE`;
+    const current = await tx.tutorVideo.findFirst({
+      where: { id: videoId, tutorId: tutor.id },
+      include: { file: videoFileSelect },
+    });
+    if (!current) return null;
+
+    if (showOnHomePage) {
+      if (!current.landingConsentAt) {
+        await tx.tutorVideo.update({
+          where: { id: videoId },
+          data: { landingConsentAt: new Date() },
+        });
+      }
+    } else {
+      await removeSourceFromLanding(tx, { kind: "tutor_video", id: videoId }, accountId);
+      await tx.tutorVideo.update({ where: { id: videoId }, data: { landingConsentAt: null } });
+    }
+    return tx.tutorVideo.findUniqueOrThrow({
+      where: { id: videoId },
+      include: { file: videoFileSelect },
+    });
+  });
+  if (!video) return null;
+  return ownerVideoFields(video);
+}
+
 export async function deleteTutorVideo(accountId: string, videoId: string) {
   const tutor = await prisma.tutor.findUnique({ where: { accountId }, select: { id: true } });
   if (!tutor) return false;
 
   const removed = await prisma.$transaction(async (tx) => {
+    // The video row is locked first, then the landing lists, then the video is deleted.
+    await tx.$queryRaw`SELECT id FROM tutor_video WHERE id = ${videoId}::uuid AND tutor_id = ${tutor.id}::uuid FOR UPDATE`;
     const video = await tx.tutorVideo.findFirst({
       where: { id: videoId, tutorId: tutor.id },
       select: { id: true, fileId: true },
     });
     if (!video) return null;
+    await removeSourceFromLanding(tx, { kind: "tutor_video", id: video.id }, accountId);
     await tx.tutorVideo.delete({ where: { id: video.id } });
     return { file: await discardFile(tx, video.fileId) };
   });

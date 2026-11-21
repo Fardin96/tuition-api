@@ -9,6 +9,7 @@ import { prisma } from "../../lib/prisma.js";
 import { removeObjects } from "../files/files.service.js";
 import { visibleNote } from "../files/upload-review.service.js";
 import { findOwnLocation } from "../location/location.service.js";
+import { removeAccountFromLanding } from "../site-content/site-content.service.js";
 
 const GOOGLE_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
 const GOOGLE_JWKS_URI = "https://www.googleapis.com/oauth2/v3/certs";
@@ -402,6 +403,8 @@ export async function softDeleteAccount(accountId: string) {
       where: { accountId, revokedAt: null },
       data: { revokedAt: now },
     });
+    // Stories and videos on the landing page come down with the account.
+    await removeAccountFromLanding(tx, accountId, accountId);
     return tx.account.update({
       where: { id: accountId },
       data: { deletedAt: now, status: "DELETED" },
@@ -417,6 +420,9 @@ export async function hardDeleteAccount(accountId: string) {
   });
 
   await prisma.$transaction(async (tx) => {
+    // First: the landing page uses these files, and a file in use cannot be deleted.
+    await removeAccountFromLanding(tx, accountId, null);
+
     // Sequential: a transaction client cannot run queries concurrently (pg deprecation warning).
     const student = await tx.student.findUnique({ where: { accountId }, select: { id: true } });
     const tutor = await tx.tutor.findUnique({ where: { accountId }, select: { id: true } });
@@ -480,6 +486,10 @@ export async function hardDeleteAccount(accountId: string) {
         data: { updatedById: null },
       });
       await tx.blogPost.deleteMany({ where: { authorId: accountId } });
+      await tx.story.updateMany({
+        where: { reviewedById: accountId },
+        data: { reviewedById: null },
+      });
     }
 
     const applicationWhere: Prisma.ApplicationWhereInput = {};
@@ -540,6 +550,8 @@ export async function hardDeleteAccount(accountId: string) {
       await tx.adminUser.deleteMany({ where: { accountId } });
     }
 
+    // Stories hold their files (RESTRICT), so they go before the file assets.
+    await tx.story.deleteMany({ where: { accountId } });
     // File assets must go after every row that references them.
     await tx.fileAsset.deleteMany({ where: { ownerAccountId: accountId } });
 

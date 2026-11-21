@@ -213,6 +213,10 @@ enum FilePurpose {
   CREDENTIAL
   TUTOR_VIDEO
   BLOG_COVER
+  SITE_IMAGE
+  SITE_VIDEO
+  STORY_IMAGE
+  STORY_VIDEO
 }
 
 enum FileStatus {
@@ -293,6 +297,9 @@ enum AppNotificationKind {
   UPLOADS_UNBLOCKED
   // A student invited the tutor to apply. Carries requirement_id, not application_id.
   REQUIREMENT_INVITED
+  // Story review. No application or requirement; the note is set only when the admin shared it.
+  STORY_APPROVED
+  STORY_REJECTED
 }
 
 // What an admin did to a user's upload, kept after the file itself is gone.
@@ -388,6 +395,7 @@ model Account {
   disputesAgainst Dispute[]         @relation("DisputeAgainst")
   refundRequests  PaymentRefund[]
   phoneOtps       PhoneOtp[]
+  stories         Story[]
 
   @@unique([id, role]) // target of the profile composite FKs
   @@map("account")
@@ -453,6 +461,7 @@ model AdminUser {
   handledDisputes       Dispute[]
   zoneRequestsDecided   ZoneLimitRequest[]
   settingsEdits         PlatformSetting[]
+  reviewedStories       Story[]             @relation("StoryReviewer")
 
   @@unique([accountId, role])
   @@map("admin_user")
@@ -590,7 +599,10 @@ model FileAsset {
   credentials          TutorCredential[]
   videos               TutorVideo[]
   blogCovers           BlogPost[]
+  siteContentUses      SiteContentFile[]
   reviews              UploadReview[]
+  storyImages          Story[]             @relation("StoryImage")
+  storyVideos          Story[]             @relation("StoryVideo")
 
   @@index([ownerAccountId])
   @@index([status, createdAt])
@@ -801,16 +813,18 @@ model TutorCredential {
 
 // Needs admin approval before it shows. Curated: top tutors only (20-50 total).
 model TutorVideo {
-  id             String           @id @default(uuid(7)) @db.Uuid
-  tutorId        String           @map("tutor_id") @db.Uuid
-  fileId         String           @unique @map("file_id") @db.Uuid
-  title          String
-  status         ModerationStatus @default(PENDING)
-  moderationNote String?          @map("moderation_note")
+  id               String           @id @default(uuid(7)) @db.Uuid
+  tutorId          String           @map("tutor_id") @db.Uuid
+  fileId           String           @unique @map("file_id") @db.Uuid
+  title            String
+  status           ModerationStatus @default(PENDING)
+  moderationNote   String?          @map("moderation_note")
   // False keeps the note between admins: the tutor sees a generic message instead.
-  noteVisible    Boolean          @default(true) @map("note_visible")
-  sortOrder      Int              @default(0) @map("sort_order")
-  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  noteVisible      Boolean          @default(true) @map("note_visible")
+  sortOrder        Int              @default(0) @map("sort_order")
+  // Set while the tutor agrees to show this approved video on the home page (see stories and site content).
+  landingConsentAt DateTime?        @map("landing_consent_at") @db.Timestamptz(3)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
 
   tutor Tutor     @relation(fields: [tutorId], references: [id])
   file  FileAsset @relation(fields: [fileId], references: [id])
@@ -1498,6 +1512,37 @@ model BlogPost {
   @@map("blog_post")
 }
 
+// A testimonial sent in by a student or tutor. Students send a headline, a body and optionally a photo
+// and a clip; tutors send a body and optionally a photo. One pending story per account, at most three
+// stories per account. The partial unique index story_one_pending_per_account is in constraints.sql.
+model Story {
+  id             String           @id @default(uuid(7)) @db.Uuid
+  accountId      String           @map("account_id") @db.Uuid
+  role           Role
+  headline       String?
+  body           String
+  imageFileId    String?          @unique @map("image_file_id") @db.Uuid
+  videoFileId    String?          @unique @map("video_file_id") @db.Uuid
+  // When the author agreed to publication. Set at creation.
+  consentAt      DateTime         @map("consent_at") @db.Timestamptz(3)
+  status         ModerationStatus @default(PENDING)
+  moderationNote String?          @map("moderation_note")
+  // False keeps the note between admins: the author sees a generic message instead.
+  noteVisible    Boolean          @default(true) @map("note_visible")
+  reviewedById   String?          @map("reviewed_by") @db.Uuid
+  decidedAt      DateTime?        @map("decided_at") @db.Timestamptz(3)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  account    Account    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  image      FileAsset? @relation("StoryImage", fields: [imageFileId], references: [id], onDelete: Restrict)
+  video      FileAsset? @relation("StoryVideo", fields: [videoFileId], references: [id], onDelete: Restrict)
+  reviewedBy AdminUser? @relation("StoryReviewer", fields: [reviewedById], references: [accountId], onDelete: Restrict)
+
+  @@index([accountId])
+  @@index([status, createdAt(sort: Desc)])
+  @@map("story")
+}
+
 // Landing-page blocks (hero, testimonials, FAQ...) as keyed JSON.
 model SiteContent {
   key         String   @id
@@ -1505,9 +1550,23 @@ model SiteContent {
   updatedById String?  @map("updated_by") @db.Uuid
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  updatedBy AdminUser? @relation(fields: [updatedById], references: [accountId], onDelete: Restrict)
+  updatedBy AdminUser?        @relation(fields: [updatedById], references: [accountId], onDelete: Restrict)
+  files     SiteContentFile[]
 
   @@map("site_content")
+}
+
+// Which uploaded files a site_content row uses (its "file:<id>" media values), so the file cleanup
+// sweep keeps them. Rewritten on every save of the block; a reset deletes the rows.
+model SiteContentFile {
+  key         String
+  fileId      String      @map("file_id") @db.Uuid
+  siteContent SiteContent @relation(fields: [key], references: [key], onDelete: Cascade, onUpdate: Cascade)
+  file        FileAsset   @relation(fields: [fileId], references: [id], onDelete: Restrict)
+
+  @@id([key, fileId])
+  @@index([fileId])
+  @@map("site_content_file")
 }
 
 // Admin-switchable platform flags and numbers. Values are validated per key by a CHECK in constraints.sql.

@@ -8,8 +8,10 @@ import {
   createArea,
   createFakeStorage,
   createFileAsset,
+  createLandingRow,
   createRequirement,
   createSession,
+  createStoryRow,
   createStudentProfile,
   createSubject,
   createTestApp,
@@ -1033,5 +1035,57 @@ describe("auth service", () => {
     const hash2 = authService.hashToken("abc");
     expect(hash1).toBe(hash2);
     expect(hash1).not.toBe("abc");
+  });
+});
+
+describe("account deletion takes landing cards off", () => {
+  async function studentWithLandingStory() {
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    await createStudentProfile(account.id, area.id);
+    const photo = await createFileAsset(account.id, "STORY_IMAGE", { contentType: "image/png" });
+    const story = await createStoryRow(account.id, { status: "APPROVED", imageFileId: photo.id });
+    await createLandingRow("testimonials", [
+      {
+        name: "Ana",
+        role: "Student",
+        photo: `file:${photo.id}`,
+        quote: "Great help",
+        comment: "Clear lessons every week",
+        source: { kind: "story", id: story.id },
+      },
+    ]);
+    await prisma.siteContentFile.create({ data: { key: "testimonials", fileId: photo.id } });
+    return { account, photo, story };
+  }
+
+  it("soft delete removes the story card from the landing page", async () => {
+    const app = await createTestApp();
+    const { account } = await studentWithLandingStory();
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me",
+      headers: await getAuthHeaders(account),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.siteContent.count({ where: { key: "testimonials" } })).toBe(0);
+  });
+
+  it("hard delete succeeds with a story on the landing page and removes its files", async () => {
+    const app = await createTestApp();
+    const { account, photo } = await studentWithLandingStory();
+
+    const res = await app.inject({
+      method: "DELETE",
+      url: "/api/v1/me/hard-delete",
+      headers: await getAuthHeaders(account),
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.count({ where: { id: account.id } })).toBe(0);
+    expect(await prisma.fileAsset.count({ where: { id: photo.id } })).toBe(0);
+    expect(await prisma.siteContent.count({ where: { key: "testimonials" } })).toBe(0);
   });
 });

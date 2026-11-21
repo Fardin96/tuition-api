@@ -232,7 +232,11 @@ export const FilePurpose = {
   TUTOR_ID: 'TUTOR_ID',
   CREDENTIAL: 'CREDENTIAL',
   TUTOR_VIDEO: 'TUTOR_VIDEO',
-  BLOG_COVER: 'BLOG_COVER'
+  BLOG_COVER: 'BLOG_COVER',
+  SITE_IMAGE: 'SITE_IMAGE',
+  SITE_VIDEO: 'SITE_VIDEO',
+  STORY_IMAGE: 'STORY_IMAGE',
+  STORY_VIDEO: 'STORY_VIDEO'
 } as const
 
 export type FilePurpose = (typeof FilePurpose)[keyof typeof FilePurpose]
@@ -336,7 +340,9 @@ export const AppNotificationKind = {
   FILE_REMOVED: 'FILE_REMOVED',
   UPLOADS_BLOCKED: 'UPLOADS_BLOCKED',
   UPLOADS_UNBLOCKED: 'UPLOADS_UNBLOCKED',
-  REQUIREMENT_INVITED: 'REQUIREMENT_INVITED'
+  REQUIREMENT_INVITED: 'REQUIREMENT_INVITED',
+  STORY_APPROVED: 'STORY_APPROVED',
+  STORY_REJECTED: 'STORY_REJECTED'
 } as const
 
 export type AppNotificationKind = (typeof AppNotificationKind)[keyof typeof AppNotificationKind]

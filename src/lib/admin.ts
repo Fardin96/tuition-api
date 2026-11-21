@@ -10,7 +10,8 @@ export function privateNoStore(app: FastifyInstance) {
 }
 
 export type AuditEntry = {
-  actorAccountId: string;
+  /** Null for a system action (no account did it). */
+  actorAccountId: string | null;
   /** "<entity>.<verb>", for example "fee.waive" or "account.block". */
   action: string;
   entityType: string;

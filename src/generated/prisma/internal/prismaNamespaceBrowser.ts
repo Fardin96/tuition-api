@@ -96,7 +96,9 @@ export const ModelName = {
   NotificationLog: 'NotificationLog',
   AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
+  Story: 'Story',
   SiteContent: 'SiteContent',
+  SiteContentFile: 'SiteContentFile',
   PlatformSetting: 'PlatformSetting',
   AuditLog: 'AuditLog'
 } as const
@@ -401,6 +403,7 @@ export const TutorVideoScalarFieldEnum = {
   moderationNote: 'moderationNote',
   noteVisible: 'noteVisible',
   sortOrder: 'sortOrder',
+  landingConsentAt: 'landingConsentAt',
   createdAt: 'createdAt'
 } as const
 
@@ -849,6 +852,26 @@ export const BlogPostScalarFieldEnum = {
 export type BlogPostScalarFieldEnum = (typeof BlogPostScalarFieldEnum)[keyof typeof BlogPostScalarFieldEnum]
 
 
+export const StoryScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  role: 'role',
+  headline: 'headline',
+  body: 'body',
+  imageFileId: 'imageFileId',
+  videoFileId: 'videoFileId',
+  consentAt: 'consentAt',
+  status: 'status',
+  moderationNote: 'moderationNote',
+  noteVisible: 'noteVisible',
+  reviewedById: 'reviewedById',
+  decidedAt: 'decidedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type StoryScalarFieldEnum = (typeof StoryScalarFieldEnum)[keyof typeof StoryScalarFieldEnum]
+
+
 export const SiteContentScalarFieldEnum = {
   key: 'key',
   value: 'value',
@@ -857,6 +880,14 @@ export const SiteContentScalarFieldEnum = {
 } as const
 
 export type SiteContentScalarFieldEnum = (typeof SiteContentScalarFieldEnum)[keyof typeof SiteContentScalarFieldEnum]
+
+
+export const SiteContentFileScalarFieldEnum = {
+  key: 'key',
+  fileId: 'fileId'
+} as const
+
+export type SiteContentFileScalarFieldEnum = (typeof SiteContentFileScalarFieldEnum)[keyof typeof SiteContentFileScalarFieldEnum]
 
 
 export const PlatformSettingScalarFieldEnum = {

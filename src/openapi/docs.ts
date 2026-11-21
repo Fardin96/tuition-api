@@ -24,11 +24,13 @@ export const TAGS = [
   { name: "Disputes", description: "Disputes inside a confirmed or completed tuition." },
   { name: "Fees", description: "A tutor's platform fees and online payments (SSLCommerz)." },
   { name: "Videos", description: "Public tutor videos." },
+  { name: "Stories", description: "Testimonials students and tutors send in for admin review." },
   {
     name: "Files",
     description: "Uploads to Cloudflare R2: signed upload URL, complete, signed read URL, delete.",
   },
   { name: "Blog", description: "Published blog posts." },
+  { name: "Site content", description: "Landing page blocks and static pages." },
   { name: "Lookups", description: "Seeded reference data." },
   { name: "Admin", description: "Admin queues. Needs an ACTIVE admin_user row." },
   {

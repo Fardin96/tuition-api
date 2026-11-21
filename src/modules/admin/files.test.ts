@@ -7,6 +7,8 @@ import {
   createArea,
   createFakeStorage,
   createFileAsset,
+  createLandingRow,
+  createStoryRow,
   createStudentProfile,
   createTestApp,
   createTutorProfile,
@@ -224,6 +226,25 @@ describe("admin files", () => {
       expect(JSON.parse(res.body).code).toBe("FILE_IN_USE");
       const row = await prisma.fileAsset.findUniqueOrThrow({ where: { id: cover.id } });
       expect(row.status).toBe("UPLOADED");
+    });
+
+    it("refuses a site image a block uses with 409 FILE_IN_USE", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const image = await createFileAsset(admin.id, "SITE_IMAGE", { contentType: "image/png" });
+      await prisma.siteContent.create({
+        data: { key: "seo", value: { title: "Masters Hub", description: "Tutors." } },
+      });
+      await prisma.siteContentFile.create({ data: { key: "seo", fileId: image.id } });
+
+      const res = await app.inject({
+        method: "DELETE",
+        url: `${LIST_URL}/${image.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("FILE_IN_USE");
     });
 
     it("answers 404 for an unknown file and 403 for non-admins", async () => {
@@ -649,6 +670,34 @@ describe("POST /api/v1/admin/files/:id/remove", () => {
     expect(alert).toMatchObject({ kind: "FILE_REMOVED", note: "Duplicate upload" });
   });
 
+  it("refuses a site image or video with 400 and points to Site content", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const headers = await getAuthHeaders(admin);
+
+    for (const purpose of ["SITE_IMAGE", "SITE_VIDEO"] as const) {
+      const file = await createFileAsset(admin.id, purpose, {
+        contentType: purpose === "SITE_IMAGE" ? "image/png" : "video/mp4",
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: removeUrl(file.id),
+        headers,
+        payload: { note: "Replace it with a new one" },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body)).toMatchObject({
+        code: "INVALID_FILE",
+        message: "Replace this file in Site content first.",
+      });
+      const row = await prisma.fileAsset.findUniqueOrThrow({ where: { id: file.id } });
+      expect(row.status).toBe("UPLOADED");
+    }
+    expect(await prisma.uploadReview.count()).toBe(0);
+  });
+
   it("answers 404 for unknown and already removed files, 400 for a blog cover, 400 for a short note, 403 for non-admins", async () => {
     const app = await createTestApp();
     const admin = await createAdmin({ status: "ACTIVE" });
@@ -706,5 +755,92 @@ describe("POST /api/v1/admin/files/:id/remove", () => {
     expect((await prisma.fileAsset.findUniqueOrThrow({ where: { id: live.id } })).status).toBe(
       "UPLOADED",
     );
+  });
+});
+
+describe("removing a story or tutor video file", () => {
+  const removeUrl = (id: string) => `/api/v1/admin/files/${id}/remove`;
+  const landing = { note: "Not something we can show.", noteVisible: true };
+
+  it("removes the story with its card and its other file, and alerts the author", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const student = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    await createStudentProfile(student.id, area.id);
+    const photo = await createFileAsset(student.id, "STORY_IMAGE", { contentType: "image/png" });
+    const clip = await createFileAsset(student.id, "STORY_VIDEO", { contentType: "video/mp4" });
+    const story = await createStoryRow(student.id, {
+      status: "APPROVED",
+      imageFileId: photo.id,
+      videoFileId: clip.id,
+    });
+    await createLandingRow("testimonials", [
+      {
+        name: "Ana",
+        role: "Student",
+        photo: `file:${photo.id}`,
+        quote: "Great help",
+        comment: "Clear lessons every week",
+        source: { kind: "story", id: story.id },
+      },
+    ]);
+
+    const res = await app.inject({
+      method: "POST",
+      url: removeUrl(photo.id),
+      headers: await getAuthHeaders(admin),
+      payload: landing,
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(await prisma.story.count({ where: { id: story.id } })).toBe(0);
+    expect(await prisma.siteContent.count({ where: { key: "testimonials" } })).toBe(0);
+    expect((await prisma.fileAsset.findUniqueOrThrow({ where: { id: clip.id } })).status).toBe(
+      "DELETED",
+    );
+    const alert = await prisma.appNotification.findFirstOrThrow({
+      where: { recipientId: student.id, kind: "FILE_REMOVED" },
+    });
+    expect(alert.filePurpose).toBe("STORY_IMAGE");
+    expect(alert.note).toBe(landing.note);
+  });
+
+  it("removes a tutor video from the landing page and deletes it", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const account = await createAccount({ role: "TUTOR" });
+    const tutor = await createTutorProfile(account.id);
+    const file = await createFileAsset(account.id, "TUTOR_VIDEO", { contentType: "video/mp4" });
+    const video = await prisma.tutorVideo.create({
+      data: {
+        tutorId: tutor.id,
+        fileId: file.id,
+        title: "Algebra",
+        status: "APPROVED",
+        landingConsentAt: new Date(),
+      },
+    });
+    await createLandingRow("showcase", [
+      {
+        kind: "video",
+        name: "Rafi",
+        subject: "Maths",
+        thumbnail: "/assets/showcase/one.png",
+        video: `file:${file.id}`,
+        source: { kind: "tutor_video", id: video.id },
+      },
+    ]);
+
+    const res = await app.inject({
+      method: "POST",
+      url: removeUrl(file.id),
+      headers: await getAuthHeaders(admin),
+      payload: landing,
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(await prisma.tutorVideo.count({ where: { id: video.id } })).toBe(0);
+    expect(await prisma.siteContent.count({ where: { key: "showcase" } })).toBe(0);
   });
 });

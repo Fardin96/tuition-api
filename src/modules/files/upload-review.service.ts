@@ -29,10 +29,10 @@ export function visibleNote(note: string | null, noteVisible: boolean): string |
 
 export type UploadCategory = "VIDEOS" | "DOCUMENTS";
 
-/** Which block switch covers a purpose. Blog covers are admin uploads and are never blocked. */
+/** Which block switch covers a purpose. Blog covers and site media are admin uploads and are never blocked. */
 export function uploadCategory(purpose: FilePurpose): UploadCategory | null {
-  if (purpose === "TUTOR_VIDEO") return "VIDEOS";
-  if (purpose === "BLOG_COVER") return null;
+  if (purpose === "TUTOR_VIDEO" || purpose === "STORY_VIDEO") return "VIDEOS";
+  if (purpose === "BLOG_COVER" || purpose === "SITE_IMAGE" || purpose === "SITE_VIDEO") return null;
   return "DOCUMENTS";
 }
 

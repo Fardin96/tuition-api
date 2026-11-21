@@ -43,6 +43,7 @@ export type TutorVideoMinAggregateOutputType = {
   moderationNote: string | null
   noteVisible: boolean | null
   sortOrder: number | null
+  landingConsentAt: Date | null
   createdAt: Date | null
 }
 
@@ -55,6 +56,7 @@ export type TutorVideoMaxAggregateOutputType = {
   moderationNote: string | null
   noteVisible: boolean | null
   sortOrder: number | null
+  landingConsentAt: Date | null
   createdAt: Date | null
 }
 
@@ -67,6 +69,7 @@ export type TutorVideoCountAggregateOutputType = {
   moderationNote: number
   noteVisible: number
   sortOrder: number
+  landingConsentAt: number
   createdAt: number
   _all: number
 }
@@ -89,6 +92,7 @@ export type TutorVideoMinAggregateInputType = {
   moderationNote?: true
   noteVisible?: true
   sortOrder?: true
+  landingConsentAt?: true
   createdAt?: true
 }
 
@@ -101,6 +105,7 @@ export type TutorVideoMaxAggregateInputType = {
   moderationNote?: true
   noteVisible?: true
   sortOrder?: true
+  landingConsentAt?: true
   createdAt?: true
 }
 
@@ -113,6 +118,7 @@ export type TutorVideoCountAggregateInputType = {
   moderationNote?: true
   noteVisible?: true
   sortOrder?: true
+  landingConsentAt?: true
   createdAt?: true
   _all?: true
 }
@@ -212,6 +218,7 @@ export type TutorVideoGroupByOutputType = {
   moderationNote: string | null
   noteVisible: boolean
   sortOrder: number
+  landingConsentAt: Date | null
   createdAt: Date
   _count: TutorVideoCountAggregateOutputType | null
   _avg: TutorVideoAvgAggregateOutputType | null
@@ -247,6 +254,7 @@ export type TutorVideoWhereInput = {
   moderationNote?: Prisma.StringNullableFilter<"TutorVideo"> | string | null
   noteVisible?: Prisma.BoolFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntFilter<"TutorVideo"> | number
+  landingConsentAt?: Prisma.DateTimeNullableFilter<"TutorVideo"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TutorVideo"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   file?: Prisma.XOR<Prisma.FileAssetScalarRelationFilter, Prisma.FileAssetWhereInput>
@@ -261,6 +269,7 @@ export type TutorVideoOrderByWithRelationInput = {
   moderationNote?: Prisma.SortOrderInput | Prisma.SortOrder
   noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  landingConsentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   tutor?: Prisma.TutorOrderByWithRelationInput
   file?: Prisma.FileAssetOrderByWithRelationInput
@@ -278,6 +287,7 @@ export type TutorVideoWhereUniqueInput = Prisma.AtLeast<{
   moderationNote?: Prisma.StringNullableFilter<"TutorVideo"> | string | null
   noteVisible?: Prisma.BoolFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntFilter<"TutorVideo"> | number
+  landingConsentAt?: Prisma.DateTimeNullableFilter<"TutorVideo"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TutorVideo"> | Date | string
   tutor?: Prisma.XOR<Prisma.TutorScalarRelationFilter, Prisma.TutorWhereInput>
   file?: Prisma.XOR<Prisma.FileAssetScalarRelationFilter, Prisma.FileAssetWhereInput>
@@ -292,6 +302,7 @@ export type TutorVideoOrderByWithAggregationInput = {
   moderationNote?: Prisma.SortOrderInput | Prisma.SortOrder
   noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  landingConsentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.TutorVideoCountOrderByAggregateInput
   _avg?: Prisma.TutorVideoAvgOrderByAggregateInput
@@ -312,6 +323,7 @@ export type TutorVideoScalarWhereWithAggregatesInput = {
   moderationNote?: Prisma.StringNullableWithAggregatesFilter<"TutorVideo"> | string | null
   noteVisible?: Prisma.BoolWithAggregatesFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntWithAggregatesFilter<"TutorVideo"> | number
+  landingConsentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TutorVideo"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TutorVideo"> | Date | string
 }
 
@@ -322,6 +334,7 @@ export type TutorVideoCreateInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutVideosInput
   file: Prisma.FileAssetCreateNestedOneWithoutVideosInput
@@ -336,6 +349,7 @@ export type TutorVideoUncheckedCreateInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -346,6 +360,7 @@ export type TutorVideoUpdateInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutVideosNestedInput
   file?: Prisma.FileAssetUpdateOneRequiredWithoutVideosNestedInput
@@ -360,6 +375,7 @@ export type TutorVideoUncheckedUpdateInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -372,6 +388,7 @@ export type TutorVideoCreateManyInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -382,6 +399,7 @@ export type TutorVideoUpdateManyMutationInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -394,6 +412,7 @@ export type TutorVideoUncheckedUpdateManyInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -416,6 +435,7 @@ export type TutorVideoCountOrderByAggregateInput = {
   moderationNote?: Prisma.SortOrder
   noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  landingConsentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -432,6 +452,7 @@ export type TutorVideoMaxOrderByAggregateInput = {
   moderationNote?: Prisma.SortOrder
   noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  landingConsentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -444,6 +465,7 @@ export type TutorVideoMinOrderByAggregateInput = {
   moderationNote?: Prisma.SortOrder
   noteVisible?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  landingConsentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -546,6 +568,7 @@ export type TutorVideoCreateWithoutFileInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
   tutor: Prisma.TutorCreateNestedOneWithoutVideosInput
 }
@@ -558,6 +581,7 @@ export type TutorVideoUncheckedCreateWithoutFileInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -599,6 +623,7 @@ export type TutorVideoScalarWhereInput = {
   moderationNote?: Prisma.StringNullableFilter<"TutorVideo"> | string | null
   noteVisible?: Prisma.BoolFilter<"TutorVideo"> | boolean
   sortOrder?: Prisma.IntFilter<"TutorVideo"> | number
+  landingConsentAt?: Prisma.DateTimeNullableFilter<"TutorVideo"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TutorVideo"> | Date | string
 }
 
@@ -609,6 +634,7 @@ export type TutorVideoCreateWithoutTutorInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
   file: Prisma.FileAssetCreateNestedOneWithoutVideosInput
 }
@@ -621,6 +647,7 @@ export type TutorVideoUncheckedCreateWithoutTutorInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -658,6 +685,7 @@ export type TutorVideoCreateManyFileInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -668,6 +696,7 @@ export type TutorVideoUpdateWithoutFileInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tutor?: Prisma.TutorUpdateOneRequiredWithoutVideosNestedInput
 }
@@ -680,6 +709,7 @@ export type TutorVideoUncheckedUpdateWithoutFileInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -691,6 +721,7 @@ export type TutorVideoUncheckedUpdateManyWithoutFileInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -702,6 +733,7 @@ export type TutorVideoCreateManyTutorInput = {
   moderationNote?: string | null
   noteVisible?: boolean
   sortOrder?: number
+  landingConsentAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -712,6 +744,7 @@ export type TutorVideoUpdateWithoutTutorInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   file?: Prisma.FileAssetUpdateOneRequiredWithoutVideosNestedInput
 }
@@ -724,6 +757,7 @@ export type TutorVideoUncheckedUpdateWithoutTutorInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -735,6 +769,7 @@ export type TutorVideoUncheckedUpdateManyWithoutTutorInput = {
   moderationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   noteVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  landingConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -749,6 +784,7 @@ export type TutorVideoSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   moderationNote?: boolean
   noteVisible?: boolean
   sortOrder?: boolean
+  landingConsentAt?: boolean
   createdAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
@@ -763,6 +799,7 @@ export type TutorVideoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   moderationNote?: boolean
   noteVisible?: boolean
   sortOrder?: boolean
+  landingConsentAt?: boolean
   createdAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
@@ -777,6 +814,7 @@ export type TutorVideoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   moderationNote?: boolean
   noteVisible?: boolean
   sortOrder?: boolean
+  landingConsentAt?: boolean
   createdAt?: boolean
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
@@ -791,10 +829,11 @@ export type TutorVideoSelectScalar = {
   moderationNote?: boolean
   noteVisible?: boolean
   sortOrder?: boolean
+  landingConsentAt?: boolean
   createdAt?: boolean
 }
 
-export type TutorVideoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "fileId" | "title" | "status" | "moderationNote" | "noteVisible" | "sortOrder" | "createdAt", ExtArgs["result"]["tutorVideo"]>
+export type TutorVideoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tutorId" | "fileId" | "title" | "status" | "moderationNote" | "noteVisible" | "sortOrder" | "landingConsentAt" | "createdAt", ExtArgs["result"]["tutorVideo"]>
 export type TutorVideoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tutor?: boolean | Prisma.TutorDefaultArgs<ExtArgs>
   file?: boolean | Prisma.FileAssetDefaultArgs<ExtArgs>
@@ -823,6 +862,7 @@ export type $TutorVideoPayload<ExtArgs extends runtime.Types.Extensions.Internal
     moderationNote: string | null
     noteVisible: boolean
     sortOrder: number
+    landingConsentAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["tutorVideo"]>
   composites: {}
@@ -1257,6 +1297,7 @@ export interface TutorVideoFieldRefs {
   readonly moderationNote: Prisma.FieldRef<"TutorVideo", 'String'>
   readonly noteVisible: Prisma.FieldRef<"TutorVideo", 'Boolean'>
   readonly sortOrder: Prisma.FieldRef<"TutorVideo", 'Int'>
+  readonly landingConsentAt: Prisma.FieldRef<"TutorVideo", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"TutorVideo", 'DateTime'>
 }
     
