@@ -17,6 +17,8 @@ import {
   createCredentialSchema,
   createTutorRequirementSchema,
   createVideoSchema,
+  type SetVideoHomePageInput,
+  setVideoHomePageSchema,
   type TutorAreasInput,
   type TutorIdParam,
   type TutorNearbyQuery,
@@ -75,6 +77,7 @@ import {
   restoreTutorRequirement,
   searchTutors,
   setDefaultTutorRequirement,
+  setVideoHomePage,
   submitTutorVerification,
   updateTutorProfile,
   updateTutorRequirement,
@@ -501,6 +504,33 @@ export async function tutorRoutes(app: FastifyInstance) {
       const video = await addTutorVideo(account.accountId, body);
       if (!video) throw notFound("Tutor profile not found");
       return reply.status(201).send(video);
+    },
+  );
+
+  app.patch(
+    "/me/videos/:id",
+    {
+      schema: {
+        ...routeDocs({
+          tag: "Tutors",
+          summary: "Agree to show a video on the home page",
+          description:
+            "showOnHomePage true lets an admin use this approved video on the landing page; false withdraws that agreement and takes the video off the landing page at once. Replies with the video. 404 when the video is not yours.",
+          auth: ["TUTOR"],
+          errors: [404],
+        }),
+        params: tutorIdParamSchema,
+        body: setVideoHomePageSchema,
+        response: { 200: tutorVideoResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "TUTOR");
+      const { id } = request.params as TutorIdParam;
+      const body = request.body as SetVideoHomePageInput;
+      const video = await setVideoHomePage(account.accountId, id, body.showOnHomePage);
+      if (!video) throw notFound("Video not found");
+      return reply.send(video);
     },
   );
 

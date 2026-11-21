@@ -6,6 +6,7 @@ import {
   createAdmin,
   createFakeStorage,
   createFileAsset,
+  createSuperAdmin,
   createTestApp,
   createTutorProfile,
   fakeFileBytes,
@@ -651,5 +652,169 @@ describe("contentDisposition", () => {
 
   it("falls back to a plain name when nothing ASCII is left", () => {
     expect(contentDisposition("পরিচয়").startsWith('inline; filename="file";')).toBe(true);
+  });
+});
+
+describe("site media uploads", () => {
+  it("lets an active admin and a super admin upload a site image", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const superAdmin = await createSuperAdmin();
+    const body = { purpose: "SITE_IMAGE", contentType: "image/webp", sizeBytes: 1000 };
+
+    expect((await startUpload(app, await getAuthHeaders(admin), body)).statusCode).toBe(201);
+    expect((await startUpload(app, await getAuthHeaders(superAdmin), body)).statusCode).toBe(201);
+  });
+
+  it("answers 403 when a tutor asks for a site image or a site video", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const { headers } = await tutorWithHeaders();
+
+    const image = await startUpload(app, headers, {
+      purpose: "SITE_IMAGE",
+      contentType: "image/png",
+      sizeBytes: 1000,
+    });
+    const video = await startUpload(app, headers, {
+      purpose: "SITE_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: 1000,
+    });
+    expect(image.statusCode).toBe(403);
+    expect(video.statusCode).toBe(403);
+  });
+
+  it("answers 400 for QuickTime on a site video, and accepts mp4 and webm", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const headers = await getAuthHeaders(admin);
+
+    const quicktime = await startUpload(app, headers, {
+      purpose: "SITE_VIDEO",
+      contentType: "video/quicktime",
+      sizeBytes: 1000,
+    });
+    expect(quicktime.statusCode).toBe(400);
+    expect(quicktime.json().code).toBe("UNSUPPORTED_FILE_TYPE");
+
+    for (const contentType of ["video/mp4", "video/webm"]) {
+      const res = await startUpload(app, headers, {
+        purpose: "SITE_VIDEO",
+        contentType,
+        sizeBytes: 1000,
+      });
+      expect(res.statusCode).toBe(201);
+    }
+  });
+
+  it("limits a site image to 5 MB and a site video to 25 MB", async () => {
+    const app = await createTestApp();
+    installFakeStorage();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const headers = await getAuthHeaders(admin);
+
+    const image = await startUpload(app, headers, {
+      purpose: "SITE_IMAGE",
+      contentType: "image/jpeg",
+      sizeBytes: 6 * MB,
+    });
+    expect(image.statusCode).toBe(400);
+    expect(image.json().code).toBe("FILE_TOO_LARGE");
+
+    const video = await startUpload(app, headers, {
+      purpose: "SITE_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: 25 * MB,
+    });
+    expect(video.statusCode).toBe(201);
+    const tooBig = await startUpload(app, headers, {
+      purpose: "SITE_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: 25 * MB + 1,
+    });
+    expect(tooBig.statusCode).toBe(400);
+    expect(tooBig.json().code).toBe("FILE_TOO_LARGE");
+  });
+});
+
+describe("story uploads", () => {
+  function request(headers: Awaited<ReturnType<typeof getAuthHeaders>>, payload: object) {
+    return createTestApp().then((app) =>
+      app.inject({ method: "POST", url: "/api/v1/files/upload-url", headers, payload }),
+    );
+  }
+
+  it("students may start a story photo or clip, tutors only a photo", async () => {
+    installFakeStorage();
+    const student = await createAccount({ role: "STUDENT" });
+    const tutor = await createAccount({ role: "TUTOR" });
+
+    const clip = await request(await getAuthHeaders(student), {
+      purpose: "STORY_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: PDF_SIZE,
+    });
+    const tutorPhoto = await request(await getAuthHeaders(tutor), {
+      purpose: "STORY_IMAGE",
+      contentType: "image/png",
+      sizeBytes: PDF_SIZE,
+    });
+    const tutorClip = await request(await getAuthHeaders(tutor), {
+      purpose: "STORY_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: PDF_SIZE,
+    });
+
+    expect(clip.statusCode).toBe(201);
+    expect(tutorPhoto.statusCode).toBe(201);
+    expect(tutorClip.statusCode).toBe(403);
+  });
+
+  it("story clips are mp4 or webm only", async () => {
+    installFakeStorage();
+    const student = await createAccount({ role: "STUDENT" });
+
+    const res = await request(await getAuthHeaders(student), {
+      purpose: "STORY_VIDEO",
+      contentType: "video/quicktime",
+      sizeBytes: PDF_SIZE,
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(JSON.parse(res.body).code).toBe("UNSUPPORTED_FILE_TYPE");
+  });
+
+  it("a video block stops a story clip but not a story photo", async () => {
+    installFakeStorage();
+    const student = await createAccount({ role: "STUDENT" });
+    const admin = await createAdmin({ status: "ACTIVE" });
+    await prisma.uploadBlock.create({
+      data: {
+        accountId: student.id,
+        blocksVideos: true,
+        blocksDocuments: false,
+        note: "Paused for review.",
+        blockedById: admin.id,
+      },
+    });
+    const headers = await getAuthHeaders(student);
+
+    const clip = await request(headers, {
+      purpose: "STORY_VIDEO",
+      contentType: "video/mp4",
+      sizeBytes: PDF_SIZE,
+    });
+    const photo = await request(headers, {
+      purpose: "STORY_IMAGE",
+      contentType: "image/png",
+      sizeBytes: PDF_SIZE,
+    });
+
+    expect(clip.statusCode).toBe(403);
+    expect(JSON.parse(clip.body).code).toBe("UPLOADS_BLOCKED");
+    expect(photo.statusCode).toBe(201);
   });
 });

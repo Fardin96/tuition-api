@@ -10,6 +10,7 @@ import {
   type UploadFlags,
   uploadFlagsFor,
 } from "../files/upload-review.service.js";
+import { removeSourceFromLanding } from "../site-content/site-content.service.js";
 import type {
   AdminVideoListQuery,
   AdminVideoPageResponse,
@@ -123,6 +124,10 @@ export async function moderateVideo(
       where: { id },
       data: { status, moderationNote: note, noteVisible },
     });
+    // A taken-down video leaves the landing page in the same transaction.
+    if (status === "REJECTED") {
+      await removeSourceFromLanding(tx, { kind: "tutor_video", id }, admin.accountId);
+    }
 
     await writeAudit(tx, {
       actorAccountId: admin.accountId,

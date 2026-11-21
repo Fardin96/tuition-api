@@ -888,3 +888,17 @@ CREATE TRIGGER tutor_phone_verified_reset_trg BEFORE UPDATE OF phone_number ON t
 ALTER TABLE city ADD CONSTRAINT city_slug_format CHECK (slug ~ '^[a-z][a-z0-9-]{1,39}$');
 ALTER TABLE city ADD CONSTRAINT city_name_len CHECK (length(btrim(name)) BETWEEN 2 AND 60);
 CREATE INDEX IF NOT EXISTS city_boundary_gix ON city USING GIST (boundary);
+
+-- ───────────────────────── [stories] testimonials ─────────────────────────
+-- Migration 20261129000200_stories. The table is created there; these are its checks and the partial index.
+ALTER TABLE story ADD CONSTRAINT story_headline_shape CHECK (
+  (role = 'STUDENT' AND headline IS NOT NULL AND length(btrim(headline)) BETWEEN 1 AND 85 AND headline !~ '[\r\n]')
+  OR (role = 'TUTOR' AND headline IS NULL));
+ALTER TABLE story ADD CONSTRAINT story_video_student_only CHECK (video_file_id IS NULL OR role = 'STUDENT');
+ALTER TABLE story ADD CONSTRAINT story_body_len CHECK (
+  length(btrim(body)) > 0 AND char_length(body) <= (CASE WHEN role = 'STUDENT' THEN 700 ELSE 300 END));
+ALTER TABLE story ADD CONSTRAINT story_decided_shape CHECK ((status = 'PENDING') = (decided_at IS NULL));
+ALTER TABLE story ADD CONSTRAINT story_rejection_note CHECK (
+  status <> 'REJECTED' OR (moderation_note IS NOT NULL AND length(btrim(moderation_note)) > 0));
+-- At most one pending story per account. Protected: never accept a DROP INDEX for it.
+CREATE UNIQUE INDEX IF NOT EXISTS story_one_pending_per_account ON story (account_id) WHERE status = 'PENDING';

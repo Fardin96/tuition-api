@@ -6,8 +6,10 @@ import {
   createAdmin,
   createApplication,
   createArea,
+  createLandingRow,
   createRequirement,
   createSession,
+  createStoryRow,
   createStudentProfile,
   createSuperAdmin,
   createTestApp,
@@ -705,5 +707,40 @@ describe("admin accounts", () => {
       expect(res.statusCode).toBe(404);
       expect(JSON.parse(res.body).code).toBe("NOT_FOUND");
     });
+  });
+});
+
+describe("blocking an account takes its landing cards off", () => {
+  it("removes the account's story card and writes the source_removed audit row", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const author = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    await createStudentProfile(author.id, area.id);
+    const story = await createStoryRow(author.id, { status: "APPROVED" });
+    await createLandingRow("testimonials", [
+      {
+        name: "Ana",
+        role: "Student",
+        photo: "/assets/testimonials/one.png",
+        quote: "Great help",
+        comment: "Clear lessons every week",
+        source: { kind: "story", id: story.id },
+      },
+    ]);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${author.id}/block`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Spam listings" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(await prisma.siteContent.count({ where: { key: "testimonials" } })).toBe(0);
+    const audit = await prisma.auditLog.findFirst({
+      where: { action: "site_content.source_removed", entityId: "testimonials" },
+    });
+    expect(audit?.actorAccountId).toBe(superAdmin.id);
   });
 });

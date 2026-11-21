@@ -1740,7 +1740,11 @@
               "TUTOR_ID",
               "CREDENTIAL",
               "TUTOR_VIDEO",
-              "BLOG_COVER"
+              "BLOG_COVER",
+              "SITE_IMAGE",
+              "SITE_VIDEO",
+              "STORY_IMAGE",
+              "STORY_VIDEO"
             ]
           },
           "contentType": {
@@ -1846,7 +1850,11 @@
                     "TUTOR_ID",
                     "CREDENTIAL",
                     "TUTOR_VIDEO",
-                    "BLOG_COVER"
+                    "BLOG_COVER",
+                    "SITE_IMAGE",
+                    "SITE_VIDEO",
+                    "STORY_IMAGE",
+                    "STORY_VIDEO"
                   ]
                 },
                 "status": {
@@ -3816,6 +3824,435 @@
         ],
         "additionalProperties": false
       },
+      "AdminSiteContentItem": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "hero",
+              "nav",
+              "categories",
+              "testimonials",
+              "showcase",
+              "how_it_works",
+              "faq",
+              "cta_banner",
+              "footer",
+              "seo",
+              "about_page",
+              "terms_page",
+              "privacy_page",
+              "contact_page"
+            ]
+          },
+          "value": {},
+          "defaultValue": {},
+          "media": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "contentType": {
+                  "type": "string"
+                },
+                "originalName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "purpose": {
+                  "type": "string",
+                  "enum": [
+                    "SITE_IMAGE",
+                    "SITE_VIDEO",
+                    "STORY_IMAGE",
+                    "STORY_VIDEO",
+                    "TUTOR_VIDEO"
+                  ]
+                }
+              },
+              "required": [
+                "url",
+                "contentType",
+                "originalName",
+                "purpose"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updatedByName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "defaultValue",
+          "media",
+          "isDefault",
+          "updatedAt",
+          "updatedByName"
+        ],
+        "additionalProperties": false
+      },
+      "AdminSiteContentList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminSiteContentItem"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "AdminSiteSource": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/SiteCardSource"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "STUDENT",
+              "TUTOR"
+            ]
+          },
+          "headline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "body": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "imageRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "videoRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "media": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "contentType": {
+                  "type": "string"
+                },
+                "originalName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "purpose": {
+                  "type": "string",
+                  "enum": [
+                    "SITE_IMAGE",
+                    "SITE_VIDEO",
+                    "STORY_IMAGE",
+                    "STORY_VIDEO",
+                    "TUTOR_VIDEO"
+                  ]
+                }
+              },
+              "required": [
+                "url",
+                "contentType",
+                "originalName",
+                "purpose"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "subjectHint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "instituteHint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "consentAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "onLanding": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "source",
+          "authorName",
+          "role",
+          "headline",
+          "body",
+          "title",
+          "imageRef",
+          "videoRef",
+          "media",
+          "subjectHint",
+          "instituteHint",
+          "consentAt",
+          "onLanding"
+        ],
+        "additionalProperties": false
+      },
+      "AdminSiteSourceList": {
+        "type": "object",
+        "properties": {
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminSiteSource"
+            }
+          }
+        },
+        "required": [
+          "sources"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "author": {
+            "type": "object",
+            "properties": {
+              "accountId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "STUDENT",
+                  "TUTOR",
+                  "ADMIN"
+                ]
+              }
+            },
+            "required": [
+              "accountId",
+              "name",
+              "role"
+            ],
+            "additionalProperties": false
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "STUDENT",
+              "TUTOR",
+              "ADMIN"
+            ]
+          },
+          "headline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "noteVisible": {
+            "type": "boolean"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminStoryMedia"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "video": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminStoryMedia"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consentAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "onLanding": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "role",
+          "headline",
+          "body",
+          "status",
+          "note",
+          "noteVisible",
+          "image",
+          "video",
+          "consentAt",
+          "createdAt",
+          "decidedAt",
+          "onLanding"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStoryMedia": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "url",
+          "contentType",
+          "originalName"
+        ],
+        "additionalProperties": false
+      },
+      "AdminStoryPage": {
+        "type": "object",
+        "properties": {
+          "stories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminStory"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "stories",
+          "nextCursor"
+        ],
+        "additionalProperties": false
+      },
       "AdminStudentVerification": {
         "type": "object",
         "properties": {
@@ -4477,7 +4914,9 @@
               "FILE_REMOVED",
               "UPLOADS_BLOCKED",
               "UPLOADS_UNBLOCKED",
-              "REQUIREMENT_INVITED"
+              "REQUIREMENT_INVITED",
+              "STORY_APPROVED",
+              "STORY_REJECTED"
             ]
           },
           "applicationId": {
@@ -4527,7 +4966,11 @@
                   "TUTOR_ID",
                   "CREDENTIAL",
                   "TUTOR_VIDEO",
-                  "BLOG_COVER"
+                  "BLOG_COVER",
+                  "SITE_IMAGE",
+                  "SITE_VIDEO",
+                  "STORY_IMAGE",
+                  "STORY_VIDEO"
                 ]
               },
               {
@@ -7032,6 +7475,39 @@
         ],
         "additionalProperties": false
       },
+      "CreateStoryInput": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 85
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 700
+          },
+          "imageFileId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "videoFileId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "consent": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "body",
+          "consent"
+        ]
+      },
       "CreateStudentProfileInput": {
         "type": "object",
         "properties": {
@@ -7414,7 +7890,11 @@
               "TUTOR_ID",
               "CREDENTIAL",
               "TUTOR_VIDEO",
-              "BLOG_COVER"
+              "BLOG_COVER",
+              "SITE_IMAGE",
+              "SITE_VIDEO",
+              "STORY_IMAGE",
+              "STORY_VIDEO"
             ]
           },
           "contentType": {
@@ -7824,6 +8304,7 @@
           "INVALID_VERIFICATION_STATE",
           "VIDEO_ALREADY_MODERATED",
           "BLOG_SLUG_EXISTS",
+          "SITE_CONTENT_CONFLICT",
           "INVALID_POST_STATE",
           "REVIEW_EXISTS",
           "REVIEW_NOT_ALLOWED",
@@ -7844,7 +8325,10 @@
           "SMS_UNAVAILABLE",
           "INVITE_EXISTS",
           "INVITE_LIMIT_REACHED",
-          "REQUIREMENT_DUPLICATE"
+          "REQUIREMENT_DUPLICATE",
+          "STORY_LIMIT_REACHED",
+          "STORY_PENDING",
+          "STORY_ALREADY_MODERATED"
         ],
         "description": "Machine-readable error code. Match on this."
       },
@@ -8003,7 +8487,11 @@
               "TUTOR_ID",
               "CREDENTIAL",
               "TUTOR_VIDEO",
-              "BLOG_COVER"
+              "BLOG_COVER",
+              "SITE_IMAGE",
+              "SITE_VIDEO",
+              "STORY_IMAGE",
+              "STORY_VIDEO"
             ]
           },
           "contentType": {
@@ -9954,6 +10442,31 @@
         "required": [
           "status",
           "note"
+        ],
+        "additionalProperties": false
+      },
+      "ModerateStoryInput": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "noteVisible": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "decision"
         ],
         "additionalProperties": false
       },
@@ -11909,6 +12422,975 @@
         ],
         "additionalProperties": false
       },
+      "SetVideoHomePageInput": {
+        "type": "object",
+        "properties": {
+          "showOnHomePage": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "showOnHomePage"
+        ],
+        "additionalProperties": false
+      },
+      "SiteCardSource": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "story",
+              "tutor_video"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "SiteCategoriesBlock": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "cta": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "href": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300,
+                "pattern": "^(?:\\/(?![/\\\\])[^\\s\\\\]*|https:\\/\\/[^\\s\\\\/]+[^\\s\\\\]*)$"
+              }
+            },
+            "required": [
+              "label",
+              "href"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "cta"
+        ],
+        "additionalProperties": false
+      },
+      "SiteContent": {
+        "type": "object",
+        "properties": {
+          "hero": {
+            "$ref": "#/components/schemas/SiteHeroBlock"
+          },
+          "nav": {
+            "$ref": "#/components/schemas/SiteNavBlock"
+          },
+          "categories": {
+            "$ref": "#/components/schemas/SiteCategoriesBlock"
+          },
+          "testimonials": {
+            "$ref": "#/components/schemas/SiteTestimonialsBlock"
+          },
+          "showcase": {
+            "$ref": "#/components/schemas/SiteShowcaseBlock"
+          },
+          "how_it_works": {
+            "$ref": "#/components/schemas/SiteHowItWorksBlock"
+          },
+          "faq": {
+            "$ref": "#/components/schemas/SiteFaqBlock"
+          },
+          "cta_banner": {
+            "$ref": "#/components/schemas/SiteCtaBannerBlock"
+          },
+          "footer": {
+            "$ref": "#/components/schemas/SiteFooterBlock"
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SiteSeoBlock"
+          }
+        },
+        "required": [
+          "hero",
+          "nav",
+          "categories",
+          "testimonials",
+          "showcase",
+          "how_it_works",
+          "faq",
+          "cta_banner",
+          "footer",
+          "seo"
+        ],
+        "additionalProperties": false
+      },
+      "SiteCtaBannerBlock": {
+        "type": "object",
+        "properties": {
+          "heading": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "cta": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "href": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300,
+                "pattern": "^(?:\\/(?![/\\\\])[^\\s\\\\]*|https:\\/\\/[^\\s\\\\/]+[^\\s\\\\]*)$"
+              }
+            },
+            "required": [
+              "label",
+              "href"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "heading",
+          "text",
+          "cta"
+        ],
+        "additionalProperties": false
+      },
+      "SiteFaqBlock": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "items": {
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "answer": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 800
+                }
+              },
+              "required": [
+                "question",
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "openIndex": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cta": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "href": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300,
+                "pattern": "^(?:\\/(?![/\\\\])[^\\s\\\\]*|https:\\/\\/[^\\s\\\\/]+[^\\s\\\\]*)$"
+              }
+            },
+            "required": [
+              "label",
+              "href"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "enabled",
+          "title",
+          "items",
+          "openIndex",
+          "cta"
+        ],
+        "additionalProperties": false
+      },
+      "SiteFooterBlock": {
+        "type": "object",
+        "properties": {
+          "about": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "address": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^\\+?[0-9][0-9 -]{5,23}$"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 120,
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "columns": {
+            "minItems": 3,
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "links": {
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 40
+                      },
+                      "href": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 300,
+                        "pattern": "^(?:\\/(?![/\\\\])[^\\s\\\\]*|https:\\/\\/[^\\s\\\\/]+[^\\s\\\\]*)$"
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "href"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "heading",
+                "links"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "socials": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "platform": {
+                  "type": "string",
+                  "enum": [
+                    "instagram",
+                    "telegram",
+                    "tiktok",
+                    "youtube"
+                  ]
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "pattern": "^https:\\/\\/[^\\s\\\\/]+[^\\s\\\\]*$"
+                }
+              },
+              "required": [
+                "platform",
+                "href"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "brandName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          }
+        },
+        "required": [
+          "about",
+          "address",
+          "phone",
+          "email",
+          "columns",
+          "socials",
+          "brandName"
+        ],
+        "additionalProperties": false
+      },
+      "SiteHeroBlock": {
+        "type": "object",
+        "properties": {
+          "tagline": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "headline": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "subline": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "skillPlaceholders": {
+            "minItems": 1,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            }
+          },
+          "placePlaceholders": {
+            "minItems": 1,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            }
+          },
+          "searchLabel": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20
+          }
+        },
+        "required": [
+          "tagline",
+          "headline",
+          "subline",
+          "skillPlaceholders",
+          "placePlaceholders",
+          "searchLabel"
+        ],
+        "additionalProperties": false
+      },
+      "SiteHowItWorksBlock": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "find": {
+            "$ref": "#/components/schemas/SiteHowItWorksFlow"
+          },
+          "become": {
+            "$ref": "#/components/schemas/SiteHowItWorksFlow"
+          }
+        },
+        "required": [
+          "enabled",
+          "title",
+          "find",
+          "become"
+        ],
+        "additionalProperties": false
+      },
+      "SiteHowItWorksFlow": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+          },
+          "video": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "subtitle": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "thumbnail": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "video": {
+                "type": "string",
+                "maxLength": 1000
+              }
+            },
+            "required": [
+              "title",
+              "subtitle",
+              "thumbnail",
+              "video"
+            ],
+            "additionalProperties": false
+          },
+          "steps": {
+            "minItems": 1,
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "icon": {
+                  "type": "string",
+                  "enum": [
+                    "signup",
+                    "details",
+                    "search",
+                    "documents",
+                    "discovered"
+                  ]
+                }
+              },
+              "required": [
+                "title",
+                "description",
+                "icon"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "label",
+          "video",
+          "steps"
+        ],
+        "additionalProperties": false
+      },
+      "SiteNavBlock": {
+        "type": "object",
+        "properties": {
+          "links": {
+            "minItems": 1,
+            "maxItems": 7,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "href": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300,
+                  "pattern": "^(?:\\/(?![/\\\\])[^\\s\\\\]*|https:\\/\\/[^\\s\\\\/]+[^\\s\\\\]*)$"
+                }
+              },
+              "required": [
+                "label",
+                "href"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "cta": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "href": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300,
+                "pattern": "^(?:\\/(?![/\\\\])[^\\s\\\\]*|https:\\/\\/[^\\s\\\\/]+[^\\s\\\\]*)$"
+              }
+            },
+            "required": [
+              "label",
+              "href"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "links",
+          "cta"
+        ],
+        "additionalProperties": false
+      },
+      "SitePage": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "title",
+          "description",
+          "body",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "SiteSeoBlock": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 70
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "SiteShowcaseBlock": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "items": {
+            "minItems": 1,
+            "maxItems": 16,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteShowcaseItem"
+            }
+          }
+        },
+        "required": [
+          "enabled",
+          "title",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "SiteShowcaseItem": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "video"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "thumbnail": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "source": {
+                "$ref": "#/components/schemas/SiteCardSource"
+              },
+              "video": {
+                "type": "string",
+                "maxLength": 1000
+              }
+            },
+            "required": [
+              "kind",
+              "name",
+              "subject",
+              "thumbnail",
+              "video"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "comment"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "thumbnail": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "source": {
+                "$ref": "#/components/schemas/SiteCardSource"
+              },
+              "university": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "comment": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "kind",
+              "name",
+              "subject",
+              "thumbnail",
+              "university",
+              "comment"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "SiteTestimonial": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "photo": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 85
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 700
+          },
+          "video": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "source": {
+            "$ref": "#/components/schemas/SiteCardSource"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "photo",
+          "quote",
+          "comment"
+        ],
+        "additionalProperties": false
+      },
+      "SiteTestimonialsBlock": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "items": {
+            "minItems": 1,
+            "maxItems": 12,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteTestimonial"
+            }
+          }
+        },
+        "required": [
+          "enabled",
+          "title",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "Story": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "STUDENT",
+              "TUTOR",
+              "ADMIN"
+            ]
+          },
+          "headline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "image": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryMedia"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "video": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryMedia"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "onLanding": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "headline",
+          "body",
+          "status",
+          "note",
+          "image",
+          "video",
+          "createdAt",
+          "decidedAt",
+          "onLanding"
+        ],
+        "additionalProperties": false
+      },
+      "StoryList": {
+        "type": "object",
+        "properties": {
+          "stories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Story"
+            }
+          },
+          "max": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "canSubmit": {
+            "type": "boolean"
+          },
+          "blockedReason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "LIMIT",
+                  "PENDING"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "stories",
+          "max",
+          "canSubmit",
+          "blockedReason"
+        ],
+        "additionalProperties": false
+      },
+      "StoryMedia": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contentType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "contentType"
+        ],
+        "additionalProperties": false
+      },
       "StudentProfile": {
         "type": "object",
         "properties": {
@@ -13801,6 +15283,9 @@
               "null"
             ]
           },
+          "showOnHomePage": {
+            "type": "boolean"
+          },
           "sortOrder": {
             "type": "number"
           },
@@ -13840,6 +15325,7 @@
           "title",
           "status",
           "moderationNote",
+          "showOnHomePage",
           "sortOrder",
           "createdAt",
           "url",
@@ -14340,6 +15826,28 @@
           "value"
         ],
         "additionalProperties": false
+      },
+      "UpdateSiteContentInput": {
+        "type": "object",
+        "properties": {
+          "value": {},
+          "expectedUpdatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "value",
+          "expectedUpdatedAt"
+        ]
       },
       "UpdateStudentProfileInput": {
         "type": "object",
@@ -14914,7 +16422,11 @@
                   "TUTOR_ID",
                   "CREDENTIAL",
                   "TUTOR_VIDEO",
-                  "BLOG_COVER"
+                  "BLOG_COVER",
+                  "SITE_IMAGE",
+                  "SITE_VIDEO",
+                  "STORY_IMAGE",
+                  "STORY_VIDEO"
                 ]
               },
               {
@@ -16028,6 +17540,261 @@
           },
           "401": {
             "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/stories": {
+      "get": {
+        "summary": "List my stories",
+        "tags": [
+          "Stories"
+        ],
+        "description": "Your stories, newest first, with a limit of 3 (any status) and one pending review at a time. canSubmit and blockedReason (LIMIT or PENDING) say whether a new one can be sent. note is the admin's note only when it was shared with you. onLanding is true while a testimonials or showcase card on the landing page uses the story.\n\n**Who:** STUDENT, TUTOR.\n\n**Rate limit:** global 100/min.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT, TUTOR",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Send a story for review",
+        "tags": [
+          "Stories"
+        ],
+        "description": "Students send a headline (one line, 85 characters at most), a body (700 characters and 90 words at most), an optional photo and an optional video (mp4 or webm, 25 MB). Tutors send a body (300 characters at most) and an optional photo; a tutor sending a headline or a video gets 400. consent must be true. Files must be yours, purpose STORY_IMAGE or STORY_VIDEO, and finished uploading. Answers 201 with the story, which waits for an admin. 409 STORY_LIMIT_REACHED at 3 stories, 409 STORY_PENDING while another waits for a decision.\n\n**Who:** STUDENT, TUTOR.\n\n**Rate limit:** 10/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStoryInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT, TUTOR",
+        "x-rate-limit": "10/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Story"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/stories/{id}": {
+      "delete": {
+        "summary": "Delete one of my stories",
+        "tags": [
+          "Stories"
+        ],
+        "description": "Removes the story and its files. A card on the landing page that uses it is removed first. Replies 204 with no body. 404 when the story is not yours.\n\n**Who:** STUDENT, TUTOR.\n\n**Rate limit:** global 100/min.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "STUDENT, TUTOR",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -18016,6 +19783,113 @@
       }
     },
     "/api/v1/tutors/me/videos/{id}": {
+      "patch": {
+        "summary": "Agree to show a video on the home page",
+        "tags": [
+          "Tutors"
+        ],
+        "description": "showOnHomePage true lets an admin use this approved video on the landing page; false withdraws that agreement and takes the video off the landing page at once. Replies with the video. 404 when the video is not yours.\n\n**Who:** TUTOR.\n\n**Rate limit:** global 100/min.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetVideoHomePageInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "TUTOR",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorVideo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "summary": "Remove a video",
         "tags": [
@@ -25209,6 +27083,130 @@
         }
       }
     },
+    "/api/v1/site-content": {
+      "get": {
+        "summary": "Get the landing page content",
+        "tags": [
+          "Site content"
+        ],
+        "description": "The ten landing blocks: hero, nav, categories, testimonials, showcase, how_it_works, faq, cta_banner, footer and seo. A block with no row, or a stored row that no longer fits, shows its default.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per account.",
+        "security": [
+          {},
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteContent"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/site-content/pages/{slug}": {
+      "get": {
+        "summary": "Get a static page",
+        "tags": [
+          "Site content"
+        ],
+        "description": "One of about-us, terms, privacy or contact. updatedAt is null while the page shows its default.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "about-us",
+                "terms",
+                "privacy",
+                "contact"
+              ]
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "security": [
+          {},
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/lookups/education": {
       "get": {
         "summary": "Get education lookups",
@@ -32266,6 +34264,253 @@
         }
       }
     },
+    "/api/v1/admin/stories": {
+      "get": {
+        "summary": "List author stories",
+        "tags": [
+          "Admin"
+        ],
+        "description": "status defaults to PENDING. Newest first for every status. role narrows to STUDENT or TUTOR stories. Cursor-paginated (limit 1 to 100, default 25). onLanding is true while a testimonials or showcase card uses the story.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "PENDING",
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STUDENT",
+                "TUTOR",
+                "ADMIN"
+              ]
+            },
+            "in": "query",
+            "name": "role",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStoryPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/stories/{id}/moderate": {
+      "post": {
+        "summary": "Approve or reject a story",
+        "tags": [
+          "Admin"
+        ],
+        "description": "APPROVE publishes the story's photo and clip. REJECT needs a note that tells the author why, takes the story off the landing page if a card uses it, and takes its files down. noteVisible false keeps the note between admins: the author sees a generic message. Each decision sends the author an alert (STORY_APPROVED or STORY_REJECTED). 409 STORY_ALREADY_MODERATED when the story already has that decision.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModerateStoryInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/files": {
       "get": {
         "summary": "List uploaded files",
@@ -32282,7 +34527,11 @@
                 "TUTOR_ID",
                 "CREDENTIAL",
                 "TUTOR_VIDEO",
-                "BLOG_COVER"
+                "BLOG_COVER",
+                "SITE_IMAGE",
+                "SITE_VIDEO",
+                "STORY_IMAGE",
+                "STORY_VIDEO"
               ]
             },
             "in": "query",
@@ -33184,6 +35433,412 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/site-content": {
+      "get": {
+        "summary": "List site content",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Every landing block and static page in a fixed order, with the default, whether a row exists (isDefault) and who saved it last.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteContentList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/site-content/sources": {
+      "get": {
+        "summary": "List submissions that can be added to a card list",
+        "tags": [
+          "Admin"
+        ],
+        "description": "for=testimonials lists approved student stories by active students. for=showcase lists approved tutor stories (comment cards) and approved tutor videos the tutor agreed to show on the home page (video cards). Newest first, at most 100. Each row says whether it is already on the landing page (onLanding). Adding one to a list is a PUT of that block with `source` set on the card.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "testimonials",
+                "showcase"
+              ]
+            },
+            "in": "query",
+            "name": "for",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSourceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/site-content/{key}": {
+      "put": {
+        "summary": "Update a site content block",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Any admin. The whole block is replaced, so send every field. expectedUpdatedAt is the updatedAt the editor loaded, or null when it loaded the default. A mismatch answers 409 SITE_CONTENT_CONFLICT. Unknown fields are dropped. Saving the same value again changes nothing.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSiteContentInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hero",
+                "nav",
+                "categories",
+                "testimonials",
+                "showcase",
+                "how_it_works",
+                "faq",
+                "cta_banner",
+                "footer",
+                "seo",
+                "about_page",
+                "terms_page",
+                "privacy_page",
+                "contact_page"
+              ]
+            },
+            "in": "path",
+            "name": "key",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteContentItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Reset a site content block to its default",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Any admin. Deletes the row, so the block follows the defaults again. expectedUpdatedAt is optional; when sent and it does not match, answers 409 SITE_CONTENT_CONFLICT. A block with no row answers 200 with its default.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            },
+            "in": "query",
+            "name": "expectedUpdatedAt",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hero",
+                "nav",
+                "categories",
+                "testimonials",
+                "showcase",
+                "how_it_works",
+                "faq",
+                "cta_banner",
+                "footer",
+                "seo",
+                "about_page",
+                "terms_page",
+                "privacy_page",
+                "contact_page"
+              ]
+            },
+            "in": "path",
+            "name": "key",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteContentItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
             "content": {
               "application/json": {
                 "schema": {
@@ -34284,12 +36939,20 @@
       "description": "Public tutor videos."
     },
     {
+      "name": "Stories",
+      "description": "Testimonials students and tutors send in for admin review."
+    },
+    {
       "name": "Files",
       "description": "Uploads to Cloudflare R2: signed upload URL, complete, signed read URL, delete."
     },
     {
       "name": "Blog",
       "description": "Published blog posts."
+    },
+    {
+      "name": "Site content",
+      "description": "Landing page blocks and static pages."
     },
     {
       "name": "Lookups",

@@ -3,6 +3,7 @@ import { writeAudit } from "../../lib/admin.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { removeAccountFromLanding } from "../site-content/site-content.service.js";
 import type {
   AccountListQuery,
   AdminAccountDetail,
@@ -239,6 +240,8 @@ export async function blockAccount(
       where: { accountId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+    // A blocked account's stories and videos leave the landing page.
+    await removeAccountFromLanding(tx, accountId, caller.accountId);
 
     await writeAudit(tx, {
       actorAccountId: caller.accountId,

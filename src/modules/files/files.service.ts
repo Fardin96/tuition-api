@@ -62,7 +62,7 @@ function checkPolicy(purpose: FilePurpose, contentType: string, sizeBytes: numbe
   }
 }
 
-/** The caller's role was already checked against FILE_POLICY[purpose].role by the route. */
+/** The caller's role was already checked against FILE_POLICY[purpose].roles by the route. */
 export async function createUploadUrl(
   ownerAccountId: string,
   input: CreateUploadUrlInput,
@@ -201,14 +201,16 @@ export async function getDownloadUrl(
 
 /** True when any record points at the file. Keep in step with the FileAsset relations. */
 export async function fileInUse(db: Db, fileId: string): Promise<boolean> {
-  const [student, verification, credential, video, post] = [
+  const [student, verification, credential, video, post, site, story] = [
     await db.student.count({ where: { verificationFileId: fileId } }),
     await db.tutorVerification.count({ where: { fileId } }),
     await db.tutorCredential.count({ where: { fileId } }),
     await db.tutorVideo.count({ where: { fileId } }),
     await db.blogPost.count({ where: { coverFileId: fileId } }),
+    await db.siteContentFile.count({ where: { fileId } }),
+    await db.story.count({ where: { OR: [{ imageFileId: fileId }, { videoFileId: fileId }] } }),
   ];
-  return student + verification + credential + video + post > 0;
+  return student + verification + credential + video + post + site + story > 0;
 }
 
 /** Prisma filter for files no record points at. Keep in step with fileInUse. */
@@ -218,6 +220,9 @@ export const unattachedFileWhere = {
   credentials: { none: {} },
   videos: { none: {} },
   blogCovers: { none: {} },
+  siteContentUses: { none: {} },
+  storyImages: { none: {} },
+  storyVideos: { none: {} },
 } satisfies Prisma.FileAssetWhereInput;
 
 /**

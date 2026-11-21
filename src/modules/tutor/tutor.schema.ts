@@ -222,12 +222,20 @@ export const tutorVideoResponseSchema = z
     title: z.string(),
     status: z.nativeEnum(ModerationStatus),
     moderationNote: z.string().nullable(),
+    /** True while the tutor agrees to show this video on the home page (once approved). */
+    showOnHomePage: z.boolean(),
     sortOrder: z.number(),
     createdAt: z.string(),
     url: z.string().nullable(),
     file: z.object({ id: z.string(), status: z.nativeEnum(FileStatus) }),
   })
   .meta({ id: "TutorVideo" });
+
+export const setVideoHomePageSchema = z
+  .object({ showOnHomePage: z.boolean() })
+  .strict()
+  .meta({ id: "SetVideoHomePage" });
+export type SetVideoHomePageInput = z.infer<typeof setVideoHomePageSchema>;
 
 export const tutorVideoListResponseSchema = z
   .object({

@@ -1,0 +1,423 @@
+{
+  "hero": {
+    "tagline": "Your #1 Platform for Tutors",
+    "headline": "Find the right tutor, faster.",
+    "subline": "A smarter way to connect students and tutors—built for clarity, trust, and real results.",
+    "skillPlaceholders": [
+      "e.g. SSC package",
+      "e.g. Math Tutor",
+      "e.g. English Specialist",
+      "e.g. Physics Teacher"
+    ],
+    "placePlaceholders": [
+      "e.g. Gulshan, Dhaka",
+      "e.g. Uttara, Dhaka",
+      "e.g. Motijheel, Dhaka"
+    ],
+    "searchLabel": "Search"
+  },
+  "nav": {
+    "links": [
+      {
+        "label": "Categories",
+        "href": "/#categories"
+      },
+      {
+        "label": "Testimonials",
+        "href": "/#testimonials"
+      },
+      {
+        "label": "Tutors",
+        "href": "/#tutors"
+      },
+      {
+        "label": "About Us",
+        "href": "/about-us"
+      },
+      {
+        "label": "Blogs",
+        "href": "/blog"
+      }
+    ],
+    "cta": {
+      "label": "Register Now",
+      "href": "/sign-in"
+    }
+  },
+  "categories": {
+    "title": "Discover the Emerging Masters",
+    "description": "Find the best master for your kids and boosts your results 10x!",
+    "cta": {
+      "label": "View All",
+      "href": "/sign-in"
+    }
+  },
+  "testimonials": {
+    "enabled": true,
+    "title": "What guardians & students say",
+    "items": [
+      {
+        "name": "Nusrat Jahan",
+        "role": "Guardian of a Class 8 student",
+        "photo": "/assets/avatar-demo/client/client1.png",
+        "quote": "Working with Masters Hub has been an incredibly painless and enjoyable experience.",
+        "comment": "We had tried three tutors before finding Masters Hub. This time the match was right from the first session. Our tutor sends a short note after every class, so I always know what my son covered and where he needs help. Booking, rescheduling and payments all happen in one place, which saves me hours every month. Most importantly, he now looks forward to studying instead of dreading it."
+      },
+      {
+        "name": "Farhana Rahman",
+        "role": "HSC candidate, Science",
+        "photo": "/assets/avatar-demo/client/client2.png",
+        "quote": "I finally understand physics instead of just memorising it.",
+        "comment": "Physics used to be a list of formulas I crammed the night before exams. My tutor rebuilt the basics with real examples and past papers, and suddenly the chapters connected. We kept a weekly plan in the app, so I never fell behind. My mock test score went from 58 to 81 in two months, and I actually enjoy solving problems now."
+      },
+      {
+        "name": "Sharmin Akter",
+        "role": "Guardian of two students",
+        "photo": "/assets/avatar-demo/client/client1.png",
+        "quote": "Finding a trusted, verified tutor near home took one evening, not one month.",
+        "comment": "As a working parent, I could not spend weeks interviewing tutors. I filtered by subject and area, read the reviews from other guardians and shortlisted two tutors the same night. Every profile was verified, which gave me real peace of mind. Both my daughters now have tutors who come on time, follow a clear plan and keep me updated."
+      },
+      {
+        "name": "Tahmina Chowdhury",
+        "role": "O Level student",
+        "photo": "/assets/avatar-demo/client/client2.png",
+        "quote": "My English tutor made speaking up in class feel easy for the first time.",
+        "comment": "I was always nervous about presentations and essays. My tutor focused on speaking first, then writing, with short practice tasks between sessions. She corrected my mistakes kindly and explained why, not just what. After one term I volunteered to present in class, and my English grade improved from a C to an A."
+      },
+      {
+        "name": "Rumana Haque",
+        "role": "Guardian and banker",
+        "photo": "/assets/avatar-demo/client/client1.png",
+        "quote": "The SSC package made exam prep structured, simple and completely stress-free.",
+        "comment": "The package covered every subject my son needed, with one schedule and one point of contact. Tutors shared progress reports every two weeks, so we could fix weak areas early instead of panicking before the exam. The price was clear from day one, with no surprises. He finished SSC with a GPA 5, and our home was calm the whole year."
+      },
+      {
+        "name": "Ayesha Siddiqua",
+        "role": "University student, BBA",
+        "photo": "/assets/avatar-demo/client/client2.png",
+        "quote": "Accounting went from my weakest subject to the one I help friends with.",
+        "comment": "I joined Masters Hub halfway through my semester, already behind in accounting. My tutor worked through my course outline, built practice sets from my own lecture notes and was flexible with timing around my classes. Within six weeks I caught up, and I finished the course with an A minus. I now recommend the platform to everyone in my batch."
+      }
+    ]
+  },
+  "showcase": {
+    "enabled": true,
+    "title": "Top Tutor portfolio Showcase",
+    "items": [
+      {
+        "kind": "video",
+        "name": "Tanvir Ahmed",
+        "subject": "Higher Math",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor1.png",
+        "video": "/videos/tutor1.mp4"
+      },
+      {
+        "kind": "video",
+        "name": "Sadia Islam",
+        "subject": "English Language",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor2.png",
+        "video": "/videos/tutor2.mp4"
+      },
+      {
+        "kind": "comment",
+        "name": "Rafiul Karim",
+        "subject": "Physics",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor3.png",
+        "university": "BUET, Electrical Engineering",
+        "comment": "I teach physics the way I wish I had learned it: start from a real example, then the formula. Most of my students stop memorising within a month."
+      },
+      {
+        "kind": "video",
+        "name": "Nabila Hossain",
+        "subject": "Chemistry",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor4.png",
+        "video": "/videos/tutor3.mp4"
+      },
+      {
+        "kind": "video",
+        "name": "Imran Chowdhury",
+        "subject": "Accounting",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor1.png",
+        "video": "/videos/tutor4.mp4"
+      },
+      {
+        "kind": "comment",
+        "name": "Farzana Akter",
+        "subject": "Biology",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor2.png",
+        "university": "Dhaka Medical College, MBBS",
+        "comment": "Diagrams, short recalls and weekly mock tests. My SSC and HSC students walk into exams knowing exactly what to expect."
+      },
+      {
+        "kind": "video",
+        "name": "Mehedi Hasan",
+        "subject": "ICT & Programming",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor3.png",
+        "video": "/videos/tutor5.mp4"
+      },
+      {
+        "kind": "video",
+        "name": "Ayesha Rahman",
+        "subject": "Bangla Literature",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor4.png",
+        "video": "/videos/tutor6.mp4"
+      },
+      {
+        "kind": "comment",
+        "name": "Shakil Mahmud",
+        "subject": "Finance",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor1.png",
+        "university": "IBA, University of Dhaka",
+        "comment": "I connect every finance topic to money decisions students already make. Once it feels practical, the numbers get easy."
+      },
+      {
+        "kind": "video",
+        "name": "Tasnim Jahan",
+        "subject": "O Level Mathematics",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor2.png",
+        "video": "/videos/tutor7.mp4"
+      },
+      {
+        "kind": "video",
+        "name": "Arif Hossain",
+        "subject": "Economics",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor3.png",
+        "video": "/videos/tutor8.mp4"
+      },
+      {
+        "kind": "comment",
+        "name": "Lamia Sultana",
+        "subject": "Art & Drawing",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor4.png",
+        "university": "Faculty of Fine Arts, University of Dhaka",
+        "comment": "Every class ends with a finished piece, however small. Confidence comes from seeing your own progress on paper."
+      }
+    ]
+  },
+  "how_it_works": {
+    "enabled": true,
+    "title": "How It Works",
+    "find": {
+      "label": "Find a Tutor",
+      "video": {
+        "title": "How to find a tutor",
+        "subtitle": "A quick walkthrough",
+        "thumbnail": "/assets/avatar-demo/client/client2.png",
+        "video": "/videos/how-to-guardians.mp4"
+      },
+      "steps": [
+        {
+          "title": "Sign up & create an account",
+          "description": "Join free as a guardian or student in under two minutes.",
+          "icon": "signup"
+        },
+        {
+          "title": "Add details & requirements",
+          "description": "Tell us the class, subjects, schedule and budget you need.",
+          "icon": "details"
+        },
+        {
+          "title": "Post requirements & find tutors",
+          "description": "Publish your request and compare verified tutors who apply.",
+          "icon": "search"
+        }
+      ]
+    },
+    "become": {
+      "label": "Become a Tutor",
+      "video": {
+        "title": "How to become a tutor",
+        "subtitle": "A quick walkthrough",
+        "thumbnail": "/assets/avatar-demo/tutor/tutor1.png",
+        "video": "/videos/how-to-tutor.mp4"
+      },
+      "steps": [
+        {
+          "title": "Sign up & create an account",
+          "description": "Register free and set up your tutor profile in minutes.",
+          "icon": "signup"
+        },
+        {
+          "title": "Add your details",
+          "description": "Share your subjects, experience, areas and availability.",
+          "icon": "details"
+        },
+        {
+          "title": "Validate your documents",
+          "description": "Upload your ID and certificates so we can verify you.",
+          "icon": "documents"
+        },
+        {
+          "title": "Get discovered!",
+          "description": "Show up in search and start receiving tuition requests.",
+          "icon": "discovered"
+        }
+      ]
+    }
+  },
+  "faq": {
+    "enabled": true,
+    "title": "Frequently asked Questions",
+    "items": [
+      {
+        "question": "How do I create an account as a guardian or student?",
+        "answer": "Tap Register Now, choose Guardian or Student, and sign up with your phone number or email. Add your area, class and the subjects you need, and we will start showing matching tutors right away. It takes about two minutes and is completely free."
+      },
+      {
+        "question": "How do I find and hire the right tutor?",
+        "answer": "Search by subject and location, then filter by class, budget and rating. Open a profile to see qualifications, reviews and teaching videos. When you find a good fit, send a request; most tutors reply within a day and many offer a free trial class."
+      },
+      {
+        "question": "How can I track my child's progress?",
+        "answer": "After each session the tutor logs what was covered and any homework. You get a short progress report every two weeks, and you can message the tutor anytime from your dashboard if you want to discuss weak areas or upcoming exams."
+      },
+      {
+        "question": "How are tutors on Masters Hub verified?",
+        "answer": "Every tutor submits a national ID and proof of their latest qualification, which our team checks by hand before the profile goes live. We also review ratings from guardians and students, and tutors who fall below our standards are removed from search."
+      },
+      {
+        "question": "Is there a cost to use Masters Hub, and what features are free?",
+        "answer": "Searching, comparing profiles, reading reviews and messaging tutors are all free. You only pay the tutor's fee once you start classes, and packages show the full price upfront. There are no hidden charges or subscription fees."
+      }
+    ],
+    "openIndex": 3,
+    "cta": {
+      "label": "View All",
+      "href": "/sign-in"
+    }
+  },
+  "cta_banner": {
+    "heading": "Find your ideal tutor and unlock your full potential today",
+    "text": "Discover trusted, subject-specialist mentors tailored to your syllabus, learning pace, and academic goals.",
+    "cta": {
+      "label": "Get Started",
+      "href": "/sign-in"
+    }
+  },
+  "footer": {
+    "about": "Masters Hub is Bangladesh's trusted platform connecting students and guardians with verified, top-tier academic tutors for school, college, and test prep.",
+    "address": "House 42, Road 11, Block D, Banani, Dhaka 1213, Bangladesh",
+    "phone": "+880 1700-000000",
+    "email": "support@mastershub.com",
+    "columns": [
+      {
+        "heading": "Quick Links",
+        "links": [
+          {
+            "label": "Find a Tutor",
+            "href": "/#tutors"
+          },
+          {
+            "label": "Subject Categories",
+            "href": "/#categories"
+          },
+          {
+            "label": "How It Works",
+            "href": "/#how-it-works"
+          },
+          {
+            "label": "Tuition Packages",
+            "href": "/#categories"
+          },
+          {
+            "label": "Frequently Asked Questions",
+            "href": "/#faq"
+          }
+        ]
+      },
+      {
+        "heading": "For Tutors",
+        "links": [
+          {
+            "label": "Become a Tutor",
+            "href": "/#how-it-works"
+          },
+          {
+            "label": "Tutor Guidelines",
+            "href": "/#faq"
+          },
+          {
+            "label": "Verification Process",
+            "href": "/#faq"
+          },
+          {
+            "label": "Code of Conduct",
+            "href": "/#faq"
+          },
+          {
+            "label": "Tuition Opportunities",
+            "href": "/#tutors"
+          }
+        ]
+      },
+      {
+        "heading": "About & Legal",
+        "links": [
+          {
+            "label": "About Us",
+            "href": "/about-us"
+          },
+          {
+            "label": "Blogs & Guidance",
+            "href": "/blog"
+          },
+          {
+            "label": "Terms and Conditions",
+            "href": "/terms"
+          },
+          {
+            "label": "Privacy Policy",
+            "href": "/privacy"
+          },
+          {
+            "label": "Contact Support",
+            "href": "/contact"
+          }
+        ]
+      }
+    ],
+    "socials": [
+      {
+        "platform": "instagram",
+        "href": "https://instagram.com"
+      },
+      {
+        "platform": "telegram",
+        "href": "https://telegram.org"
+      },
+      {
+        "platform": "tiktok",
+        "href": "https://tiktok.com"
+      },
+      {
+        "platform": "youtube",
+        "href": "https://youtube.com"
+      }
+    ],
+    "brandName": "Masters Hub"
+  },
+  "seo": {
+    "title": "Masters Hub",
+    "description": "Find verified home and online tutors for school, college and test prep in Bangladesh. Compare profiles and reviews, then hire the tutor who fits."
+  },
+  "about_page": {
+    "title": "About Us",
+    "description": "Masters Hub connects students and guardians in Bangladesh with verified tutors.",
+    "body": "Masters Hub helps students and guardians in Bangladesh find a tutor they can trust, and helps good tutors find steady work.\n\n## What we do\n\nGuardians and students post what they need: the class, the subjects, the area and the budget. Tutors who match apply, and you choose. Tutors can also publish packages, such as a full SSC course, with the price shown upfront.\n\n## Why verification matters\n\nEvery tutor can submit a national ID and proof of their latest qualification. Our team checks each document by hand, and verified tutors carry a badge on their profile. Reviews come only from guardians and students who actually hired the tutor.\n\n## Where we work\n\nWe are starting in Dhaka and will add more cities as we grow. Online tuition is open to students anywhere in Bangladesh."
+  },
+  "terms_page": {
+    "title": "Terms and Conditions",
+    "description": "The rules for using Masters Hub as a student, guardian or tutor.",
+    "body": "These terms apply to everyone who uses Masters Hub. By creating an account you agree to them.\n\n## Accounts\n\nYou must give accurate details and keep your sign-in secure. One person may hold one account. We may pause or close an account that breaks these terms.\n\n## Tutors\n\nTutors must describe their qualifications honestly and upload only their own documents. A placement fee is due when a tuition is confirmed. The amount and due date are shown before you accept.\n\n## Students and guardians\n\nPost real requirements only. Pay the tutor as agreed, and report problems through the app so we can help.\n\n## Payments and refunds\n\nOnline payments go through SSLCommerz. A refund can be requested within the refund window shown on each payment. The gateway's processing charge is not refunded.\n\n## Reviews and reports\n\nReviews must be honest and about the tuition. We may hide reviews that are abusive or off-topic. Reports and disputes are handled by our team, and our decision is final within the app.\n\n## Changes\n\nWe may update these terms. We will show the date of the latest change on this page."
+  },
+  "privacy_page": {
+    "title": "Privacy Policy",
+    "description": "What Masters Hub collects, why, and how we protect it.",
+    "body": "This policy explains what we collect and how we use it.\n\n## What we collect\n\n- Your name, email, phone number and the area you live or teach in.\n- For tutors: education, subjects, documents you upload for verification, and teaching videos.\n- Requirements, applications, messages about a tuition, payments and reviews.\n\n## How we use it\n\nWe use your details to match students with tutors, to verify tutors, to process payments and to keep the platform safe. We send notifications about your tuitions by SMS, email or in the app.\n\n## Who can see it\n\nOther users see only what a profile shows publicly. Phone numbers are shared only after a tuition is confirmed. ID documents are seen only by our review team.\n\n## Storage and security\n\nFiles are stored privately and opened through short-lived links. Payments are handled by SSLCommerz; we never see your card details.\n\n## Your choices\n\nYou can edit your profile at any time. To delete your account or ask what we hold about you, contact support."
+  },
+  "contact_page": {
+    "title": "Contact Support",
+    "description": "Get help with your account, a tuition or a payment.",
+    "body": "We usually reply within one working day.\n\nIf your question is about a tuition, payment or refund, include the application or payment reference so we can find it quickly. To report a user, use **Report** on the application page; it reaches our team directly."
+  }
+}

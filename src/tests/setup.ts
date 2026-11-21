@@ -97,7 +97,9 @@ beforeEach(async () => {
       subject,
       area,
       blog_post,
+      site_content_file,
       site_content,
+      story,
       audit_log,
       account,
       super_admin_email

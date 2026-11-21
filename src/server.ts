@@ -30,6 +30,8 @@ import { adminRefundRoutes } from "./modules/admin/refunds.routes.js";
 import { adminReportRoutes } from "./modules/admin/reports.routes.js";
 import { adminReviewRoutes } from "./modules/admin/reviews.routes.js";
 import { adminSettingRoutes } from "./modules/admin/settings.routes.js";
+import { adminSiteContentRoutes } from "./modules/admin/site-content.routes.js";
+import { adminStoryRoutes } from "./modules/admin/stories.routes.js";
 import { adminSubjectRoutes } from "./modules/admin/subjects.routes.js";
 import { adminUploadRoutes } from "./modules/admin/uploads.routes.js";
 import { adminVerificationRoutes } from "./modules/admin/verifications.routes.js";
@@ -53,6 +55,8 @@ import { phoneVerificationRoutes } from "./modules/phone-verification/phone-veri
 import { reportRoutes } from "./modules/report/report.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { reviewRoutes } from "./modules/review/review.routes.js";
+import { siteContentRoutes } from "./modules/site-content/site-content.routes.js";
+import { storyRoutes } from "./modules/story/story.routes.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
 import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
 import { zoneRoutes } from "./modules/zone/zone.routes.js";
@@ -132,6 +136,7 @@ export async function buildApp() {
   await app.register(healthRoutes, { prefix: "/api/v1/health" });
   await app.register(authRoutes, { prefix: "/api/v1/auth" });
   await app.register(meRoutes, { prefix: "/api/v1/me" });
+  await app.register(storyRoutes, { prefix: "/api/v1/me/stories" });
   await app.register(studentRoutes, { prefix: "/api/v1/students" });
   await app.register(tutorRoutes, { prefix: "/api/v1/tutors" });
   await app.register(zoneRoutes, { prefix: "/api/v1/tutors/me" });
@@ -152,6 +157,7 @@ export async function buildApp() {
   await app.register(publicVideoRoutes, { prefix: "/api/v1/videos" });
   await app.register(fileRoutes, { prefix: "/api/v1/files" });
   await app.register(blogRoutes, { prefix: "/api/v1/blog" });
+  await app.register(siteContentRoutes, { prefix: "/api/v1/site-content" });
   await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
   await app.register(areaRoutes, { prefix: "/api/v1/areas" });
   await app.register(subjectRoutes, { prefix: "/api/v1/subjects" });
@@ -174,8 +180,10 @@ export async function buildApp() {
   await app.register(adminAuditLogRoutes, { prefix: "/api/v1/admin/audit-logs" });
   await app.register(adminVerificationRoutes, { prefix: "/api/v1/admin/verifications" });
   await app.register(adminVideoRoutes, { prefix: "/api/v1/admin/videos" });
+  await app.register(adminStoryRoutes, { prefix: "/api/v1/admin/stories" });
   await app.register(adminFileRoutes, { prefix: "/api/v1/admin/files" });
   await app.register(adminBlogRoutes, { prefix: "/api/v1/admin/blog" });
+  await app.register(adminSiteContentRoutes, { prefix: "/api/v1/admin/site-content" });
   await app.register(adminReviewRoutes, { prefix: "/api/v1/admin/reviews" });
   await app.register(adminReportRoutes, { prefix: "/api/v1/admin/reports" });
   await app.register(adminDisputeRoutes, { prefix: "/api/v1/admin/disputes" });

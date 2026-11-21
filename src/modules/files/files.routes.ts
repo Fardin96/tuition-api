@@ -64,8 +64,10 @@ export async function fileRoutes(app: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const body = request.body as CreateUploadUrlInput;
-      const { role } = FILE_POLICY[body.purpose];
-      const account = role === "ADMIN" ? await requireAdmin(request) : requireRole(request, role);
+      const { roles } = FILE_POLICY[body.purpose];
+      const account = roles.includes("ADMIN")
+        ? await requireAdmin(request)
+        : requireRole(request, ...roles);
       return reply.status(201).send(await createUploadUrl(account.accountId, body));
     },
   );

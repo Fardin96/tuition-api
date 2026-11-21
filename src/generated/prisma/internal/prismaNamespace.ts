@@ -442,7 +442,9 @@ export const ModelName = {
   NotificationLog: 'NotificationLog',
   AppNotification: 'AppNotification',
   BlogPost: 'BlogPost',
+  Story: 'Story',
   SiteContent: 'SiteContent',
+  SiteContentFile: 'SiteContentFile',
   PlatformSetting: 'PlatformSetting',
   AuditLog: 'AuditLog'
 } as const
@@ -460,7 +462,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "siteContent" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "story" | "siteContent" | "siteContentFile" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3794,6 +3796,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Story: {
+      payload: Prisma.$StoryPayload<ExtArgs>
+      fields: Prisma.StoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>
+        }
+        findFirst: {
+          args: Prisma.StoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>
+        }
+        findMany: {
+          args: Prisma.StoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>[]
+        }
+        create: {
+          args: Prisma.StoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>
+        }
+        createMany: {
+          args: Prisma.StoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>[]
+        }
+        delete: {
+          args: Prisma.StoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>
+        }
+        update: {
+          args: Prisma.StoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.StoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.StoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoryPayload>
+        }
+        aggregate: {
+          args: Prisma.StoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStory>
+        }
+        groupBy: {
+          args: Prisma.StoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StoryCountAggregateOutputType> | number
+        }
+      }
+    }
     SiteContent: {
       payload: Prisma.$SiteContentPayload<ExtArgs>
       fields: Prisma.SiteContentFieldRefs
@@ -3865,6 +3941,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SiteContentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SiteContentCountAggregateOutputType> | number
+        }
+      }
+    }
+    SiteContentFile: {
+      payload: Prisma.$SiteContentFilePayload<ExtArgs>
+      fields: Prisma.SiteContentFileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SiteContentFileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SiteContentFileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>
+        }
+        findFirst: {
+          args: Prisma.SiteContentFileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SiteContentFileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>
+        }
+        findMany: {
+          args: Prisma.SiteContentFileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>[]
+        }
+        create: {
+          args: Prisma.SiteContentFileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>
+        }
+        createMany: {
+          args: Prisma.SiteContentFileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SiteContentFileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>[]
+        }
+        delete: {
+          args: Prisma.SiteContentFileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>
+        }
+        update: {
+          args: Prisma.SiteContentFileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>
+        }
+        deleteMany: {
+          args: Prisma.SiteContentFileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SiteContentFileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SiteContentFileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>[]
+        }
+        upsert: {
+          args: Prisma.SiteContentFileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteContentFilePayload>
+        }
+        aggregate: {
+          args: Prisma.SiteContentFileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSiteContentFile>
+        }
+        groupBy: {
+          args: Prisma.SiteContentFileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteContentFileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SiteContentFileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteContentFileCountAggregateOutputType> | number
         }
       }
     }
@@ -4339,6 +4489,7 @@ export const TutorVideoScalarFieldEnum = {
   moderationNote: 'moderationNote',
   noteVisible: 'noteVisible',
   sortOrder: 'sortOrder',
+  landingConsentAt: 'landingConsentAt',
   createdAt: 'createdAt'
 } as const
 
@@ -4787,6 +4938,26 @@ export const BlogPostScalarFieldEnum = {
 export type BlogPostScalarFieldEnum = (typeof BlogPostScalarFieldEnum)[keyof typeof BlogPostScalarFieldEnum]
 
 
+export const StoryScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  role: 'role',
+  headline: 'headline',
+  body: 'body',
+  imageFileId: 'imageFileId',
+  videoFileId: 'videoFileId',
+  consentAt: 'consentAt',
+  status: 'status',
+  moderationNote: 'moderationNote',
+  noteVisible: 'noteVisible',
+  reviewedById: 'reviewedById',
+  decidedAt: 'decidedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type StoryScalarFieldEnum = (typeof StoryScalarFieldEnum)[keyof typeof StoryScalarFieldEnum]
+
+
 export const SiteContentScalarFieldEnum = {
   key: 'key',
   value: 'value',
@@ -4795,6 +4966,14 @@ export const SiteContentScalarFieldEnum = {
 } as const
 
 export type SiteContentScalarFieldEnum = (typeof SiteContentScalarFieldEnum)[keyof typeof SiteContentScalarFieldEnum]
+
+
+export const SiteContentFileScalarFieldEnum = {
+  key: 'key',
+  fileId: 'fileId'
+} as const
+
+export type SiteContentFileScalarFieldEnum = (typeof SiteContentFileScalarFieldEnum)[keyof typeof SiteContentFileScalarFieldEnum]
 
 
 export const PlatformSettingScalarFieldEnum = {
@@ -5722,7 +5901,9 @@ export type GlobalOmitConfig = {
   notificationLog?: Prisma.NotificationLogOmit
   appNotification?: Prisma.AppNotificationOmit
   blogPost?: Prisma.BlogPostOmit
+  story?: Prisma.StoryOmit
   siteContent?: Prisma.SiteContentOmit
+  siteContentFile?: Prisma.SiteContentFileOmit
   platformSetting?: Prisma.PlatformSettingOmit
   auditLog?: Prisma.AuditLogOmit
 }

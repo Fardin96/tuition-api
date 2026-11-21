@@ -171,6 +171,7 @@ export type SiteContentWhereInput = {
   updatedById?: Prisma.UuidNullableFilter<"SiteContent"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SiteContent"> | Date | string
   updatedBy?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
+  files?: Prisma.SiteContentFileListRelationFilter
 }
 
 export type SiteContentOrderByWithRelationInput = {
@@ -179,6 +180,7 @@ export type SiteContentOrderByWithRelationInput = {
   updatedById?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   updatedBy?: Prisma.AdminUserOrderByWithRelationInput
+  files?: Prisma.SiteContentFileOrderByRelationAggregateInput
 }
 
 export type SiteContentWhereUniqueInput = Prisma.AtLeast<{
@@ -190,6 +192,7 @@ export type SiteContentWhereUniqueInput = Prisma.AtLeast<{
   updatedById?: Prisma.UuidNullableFilter<"SiteContent"> | string | null
   updatedAt?: Prisma.DateTimeFilter<"SiteContent"> | Date | string
   updatedBy?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
+  files?: Prisma.SiteContentFileListRelationFilter
 }, "key">
 
 export type SiteContentOrderByWithAggregationInput = {
@@ -217,6 +220,7 @@ export type SiteContentCreateInput = {
   value: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Date | string
   updatedBy?: Prisma.AdminUserCreateNestedOneWithoutContentEditsInput
+  files?: Prisma.SiteContentFileCreateNestedManyWithoutSiteContentInput
 }
 
 export type SiteContentUncheckedCreateInput = {
@@ -224,6 +228,7 @@ export type SiteContentUncheckedCreateInput = {
   value: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedById?: string | null
   updatedAt?: Date | string
+  files?: Prisma.SiteContentFileUncheckedCreateNestedManyWithoutSiteContentInput
 }
 
 export type SiteContentUpdateInput = {
@@ -231,6 +236,7 @@ export type SiteContentUpdateInput = {
   value?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedBy?: Prisma.AdminUserUpdateOneWithoutContentEditsNestedInput
+  files?: Prisma.SiteContentFileUpdateManyWithoutSiteContentNestedInput
 }
 
 export type SiteContentUncheckedUpdateInput = {
@@ -238,6 +244,7 @@ export type SiteContentUncheckedUpdateInput = {
   value?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.SiteContentFileUncheckedUpdateManyWithoutSiteContentNestedInput
 }
 
 export type SiteContentCreateManyInput = {
@@ -289,6 +296,11 @@ export type SiteContentMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type SiteContentScalarRelationFilter = {
+  is?: Prisma.SiteContentWhereInput
+  isNot?: Prisma.SiteContentWhereInput
+}
+
 export type SiteContentCreateNestedManyWithoutUpdatedByInput = {
   create?: Prisma.XOR<Prisma.SiteContentCreateWithoutUpdatedByInput, Prisma.SiteContentUncheckedCreateWithoutUpdatedByInput> | Prisma.SiteContentCreateWithoutUpdatedByInput[] | Prisma.SiteContentUncheckedCreateWithoutUpdatedByInput[]
   connectOrCreate?: Prisma.SiteContentCreateOrConnectWithoutUpdatedByInput | Prisma.SiteContentCreateOrConnectWithoutUpdatedByInput[]
@@ -331,16 +343,32 @@ export type SiteContentUncheckedUpdateManyWithoutUpdatedByNestedInput = {
   deleteMany?: Prisma.SiteContentScalarWhereInput | Prisma.SiteContentScalarWhereInput[]
 }
 
+export type SiteContentCreateNestedOneWithoutFilesInput = {
+  create?: Prisma.XOR<Prisma.SiteContentCreateWithoutFilesInput, Prisma.SiteContentUncheckedCreateWithoutFilesInput>
+  connectOrCreate?: Prisma.SiteContentCreateOrConnectWithoutFilesInput
+  connect?: Prisma.SiteContentWhereUniqueInput
+}
+
+export type SiteContentUpdateOneRequiredWithoutFilesNestedInput = {
+  create?: Prisma.XOR<Prisma.SiteContentCreateWithoutFilesInput, Prisma.SiteContentUncheckedCreateWithoutFilesInput>
+  connectOrCreate?: Prisma.SiteContentCreateOrConnectWithoutFilesInput
+  upsert?: Prisma.SiteContentUpsertWithoutFilesInput
+  connect?: Prisma.SiteContentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SiteContentUpdateToOneWithWhereWithoutFilesInput, Prisma.SiteContentUpdateWithoutFilesInput>, Prisma.SiteContentUncheckedUpdateWithoutFilesInput>
+}
+
 export type SiteContentCreateWithoutUpdatedByInput = {
   key: string
   value: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Date | string
+  files?: Prisma.SiteContentFileCreateNestedManyWithoutSiteContentInput
 }
 
 export type SiteContentUncheckedCreateWithoutUpdatedByInput = {
   key: string
   value: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Date | string
+  files?: Prisma.SiteContentFileUncheckedCreateNestedManyWithoutSiteContentInput
 }
 
 export type SiteContentCreateOrConnectWithoutUpdatedByInput = {
@@ -379,6 +407,50 @@ export type SiteContentScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"SiteContent"> | Date | string
 }
 
+export type SiteContentCreateWithoutFilesInput = {
+  key: string
+  value: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Date | string
+  updatedBy?: Prisma.AdminUserCreateNestedOneWithoutContentEditsInput
+}
+
+export type SiteContentUncheckedCreateWithoutFilesInput = {
+  key: string
+  value: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedById?: string | null
+  updatedAt?: Date | string
+}
+
+export type SiteContentCreateOrConnectWithoutFilesInput = {
+  where: Prisma.SiteContentWhereUniqueInput
+  create: Prisma.XOR<Prisma.SiteContentCreateWithoutFilesInput, Prisma.SiteContentUncheckedCreateWithoutFilesInput>
+}
+
+export type SiteContentUpsertWithoutFilesInput = {
+  update: Prisma.XOR<Prisma.SiteContentUpdateWithoutFilesInput, Prisma.SiteContentUncheckedUpdateWithoutFilesInput>
+  create: Prisma.XOR<Prisma.SiteContentCreateWithoutFilesInput, Prisma.SiteContentUncheckedCreateWithoutFilesInput>
+  where?: Prisma.SiteContentWhereInput
+}
+
+export type SiteContentUpdateToOneWithWhereWithoutFilesInput = {
+  where?: Prisma.SiteContentWhereInput
+  data: Prisma.XOR<Prisma.SiteContentUpdateWithoutFilesInput, Prisma.SiteContentUncheckedUpdateWithoutFilesInput>
+}
+
+export type SiteContentUpdateWithoutFilesInput = {
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedBy?: Prisma.AdminUserUpdateOneWithoutContentEditsNestedInput
+}
+
+export type SiteContentUncheckedUpdateWithoutFilesInput = {
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  updatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type SiteContentCreateManyUpdatedByInput = {
   key: string
   value: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -389,12 +461,14 @@ export type SiteContentUpdateWithoutUpdatedByInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   value?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.SiteContentFileUpdateManyWithoutSiteContentNestedInput
 }
 
 export type SiteContentUncheckedUpdateWithoutUpdatedByInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   value?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.SiteContentFileUncheckedUpdateManyWithoutSiteContentNestedInput
 }
 
 export type SiteContentUncheckedUpdateManyWithoutUpdatedByInput = {
@@ -404,6 +478,35 @@ export type SiteContentUncheckedUpdateManyWithoutUpdatedByInput = {
 }
 
 
+/**
+ * Count Type SiteContentCountOutputType
+ */
+
+export type SiteContentCountOutputType = {
+  files: number
+}
+
+export type SiteContentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  files?: boolean | SiteContentCountOutputTypeCountFilesArgs
+}
+
+/**
+ * SiteContentCountOutputType without action
+ */
+export type SiteContentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SiteContentCountOutputType
+   */
+  select?: Prisma.SiteContentCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * SiteContentCountOutputType without action
+ */
+export type SiteContentCountOutputTypeCountFilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SiteContentFileWhereInput
+}
+
 
 export type SiteContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   key?: boolean
@@ -411,6 +514,8 @@ export type SiteContentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   updatedById?: boolean
   updatedAt?: boolean
   updatedBy?: boolean | Prisma.SiteContent$updatedByArgs<ExtArgs>
+  files?: boolean | Prisma.SiteContent$filesArgs<ExtArgs>
+  _count?: boolean | Prisma.SiteContentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["siteContent"]>
 
 export type SiteContentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -439,6 +544,8 @@ export type SiteContentSelectScalar = {
 export type SiteContentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"key" | "value" | "updatedById" | "updatedAt", ExtArgs["result"]["siteContent"]>
 export type SiteContentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   updatedBy?: boolean | Prisma.SiteContent$updatedByArgs<ExtArgs>
+  files?: boolean | Prisma.SiteContent$filesArgs<ExtArgs>
+  _count?: boolean | Prisma.SiteContentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SiteContentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   updatedBy?: boolean | Prisma.SiteContent$updatedByArgs<ExtArgs>
@@ -451,6 +558,7 @@ export type $SiteContentPayload<ExtArgs extends runtime.Types.Extensions.Interna
   name: "SiteContent"
   objects: {
     updatedBy: Prisma.$AdminUserPayload<ExtArgs> | null
+    files: Prisma.$SiteContentFilePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     key: string
@@ -852,6 +960,7 @@ readonly fields: SiteContentFieldRefs;
 export interface Prisma__SiteContentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   updatedBy<T extends Prisma.SiteContent$updatedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteContent$updatedByArgs<ExtArgs>>): Prisma.Prisma__AdminUserClient<runtime.Types.Result.GetResult<Prisma.$AdminUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  files<T extends Prisma.SiteContent$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteContent$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteContentFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1302,6 +1411,30 @@ export type SiteContent$updatedByArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   include?: Prisma.AdminUserInclude<ExtArgs> | null
   where?: Prisma.AdminUserWhereInput
+}
+
+/**
+ * SiteContent.files
+ */
+export type SiteContent$filesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SiteContentFile
+   */
+  select?: Prisma.SiteContentFileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SiteContentFile
+   */
+  omit?: Prisma.SiteContentFileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SiteContentFileInclude<ExtArgs> | null
+  where?: Prisma.SiteContentFileWhereInput
+  orderBy?: Prisma.SiteContentFileOrderByWithRelationInput | Prisma.SiteContentFileOrderByWithRelationInput[]
+  cursor?: Prisma.SiteContentFileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SiteContentFileScalarFieldEnum | Prisma.SiteContentFileScalarFieldEnum[]
 }
 
 /**

@@ -49,6 +49,7 @@ export const ERROR_CODES = {
   InvalidVerificationState: "INVALID_VERIFICATION_STATE",
   VideoAlreadyModerated: "VIDEO_ALREADY_MODERATED",
   BlogSlugExists: "BLOG_SLUG_EXISTS",
+  SiteContentConflict: "SITE_CONTENT_CONFLICT",
   InvalidPostState: "INVALID_POST_STATE",
   ReviewExists: "REVIEW_EXISTS",
   ReviewNotAllowed: "REVIEW_NOT_ALLOWED",
@@ -70,6 +71,9 @@ export const ERROR_CODES = {
   InviteExists: "INVITE_EXISTS",
   InviteLimitReached: "INVITE_LIMIT_REACHED",
   RequirementDuplicate: "REQUIREMENT_DUPLICATE",
+  StoryLimitReached: "STORY_LIMIT_REACHED",
+  StoryPending: "STORY_PENDING",
+  StoryAlreadyModerated: "STORY_ALREADY_MODERATED",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

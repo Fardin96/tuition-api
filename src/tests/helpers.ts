@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import type { Prisma } from "../generated/prisma/client.js";
 import type {
   AcademicGroup,
   AdmissionTarget,
@@ -311,7 +312,16 @@ export async function setStudentLocation(
 
 export async function createFileAsset(
   ownerAccountId: string,
-  purpose: "STUDENT_ID" | "TUTOR_ID" | "CREDENTIAL" | "TUTOR_VIDEO" | "BLOG_COVER",
+  purpose:
+    | "STUDENT_ID"
+    | "TUTOR_ID"
+    | "CREDENTIAL"
+    | "TUTOR_VIDEO"
+    | "BLOG_COVER"
+    | "SITE_IMAGE"
+    | "SITE_VIDEO"
+    | "STORY_IMAGE"
+    | "STORY_VIDEO",
   overrides: {
     status?: "PENDING_UPLOAD" | "UPLOADED" | "DELETED";
     contentType?: string;
@@ -850,4 +860,52 @@ export async function setPlatformSetting(key: string, value: boolean | number | 
     update: { value },
     create: { key, value },
   });
+}
+
+/** A story row. Status defaults to PENDING; a decided story gets decidedAt, a rejected one a note. */
+export async function createStoryRow(
+  accountId: string,
+  overrides: {
+    role?: "STUDENT" | "TUTOR";
+    status?: "PENDING" | "APPROVED" | "REJECTED";
+    headline?: string | null;
+    body?: string;
+    imageFileId?: string | null;
+    videoFileId?: string | null;
+    moderationNote?: string | null;
+    noteVisible?: boolean;
+    createdAt?: Date;
+  } = {},
+) {
+  const role = overrides.role ?? "STUDENT";
+  const status = overrides.status ?? "PENDING";
+  return prisma.story.create({
+    data: {
+      accountId,
+      role,
+      headline:
+        role === "STUDENT"
+          ? overrides.headline === undefined
+            ? "A patient tutor"
+            : overrides.headline
+          : null,
+      body: overrides.body ?? "Lessons were clear and on time.",
+      imageFileId: overrides.imageFileId ?? null,
+      videoFileId: overrides.videoFileId ?? null,
+      consentAt: new Date(),
+      status,
+      moderationNote:
+        overrides.moderationNote ?? (status === "REJECTED" ? "Not a good fit." : null),
+      noteVisible: overrides.noteVisible ?? true,
+      decidedAt: status === "PENDING" ? null : new Date(),
+      createdAt: overrides.createdAt,
+    },
+  });
+}
+
+/** A testimonials or showcase row holding the given cards, written straight to the table. */
+export async function createLandingRow(key: "testimonials" | "showcase", items: object[]) {
+  const title = key === "testimonials" ? "Stories" : "Videos";
+  const value = { enabled: true, title, items };
+  return prisma.siteContent.create({ data: { key, value: value as Prisma.InputJsonValue } });
 }
