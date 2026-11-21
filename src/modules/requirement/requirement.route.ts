@@ -26,6 +26,15 @@ import {
   requirementBrowseQuerySchema,
 } from "./requirement-browse.schema.js";
 import { browseRequirements } from "./requirement-browse.service.js";
+import {
+  type RecommendedTutorsQuery,
+  type RequirementInviteBody,
+  recommendedTutorPageSchema,
+  recommendedTutorsQuerySchema,
+  requirementInviteBodySchema,
+  requirementInviteSchema,
+} from "./requirement-match.schema.js";
+import { inviteTutor, listRecommendedTutors } from "./requirement-match.service.js";
 
 export async function requirementRoutes(app: FastifyInstance) {
   app.post(
@@ -63,7 +72,7 @@ export async function requirementRoutes(app: FastifyInstance) {
           tag: "Requirements",
           summary: "Browse open requirements",
           description:
-            "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. scope=set lists requirements that match one of the tutor's own active sets (setId, required) by curriculum, level, subject and area; the manual filters are ignored in that mode. Filters: curriculum, levelCode, subjectId, areaId. Newest first, keyset cursor. No matching score is applied yet. noServiceArea is true when the tutor has no zones and no areas.",
+            "Tutor browse (#46). OPEN requirements from ACTIVE students. scope=nearby matches requirements whose student pin is inside one of the tutor's zones, or whose area is in the tutor's service areas; scope=all skips the location match. scope=set lists the requirements that the matching engine pairs with one of the tutor's own active sets (setId, required); each row carries match {score, reasons}, and matchVersion is the config version. sort=newest (default) keeps newest first with a keyset cursor; sort=match (scope=set only) ranks by score, best first, then newest, capped at 300 with an offset cursor. scope=invited lists the OPEN requirements the tutor was invited to, newest invite first. The manual filters (curriculum, levelCode, subjectId, areaId) apply to nearby and all only. Every row has invitedAt. gaps explains an empty set page. noServiceArea is true when the tutor has no zones and no areas.",
           auth: ["TUTOR"],
           errors: [404],
           rateLimit: "300/min per account",
@@ -80,6 +89,67 @@ export async function requirementRoutes(app: FastifyInstance) {
       const page = await browseRequirements(account.accountId, query);
       reply.header("Cache-Control", "private, no-store");
       return reply.send(page);
+    },
+  );
+
+  app.get(
+    "/:id/tutors",
+    {
+      config: accountRateLimit(120, "1 minute"),
+      schema: {
+        ...routeDocs({
+          tag: "Requirements",
+          summary: "Tutors who match my requirement",
+          description:
+            "Listed tutors whose best active set matches the requirement, best match first, 20 per page (page 1 to 15, at most 300 tutors). Each tutor has match reasons for the student and no numeric score. invitedAt is set when this student invited the tutor; application is the tutor's application here, any status. suggestions appear when fewer than 3 tutors match: allowing online tuition or any tutor gender would add tutors. 404 when the requirement is not the caller's; 409 LISTING_NOT_OPEN when it is not OPEN.",
+          auth: ["STUDENT"],
+          errors: [404, 409],
+          rateLimit: "120/min per account",
+        }),
+        params: requirementIdParamSchema,
+        querystring: recommendedTutorsQuerySchema,
+        response: {
+          200: recommendedTutorPageSchema,
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "STUDENT");
+      const { id } = request.params as RequirementIdParam;
+      const { page } = request.query as RecommendedTutorsQuery;
+      const result = await listRecommendedTutors(account.accountId, id, page);
+      reply.header("Cache-Control", "private, no-store");
+      return reply.send(result);
+    },
+  );
+
+  app.post(
+    "/:id/invites",
+    {
+      config: accountRateLimit(30, "1 minute"),
+      schema: {
+        ...routeDocs({
+          tag: "Requirements",
+          summary: "Invite a tutor to my requirement",
+          description:
+            "Invites a listed tutor to an OPEN requirement. The tutor gets a REQUIREMENT_INVITED alert. No match is needed. 404 when the requirement is not the caller's or the tutor is not listed; 409 LISTING_NOT_OPEN, APPLICATION_CLOSED, ALREADY_APPLIED (the tutor has an application here), INVITE_EXISTS, or INVITE_LIMIT_REACHED (20 invites per requirement).",
+          auth: ["STUDENT"],
+          errors: [404, 409],
+          rateLimit: "30/min per account",
+        }),
+        params: requirementIdParamSchema,
+        body: requirementInviteBodySchema,
+        response: {
+          201: requirementInviteSchema,
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const account = requireRole(request, "STUDENT");
+      const { id } = request.params as RequirementIdParam;
+      const { tutorId } = request.body as RequirementInviteBody;
+      const invite = await inviteTutor(account.accountId, id, tutorId);
+      return reply.status(201).send(invite);
     },
   );
 

@@ -40,6 +40,16 @@ async function createTutor(subjectIds: number[], areaId: number) {
   return { tutor, headers: await getAuthHeaders(account) };
 }
 
+// A set for home tuition with no zones. Without zones a set that teaches online is online-only, so
+// the matching sets here are home-only and their area (the requirement's area) carries the match.
+async function createHomeSet(
+  tutorId: string,
+  overrides: Parameters<typeof createTutorRequirement>[1] = {},
+) {
+  const set = await createTutorRequirement(tutorId, overrides);
+  return prisma.tutorRequirement.update({ where: { id: set.id }, data: { teachesOnline: false } });
+}
+
 async function getDetail(headers: Record<string, string>, id: string) {
   const app = await createTestApp();
   const res = await app.inject({ method: "GET", url: `${BASE}/${id}`, headers });
@@ -66,7 +76,7 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
       subjectIds: [math.id],
       curricula: ["ENGLISH_VERSION"],
     });
-    const matching = await createTutorRequirement(tutor.id, {
+    const matching = await createHomeSet(tutor.id, {
       name: "Evening Math",
       subjectIds: [math.id],
       curricula: ["BANGLA_MEDIUM"],
@@ -104,7 +114,7 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
         daysPerWeek: null,
         minSalary: null,
         maxStudents: 1,
-        teachesOnline: true,
+        teachesOnline: false,
       },
     });
     expect(res.body.tutorProfile).toEqual({
@@ -176,11 +186,11 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
     });
     // Two matching sets. The older one shares two subjects, the newer one shares one, so the
     // shared count wins over recency.
-    const twoShared = await createTutorRequirement(tutor.id, {
+    const twoShared = await createHomeSet(tutor.id, {
       name: "Two shared",
       subjectIds: [math.id, english.id],
     });
-    await createTutorRequirement(tutor.id, { name: "One shared", subjectIds: [math.id] });
+    await createHomeSet(tutor.id, { name: "One shared", subjectIds: [math.id] });
 
     const bySubjects = await getDetail(studentHeaders, application.id);
     expect(bySubjects.body.tutorSet).toMatchObject({
@@ -188,11 +198,12 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
       set: { id: twoShared.id },
     });
 
-    // A matching default set beats both.
-    const defaultSet = await createTutorRequirement(tutor.id, {
+    // A matching default set beats both. It shares both subjects too, so the scores tie and the
+    // default flag decides.
+    const defaultSet = await createHomeSet(tutor.id, {
       name: "Default",
       isDefault: true,
-      subjectIds: [math.id],
+      subjectIds: [math.id, english.id],
     });
     const byDefault = await getDetail(studentHeaders, application.id);
     expect(byDefault.body.tutorSet).toMatchObject({
@@ -287,7 +298,7 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
     const area = await createArea();
     const math = await createSubject();
     const { tutor } = await createTutor([math.id], area.id);
-    const set = await createTutorRequirement(tutor.id, { isDefault: true, subjectIds: [math.id] });
+    const set = await createHomeSet(tutor.id, { isDefault: true, subjectIds: [math.id] });
     const { student } = await createStudent();
     const requirement = await createRequirement({
       studentId: student.id,

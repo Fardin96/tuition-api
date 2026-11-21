@@ -67,6 +67,8 @@ export const ERROR_CODES = {
   OtpExpired: "OTP_EXPIRED",
   OtpTooManyAttempts: "OTP_TOO_MANY_ATTEMPTS",
   SmsUnavailable: "SMS_UNAVAILABLE",
+  InviteExists: "INVITE_EXISTS",
+  InviteLimitReached: "INVITE_LIMIT_REACHED",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

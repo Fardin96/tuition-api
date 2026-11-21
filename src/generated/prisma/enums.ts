@@ -335,7 +335,8 @@ export const AppNotificationKind = {
   VIDEO_REJECTED: 'VIDEO_REJECTED',
   FILE_REMOVED: 'FILE_REMOVED',
   UPLOADS_BLOCKED: 'UPLOADS_BLOCKED',
-  UPLOADS_UNBLOCKED: 'UPLOADS_UNBLOCKED'
+  UPLOADS_UNBLOCKED: 'UPLOADS_UNBLOCKED',
+  REQUIREMENT_INVITED: 'REQUIREMENT_INVITED'
 } as const
 
 export type AppNotificationKind = (typeof AppNotificationKind)[keyof typeof AppNotificationKind]

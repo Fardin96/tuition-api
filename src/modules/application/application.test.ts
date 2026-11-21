@@ -119,6 +119,32 @@ describe("POST /requirements/:id/applications (apply, #57)", () => {
     });
   });
 
+  it("stores the match score, the config version and the match parts on the application", async () => {
+    const app = await createTestApp();
+    const { student } = await createStudent();
+    const requirement = await createRequirement({ studentId: student.id });
+    const { actor } = await createReadyTutor();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/requirements/${requirement.id}/applications`,
+      headers: actor.headers,
+    });
+    expect(res.statusCode).toBe(201);
+    const row = await prisma.application.findUniqueOrThrow({
+      where: { id: JSON.parse(res.body).id },
+    });
+    expect(row.matchScore).toBeGreaterThanOrEqual(0);
+    expect(row.matchScore).toBeLessThanOrEqual(100);
+    expect(row.matchVersion).toBe(0);
+    // The default set's curricula include the requirement's, so the curriculum rule passes.
+    expect(row.matchParts).toMatchObject({
+      version: 0,
+      score: row.matchScore,
+      rules: { curriculum: { mode: "REQUIRED", pass: true } },
+    });
+  });
+
   it("returns 409 ALREADY_APPLIED with the existing application id on a second apply", async () => {
     const app = await createTestApp();
     const { student } = await createStudent();

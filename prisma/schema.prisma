@@ -291,6 +291,8 @@ enum AppNotificationKind {
   FILE_REMOVED // file_purpose says which upload
   UPLOADS_BLOCKED // blocks_videos / blocks_documents say what is paused
   UPLOADS_UNBLOCKED
+  // A student invited the tutor to apply. Carries requirement_id, not application_id.
+  REQUIREMENT_INVITED
 }
 
 // What an admin did to a user's upload, kept after the file itself is gone.
@@ -633,6 +635,7 @@ model Student {
   applications           Application[]
   reviewsGiven           Review[]             @relation("ReviewStudent")
   location               StudentLocation?
+  invitesSent            RequirementInvite[]
 
   @@unique([accountId, role])
   @@index([areaId])
@@ -684,6 +687,7 @@ model Tutor {
   paymentAttempts   PaymentAttempt[]
   promoRedemptions  PromoRedemption[]
   refunds           PaymentRefund[]
+  invites           RequirementInvite[]
 
   @@unique([accountId, role])
   @@index([isListed, ratingAvg(sort: Desc)])
@@ -951,6 +955,8 @@ model TuitionRequirement {
   area         Area?                @relation(fields: [areaId], references: [id], onDelete: Restrict)
   subjects     RequirementSubject[]
   applications Application[]
+  invites      RequirementInvite[]
+  alerts       AppNotification[]
 
   @@index([studentId, createdAt(sort: Desc)])
   @@index([status, curriculum, levelCode, areaId, createdAt(sort: Desc)])
@@ -968,6 +974,40 @@ model RequirementSubject {
   @@id([requirementId, subjectId])
   @@index([subjectId, requirementId])
   @@map("requirement_subject")
+}
+
+// A student asks a tutor to apply to one of their OPEN requirements. The tutor then applies as usual;
+// the invite never creates an application. One per (requirement, tutor).
+model RequirementInvite {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  requirementId String   @map("requirement_id") @db.Uuid
+  tutorId       String   @map("tutor_id") @db.Uuid
+  studentId     String   @map("student_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  requirement TuitionRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  tutor       Tutor              @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  student     Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([requirementId, tutorId])
+  @@index([tutorId, createdAt(sort: Desc)])
+  @@index([studentId])
+  @@map("requirement_invite")
+}
+
+// The hard limit for home tuition (see src/modules/matching/). Created by migration 20261128000100_matching,
+// which seeds Dhaka. boundary is optional in Prisma only; NOT NULL is enforced in SQL, and it is written
+// through raw SQL (ST_GeomFromGeoJSON). GIST index city_boundary_gix lives in SQL.
+model City {
+  slug         String                                       @id
+  name         String
+  districtCode String                                       @map("district_code")
+  boundary     Unsupported("GEOGRAPHY(MULTIPOLYGON,4326)")?
+  isActive     Boolean                                      @default(true) @map("is_active")
+  createdAt    DateTime                                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime                                     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("city")
 }
 
 // Created by a tutor. Needs admin approval before students can see it.
@@ -1416,6 +1456,8 @@ model AppNotification {
   recipientId     String              @map("recipient_account_id") @db.Uuid
   kind            AppNotificationKind
   applicationId   String?             @map("application_id") @db.Uuid
+  // REQUIREMENT_INVITED only (CHECK app_notification_requirement_shape).
+  requirementId   String?             @map("requirement_id") @db.Uuid
   // Upload kinds: the admin's note when it was shared with the user, else null.
   note            String?
   filePurpose     FilePurpose?        @map("file_purpose")
@@ -1424,11 +1466,13 @@ model AppNotification {
   readAt          DateTime?           @map("read_at") @db.Timestamptz(3)
   createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  recipient   Account      @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  application Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  recipient   Account             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  application Application?        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  requirement TuitionRequirement? @relation(fields: [requirementId], references: [id], onDelete: Cascade)
 
   @@index([recipientId, createdAt(sort: Desc)])
   @@index([applicationId])
+  @@index([requirementId])
   @@map("app_notification")
 }
 

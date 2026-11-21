@@ -16,9 +16,14 @@ export const appNotificationSchema = z
     kind: z.nativeEnum(AppNotificationKind),
     /** Null for upload alerts, which are not about an application. */
     applicationId: z.string().nullable(),
+    /** The requirement an invite is about (REQUIREMENT_INVITED alerts only). Null otherwise. */
+    requirementId: z.string().nullable(),
     /** Picks the wording: a tuition (requirement) or a package. Null for upload alerts. */
     listingKind: z.enum(["REQUIREMENT", "PACKAGE"]).nullable(),
-    /** The other party of the application, as the recipient sees them. Null for upload alerts. */
+    /**
+     * The other party, as the recipient sees them: the student on an invite, the other side of an
+     * application. Null for upload alerts.
+     */
     counterpartName: z.string().nullable(),
     /** The admin's note, only when it was shared with the user. Null otherwise. */
     note: z.string().nullable(),

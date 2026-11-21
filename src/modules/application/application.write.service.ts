@@ -11,6 +11,9 @@ import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { COMMISSION_DEFAULT_PERCENT } from "../admin/settings.service.js";
 import type { AuthContext } from "../auth/auth.schema.js";
+import { bestSetForPair } from "../matching/match.service.js";
+import { partsOf } from "../matching/match-sql.js";
+import { getMatchingConfig } from "../matching/matching-config.js";
 import { computeAllowedActions, type Side, type TargetState } from "./application.read.service.js";
 import { type ApplicationAction, FEE_DUE_IN_DAYS } from "./application.schema.js";
 
@@ -220,6 +223,9 @@ export async function applyToRequirement(
   });
   if (!tutor) throw notFound(TUTOR_PROFILE_NOT_FOUND);
 
+  // Read before the transaction: the config is cached, and the score is stored with its version.
+  const cfg = await getMatchingConfig();
+
   try {
     return await prisma.$transaction(async (tx) => {
       const [requirement] = await tx.$queryRaw<{ studentId: string; status: ListingStatus }[]>`
@@ -257,6 +263,19 @@ export async function applyToRequirement(
           status: "PENDING",
         },
       });
+
+      // Applying never needs a match: a tutor with no active set gets nulls here.
+      const best = await bestSetForPair(tx, cfg, requirementId, tutor.id);
+      if (best) {
+        await tx.application.update({
+          where: { id: created.id },
+          data: {
+            matchScore: best.score,
+            matchVersion: cfg.version,
+            matchParts: partsOf(best, cfg) as Prisma.InputJsonValue,
+          },
+        });
+      }
 
       const parties = await loadParties(tx, tutor.id, requirement.studentId);
       await enqueue(tx, {

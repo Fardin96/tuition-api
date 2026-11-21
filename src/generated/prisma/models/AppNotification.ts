@@ -29,6 +29,7 @@ export type AppNotificationMinAggregateOutputType = {
   recipientId: string | null
   kind: $Enums.AppNotificationKind | null
   applicationId: string | null
+  requirementId: string | null
   note: string | null
   filePurpose: $Enums.FilePurpose | null
   blocksVideos: boolean | null
@@ -42,6 +43,7 @@ export type AppNotificationMaxAggregateOutputType = {
   recipientId: string | null
   kind: $Enums.AppNotificationKind | null
   applicationId: string | null
+  requirementId: string | null
   note: string | null
   filePurpose: $Enums.FilePurpose | null
   blocksVideos: boolean | null
@@ -55,6 +57,7 @@ export type AppNotificationCountAggregateOutputType = {
   recipientId: number
   kind: number
   applicationId: number
+  requirementId: number
   note: number
   filePurpose: number
   blocksVideos: number
@@ -70,6 +73,7 @@ export type AppNotificationMinAggregateInputType = {
   recipientId?: true
   kind?: true
   applicationId?: true
+  requirementId?: true
   note?: true
   filePurpose?: true
   blocksVideos?: true
@@ -83,6 +87,7 @@ export type AppNotificationMaxAggregateInputType = {
   recipientId?: true
   kind?: true
   applicationId?: true
+  requirementId?: true
   note?: true
   filePurpose?: true
   blocksVideos?: true
@@ -96,6 +101,7 @@ export type AppNotificationCountAggregateInputType = {
   recipientId?: true
   kind?: true
   applicationId?: true
+  requirementId?: true
   note?: true
   filePurpose?: true
   blocksVideos?: true
@@ -182,6 +188,7 @@ export type AppNotificationGroupByOutputType = {
   recipientId: string
   kind: $Enums.AppNotificationKind
   applicationId: string | null
+  requirementId: string | null
   note: string | null
   filePurpose: $Enums.FilePurpose | null
   blocksVideos: boolean | null
@@ -216,6 +223,7 @@ export type AppNotificationWhereInput = {
   recipientId?: Prisma.UuidFilter<"AppNotification"> | string
   kind?: Prisma.EnumAppNotificationKindFilter<"AppNotification"> | $Enums.AppNotificationKind
   applicationId?: Prisma.UuidNullableFilter<"AppNotification"> | string | null
+  requirementId?: Prisma.UuidNullableFilter<"AppNotification"> | string | null
   note?: Prisma.StringNullableFilter<"AppNotification"> | string | null
   filePurpose?: Prisma.EnumFilePurposeNullableFilter<"AppNotification"> | $Enums.FilePurpose | null
   blocksVideos?: Prisma.BoolNullableFilter<"AppNotification"> | boolean | null
@@ -224,6 +232,7 @@ export type AppNotificationWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"AppNotification"> | Date | string
   recipient?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   application?: Prisma.XOR<Prisma.ApplicationNullableScalarRelationFilter, Prisma.ApplicationWhereInput> | null
+  requirement?: Prisma.XOR<Prisma.TuitionRequirementNullableScalarRelationFilter, Prisma.TuitionRequirementWhereInput> | null
 }
 
 export type AppNotificationOrderByWithRelationInput = {
@@ -231,6 +240,7 @@ export type AppNotificationOrderByWithRelationInput = {
   recipientId?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   applicationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  requirementId?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   filePurpose?: Prisma.SortOrderInput | Prisma.SortOrder
   blocksVideos?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -239,6 +249,7 @@ export type AppNotificationOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   recipient?: Prisma.AccountOrderByWithRelationInput
   application?: Prisma.ApplicationOrderByWithRelationInput
+  requirement?: Prisma.TuitionRequirementOrderByWithRelationInput
 }
 
 export type AppNotificationWhereUniqueInput = Prisma.AtLeast<{
@@ -249,6 +260,7 @@ export type AppNotificationWhereUniqueInput = Prisma.AtLeast<{
   recipientId?: Prisma.UuidFilter<"AppNotification"> | string
   kind?: Prisma.EnumAppNotificationKindFilter<"AppNotification"> | $Enums.AppNotificationKind
   applicationId?: Prisma.UuidNullableFilter<"AppNotification"> | string | null
+  requirementId?: Prisma.UuidNullableFilter<"AppNotification"> | string | null
   note?: Prisma.StringNullableFilter<"AppNotification"> | string | null
   filePurpose?: Prisma.EnumFilePurposeNullableFilter<"AppNotification"> | $Enums.FilePurpose | null
   blocksVideos?: Prisma.BoolNullableFilter<"AppNotification"> | boolean | null
@@ -257,6 +269,7 @@ export type AppNotificationWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"AppNotification"> | Date | string
   recipient?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   application?: Prisma.XOR<Prisma.ApplicationNullableScalarRelationFilter, Prisma.ApplicationWhereInput> | null
+  requirement?: Prisma.XOR<Prisma.TuitionRequirementNullableScalarRelationFilter, Prisma.TuitionRequirementWhereInput> | null
 }, "id">
 
 export type AppNotificationOrderByWithAggregationInput = {
@@ -264,6 +277,7 @@ export type AppNotificationOrderByWithAggregationInput = {
   recipientId?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   applicationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  requirementId?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   filePurpose?: Prisma.SortOrderInput | Prisma.SortOrder
   blocksVideos?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -283,6 +297,7 @@ export type AppNotificationScalarWhereWithAggregatesInput = {
   recipientId?: Prisma.UuidWithAggregatesFilter<"AppNotification"> | string
   kind?: Prisma.EnumAppNotificationKindWithAggregatesFilter<"AppNotification"> | $Enums.AppNotificationKind
   applicationId?: Prisma.UuidNullableWithAggregatesFilter<"AppNotification"> | string | null
+  requirementId?: Prisma.UuidNullableWithAggregatesFilter<"AppNotification"> | string | null
   note?: Prisma.StringNullableWithAggregatesFilter<"AppNotification"> | string | null
   filePurpose?: Prisma.EnumFilePurposeNullableWithAggregatesFilter<"AppNotification"> | $Enums.FilePurpose | null
   blocksVideos?: Prisma.BoolNullableWithAggregatesFilter<"AppNotification"> | boolean | null
@@ -302,6 +317,7 @@ export type AppNotificationCreateInput = {
   createdAt?: Date | string
   recipient: Prisma.AccountCreateNestedOneWithoutAlertsInput
   application?: Prisma.ApplicationCreateNestedOneWithoutAlertsInput
+  requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutAlertsInput
 }
 
 export type AppNotificationUncheckedCreateInput = {
@@ -309,6 +325,7 @@ export type AppNotificationUncheckedCreateInput = {
   recipientId: string
   kind: $Enums.AppNotificationKind
   applicationId?: string | null
+  requirementId?: string | null
   note?: string | null
   filePurpose?: $Enums.FilePurpose | null
   blocksVideos?: boolean | null
@@ -328,6 +345,7 @@ export type AppNotificationUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recipient?: Prisma.AccountUpdateOneRequiredWithoutAlertsNestedInput
   application?: Prisma.ApplicationUpdateOneWithoutAlertsNestedInput
+  requirement?: Prisma.TuitionRequirementUpdateOneWithoutAlertsNestedInput
 }
 
 export type AppNotificationUncheckedUpdateInput = {
@@ -335,6 +353,7 @@ export type AppNotificationUncheckedUpdateInput = {
   recipientId?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
   blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -348,6 +367,7 @@ export type AppNotificationCreateManyInput = {
   recipientId: string
   kind: $Enums.AppNotificationKind
   applicationId?: string | null
+  requirementId?: string | null
   note?: string | null
   filePurpose?: $Enums.FilePurpose | null
   blocksVideos?: boolean | null
@@ -372,6 +392,7 @@ export type AppNotificationUncheckedUpdateManyInput = {
   recipientId?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
   blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -395,6 +416,7 @@ export type AppNotificationCountOrderByAggregateInput = {
   recipientId?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
+  requirementId?: Prisma.SortOrder
   note?: Prisma.SortOrder
   filePurpose?: Prisma.SortOrder
   blocksVideos?: Prisma.SortOrder
@@ -408,6 +430,7 @@ export type AppNotificationMaxOrderByAggregateInput = {
   recipientId?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
+  requirementId?: Prisma.SortOrder
   note?: Prisma.SortOrder
   filePurpose?: Prisma.SortOrder
   blocksVideos?: Prisma.SortOrder
@@ -421,6 +444,7 @@ export type AppNotificationMinOrderByAggregateInput = {
   recipientId?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
+  requirementId?: Prisma.SortOrder
   note?: Prisma.SortOrder
   filePurpose?: Prisma.SortOrder
   blocksVideos?: Prisma.SortOrder
@@ -468,6 +492,48 @@ export type AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput = {
   connect?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
   update?: Prisma.AppNotificationUpdateWithWhereUniqueWithoutRecipientInput | Prisma.AppNotificationUpdateWithWhereUniqueWithoutRecipientInput[]
   updateMany?: Prisma.AppNotificationUpdateManyWithWhereWithoutRecipientInput | Prisma.AppNotificationUpdateManyWithWhereWithoutRecipientInput[]
+  deleteMany?: Prisma.AppNotificationScalarWhereInput | Prisma.AppNotificationScalarWhereInput[]
+}
+
+export type AppNotificationCreateNestedManyWithoutRequirementInput = {
+  create?: Prisma.XOR<Prisma.AppNotificationCreateWithoutRequirementInput, Prisma.AppNotificationUncheckedCreateWithoutRequirementInput> | Prisma.AppNotificationCreateWithoutRequirementInput[] | Prisma.AppNotificationUncheckedCreateWithoutRequirementInput[]
+  connectOrCreate?: Prisma.AppNotificationCreateOrConnectWithoutRequirementInput | Prisma.AppNotificationCreateOrConnectWithoutRequirementInput[]
+  createMany?: Prisma.AppNotificationCreateManyRequirementInputEnvelope
+  connect?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+}
+
+export type AppNotificationUncheckedCreateNestedManyWithoutRequirementInput = {
+  create?: Prisma.XOR<Prisma.AppNotificationCreateWithoutRequirementInput, Prisma.AppNotificationUncheckedCreateWithoutRequirementInput> | Prisma.AppNotificationCreateWithoutRequirementInput[] | Prisma.AppNotificationUncheckedCreateWithoutRequirementInput[]
+  connectOrCreate?: Prisma.AppNotificationCreateOrConnectWithoutRequirementInput | Prisma.AppNotificationCreateOrConnectWithoutRequirementInput[]
+  createMany?: Prisma.AppNotificationCreateManyRequirementInputEnvelope
+  connect?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+}
+
+export type AppNotificationUpdateManyWithoutRequirementNestedInput = {
+  create?: Prisma.XOR<Prisma.AppNotificationCreateWithoutRequirementInput, Prisma.AppNotificationUncheckedCreateWithoutRequirementInput> | Prisma.AppNotificationCreateWithoutRequirementInput[] | Prisma.AppNotificationUncheckedCreateWithoutRequirementInput[]
+  connectOrCreate?: Prisma.AppNotificationCreateOrConnectWithoutRequirementInput | Prisma.AppNotificationCreateOrConnectWithoutRequirementInput[]
+  upsert?: Prisma.AppNotificationUpsertWithWhereUniqueWithoutRequirementInput | Prisma.AppNotificationUpsertWithWhereUniqueWithoutRequirementInput[]
+  createMany?: Prisma.AppNotificationCreateManyRequirementInputEnvelope
+  set?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  disconnect?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  delete?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  connect?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  update?: Prisma.AppNotificationUpdateWithWhereUniqueWithoutRequirementInput | Prisma.AppNotificationUpdateWithWhereUniqueWithoutRequirementInput[]
+  updateMany?: Prisma.AppNotificationUpdateManyWithWhereWithoutRequirementInput | Prisma.AppNotificationUpdateManyWithWhereWithoutRequirementInput[]
+  deleteMany?: Prisma.AppNotificationScalarWhereInput | Prisma.AppNotificationScalarWhereInput[]
+}
+
+export type AppNotificationUncheckedUpdateManyWithoutRequirementNestedInput = {
+  create?: Prisma.XOR<Prisma.AppNotificationCreateWithoutRequirementInput, Prisma.AppNotificationUncheckedCreateWithoutRequirementInput> | Prisma.AppNotificationCreateWithoutRequirementInput[] | Prisma.AppNotificationUncheckedCreateWithoutRequirementInput[]
+  connectOrCreate?: Prisma.AppNotificationCreateOrConnectWithoutRequirementInput | Prisma.AppNotificationCreateOrConnectWithoutRequirementInput[]
+  upsert?: Prisma.AppNotificationUpsertWithWhereUniqueWithoutRequirementInput | Prisma.AppNotificationUpsertWithWhereUniqueWithoutRequirementInput[]
+  createMany?: Prisma.AppNotificationCreateManyRequirementInputEnvelope
+  set?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  disconnect?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  delete?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  connect?: Prisma.AppNotificationWhereUniqueInput | Prisma.AppNotificationWhereUniqueInput[]
+  update?: Prisma.AppNotificationUpdateWithWhereUniqueWithoutRequirementInput | Prisma.AppNotificationUpdateWithWhereUniqueWithoutRequirementInput[]
+  updateMany?: Prisma.AppNotificationUpdateManyWithWhereWithoutRequirementInput | Prisma.AppNotificationUpdateManyWithWhereWithoutRequirementInput[]
   deleteMany?: Prisma.AppNotificationScalarWhereInput | Prisma.AppNotificationScalarWhereInput[]
 }
 
@@ -531,12 +597,14 @@ export type AppNotificationCreateWithoutRecipientInput = {
   readAt?: Date | string | null
   createdAt?: Date | string
   application?: Prisma.ApplicationCreateNestedOneWithoutAlertsInput
+  requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutAlertsInput
 }
 
 export type AppNotificationUncheckedCreateWithoutRecipientInput = {
   id?: string
   kind: $Enums.AppNotificationKind
   applicationId?: string | null
+  requirementId?: string | null
   note?: string | null
   filePurpose?: $Enums.FilePurpose | null
   blocksVideos?: boolean | null
@@ -579,12 +647,65 @@ export type AppNotificationScalarWhereInput = {
   recipientId?: Prisma.UuidFilter<"AppNotification"> | string
   kind?: Prisma.EnumAppNotificationKindFilter<"AppNotification"> | $Enums.AppNotificationKind
   applicationId?: Prisma.UuidNullableFilter<"AppNotification"> | string | null
+  requirementId?: Prisma.UuidNullableFilter<"AppNotification"> | string | null
   note?: Prisma.StringNullableFilter<"AppNotification"> | string | null
   filePurpose?: Prisma.EnumFilePurposeNullableFilter<"AppNotification"> | $Enums.FilePurpose | null
   blocksVideos?: Prisma.BoolNullableFilter<"AppNotification"> | boolean | null
   blocksDocuments?: Prisma.BoolNullableFilter<"AppNotification"> | boolean | null
   readAt?: Prisma.DateTimeNullableFilter<"AppNotification"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"AppNotification"> | Date | string
+}
+
+export type AppNotificationCreateWithoutRequirementInput = {
+  id?: string
+  kind: $Enums.AppNotificationKind
+  note?: string | null
+  filePurpose?: $Enums.FilePurpose | null
+  blocksVideos?: boolean | null
+  blocksDocuments?: boolean | null
+  readAt?: Date | string | null
+  createdAt?: Date | string
+  recipient: Prisma.AccountCreateNestedOneWithoutAlertsInput
+  application?: Prisma.ApplicationCreateNestedOneWithoutAlertsInput
+}
+
+export type AppNotificationUncheckedCreateWithoutRequirementInput = {
+  id?: string
+  recipientId: string
+  kind: $Enums.AppNotificationKind
+  applicationId?: string | null
+  note?: string | null
+  filePurpose?: $Enums.FilePurpose | null
+  blocksVideos?: boolean | null
+  blocksDocuments?: boolean | null
+  readAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type AppNotificationCreateOrConnectWithoutRequirementInput = {
+  where: Prisma.AppNotificationWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppNotificationCreateWithoutRequirementInput, Prisma.AppNotificationUncheckedCreateWithoutRequirementInput>
+}
+
+export type AppNotificationCreateManyRequirementInputEnvelope = {
+  data: Prisma.AppNotificationCreateManyRequirementInput | Prisma.AppNotificationCreateManyRequirementInput[]
+  skipDuplicates?: boolean
+}
+
+export type AppNotificationUpsertWithWhereUniqueWithoutRequirementInput = {
+  where: Prisma.AppNotificationWhereUniqueInput
+  update: Prisma.XOR<Prisma.AppNotificationUpdateWithoutRequirementInput, Prisma.AppNotificationUncheckedUpdateWithoutRequirementInput>
+  create: Prisma.XOR<Prisma.AppNotificationCreateWithoutRequirementInput, Prisma.AppNotificationUncheckedCreateWithoutRequirementInput>
+}
+
+export type AppNotificationUpdateWithWhereUniqueWithoutRequirementInput = {
+  where: Prisma.AppNotificationWhereUniqueInput
+  data: Prisma.XOR<Prisma.AppNotificationUpdateWithoutRequirementInput, Prisma.AppNotificationUncheckedUpdateWithoutRequirementInput>
+}
+
+export type AppNotificationUpdateManyWithWhereWithoutRequirementInput = {
+  where: Prisma.AppNotificationScalarWhereInput
+  data: Prisma.XOR<Prisma.AppNotificationUpdateManyMutationInput, Prisma.AppNotificationUncheckedUpdateManyWithoutRequirementInput>
 }
 
 export type AppNotificationCreateWithoutApplicationInput = {
@@ -597,12 +718,14 @@ export type AppNotificationCreateWithoutApplicationInput = {
   readAt?: Date | string | null
   createdAt?: Date | string
   recipient: Prisma.AccountCreateNestedOneWithoutAlertsInput
+  requirement?: Prisma.TuitionRequirementCreateNestedOneWithoutAlertsInput
 }
 
 export type AppNotificationUncheckedCreateWithoutApplicationInput = {
   id?: string
   recipientId: string
   kind: $Enums.AppNotificationKind
+  requirementId?: string | null
   note?: string | null
   filePurpose?: $Enums.FilePurpose | null
   blocksVideos?: boolean | null
@@ -641,6 +764,7 @@ export type AppNotificationCreateManyRecipientInput = {
   id?: string
   kind: $Enums.AppNotificationKind
   applicationId?: string | null
+  requirementId?: string | null
   note?: string | null
   filePurpose?: $Enums.FilePurpose | null
   blocksVideos?: boolean | null
@@ -659,12 +783,14 @@ export type AppNotificationUpdateWithoutRecipientInput = {
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.ApplicationUpdateOneWithoutAlertsNestedInput
+  requirement?: Prisma.TuitionRequirementUpdateOneWithoutAlertsNestedInput
 }
 
 export type AppNotificationUncheckedUpdateWithoutRecipientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
   blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -675,6 +801,59 @@ export type AppNotificationUncheckedUpdateWithoutRecipientInput = {
 
 export type AppNotificationUncheckedUpdateManyWithoutRecipientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
+  applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
+  blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  blocksDocuments?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AppNotificationCreateManyRequirementInput = {
+  id?: string
+  recipientId: string
+  kind: $Enums.AppNotificationKind
+  applicationId?: string | null
+  note?: string | null
+  filePurpose?: $Enums.FilePurpose | null
+  blocksVideos?: boolean | null
+  blocksDocuments?: boolean | null
+  readAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type AppNotificationUpdateWithoutRequirementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
+  blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  blocksDocuments?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recipient?: Prisma.AccountUpdateOneRequiredWithoutAlertsNestedInput
+  application?: Prisma.ApplicationUpdateOneWithoutAlertsNestedInput
+}
+
+export type AppNotificationUncheckedUpdateWithoutRequirementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
+  applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
+  blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  blocksDocuments?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AppNotificationUncheckedUpdateManyWithoutRequirementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientId?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
   applicationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -689,6 +868,7 @@ export type AppNotificationCreateManyApplicationInput = {
   id?: string
   recipientId: string
   kind: $Enums.AppNotificationKind
+  requirementId?: string | null
   note?: string | null
   filePurpose?: $Enums.FilePurpose | null
   blocksVideos?: boolean | null
@@ -707,12 +887,14 @@ export type AppNotificationUpdateWithoutApplicationInput = {
   readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recipient?: Prisma.AccountUpdateOneRequiredWithoutAlertsNestedInput
+  requirement?: Prisma.TuitionRequirementUpdateOneWithoutAlertsNestedInput
 }
 
 export type AppNotificationUncheckedUpdateWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   recipientId?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
+  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
   blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -725,6 +907,7 @@ export type AppNotificationUncheckedUpdateManyWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   recipientId?: Prisma.StringFieldUpdateOperationsInput | string
   kind?: Prisma.EnumAppNotificationKindFieldUpdateOperationsInput | $Enums.AppNotificationKind
+  requirementId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filePurpose?: Prisma.NullableEnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose | null
   blocksVideos?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -740,6 +923,7 @@ export type AppNotificationSelect<ExtArgs extends runtime.Types.Extensions.Inter
   recipientId?: boolean
   kind?: boolean
   applicationId?: boolean
+  requirementId?: boolean
   note?: boolean
   filePurpose?: boolean
   blocksVideos?: boolean
@@ -748,6 +932,7 @@ export type AppNotificationSelect<ExtArgs extends runtime.Types.Extensions.Inter
   createdAt?: boolean
   recipient?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   application?: boolean | Prisma.AppNotification$applicationArgs<ExtArgs>
+  requirement?: boolean | Prisma.AppNotification$requirementArgs<ExtArgs>
 }, ExtArgs["result"]["appNotification"]>
 
 export type AppNotificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -755,6 +940,7 @@ export type AppNotificationSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   recipientId?: boolean
   kind?: boolean
   applicationId?: boolean
+  requirementId?: boolean
   note?: boolean
   filePurpose?: boolean
   blocksVideos?: boolean
@@ -763,6 +949,7 @@ export type AppNotificationSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   createdAt?: boolean
   recipient?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   application?: boolean | Prisma.AppNotification$applicationArgs<ExtArgs>
+  requirement?: boolean | Prisma.AppNotification$requirementArgs<ExtArgs>
 }, ExtArgs["result"]["appNotification"]>
 
 export type AppNotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -770,6 +957,7 @@ export type AppNotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   recipientId?: boolean
   kind?: boolean
   applicationId?: boolean
+  requirementId?: boolean
   note?: boolean
   filePurpose?: boolean
   blocksVideos?: boolean
@@ -778,6 +966,7 @@ export type AppNotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   createdAt?: boolean
   recipient?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   application?: boolean | Prisma.AppNotification$applicationArgs<ExtArgs>
+  requirement?: boolean | Prisma.AppNotification$requirementArgs<ExtArgs>
 }, ExtArgs["result"]["appNotification"]>
 
 export type AppNotificationSelectScalar = {
@@ -785,6 +974,7 @@ export type AppNotificationSelectScalar = {
   recipientId?: boolean
   kind?: boolean
   applicationId?: boolean
+  requirementId?: boolean
   note?: boolean
   filePurpose?: boolean
   blocksVideos?: boolean
@@ -793,18 +983,21 @@ export type AppNotificationSelectScalar = {
   createdAt?: boolean
 }
 
-export type AppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientId" | "kind" | "applicationId" | "note" | "filePurpose" | "blocksVideos" | "blocksDocuments" | "readAt" | "createdAt", ExtArgs["result"]["appNotification"]>
+export type AppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipientId" | "kind" | "applicationId" | "requirementId" | "note" | "filePurpose" | "blocksVideos" | "blocksDocuments" | "readAt" | "createdAt", ExtArgs["result"]["appNotification"]>
 export type AppNotificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipient?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   application?: boolean | Prisma.AppNotification$applicationArgs<ExtArgs>
+  requirement?: boolean | Prisma.AppNotification$requirementArgs<ExtArgs>
 }
 export type AppNotificationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipient?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   application?: boolean | Prisma.AppNotification$applicationArgs<ExtArgs>
+  requirement?: boolean | Prisma.AppNotification$requirementArgs<ExtArgs>
 }
 export type AppNotificationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipient?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   application?: boolean | Prisma.AppNotification$applicationArgs<ExtArgs>
+  requirement?: boolean | Prisma.AppNotification$requirementArgs<ExtArgs>
 }
 
 export type $AppNotificationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -812,12 +1005,14 @@ export type $AppNotificationPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     recipient: Prisma.$AccountPayload<ExtArgs>
     application: Prisma.$ApplicationPayload<ExtArgs> | null
+    requirement: Prisma.$TuitionRequirementPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     recipientId: string
     kind: $Enums.AppNotificationKind
     applicationId: string | null
+    requirementId: string | null
     note: string | null
     filePurpose: $Enums.FilePurpose | null
     blocksVideos: boolean | null
@@ -1220,6 +1415,7 @@ export interface Prisma__AppNotificationClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   recipient<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   application<T extends Prisma.AppNotification$applicationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppNotification$applicationArgs<ExtArgs>>): Prisma.Prisma__ApplicationClient<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  requirement<T extends Prisma.AppNotification$requirementArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppNotification$requirementArgs<ExtArgs>>): Prisma.Prisma__TuitionRequirementClient<runtime.Types.Result.GetResult<Prisma.$TuitionRequirementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1253,6 +1449,7 @@ export interface AppNotificationFieldRefs {
   readonly recipientId: Prisma.FieldRef<"AppNotification", 'String'>
   readonly kind: Prisma.FieldRef<"AppNotification", 'AppNotificationKind'>
   readonly applicationId: Prisma.FieldRef<"AppNotification", 'String'>
+  readonly requirementId: Prisma.FieldRef<"AppNotification", 'String'>
   readonly note: Prisma.FieldRef<"AppNotification", 'String'>
   readonly filePurpose: Prisma.FieldRef<"AppNotification", 'FilePurpose'>
   readonly blocksVideos: Prisma.FieldRef<"AppNotification", 'Boolean'>
@@ -1676,6 +1873,25 @@ export type AppNotification$applicationArgs<ExtArgs extends runtime.Types.Extens
    */
   include?: Prisma.ApplicationInclude<ExtArgs> | null
   where?: Prisma.ApplicationWhereInput
+}
+
+/**
+ * AppNotification.requirement
+ */
+export type AppNotification$requirementArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TuitionRequirement
+   */
+  select?: Prisma.TuitionRequirementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TuitionRequirement
+   */
+  omit?: Prisma.TuitionRequirementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TuitionRequirementInclude<ExtArgs> | null
+  where?: Prisma.TuitionRequirementWhereInput
 }
 
 /**

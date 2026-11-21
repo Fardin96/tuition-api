@@ -49,6 +49,9 @@ beforeAll(async () => {
 beforeEach(async () => {
   const { setStorageForTests } = await import("../lib/storage.js");
   setStorageForTests(null);
+  // matching_config lives in platform_setting (truncated below); drop the per-process copy too.
+  const { resetMatchingConfigCache } = await import("../modules/matching/matching-config.js");
+  resetMatchingConfigCache();
 
   await prisma.$executeRawUnsafe(`
     TRUNCATE TABLE
@@ -68,6 +71,7 @@ beforeEach(async () => {
       platform_fee,
       notification_log,
       app_notification,
+      requirement_invite,
       application,
       review,
       tuition_requirement,
@@ -106,4 +110,9 @@ beforeEach(async () => {
       ('require_student_phone_verification', 'false'::jsonb, now())
     ON CONFLICT (key) DO NOTHING;
   `);
+  // city is seeded by migration (Dhaka) and never truncated: drop cities a test added, keep Dhaka on.
+  await prisma.$executeRawUnsafe(`DELETE FROM city WHERE slug <> 'dhaka'`);
+  await prisma.$executeRawUnsafe(
+    `UPDATE city SET is_active = true WHERE slug = 'dhaka' AND NOT is_active`,
+  );
 });
