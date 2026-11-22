@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTestApp } from "../../tests/helpers.js";
+import { createAccount, createTestApp, getAuthHeaders } from "../../tests/helpers.js";
 
 const URL = "/api/v1/lookups/education";
 const EM_NO_GROUPS = ["EM_CAMBRIDGE", "EM_EDEXCEL", "EM_IB", "EM_AMERICAN"];
@@ -36,6 +36,23 @@ describe("GET /api/v1/lookups/education", () => {
     const res = await app.inject({ method: "GET", url: URL });
 
     expect(res.headers["cache-control"]).toBe("public, max-age=300, stale-while-revalidate=600");
+  });
+
+  it("sends a browser-only cache header to signed-in callers, with the same body", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+
+    const anonymous = await app.inject({ method: "GET", url: URL });
+    const res = await app.inject({
+      method: "GET",
+      url: URL,
+      headers: await getAuthHeaders(account),
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["cache-control"]).toBe("private, max-age=300");
+    expect(res.headers.vary).toContain("Authorization");
+    expect(res.body).toBe(anonymous.body);
   });
 
   it("answers 304 when if-none-match matches the etag", async () => {

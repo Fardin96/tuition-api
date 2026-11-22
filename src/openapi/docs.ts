@@ -44,7 +44,7 @@ export type Tag = (typeof TAGS)[number]["name"];
 /**
  * Who may call a route:
  * - "public": no token needed, the response is the same for everyone.
- * - "optional": no token needed; a token only changes caching (private, no-store).
+ * - "optional": no token needed; a token only changes caching (private, no-store unless signedInCache says otherwise).
  * - "any": any signed-in account.
  * - a role list: one of these roles (checked by requireRole).
  * - "admin": role ADMIN with an ACTIVE admin_user row (checked by requireAdmin).
@@ -70,13 +70,18 @@ export type RouteDocsOptions = {
   noContent?: boolean;
   /** The route is a stub that answers 501 until its feature lands. */
   deferred?: boolean;
+  /**
+   * For an "optional" route whose signed-in callers get a different Cache-Control than the default
+   * "private, no-store" (see sharedCache in plugins/cache.ts). Written into the "Who" line.
+   */
+  signedInCache?: string;
 };
 
 const BEARER = [{ bearerAuth: [] }] as const;
 
-function roleText(auth: RouteAuth): string {
+function roleText(auth: RouteAuth, signedInCache = "private, no-store"): string {
   if (auth === "public") return "Public";
-  if (auth === "optional") return "Public; signed-in callers get Cache-Control: private, no-store";
+  if (auth === "optional") return `Public; signed-in callers get Cache-Control: ${signedInCache}`;
   if (auth === "any") return "Any signed-in account";
   if (auth === "admin") return "ADMIN with an ACTIVE admin_user row";
   return auth.join(", ");
@@ -97,7 +102,7 @@ export function routeDocs(opts: RouteDocsOptions) {
   errors.add(429);
   errors.add(500);
 
-  const lines = [opts.description, `**Who:** ${roleText(opts.auth)}.`];
+  const lines = [opts.description, `**Who:** ${roleText(opts.auth, opts.signedInCache)}.`];
   lines.push(`**Rate limit:** ${opts.rateLimit ?? "global 100/min"}.`);
 
   return {
@@ -107,7 +112,7 @@ export function routeDocs(opts: RouteDocsOptions) {
     security:
       opts.auth === "public" ? [] : opts.auth === "optional" ? [{}, ...BEARER] : [...BEARER],
     ...(opts.deferred ? { "x-deferred": true, hide: true } : {}),
-    "x-roles": roleText(opts.auth),
+    "x-roles": roleText(opts.auth, opts.signedInCache),
     ...(opts.rateLimit ? { "x-rate-limit": opts.rateLimit } : {}),
     "x-errors": [...errors].sort((a, b) => a - b),
     ...(opts.noContent ? { "x-no-content": true } : {}),

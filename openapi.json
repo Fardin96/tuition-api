@@ -27089,14 +27089,14 @@
         "tags": [
           "Site content"
         ],
-        "description": "The ten landing blocks: hero, nav, categories, testimonials, showcase, how_it_works, faq, cta_banner, footer and seo. A block with no row, or a stored row that no longer fits, shows its default.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per account.",
+        "description": "The ten landing blocks: hero, nav, categories, testimonials, showcase, how_it_works, faq, cta_banner, footer and seo. A block with no row, or a stored row that no longer fits, shows its default. The same body for every caller. Cached for 5 minutes by shared caches; signed-in callers cache it in the browser only.\n\n**Who:** Public; signed-in callers get Cache-Control: private, max-age=300.\n\n**Rate limit:** 120/min per account.",
         "security": [
           {},
           {
             "bearerAuth": []
           }
         ],
-        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-roles": "Public; signed-in callers get Cache-Control: private, max-age=300",
         "x-rate-limit": "120/min per account",
         "responses": {
           "200": {
@@ -27138,7 +27138,7 @@
         "tags": [
           "Site content"
         ],
-        "description": "One of about-us, terms, privacy or contact. updatedAt is null while the page shows its default.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per account.",
+        "description": "One of about-us, terms, privacy or contact. updatedAt is null while the page shows its default. The same body for every caller. Cached for 5 minutes by shared caches; signed-in callers cache it in the browser only.\n\n**Who:** Public; signed-in callers get Cache-Control: private, max-age=300.\n\n**Rate limit:** 120/min per account.",
         "parameters": [
           {
             "schema": {
@@ -27161,7 +27161,7 @@
             "bearerAuth": []
           }
         ],
-        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-roles": "Public; signed-in callers get Cache-Control: private, max-age=300",
         "x-rate-limit": "120/min per account",
         "responses": {
           "200": {
@@ -27213,14 +27213,14 @@
         "tags": [
           "Lookups"
         ],
-        "description": "Curricula with their levels and groups, admission targets, retaker labels and the level range. Cached for 5 minutes; signed-in callers get no-store.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per IP.",
+        "description": "Curricula with their levels and groups, admission targets, retaker labels and the level range. The same body for every caller. Cached for 5 minutes by shared caches; signed-in callers cache it in the browser only.\n\n**Who:** Public; signed-in callers get Cache-Control: private, max-age=300.\n\n**Rate limit:** 120/min per IP.",
         "security": [
           {},
           {
             "bearerAuth": []
           }
         ],
-        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-roles": "Public; signed-in callers get Cache-Control: private, max-age=300",
         "x-rate-limit": "120/min per IP",
         "responses": {
           "200": {
@@ -27262,14 +27262,14 @@
         "tags": [
           "Lookups"
         ],
-        "description": "Active areas grouped by division, then district. Divisions, districts and areas are each sorted by name. code is the district code that tutor-city checks compare against (null when the district name is not recognised). Cached for 5 minutes; signed-in callers get no-store.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per IP.",
+        "description": "Active areas grouped by division, then district. Divisions, districts and areas are each sorted by name. code is the district code that tutor-city checks compare against (null when the district name is not recognised). The same body for every caller. Cached for 5 minutes by shared caches; signed-in callers cache it in the browser only.\n\n**Who:** Public; signed-in callers get Cache-Control: private, max-age=300.\n\n**Rate limit:** 120/min per IP.",
         "security": [
           {},
           {
             "bearerAuth": []
           }
         ],
-        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-roles": "Public; signed-in callers get Cache-Control: private, max-age=300",
         "x-rate-limit": "120/min per IP",
         "responses": {
           "200": {
@@ -27311,14 +27311,14 @@
         "tags": [
           "Lookups"
         ],
-        "description": "Active subjects only, ordered by sortOrder then name. Cached for 5 minutes; signed-in callers get no-store.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** 120/min per IP.",
+        "description": "Active subjects only, ordered by sortOrder then name. The same body for every caller. Cached for 5 minutes by shared caches; signed-in callers cache it in the browser only.\n\n**Who:** Public; signed-in callers get Cache-Control: private, max-age=300.\n\n**Rate limit:** 120/min per IP.",
         "security": [
           {},
           {
             "bearerAuth": []
           }
         ],
-        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-roles": "Public; signed-in callers get Cache-Control: private, max-age=300",
         "x-rate-limit": "120/min per IP",
         "responses": {
           "200": {

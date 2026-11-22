@@ -47,10 +47,13 @@ async function buildTokenResponse(account: {
   return { accessToken, refreshToken, account };
 }
 
+// Every route here sets compress: false. Token responses and session lists are never compressed,
+// which closes the compression side channels (BREACH-style) for secrets sent in these bodies.
 export async function authRoutes(app: FastifyInstance) {
   app.post(
     "/google",
     {
+      compress: false,
       schema: {
         ...routeDocs({
           tag: "Auth",
@@ -86,6 +89,7 @@ export async function authRoutes(app: FastifyInstance) {
   app.post(
     "/refresh",
     {
+      compress: false,
       schema: {
         ...routeDocs({
           tag: "Auth",
@@ -130,6 +134,7 @@ export async function authRoutes(app: FastifyInstance) {
   app.post(
     "/logout",
     {
+      compress: false,
       schema: {
         ...routeDocs({
           tag: "Auth",
@@ -155,6 +160,7 @@ export async function authRoutes(app: FastifyInstance) {
   app.post(
     "/logout-all",
     {
+      compress: false,
       schema: {
         ...routeDocs({
           tag: "Auth",
@@ -175,6 +181,7 @@ export async function authRoutes(app: FastifyInstance) {
   app.get(
     "/sessions",
     {
+      compress: false,
       schema: {
         ...routeDocs({
           tag: "Auth",
@@ -195,6 +202,7 @@ export async function authRoutes(app: FastifyInstance) {
   app.delete(
     "/sessions/:id",
     {
+      compress: false,
       schema: {
         ...routeDocs({
           tag: "Auth",
@@ -219,6 +227,7 @@ export async function authRoutes(app: FastifyInstance) {
   app.post(
     "/consent",
     {
+      compress: false,
       schema: {
         ...routeDocs({
           tag: "Auth",
