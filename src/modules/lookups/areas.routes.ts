@@ -3,7 +3,7 @@ import { z } from "zod";
 import { toDistrictCode } from "../../lib/districts.js";
 import { prisma } from "../../lib/prisma.js";
 import { routeDocs } from "../../openapi/docs.js";
-import { publicCache } from "../../plugins/cache.js";
+import { sharedCache } from "../../plugins/cache.js";
 
 const areaOptionSchema = z
   .object({
@@ -34,6 +34,8 @@ const areaListSchema = z
 type AreaDistrict = z.infer<typeof areaDistrictSchema>;
 type AreaDivision = z.infer<typeof areaDivisionSchema>;
 
+const CACHE_SECONDS = 300;
+
 export async function areaRoutes(app: FastifyInstance) {
   app.get(
     "/",
@@ -44,15 +46,16 @@ export async function areaRoutes(app: FastifyInstance) {
           tag: "Lookups",
           summary: "List areas",
           description:
-            "Active areas grouped by division, then district. Divisions, districts and areas are each sorted by name. code is the district code that tutor-city checks compare against (null when the district name is not recognised). Cached for 5 minutes; signed-in callers get no-store.",
+            "Active areas grouped by division, then district. Divisions, districts and areas are each sorted by name. code is the district code that tutor-city checks compare against (null when the district name is not recognised). The same body for every caller. Cached for 5 minutes by shared caches; signed-in callers cache it in the browser only.",
           auth: "optional",
+          signedInCache: `private, max-age=${CACHE_SECONDS}`,
           rateLimit: "120/min per IP",
         }),
         response: { 200: areaListSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      publicCache(request, reply, "public, max-age=300, stale-while-revalidate=600");
+      sharedCache(request, reply, CACHE_SECONDS);
       const rows = await prisma.area.findMany({
         where: { isActive: true },
         select: { id: true, name: true, division: true, district: true },

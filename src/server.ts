@@ -1,4 +1,6 @@
+import zlib from "node:zlib";
 import "./lib/bigint.js";
+import compress from "@fastify/compress";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import etag from "@fastify/etag";
@@ -10,7 +12,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
-import { env } from "./config/env.js";
+import { env, r2PublicConfigWarnings } from "./config/env.js";
 import { type AppError, ERROR_CODES, errorCodeOf } from "./lib/errors.js";
 import { pool, startPoolStats } from "./lib/prisma.js";
 import { adminAccountRoutes } from "./modules/admin/accounts.routes.js";
@@ -112,7 +114,19 @@ export async function buildApp() {
     allowedHeaders: ["Content-Type", "Authorization"],
   });
   await app.register(cookie);
-  await app.register(etag);
+  // The ETag is weak because the body can be sent compressed: gzip and br bytes differ from the identity
+  // bytes the tag was computed on, and a strong tag must name exactly one byte sequence.
+  await app.register(etag, { weak: true });
+  // Registered before any route so its onRoute hook sees every route. Brotli quality 4: the default 11
+  // is too slow for dynamic JSON. Request bodies are never inflated: the API takes no compressed uploads,
+  // and accepting them would add a decompression-bomb path.
+  await app.register(compress, {
+    global: true,
+    threshold: 1024,
+    encodings: ["br", "gzip"],
+    brotliOptions: { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 4 } },
+    globalDecompression: false,
+  });
   await app.register(rateLimit, {
     max: 100,
     timeWindow: "1 minute",
@@ -193,6 +207,7 @@ export async function buildApp() {
 
 async function main() {
   const app = await buildApp();
+  for (const warning of r2PublicConfigWarnings()) app.log.warn(warning);
   try {
     await app.listen({ port: env.PORT, host: env.HOST });
     app.log.info(`Server listening on http://${env.HOST}:${env.PORT}`);

@@ -126,7 +126,7 @@ describe("public site content", () => {
       expect(res.headers.vary).toContain("Authorization");
     });
 
-    it("sends private, no-store to signed-in callers", async () => {
+    it("sends a browser-only cache header to signed-in callers", async () => {
       const app = await createTestApp();
       const student = await createAccount({ role: "STUDENT" });
 
@@ -137,7 +137,8 @@ describe("public site content", () => {
       });
 
       expect(res.statusCode).toBe(200);
-      expect(res.headers["cache-control"]).toBe("private, no-store");
+      expect(res.headers["cache-control"]).toBe("private, max-age=300");
+      expect(res.headers.vary).toContain("Authorization");
     });
   });
 
@@ -164,6 +165,26 @@ describe("public site content", () => {
         });
       },
     );
+
+    it("sends the shared cache header to anonymous callers and a browser-only one to signed-in callers", async () => {
+      const app = await createTestApp();
+      const student = await createAccount({ role: "STUDENT" });
+
+      const anonymous = await app.inject({ method: "GET", url: `${URL}/pages/terms` });
+      const signedIn = await app.inject({
+        method: "GET",
+        url: `${URL}/pages/terms`,
+        headers: await getAuthHeaders(student),
+      });
+
+      expect(anonymous.headers["cache-control"]).toBe(
+        "public, max-age=300, stale-while-revalidate=600",
+      );
+      expect(signedIn.statusCode).toBe(200);
+      expect(signedIn.headers["cache-control"]).toBe("private, max-age=300");
+      expect(signedIn.headers.vary).toContain("Authorization");
+      expect(signedIn.body).toBe(anonymous.body);
+    });
 
     it("returns a stored page with its updatedAt", async () => {
       const app = await createTestApp();

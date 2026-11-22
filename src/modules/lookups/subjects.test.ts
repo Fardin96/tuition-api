@@ -37,10 +37,12 @@ describe("GET /api/v1/subjects", () => {
     expect(res.headers["cache-control"]).toBe("public, max-age=300, stale-while-revalidate=600");
   });
 
-  it("sends private, no-store to signed-in callers", async () => {
+  it("sends a browser-only cache header to signed-in callers, with the same body", async () => {
     const app = await createTestApp();
+    await addSubject({ name: "Physics", slug: "physics" });
     const account = await createAccount({ role: "STUDENT" });
 
+    const anonymous = await app.inject({ method: "GET", url: URL });
     const res = await app.inject({
       method: "GET",
       url: URL,
@@ -48,7 +50,9 @@ describe("GET /api/v1/subjects", () => {
     });
 
     expect(res.statusCode).toBe(200);
-    expect(res.headers["cache-control"]).toBe("private, no-store");
+    expect(res.headers["cache-control"]).toBe("private, max-age=300");
+    expect(res.headers.vary).toContain("Authorization");
+    expect(res.body).toBe(anonymous.body);
   });
 
   it("answers 304 when if-none-match matches the etag", async () => {

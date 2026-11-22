@@ -33,6 +33,7 @@
     "cron:file-cleanup": "tsx --env-file-if-exists=.env src/cron/file-cleanup.ts",
     "cron:phone-otp-cleanup": "tsx --env-file-if-exists=.env src/cron/phone-otp-cleanup.ts",
     "r2:smoke": "tsx --env-file-if-exists=.env scripts/r2-smoke.ts",
+    "r2:backfill-cache-control": "tsx --env-file-if-exists=.env scripts/backfill-public-cache-control.ts",
     "sms:smoke": "tsx --env-file-if-exists=.env scripts/sms-smoke.ts",
     "prepare": "husky || true"
   },
@@ -40,6 +41,7 @@
     "@aws-sdk/client-s3": "^3.1153.0",
     "@aws-sdk/lib-storage": "^3.1153.0",
     "@aws-sdk/s3-request-presigner": "^3.1153.0",
+    "@fastify/compress": "^9.3.0",
     "@fastify/cookie": "^11.1.3",
     "@fastify/cors": "^11.3.1",
     "@fastify/etag": "^6.2.2",

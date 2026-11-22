@@ -36,6 +36,13 @@ export const DOWNLOAD_URL_TTL = 5 * 60;
 /** Signed read URLs embedded in list responses, such as video players (seconds). */
 export const EMBED_URL_TTL = 60 * 60;
 /**
+ * Embed links are signed at the start of a window this long (seconds), so every response inside
+ * one window carries the same URL and browsers and CDNs can reuse it. A link expires at the start
+ * of its window plus this window plus EMBED_URL_TTL: it is valid for at least EMBED_URL_TTL after
+ * it is issued, and at most EMBED_URL_TTL + this window (90 minutes) after.
+ */
+export const EMBED_URL_WINDOW = 30 * 60;
+/**
  * Uploads one account may have started in the last 24 hours that nothing uses yet: unfinished,
  * or finished but not attached. Attached files do not count, so a tutor can still upload every
  * credential; this only stops storage being filled with files that are never used.

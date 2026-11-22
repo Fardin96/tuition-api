@@ -18,7 +18,7 @@ import {
   type RefundInput,
   type RefundQueryResult,
 } from "../lib/sslcommerz.js";
-import type { ObjectStorage } from "../lib/storage.js";
+import { type ObjectStorage, PUBLIC_MEDIA_CACHE_CONTROL } from "../lib/storage.js";
 import { generateRefreshToken, hashToken, signAccessToken } from "../modules/auth/auth.service.js";
 import { buildApp } from "../server.js";
 
@@ -384,6 +384,9 @@ export function createFakeStorage(options: { publicBucket?: boolean } = {}) {
   const objects = new Map<string, { bytes: Uint8Array; contentType: string }>();
   const publicObjects = new Map<string, { bytes: Uint8Array; contentType: string }>();
   const presignedPuts: { key: string; contentType: string; contentLength: number }[] = [];
+  const presignedGets: { key: string; expiresIn: number; stableWindowSeconds?: number }[] = [];
+  // Cache-Control each public object was last written with (copyToPublic or applyPublicCacheControl).
+  const publicCacheControl = new Map<string, string>();
   let nextFailure: Error | null = null;
 
   const maybeFail = () => {
@@ -400,8 +403,9 @@ export function createFakeStorage(options: { publicBucket?: boolean } = {}) {
       presignedPuts.push({ key, contentType, contentLength });
       return `https://fake-r2.test/private/${key}?put&expires=${expiresIn}`;
     },
-    async presignGet({ key, expiresIn }) {
+    async presignGet({ key, expiresIn, stableWindowSeconds }) {
       maybeFail();
+      presignedGets.push({ key, expiresIn, stableWindowSeconds });
       return `https://fake-r2.test/private/${key}?get&expires=${expiresIn}`;
     },
     async head(key) {
@@ -422,6 +426,17 @@ export function createFakeStorage(options: { publicBucket?: boolean } = {}) {
       const obj = objects.get(key);
       if (!obj) throw new Error(`NoSuchKey ${key}`);
       publicObjects.set(key, obj);
+      publicCacheControl.set(key, PUBLIC_MEDIA_CACHE_CONTROL);
+    },
+    async *publicKeys() {
+      maybeFail();
+      for (const key of publicObjects.keys()) yield key;
+    },
+    async applyPublicCacheControl(key) {
+      maybeFail();
+      const obj = publicObjects.get(key);
+      if (!obj) throw new Error(`NoSuchKey ${key}`);
+      publicCacheControl.set(key, PUBLIC_MEDIA_CACHE_CONTROL);
     },
     publicUrl: (key) => (publicBucket ? `https://media.test/${key}` : null),
   };
@@ -430,7 +445,9 @@ export function createFakeStorage(options: { publicBucket?: boolean } = {}) {
     storage,
     objects,
     publicObjects,
+    publicCacheControl,
     presignedPuts,
+    presignedGets,
     put(key: string, bytes: Uint8Array, contentType: string) {
       objects.set(key, { bytes, contentType });
     },

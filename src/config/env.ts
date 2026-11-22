@@ -78,3 +78,25 @@ export const env = schema
     }
   })
   .parse(process.env);
+
+/**
+ * Startup warnings about the public R2 bucket settings. Storage serves public media only when both
+ * R2_PUBLIC_BUCKET and R2_PUBLIC_URL_PREFIX are set (src/lib/storage.ts). The messages name the
+ * variables and never print a value.
+ */
+export function r2PublicConfigWarnings(vars: NodeJS.ProcessEnv = process.env): string[] {
+  const warnings: string[] = [];
+  const publicBucket = Boolean(vars.R2_PUBLIC_BUCKET);
+  const publicPrefix = Boolean(vars.R2_PUBLIC_URL_PREFIX);
+  if (vars.R2_BUCKET_PUBLIC && !publicBucket) {
+    warnings.push(
+      "R2_BUCKET_PUBLIC is set; did you mean R2_PUBLIC_BUCKET? Public media stays on signed links until it is set.",
+    );
+  }
+  if (publicBucket !== publicPrefix) {
+    warnings.push(
+      "Only one of R2_PUBLIC_BUCKET and R2_PUBLIC_URL_PREFIX is set. Public media stays on signed links until both are set.",
+    );
+  }
+  return warnings;
+}

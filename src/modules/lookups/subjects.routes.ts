@@ -2,7 +2,9 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import { routeDocs } from "../../openapi/docs.js";
-import { publicCache } from "../../plugins/cache.js";
+import { sharedCache } from "../../plugins/cache.js";
+
+const CACHE_SECONDS = 300;
 
 const subjectSchema = z
   .object({
@@ -26,15 +28,16 @@ export async function subjectRoutes(app: FastifyInstance) {
           tag: "Lookups",
           summary: "List subjects",
           description:
-            "Active subjects only, ordered by sortOrder then name. Cached for 5 minutes; signed-in callers get no-store.",
+            "Active subjects only, ordered by sortOrder then name. The same body for every caller. Cached for 5 minutes by shared caches; signed-in callers cache it in the browser only.",
           auth: "optional",
+          signedInCache: `private, max-age=${CACHE_SECONDS}`,
           rateLimit: "120/min per IP",
         }),
         response: { 200: subjectListSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      publicCache(request, reply, "public, max-age=300, stale-while-revalidate=600");
+      sharedCache(request, reply, CACHE_SECONDS);
       const subjects = await prisma.subject.findMany({
         where: { isActive: true },
         select: { id: true, name: true, slug: true },

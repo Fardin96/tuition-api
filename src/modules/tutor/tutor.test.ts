@@ -2060,11 +2060,14 @@ describe("tutor routes", () => {
         "/api/v1/tutors",
         `/api/v1/tutors/${tutor.id}`,
         `/api/v1/tutors/${tutor.id}/reviews`,
-        "/api/v1/videos",
       ]) {
         const res = await app.inject({ method: "GET", url, headers });
         expect(res.headers["cache-control"]).toBe("private, no-store");
       }
+
+      // The video list is the same for everyone, so a signed-in reader keeps it in the browser only.
+      const videos = await app.inject({ method: "GET", url: "/api/v1/videos", headers });
+      expect(videos.headers["cache-control"]).toBe("private, max-age=300");
     });
 
     it("uses the longer window for reviews and videos", async () => {

@@ -12,7 +12,14 @@ import {
   fakeFileBytes,
   getAuthHeaders,
 } from "../../tests/helpers.js";
-import { cleanFileName, MAX_FILE_NAME } from "./file-policy.js";
+import {
+  cleanFileName,
+  DOWNLOAD_URL_TTL,
+  EMBED_URL_TTL,
+  EMBED_URL_WINDOW,
+  MAX_FILE_NAME,
+} from "./file-policy.js";
+import { fileUrl, getDownloadUrl } from "./files.service.js";
 
 const PDF_SIZE = 64;
 const MB = 1024 * 1024;
@@ -816,5 +823,22 @@ describe("story uploads", () => {
     expect(clip.statusCode).toBe(403);
     expect(JSON.parse(clip.body).code).toBe("UPLOADS_BLOCKED");
     expect(photo.statusCode).toBe(201);
+  });
+});
+
+describe("embed and download links", () => {
+  it("signs embed links on the stable window and download links without one", async () => {
+    const fake = installFakeStorage();
+    const account = await createAccount({ role: "TUTOR" });
+    const file = await createFileAsset(account.id, "CREDENTIAL");
+
+    const embed = await fileUrl(file);
+    await getDownloadUrl({ accountId: account.id, isAdmin: false }, file.id, undefined);
+
+    expect(embed).toContain("fake-r2.test");
+    expect(fake.presignedGets).toEqual([
+      { key: file.storageKey, expiresIn: EMBED_URL_TTL, stableWindowSeconds: EMBED_URL_WINDOW },
+      { key: file.storageKey, expiresIn: DOWNLOAD_URL_TTL, stableWindowSeconds: undefined },
+    ]);
   });
 });
