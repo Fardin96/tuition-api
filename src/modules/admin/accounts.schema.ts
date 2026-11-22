@@ -91,3 +91,10 @@ export const blockAccountSchema = z
   .strict()
   .meta({ id: "BlockAccount" });
 export type BlockAccountInput = z.infer<typeof blockAccountSchema>;
+
+// Deactivate (the soft delete) and permanent delete both record why in the audit log.
+export const accountActionReasonSchema = z
+  .object({ reason: z.string().trim().min(3).max(500) })
+  .strict()
+  .meta({ id: "AccountActionReason" });
+export type AccountActionReasonInput = z.infer<typeof accountActionReasonSchema>;

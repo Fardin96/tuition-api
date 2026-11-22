@@ -420,7 +420,24 @@ describe("admin accounts", () => {
       expect(res.statusCode).toBe(401);
     });
 
-    it("plain ACTIVE admin gets 403", async () => {
+    it("PENDING admin gets 403", async () => {
+      const app = await createTestApp();
+      const pending = await createAdmin({ status: "PENDING" });
+      const student = await createAccount({ role: "STUDENT" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${LIST_URL}/${student.id}/block`,
+        headers: await getAuthHeaders(pending),
+        payload: { reason: "Spam listings" },
+      });
+
+      expect(res.statusCode).toBe(403);
+      const row = await prisma.account.findUniqueOrThrow({ where: { id: student.id } });
+      expect(row.status).toBe("ACTIVE");
+    });
+
+    it("a plain admin blocks a student", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
       const student = await createAccount({ role: "STUDENT" });
@@ -432,9 +449,63 @@ describe("admin accounts", () => {
         payload: { reason: "Spam listings" },
       });
 
-      expect(res.statusCode).toBe(403);
-      const row = await prisma.account.findUniqueOrThrow({ where: { id: student.id } });
-      expect(row.status).toBe("ACTIVE");
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).activeBlock).toMatchObject({ reason: "Spam listings" });
+    });
+
+    it("a plain admin cannot block another admin; a super admin can", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const otherAdmin = await createAdmin({ status: "ACTIVE" });
+      const superAdmin = await createSuperAdmin();
+
+      const refused = await app.inject({
+        method: "POST",
+        url: `${LIST_URL}/${otherAdmin.id}/block`,
+        headers: await getAuthHeaders(admin),
+        payload: { reason: "Account misuse" },
+      });
+      expect(refused.statusCode).toBe(403);
+      const body = JSON.parse(refused.body);
+      expect(body.code).toBe("FORBIDDEN");
+      expect(body.message).toBe("Only a super admin can block an admin account");
+      expect(await prisma.accountBlock.count({ where: { accountId: otherAdmin.id } })).toBe(0);
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${LIST_URL}/${otherAdmin.id}/block`,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { reason: "Account misuse" },
+      });
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).status).toBe("BLOCKED");
+    });
+
+    it("the database refuses a plain admin's block on an admin", async () => {
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const otherAdmin = await createAdmin({ status: "ACTIVE" });
+
+      await expect(
+        prisma.accountBlock.create({
+          data: { accountId: otherAdmin.id, blockedById: admin.id, reason: "Direct insert" },
+        }),
+      ).rejects.toThrow(/only an active super admin can block an admin/);
+    });
+
+    it("a plain admin cannot block a super admin", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const superAdmin = await createSuperAdmin();
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${LIST_URL}/${superAdmin.id}/block`,
+        headers: await getAuthHeaders(admin),
+        payload: { reason: "Testing" },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).message).toBe("A super admin cannot be blocked");
     });
 
     it("super admin blocks a student: sets BLOCKED, revokes sessions, writes an audit row", async () => {
@@ -611,7 +682,7 @@ describe("admin accounts", () => {
   });
 
   describe("POST /api/v1/admin/accounts/:id/unblock", () => {
-    it("plain ACTIVE admin gets 403", async () => {
+    it("a plain admin unblocks a super admin's block", async () => {
       const app = await createTestApp();
       const superAdmin = await createSuperAdmin();
       const admin = await createAdmin({ status: "ACTIVE" });
@@ -626,9 +697,9 @@ describe("admin accounts", () => {
         headers: await getAuthHeaders(admin),
       });
 
-      expect(res.statusCode).toBe(403);
+      expect(res.statusCode).toBe(200);
       const row = await prisma.account.findUniqueOrThrow({ where: { id: student.id } });
-      expect(row.status).toBe("BLOCKED");
+      expect(row.status).toBe("ACTIVE");
     });
 
     it("super admin unblocks: sets ACTIVE and closes the block", async () => {
@@ -675,6 +746,27 @@ describe("admin accounts", () => {
       expect(audit.actorAccountId).toBe(superAdmin.id);
       expect(audit.before).toEqual({ status: "BLOCKED" });
       expect(audit.after).toEqual({ status: "ACTIVE" });
+    });
+
+    it("a plain admin cannot unblock an admin", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const blockedAdmin = await createAdmin({ status: "ACTIVE" });
+      await prisma.accountBlock.create({
+        data: { accountId: blockedAdmin.id, blockedById: superAdmin.id, reason: "Misuse" },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `${LIST_URL}/${blockedAdmin.id}/unblock`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(JSON.parse(res.body).message).toBe("Only a super admin can unblock an admin account");
+      const row = await prisma.account.findUniqueOrThrow({ where: { id: blockedAdmin.id } });
+      expect(row.status).toBe("BLOCKED");
     });
 
     it("unblocking an account that is not blocked returns 409", async () => {
@@ -742,5 +834,436 @@ describe("blocking an account takes its landing cards off", () => {
       where: { action: "site_content.source_removed", entityId: "testimonials" },
     });
     expect(audit?.actorAccountId).toBe(superAdmin.id);
+  });
+});
+
+describe("POST /api/v1/admin/accounts/:id/deactivate", () => {
+  it("PENDING admin gets 403", async () => {
+    const app = await createTestApp();
+    const pending = await createAdmin({ status: "PENDING" });
+    const student = await createAccount({ role: "STUDENT" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${student.id}/deactivate`,
+      headers: await getAuthHeaders(pending),
+      payload: { reason: "Asked by email" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    const row = await prisma.account.findUniqueOrThrow({ where: { id: student.id } });
+    expect(row.status).toBe("ACTIVE");
+  });
+
+  it("a plain admin deactivates a student", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const student = await createAccount({ role: "STUDENT" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${student.id}/deactivate`,
+      headers: await getAuthHeaders(admin),
+      payload: { reason: "Asked by email" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).status).toBe("DELETED");
+  });
+
+  it("super admin deactivates a student: soft delete, sessions revoked, audit row", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const area = await createArea();
+    const account = await createAccount({ role: "STUDENT" });
+    const student = await createStudentProfile(account.id, area.id);
+    const requirement = await createRequirement({ studentId: student.id, areaId: area.id });
+    await createSession(account.id);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${account.id}/deactivate`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "  Asked by email  " },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+    expect(body.status).toBe("DELETED");
+    expect(body.deletedAt).toEqual(expect.any(String));
+    expect(body.phoneNumber).toBeNull();
+    expect(body.counts.openRequirements).toBe(0);
+
+    const closed = await prisma.tuitionRequirement.findUniqueOrThrow({
+      where: { id: requirement.id },
+    });
+    expect(closed.status).toBe("CLOSED");
+    const sessions = await prisma.session.findMany({ where: { accountId: account.id } });
+    expect(sessions.every((s) => s.revokedAt !== null)).toBe(true);
+
+    const audit = await prisma.auditLog.findFirstOrThrow({
+      where: { action: "account.deactivate", entityId: account.id },
+    });
+    expect(audit.actorAccountId).toBe(superAdmin.id);
+    expect(audit.before).toEqual({ status: "ACTIVE" });
+    expect(audit.after).toEqual({ status: "DELETED", reason: "Asked by email" });
+  });
+
+  it("deactivating a blocked account returns 409: unblock first", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const account = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(account.id);
+    const headers = await getAuthHeaders(superAdmin);
+    const blocked = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${account.id}/block`,
+      headers,
+      payload: { reason: "Fake credentials" },
+    });
+    expect(blocked.statusCode).toBe(200);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${account.id}/deactivate`,
+      headers,
+      payload: { reason: "Closing it too" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).message).toBe("Unblock this account before deactivating it");
+    const row = await prisma.account.findUniqueOrThrow({ where: { id: account.id } });
+    expect(row.status).toBe("BLOCKED");
+  });
+
+  it("deactivates a plain admin", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const admin = await createAdmin({ status: "ACTIVE" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${admin.id}/deactivate`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Left the team" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).status).toBe("DELETED");
+  });
+
+  it("a plain admin cannot deactivate another admin", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const otherAdmin = await createAdmin({ status: "ACTIVE" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${otherAdmin.id}/deactivate`,
+      headers: await getAuthHeaders(admin),
+      payload: { reason: "Left the team" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body).message).toBe("Only a super admin can deactivate an admin account");
+    const row = await prisma.account.findUniqueOrThrow({ where: { id: otherAdmin.id } });
+    expect(row.status).toBe("ACTIVE");
+  });
+
+  it("deactivating yourself returns 409", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${superAdmin.id}/deactivate`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Testing" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).message).toBe("You cannot deactivate yourself");
+  });
+
+  it("deactivating a super admin returns 409", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const other = await createAdmin({ adminRole: "SUPER_ADMIN" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${other.id}/deactivate`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Testing" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    const body = JSON.parse(res.body);
+    expect(body.code).toBe("INVALID_ACCOUNT_STATE");
+    expect(body.message).toBe("A super admin cannot be deactivated");
+    const row = await prisma.account.findUniqueOrThrow({ where: { id: other.id } });
+    expect(row.status).toBe("ACTIVE");
+  });
+
+  it("deactivating an already deactivated account returns 409", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const account = await createAccount({ role: "STUDENT" });
+    await prisma.account.update({
+      where: { id: account.id },
+      data: { status: "DELETED", deletedAt: new Date() },
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${account.id}/deactivate`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Testing" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).message).toBe("This account is already deactivated");
+  });
+
+  it("reason shorter than 3 characters returns 400", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const student = await createAccount({ role: "STUDENT" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${student.id}/deactivate`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: " x " },
+    });
+
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("unknown id returns 404", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${crypto.randomUUID()}/deactivate`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Testing" },
+    });
+
+    expect(res.statusCode).toBe(404);
+  });
+});
+
+describe("POST /api/v1/admin/accounts/:id/hard-delete", () => {
+  it("PENDING admin gets 403 and nothing is deleted", async () => {
+    const app = await createTestApp();
+    const pending = await createAdmin({ status: "PENDING" });
+    const student = await createAccount({ role: "STUDENT" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${student.id}/hard-delete`,
+      headers: await getAuthHeaders(pending),
+      payload: { reason: "Spam account" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(await prisma.account.count({ where: { id: student.id } })).toBe(1);
+  });
+
+  it("a plain admin deletes a student, but not a super admin", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const student = await createAccount({ role: "STUDENT" });
+    const superAdmin = await createSuperAdmin();
+    const headers = await getAuthHeaders(admin);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${student.id}/hard-delete`,
+      headers,
+      payload: { reason: "Spam account" },
+    });
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.count({ where: { id: student.id } })).toBe(0);
+
+    const refused = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${superAdmin.id}/hard-delete`,
+      headers,
+      payload: { reason: "Testing" },
+    });
+    expect(refused.statusCode).toBe(409);
+    expect(await prisma.account.count({ where: { id: superAdmin.id } })).toBe(1);
+  });
+
+  it("super admin deletes a student and their rows; the audit row keeps no email", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const area = await createArea();
+    const account = await createAccount({ role: "STUDENT" });
+    const student = await createStudentProfile(account.id, area.id);
+    await createRequirement({ studentId: student.id, areaId: area.id });
+    await createSession(account.id);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${account.id}/hard-delete`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Spam account" },
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.count({ where: { id: account.id } })).toBe(0);
+    expect(await prisma.student.count({ where: { id: student.id } })).toBe(0);
+    expect(await prisma.tuitionRequirement.count({ where: { studentId: student.id } })).toBe(0);
+    expect(await prisma.session.count({ where: { accountId: account.id } })).toBe(0);
+
+    const audit = await prisma.auditLog.findFirstOrThrow({
+      where: { action: "account.delete", entityId: account.id },
+    });
+    expect(audit.actorAccountId).toBe(superAdmin.id);
+    expect(audit.before).toEqual({ role: "STUDENT", status: "ACTIVE" });
+    expect(audit.after).toEqual({ reason: "Spam account" });
+  });
+
+  it("deletes a blocked tutor", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const account = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(account.id);
+    const headers = await getAuthHeaders(superAdmin);
+    await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${account.id}/block`,
+      headers,
+      payload: { reason: "Fake credentials" },
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${account.id}/hard-delete`,
+      headers,
+      payload: { reason: "Fake credentials" },
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.count({ where: { id: account.id } })).toBe(0);
+  });
+
+  it("an admin with audit history returns 409 and nothing changes", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    await prisma.auditLog.create({
+      data: {
+        actorAccountId: admin.id,
+        action: "account.block",
+        entityType: "account",
+        entityId: crypto.randomUUID(),
+      },
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${admin.id}/hard-delete`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Left the team" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    const body = JSON.parse(res.body);
+    expect(body.code).toBe("INVALID_ACCOUNT_STATE");
+    expect(body.message).toBe(
+      "This account has payment or admin records that must be kept, so it can't be deleted. Block or deactivate it instead.",
+    );
+    expect(await prisma.account.count({ where: { id: admin.id } })).toBe(1);
+    expect(await prisma.adminUser.count({ where: { accountId: admin.id } })).toBe(1);
+    expect(
+      await prisma.auditLog.count({ where: { action: "account.delete", entityId: admin.id } }),
+    ).toBe(0);
+  });
+
+  it("a plain admin cannot delete another admin", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    const otherAdmin = await createAdmin({ status: "ACTIVE" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${otherAdmin.id}/hard-delete`,
+      headers: await getAuthHeaders(admin),
+      payload: { reason: "Left the team" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body).message).toBe("Only a super admin can delete an admin account");
+    expect(await prisma.account.count({ where: { id: otherAdmin.id } })).toBe(1);
+    expect(
+      await prisma.auditLog.count({ where: { action: "account.delete", entityId: otherAdmin.id } }),
+    ).toBe(0);
+  });
+
+  it("a super admin deletes a plain admin with no history", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const admin = await createAdmin({ status: "ACTIVE" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${admin.id}/hard-delete`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Left the team" },
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(await prisma.account.count({ where: { id: admin.id } })).toBe(0);
+  });
+
+  it("deleting yourself returns 409", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${superAdmin.id}/hard-delete`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Testing" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).message).toBe("You cannot delete yourself");
+  });
+
+  it("deleting a super admin returns 409", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+    const other = await createAdmin({ adminRole: "SUPER_ADMIN" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${other.id}/hard-delete`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Testing" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).message).toBe("A super admin cannot be deleted");
+    expect(await prisma.account.count({ where: { id: other.id } })).toBe(1);
+  });
+
+  it("unknown id returns 404", async () => {
+    const app = await createTestApp();
+    const superAdmin = await createSuperAdmin();
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${LIST_URL}/${crypto.randomUUID()}/hard-delete`,
+      headers: await getAuthHeaders(superAdmin),
+      payload: { reason: "Testing" },
+    });
+
+    expect(res.statusCode).toBe(404);
   });
 });

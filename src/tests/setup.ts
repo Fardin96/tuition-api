@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { execSync } from "node:child_process";
+import pg from "pg";
 
 if (process.env.TEST_DATABASE_URL) {
   process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
@@ -11,39 +11,31 @@ for (const key of Object.keys(process.env)) {
   if (key.startsWith("R2_")) delete process.env[key];
 }
 
-import { beforeAll, beforeEach } from "vitest";
+import { afterAll, beforeAll, beforeEach } from "vitest";
 import type { PrismaClient } from "../generated/prisma/client.js";
+
+// Migrations run once per vitest run in global-setup.ts.
+
+// Every file truncates the shared test database before each test, so two vitest runs at once (a
+// pre-push hook and a manual run) wiped each other's rows: deadlocks, 401s, foreign key errors.
+// Each file holds this session lock while it runs, so concurrent runs take turns file by file.
+const TEST_DB_LOCK = 4_181_957_207;
+const LOCK_WAIT_MS = 10 * 60_000;
+const lock = new pg.Client({ connectionString: process.env.DATABASE_URL });
 
 let prisma: PrismaClient;
 
 beforeAll(async () => {
+  await lock.connect();
+  await lock.query("SELECT pg_advisory_lock($1)", [TEST_DB_LOCK]);
   const { prisma: client } = await import("../lib/prisma.js");
   prisma = client;
+}, LOCK_WAIT_MS);
 
-  try {
-    execSync("npx prisma migrate deploy", {
-      stdio: "pipe",
-      encoding: "utf8",
-      env: { ...process.env },
-    });
-  } catch (err) {
-    const { stdout = "", stderr = "" } = err as { stdout?: string; stderr?: string };
-    const output = `${stdout}${stderr}`;
-    const dbName = new URL(process.env.DATABASE_URL ?? "").pathname;
-    if (!output.includes("P3005") || !dbName.includes("test")) {
-      throw new Error(`prisma migrate deploy failed:\n${output}`);
-    }
-    // The DB has tables but no migration history (P3005), so it is rebuilt from the migrations.
-    await prisma.$executeRawUnsafe("DROP SCHEMA public CASCADE");
-    await prisma.$executeRawUnsafe("CREATE SCHEMA public");
-    await prisma.$executeRawUnsafe("CREATE EXTENSION IF NOT EXISTS pg_trgm");
-    await prisma.$executeRawUnsafe("CREATE EXTENSION IF NOT EXISTS postgis");
-    execSync("npx prisma migrate deploy", {
-      stdio: "pipe",
-      encoding: "utf8",
-      env: { ...process.env },
-    });
-  }
+afterAll(async () => {
+  // Closing the session releases the lock even if the unlock fails.
+  await lock.query("SELECT pg_advisory_unlock($1)", [TEST_DB_LOCK]).catch(() => undefined);
+  await lock.end();
 });
 
 beforeEach(async () => {
