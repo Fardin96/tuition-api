@@ -3,7 +3,7 @@ import { notFound } from "../../lib/errors.js";
 import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireRole } from "../../plugins/auth.js";
-import { privateCache, publicCache } from "../../plugins/cache.js";
+import { privateCache, publicCache, sharedCache } from "../../plugins/cache.js";
 import { findNearbyTutors } from "../location/location.service.js";
 import { type ReviewPageQuery, reviewPageQuerySchema } from "../review/review.schema.js";
 import {
@@ -767,13 +767,16 @@ export async function publicVideoRoutes(app: FastifyInstance) {
           summary: "List approved videos",
           description: "Approved videos from all tutors, in display order.",
           auth: "optional",
+          signedInCache: "private, max-age=300",
         }),
         response: { 200: tutorPublicVideoListResponseSchema },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      publicCache(request, reply, "public, max-age=300, stale-while-revalidate=600");
+      // Same body for every caller (getApprovedVideos never reads the account),
+      // so shared caches may keep it.
       const videos = await getApprovedVideos();
+      sharedCache(request, reply, 300);
       return reply.send({ videos });
     },
   );

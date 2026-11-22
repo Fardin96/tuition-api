@@ -33,6 +33,7 @@
     "cron:file-cleanup": "tsx --env-file-if-exists=.env src/cron/file-cleanup.ts",
     "cron:phone-otp-cleanup": "tsx --env-file-if-exists=.env src/cron/phone-otp-cleanup.ts",
     "r2:smoke": "tsx --env-file-if-exists=.env scripts/r2-smoke.ts",
+    "r2:backfill-cache-control": "tsx --env-file-if-exists=.env scripts/backfill-public-cache-control.ts",
     "sms:smoke": "tsx --env-file-if-exists=.env scripts/sms-smoke.ts",
     "prepare": "husky || true"
   },

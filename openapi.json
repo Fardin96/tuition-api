@@ -26420,14 +26420,14 @@
         "tags": [
           "Videos"
         ],
-        "description": "Approved videos from all tutors, in display order.\n\n**Who:** Public; signed-in callers get Cache-Control: private, no-store.\n\n**Rate limit:** global 100/min.",
+        "description": "Approved videos from all tutors, in display order.\n\n**Who:** Public; signed-in callers get Cache-Control: private, max-age=300.\n\n**Rate limit:** global 100/min.",
         "security": [
           {},
           {
             "bearerAuth": []
           }
         ],
-        "x-roles": "Public; signed-in callers get Cache-Control: private, no-store",
+        "x-roles": "Public; signed-in callers get Cache-Control: private, max-age=300",
         "responses": {
           "200": {
             "description": "OK",

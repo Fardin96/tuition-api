@@ -8,6 +8,7 @@ import { getStorage, maybeStorage } from "../../lib/storage.js";
 import {
   DOWNLOAD_URL_TTL,
   EMBED_URL_TTL,
+  EMBED_URL_WINDOW,
   extensionFor,
   FILE_POLICY,
   MAX_UNUSED_UPLOADS,
@@ -325,8 +326,9 @@ export async function deleteFile(
 
 /**
  * URL a page can embed (video player, cover image): the public URL for a published file,
- * otherwise a signed URL valid for EMBED_URL_TTL. Null when storage is not configured or the
- * file is not uploaded.
+ * otherwise a signed URL valid for EMBED_URL_TTL, signed on a stable window (EMBED_URL_WINDOW) so
+ * responses inside one window carry the same URL. Null when storage is not configured or the file
+ * is not uploaded. Download links (getDownloadUrl) never use the window.
  */
 export async function fileUrl(file: {
   storageKey: string;
@@ -340,7 +342,11 @@ export async function fileUrl(file: {
     const url = storage.publicUrl(file.storageKey);
     if (url) return url;
   }
-  return storage.presignGet({ key: file.storageKey, expiresIn: EMBED_URL_TTL });
+  return storage.presignGet({
+    key: file.storageKey,
+    expiresIn: EMBED_URL_TTL,
+    stableWindowSeconds: EMBED_URL_WINDOW,
+  });
 }
 
 /**
