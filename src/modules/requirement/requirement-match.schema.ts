@@ -26,6 +26,7 @@ const recommendedTutorSchema = z.object({
     ratingAvg: z.number(),
     ratingCount: z.number().int(),
     verificationStatus: z.nativeEnum(VerificationStatus),
+    avatarUrl: z.string().nullable(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),
     subjects: z.array(z.object({ id: z.number(), name: z.string() })),
   }),

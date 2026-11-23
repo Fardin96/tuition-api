@@ -87,7 +87,7 @@ export const studentReviewSchema = z
     rating: z.number(),
     comment: z.string().nullable(),
     createdAt: z.string(),
-    tutor: z.object({ id: z.string(), name: z.string() }),
+    tutor: z.object({ id: z.string(), name: z.string(), avatarUrl: z.string().nullable() }),
   })
   .meta({ id: "StudentReview" });
 

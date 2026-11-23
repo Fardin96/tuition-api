@@ -1,4 +1,5 @@
 import { Prisma } from "../../generated/prisma/client.js";
+import { avatarSelect, avatarUrlFor } from "../../lib/avatar.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { MATCH_LIST_CAP, recommendTutors, studentSuggestions } from "../matching/match.service.js";
@@ -62,6 +63,7 @@ export async function listRecommendedTutors(
             ratingAvg: true,
             ratingCount: true,
             verificationStatus: true,
+            account: { select: avatarSelect },
             areas: {
               select: { area: { select: { id: true, name: true } } },
               orderBy: { areaId: "asc" },
@@ -88,6 +90,9 @@ export async function listRecommendedTutors(
   ]);
 
   const tutorById = new Map(tutors.map((t) => [t.id, t]));
+  const avatarById = new Map(
+    await Promise.all(tutors.map(async (t) => [t.id, await avatarUrlFor(t.account)] as const)),
+  );
   const invitedAt = new Map(invites.map((i) => [i.tutorId, i.createdAt]));
   const applicationBy = new Map(
     applications.map((a) => [a.tutorId, { id: a.id, status: a.status }]),
@@ -107,6 +112,7 @@ export async function listRecommendedTutors(
           ratingAvg: Number(tutor.ratingAvg),
           ratingCount: tutor.ratingCount,
           verificationStatus: tutor.verificationStatus,
+          avatarUrl: avatarById.get(tutor.id) ?? null,
           areas: tutor.areas.map((a) => a.area),
           subjects: tutor.subjects.map((s) => s.subject),
         },

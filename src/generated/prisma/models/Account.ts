@@ -35,6 +35,8 @@ export type AccountMinAggregateOutputType = {
   createdAt: Date | null
   lastLoginAt: Date | null
   deletedAt: Date | null
+  avatarFileId: string | null
+  googlePictureUrl: string | null
 }
 
 export type AccountMaxAggregateOutputType = {
@@ -48,6 +50,8 @@ export type AccountMaxAggregateOutputType = {
   createdAt: Date | null
   lastLoginAt: Date | null
   deletedAt: Date | null
+  avatarFileId: string | null
+  googlePictureUrl: string | null
 }
 
 export type AccountCountAggregateOutputType = {
@@ -61,6 +65,8 @@ export type AccountCountAggregateOutputType = {
   createdAt: number
   lastLoginAt: number
   deletedAt: number
+  avatarFileId: number
+  googlePictureUrl: number
   _all: number
 }
 
@@ -76,6 +82,8 @@ export type AccountMinAggregateInputType = {
   createdAt?: true
   lastLoginAt?: true
   deletedAt?: true
+  avatarFileId?: true
+  googlePictureUrl?: true
 }
 
 export type AccountMaxAggregateInputType = {
@@ -89,6 +97,8 @@ export type AccountMaxAggregateInputType = {
   createdAt?: true
   lastLoginAt?: true
   deletedAt?: true
+  avatarFileId?: true
+  googlePictureUrl?: true
 }
 
 export type AccountCountAggregateInputType = {
@@ -102,6 +112,8 @@ export type AccountCountAggregateInputType = {
   createdAt?: true
   lastLoginAt?: true
   deletedAt?: true
+  avatarFileId?: true
+  googlePictureUrl?: true
   _all?: true
 }
 
@@ -188,6 +200,8 @@ export type AccountGroupByOutputType = {
   createdAt: Date
   lastLoginAt: Date | null
   deletedAt: Date | null
+  avatarFileId: string | null
+  googlePictureUrl: string | null
   _count: AccountCountAggregateOutputType | null
   _min: AccountMinAggregateOutputType | null
   _max: AccountMaxAggregateOutputType | null
@@ -222,6 +236,9 @@ export type AccountWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
+  avatarFileId?: Prisma.UuidNullableFilter<"Account"> | string | null
+  googlePictureUrl?: Prisma.StringNullableFilter<"Account"> | string | null
+  avatarFile?: Prisma.XOR<Prisma.FileAssetNullableScalarRelationFilter, Prisma.FileAssetWhereInput> | null
   student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
   tutor?: Prisma.XOR<Prisma.TutorNullableScalarRelationFilter, Prisma.TutorWhereInput> | null
   adminUser?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
@@ -253,6 +270,9 @@ export type AccountOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatarFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  googlePictureUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatarFile?: Prisma.FileAssetOrderByWithRelationInput
   student?: Prisma.StudentOrderByWithRelationInput
   tutor?: Prisma.TutorOrderByWithRelationInput
   adminUser?: Prisma.AdminUserOrderByWithRelationInput
@@ -277,6 +297,7 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   googleSub?: string
   email?: string
+  avatarFileId?: string
   id_role?: Prisma.AccountIdRoleCompoundUniqueInput
   AND?: Prisma.AccountWhereInput | Prisma.AccountWhereInput[]
   OR?: Prisma.AccountWhereInput[]
@@ -288,6 +309,8 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
+  googlePictureUrl?: Prisma.StringNullableFilter<"Account"> | string | null
+  avatarFile?: Prisma.XOR<Prisma.FileAssetNullableScalarRelationFilter, Prisma.FileAssetWhereInput> | null
   student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
   tutor?: Prisma.XOR<Prisma.TutorNullableScalarRelationFilter, Prisma.TutorWhereInput> | null
   adminUser?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
@@ -306,7 +329,7 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   refundRequests?: Prisma.PaymentRefundListRelationFilter
   phoneOtps?: Prisma.PhoneOtpListRelationFilter
   stories?: Prisma.StoryListRelationFilter
-}, "id" | "googleSub" | "email" | "id_role">
+}, "id" | "googleSub" | "email" | "avatarFileId" | "id_role">
 
 export type AccountOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -319,6 +342,8 @@ export type AccountOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatarFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  googlePictureUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AccountCountOrderByAggregateInput
   _max?: Prisma.AccountMaxOrderByAggregateInput
   _min?: Prisma.AccountMinOrderByAggregateInput
@@ -338,6 +363,8 @@ export type AccountScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Account"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Account"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Account"> | Date | string | null
+  avatarFileId?: Prisma.UuidNullableWithAggregatesFilter<"Account"> | string | null
+  googlePictureUrl?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
 }
 
 export type AccountCreateInput = {
@@ -351,6 +378,8 @@ export type AccountCreateInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -382,6 +411,8 @@ export type AccountUncheckedCreateInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -413,6 +444,8 @@ export type AccountUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -444,6 +477,8 @@ export type AccountUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -475,6 +510,8 @@ export type AccountCreateManyInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
 }
 
 export type AccountUpdateManyMutationInput = {
@@ -488,6 +525,7 @@ export type AccountUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AccountUncheckedUpdateManyInput = {
@@ -501,6 +539,8 @@ export type AccountUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AccountIdRoleCompoundUniqueInput = {
@@ -519,6 +559,8 @@ export type AccountCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  avatarFileId?: Prisma.SortOrder
+  googlePictureUrl?: Prisma.SortOrder
 }
 
 export type AccountMaxOrderByAggregateInput = {
@@ -532,6 +574,8 @@ export type AccountMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  avatarFileId?: Prisma.SortOrder
+  googlePictureUrl?: Prisma.SortOrder
 }
 
 export type AccountMinOrderByAggregateInput = {
@@ -545,6 +589,8 @@ export type AccountMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  avatarFileId?: Prisma.SortOrder
+  googlePictureUrl?: Prisma.SortOrder
 }
 
 export type AccountScalarRelationFilter = {
@@ -657,12 +703,44 @@ export type AccountCreateNestedOneWithoutFilesInput = {
   connect?: Prisma.AccountWhereUniqueInput
 }
 
+export type AccountCreateNestedOneWithoutAvatarFileInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutAvatarFileInput, Prisma.AccountUncheckedCreateWithoutAvatarFileInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutAvatarFileInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUncheckedCreateNestedOneWithoutAvatarFileInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutAvatarFileInput, Prisma.AccountUncheckedCreateWithoutAvatarFileInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutAvatarFileInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
 export type AccountUpdateOneRequiredWithoutFilesNestedInput = {
   create?: Prisma.XOR<Prisma.AccountCreateWithoutFilesInput, Prisma.AccountUncheckedCreateWithoutFilesInput>
   connectOrCreate?: Prisma.AccountCreateOrConnectWithoutFilesInput
   upsert?: Prisma.AccountUpsertWithoutFilesInput
   connect?: Prisma.AccountWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutFilesInput, Prisma.AccountUpdateWithoutFilesInput>, Prisma.AccountUncheckedUpdateWithoutFilesInput>
+}
+
+export type AccountUpdateOneWithoutAvatarFileNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutAvatarFileInput, Prisma.AccountUncheckedCreateWithoutAvatarFileInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutAvatarFileInput
+  upsert?: Prisma.AccountUpsertWithoutAvatarFileInput
+  disconnect?: Prisma.AccountWhereInput | boolean
+  delete?: Prisma.AccountWhereInput | boolean
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutAvatarFileInput, Prisma.AccountUpdateWithoutAvatarFileInput>, Prisma.AccountUncheckedUpdateWithoutAvatarFileInput>
+}
+
+export type AccountUncheckedUpdateOneWithoutAvatarFileNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutAvatarFileInput, Prisma.AccountUncheckedCreateWithoutAvatarFileInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutAvatarFileInput
+  upsert?: Prisma.AccountUpsertWithoutAvatarFileInput
+  disconnect?: Prisma.AccountWhereInput | boolean
+  delete?: Prisma.AccountWhereInput | boolean
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutAvatarFileInput, Prisma.AccountUpdateWithoutAvatarFileInput>, Prisma.AccountUncheckedUpdateWithoutAvatarFileInput>
 }
 
 export type AccountCreateNestedOneWithoutStudentInput = {
@@ -846,6 +924,8 @@ export type AccountCreateWithoutSessionsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -876,6 +956,8 @@ export type AccountUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -922,6 +1004,8 @@ export type AccountUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -952,6 +1036,8 @@ export type AccountUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -982,6 +1068,8 @@ export type AccountCreateWithoutAdminUserInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
@@ -1012,6 +1100,8 @@ export type AccountUncheckedCreateWithoutAdminUserInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
@@ -1058,6 +1148,8 @@ export type AccountUpdateWithoutAdminUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
@@ -1088,6 +1180,8 @@ export type AccountUncheckedUpdateWithoutAdminUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
@@ -1118,6 +1212,8 @@ export type AccountCreateWithoutBlocksInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -1148,6 +1244,8 @@ export type AccountUncheckedCreateWithoutBlocksInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -1194,6 +1292,8 @@ export type AccountUpdateWithoutBlocksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -1224,6 +1324,8 @@ export type AccountUncheckedUpdateWithoutBlocksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -1254,6 +1356,8 @@ export type AccountCreateWithoutUploadReviewsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -1284,6 +1388,8 @@ export type AccountUncheckedCreateWithoutUploadReviewsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -1330,6 +1436,8 @@ export type AccountUpdateWithoutUploadReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -1360,6 +1468,8 @@ export type AccountUncheckedUpdateWithoutUploadReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -1390,6 +1500,8 @@ export type AccountCreateWithoutUploadBlocksInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -1420,6 +1532,8 @@ export type AccountUncheckedCreateWithoutUploadBlocksInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -1466,6 +1580,8 @@ export type AccountUpdateWithoutUploadBlocksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -1496,6 +1612,8 @@ export type AccountUncheckedUpdateWithoutUploadBlocksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -1526,6 +1644,8 @@ export type AccountCreateWithoutFilesInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -1556,6 +1676,8 @@ export type AccountUncheckedCreateWithoutFilesInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -1580,6 +1702,75 @@ export type AccountCreateOrConnectWithoutFilesInput = {
   create: Prisma.XOR<Prisma.AccountCreateWithoutFilesInput, Prisma.AccountUncheckedCreateWithoutFilesInput>
 }
 
+export type AccountCreateWithoutAvatarFileInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  student?: Prisma.StudentCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
+  stories?: Prisma.StoryCreateNestedManyWithoutAccountInput
+}
+
+export type AccountUncheckedCreateWithoutAvatarFileInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type AccountCreateOrConnectWithoutAvatarFileInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutAvatarFileInput, Prisma.AccountUncheckedCreateWithoutAvatarFileInput>
+}
+
 export type AccountUpsertWithoutFilesInput = {
   update: Prisma.XOR<Prisma.AccountUpdateWithoutFilesInput, Prisma.AccountUncheckedUpdateWithoutFilesInput>
   create: Prisma.XOR<Prisma.AccountCreateWithoutFilesInput, Prisma.AccountUncheckedCreateWithoutFilesInput>
@@ -1602,6 +1793,8 @@ export type AccountUpdateWithoutFilesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -1632,10 +1825,87 @@ export type AccountUncheckedUpdateWithoutFilesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountUpsertWithoutAvatarFileInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutAvatarFileInput, Prisma.AccountUncheckedUpdateWithoutAvatarFileInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutAvatarFileInput, Prisma.AccountUncheckedCreateWithoutAvatarFileInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutAvatarFileInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutAvatarFileInput, Prisma.AccountUncheckedUpdateWithoutAvatarFileInput>
+}
+
+export type AccountUpdateWithoutAvatarFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutAvatarFileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
@@ -1662,6 +1932,8 @@ export type AccountCreateWithoutStudentInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
@@ -1692,6 +1964,8 @@ export type AccountUncheckedCreateWithoutStudentInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
@@ -1738,6 +2012,8 @@ export type AccountUpdateWithoutStudentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
@@ -1768,6 +2044,8 @@ export type AccountUncheckedUpdateWithoutStudentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
@@ -1798,6 +2076,8 @@ export type AccountCreateWithoutTutorInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
@@ -1828,6 +2108,8 @@ export type AccountUncheckedCreateWithoutTutorInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
@@ -1874,6 +2156,8 @@ export type AccountUpdateWithoutTutorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
@@ -1904,6 +2188,8 @@ export type AccountUncheckedUpdateWithoutTutorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
@@ -1934,6 +2220,8 @@ export type AccountCreateWithoutReportsMadeInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -1964,6 +2252,8 @@ export type AccountUncheckedCreateWithoutReportsMadeInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -1999,6 +2289,8 @@ export type AccountCreateWithoutReportsAgainstInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -2029,6 +2321,8 @@ export type AccountUncheckedCreateWithoutReportsAgainstInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -2075,6 +2369,8 @@ export type AccountUpdateWithoutReportsMadeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2105,6 +2401,8 @@ export type AccountUncheckedUpdateWithoutReportsMadeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -2146,6 +2444,8 @@ export type AccountUpdateWithoutReportsAgainstInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2176,6 +2476,8 @@ export type AccountUncheckedUpdateWithoutReportsAgainstInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -2206,6 +2508,8 @@ export type AccountCreateWithoutDisputesRaisedInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -2236,6 +2540,8 @@ export type AccountUncheckedCreateWithoutDisputesRaisedInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -2271,6 +2577,8 @@ export type AccountCreateWithoutDisputesAgainstInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -2301,6 +2609,8 @@ export type AccountUncheckedCreateWithoutDisputesAgainstInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -2347,6 +2657,8 @@ export type AccountUpdateWithoutDisputesRaisedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2377,6 +2689,8 @@ export type AccountUncheckedUpdateWithoutDisputesRaisedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -2418,6 +2732,8 @@ export type AccountUpdateWithoutDisputesAgainstInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2448,6 +2764,8 @@ export type AccountUncheckedUpdateWithoutDisputesAgainstInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -2478,6 +2796,8 @@ export type AccountCreateWithoutRefundRequestsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -2508,6 +2828,8 @@ export type AccountUncheckedCreateWithoutRefundRequestsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -2554,6 +2876,8 @@ export type AccountUpdateWithoutRefundRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2584,6 +2908,8 @@ export type AccountUncheckedUpdateWithoutRefundRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -2614,6 +2940,8 @@ export type AccountCreateWithoutPhoneOtpsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -2644,6 +2972,8 @@ export type AccountUncheckedCreateWithoutPhoneOtpsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -2690,6 +3020,8 @@ export type AccountUpdateWithoutPhoneOtpsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2720,6 +3052,8 @@ export type AccountUncheckedUpdateWithoutPhoneOtpsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -2750,6 +3084,8 @@ export type AccountCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -2780,6 +3116,8 @@ export type AccountUncheckedCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -2826,6 +3164,8 @@ export type AccountUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2856,6 +3196,8 @@ export type AccountUncheckedUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -2886,6 +3228,8 @@ export type AccountCreateWithoutAlertsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -2916,6 +3260,8 @@ export type AccountUncheckedCreateWithoutAlertsInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -2962,6 +3308,8 @@ export type AccountUpdateWithoutAlertsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -2992,6 +3340,8 @@ export type AccountUncheckedUpdateWithoutAlertsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -3022,6 +3372,8 @@ export type AccountCreateWithoutStoriesInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -3052,6 +3404,8 @@ export type AccountUncheckedCreateWithoutStoriesInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -3098,6 +3452,8 @@ export type AccountUpdateWithoutStoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -3128,6 +3484,8 @@ export type AccountUncheckedUpdateWithoutStoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -3158,6 +3516,8 @@ export type AccountCreateWithoutAuditEntriesInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
@@ -3188,6 +3548,8 @@ export type AccountUncheckedCreateWithoutAuditEntriesInput = {
   createdAt?: Date | string
   lastLoginAt?: Date | string | null
   deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
@@ -3234,6 +3596,8 @@ export type AccountUpdateWithoutAuditEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
@@ -3264,6 +3628,8 @@ export type AccountUncheckedUpdateWithoutAuditEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
@@ -3451,6 +3817,9 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   lastLoginAt?: boolean
   deletedAt?: boolean
+  avatarFileId?: boolean
+  googlePictureUrl?: boolean
+  avatarFile?: boolean | Prisma.Account$avatarFileArgs<ExtArgs>
   student?: boolean | Prisma.Account$studentArgs<ExtArgs>
   tutor?: boolean | Prisma.Account$tutorArgs<ExtArgs>
   adminUser?: boolean | Prisma.Account$adminUserArgs<ExtArgs>
@@ -3483,6 +3852,9 @@ export type AccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   lastLoginAt?: boolean
   deletedAt?: boolean
+  avatarFileId?: boolean
+  googlePictureUrl?: boolean
+  avatarFile?: boolean | Prisma.Account$avatarFileArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
 export type AccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -3496,6 +3868,9 @@ export type AccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   lastLoginAt?: boolean
   deletedAt?: boolean
+  avatarFileId?: boolean
+  googlePictureUrl?: boolean
+  avatarFile?: boolean | Prisma.Account$avatarFileArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
 export type AccountSelectScalar = {
@@ -3509,10 +3884,13 @@ export type AccountSelectScalar = {
   createdAt?: boolean
   lastLoginAt?: boolean
   deletedAt?: boolean
+  avatarFileId?: boolean
+  googlePictureUrl?: boolean
 }
 
-export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "googleSub" | "email" | "status" | "consentVersion" | "consentAcceptedAt" | "createdAt" | "lastLoginAt" | "deletedAt", ExtArgs["result"]["account"]>
+export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "googleSub" | "email" | "status" | "consentVersion" | "consentAcceptedAt" | "createdAt" | "lastLoginAt" | "deletedAt" | "avatarFileId" | "googlePictureUrl", ExtArgs["result"]["account"]>
 export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  avatarFile?: boolean | Prisma.Account$avatarFileArgs<ExtArgs>
   student?: boolean | Prisma.Account$studentArgs<ExtArgs>
   tutor?: boolean | Prisma.Account$tutorArgs<ExtArgs>
   adminUser?: boolean | Prisma.Account$adminUserArgs<ExtArgs>
@@ -3533,12 +3911,17 @@ export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   stories?: boolean | Prisma.Account$storiesArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type AccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type AccountIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  avatarFile?: boolean | Prisma.Account$avatarFileArgs<ExtArgs>
+}
+export type AccountIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  avatarFile?: boolean | Prisma.Account$avatarFileArgs<ExtArgs>
+}
 
 export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Account"
   objects: {
+    avatarFile: Prisma.$FileAssetPayload<ExtArgs> | null
     student: Prisma.$StudentPayload<ExtArgs> | null
     tutor: Prisma.$TutorPayload<ExtArgs> | null
     adminUser: Prisma.$AdminUserPayload<ExtArgs> | null
@@ -3569,6 +3952,8 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     createdAt: Date
     lastLoginAt: Date | null
     deletedAt: Date | null
+    avatarFileId: string | null
+    googlePictureUrl: string | null
   }, ExtArgs["result"]["account"]>
   composites: {}
 }
@@ -3963,6 +4348,7 @@ readonly fields: AccountFieldRefs;
  */
 export interface Prisma__AccountClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  avatarFile<T extends Prisma.Account$avatarFileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$avatarFileArgs<ExtArgs>>): Prisma.Prisma__FileAssetClient<runtime.Types.Result.GetResult<Prisma.$FileAssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   student<T extends Prisma.Account$studentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$studentArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   tutor<T extends Prisma.Account$tutorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$tutorArgs<ExtArgs>>): Prisma.Prisma__TutorClient<runtime.Types.Result.GetResult<Prisma.$TutorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   adminUser<T extends Prisma.Account$adminUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$adminUserArgs<ExtArgs>>): Prisma.Prisma__AdminUserClient<runtime.Types.Result.GetResult<Prisma.$AdminUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -4020,6 +4406,8 @@ export interface AccountFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Account", 'DateTime'>
   readonly lastLoginAt: Prisma.FieldRef<"Account", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Account", 'DateTime'>
+  readonly avatarFileId: Prisma.FieldRef<"Account", 'String'>
+  readonly googlePictureUrl: Prisma.FieldRef<"Account", 'String'>
 }
     
 
@@ -4274,6 +4662,10 @@ export type AccountCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    */
   data: Prisma.AccountCreateManyInput | Prisma.AccountCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -4344,6 +4736,10 @@ export type AccountUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Accounts to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -4410,6 +4806,25 @@ export type AccountDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Accounts to delete.
    */
   limit?: number
+}
+
+/**
+ * Account.avatarFile
+ */
+export type Account$avatarFileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FileAsset
+   */
+  select?: Prisma.FileAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FileAsset
+   */
+  omit?: Prisma.FileAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FileAssetInclude<ExtArgs> | null
+  where?: Prisma.FileAssetWhereInput
 }
 
 /**

@@ -152,6 +152,7 @@ export const tutorNearbyResultSchema = z
     ratingAvg: z.number(),
     ratingCount: z.number(),
     distanceMeters: z.number(),
+    avatarUrl: z.string().nullable(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),
     subjects: z.array(z.object({ id: z.number(), name: z.string() })),
   })
@@ -169,6 +170,7 @@ export const tutorSearchResultSchema = z
     name: z.string(),
     instituteName: z.string().nullable(),
     gender: z.nativeEnum(Gender),
+    avatarUrl: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),
@@ -268,6 +270,7 @@ export const tutorPublicProfileSchema = z
     name: z.string(),
     instituteName: z.string().nullable(),
     gender: z.nativeEnum(Gender),
+    avatarUrl: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     verificationStatus: z.nativeEnum(VerificationStatus),
@@ -303,7 +306,7 @@ export const tutorReviewResponseSchema = z
     rating: z.number(),
     comment: z.string().nullable(),
     createdAt: z.string(),
-    student: z.object({ id: z.string(), name: z.string() }),
+    student: z.object({ id: z.string(), name: z.string(), avatarUrl: z.string().nullable() }),
   })
   .meta({ id: "TutorReview" });
 

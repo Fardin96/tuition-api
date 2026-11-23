@@ -4,9 +4,10 @@ import { env } from "../../config/env.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import type { Role } from "../../generated/prisma/enums.js";
 import type { AccountModel } from "../../generated/prisma/models/Account.js";
+import { avatarSelect, avatarUrlFor, googlePictureFor } from "../../lib/avatar.js";
 import { isNumberUsedByOtherAccount } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
-import { removeObjects } from "../files/files.service.js";
+import { publishFile, removeObjects, unpublishFile } from "../files/files.service.js";
 import { visibleNote } from "../files/upload-review.service.js";
 import { findOwnLocation } from "../location/location.service.js";
 import { removeAccountFromLanding } from "../site-content/site-content.service.js";
@@ -221,12 +222,12 @@ async function restoreNumber(accountId: string, value: string) {
   return (await isNumberUsedByOtherAccount(accountId, original)) ? value : original;
 }
 
-async function reactivateAccount(accountId: string) {
+async function reactivateAccount(accountId: string, googlePictureUrl: string | null) {
   const account = await prisma.account.findUniqueOrThrow({
     where: { id: accountId },
     include: { student: true, tutor: true },
   });
-  return prisma.$transaction(async (tx) => {
+  const reactivated = await prisma.$transaction(async (tx) => {
     if (account.student) {
       await tx.student.update({
         where: { id: account.student.id },
@@ -251,9 +252,15 @@ async function reactivateAccount(accountId: string) {
     }
     return tx.account.update({
       where: { id: accountId },
-      data: { status: "ACTIVE", deletedAt: null, lastLoginAt: new Date() },
+      data: { status: "ACTIVE", deletedAt: null, lastLoginAt: new Date(), googlePictureUrl },
     });
   });
+  // After the commit: a tutor's public photo comes back with the account (a no-op when it is there).
+  // A student's photo is served through signed URLs, so it is never published.
+  if (reactivated.avatarFileId && reactivated.role === "TUTOR") {
+    await publishFile(reactivated.avatarFileId);
+  }
+  return reactivated;
 }
 
 export async function createOrUpdateAccount(
@@ -282,12 +289,14 @@ export async function createOrUpdateAccount(
         statusCode: 403,
       });
     }
+    // Google sends its picture on every sign-in, so the stored one follows the user's current choice.
+    const googlePictureUrl = googlePictureFor(payload.picture);
     if (deleted) {
-      return { account: await reactivateAccount(existing.id), isNew: false };
+      return { account: await reactivateAccount(existing.id, googlePictureUrl), isNew: false };
     }
     const account = await prisma.account.update({
       where: { id: existing.id },
-      data: { lastLoginAt: new Date() },
+      data: { lastLoginAt: new Date(), googlePictureUrl },
     });
     return { account, isNew: false };
   }
@@ -322,6 +331,7 @@ export async function createOrUpdateAccount(
       email: payload.email,
       status: "ACTIVE",
       lastLoginAt: new Date(),
+      googlePictureUrl: googlePictureFor(payload.picture),
       ...consent,
       ...(accountRole === "ADMIN"
         ? {
@@ -359,7 +369,12 @@ export async function softDeleteAccount(accountId: string) {
   if (account.status === "BLOCKED") {
     throw Object.assign(new Error("Account is blocked"), { statusCode: 403 });
   }
-  return prisma.$transaction((tx) => softDeleteInTx(tx, accountId, account, accountId));
+  const deleted = await prisma.$transaction((tx) =>
+    softDeleteInTx(tx, accountId, account, accountId),
+  );
+  // After the commit: the photo stays on the account for a reactivation, only its public copy goes.
+  if (deleted.avatarFileId) await unpublishFile(deleted.avatarFileId);
+  return deleted;
 }
 
 type ContactNumbers = { id: string; phoneNumber: string; whatsappNumber: string | null };
@@ -368,6 +383,7 @@ type ContactNumbers = { id: string; phoneNumber: string; whatsappNumber: string 
  * The soft delete itself, inside the caller's transaction: tombstones the numbers, closes open
  * listings, withdraws pending applications, revokes sessions and takes landing cards down.
  * `actorId` is recorded on the landing removal (the account itself, or the admin deactivating it).
+ * Returns the updated account, whose avatarFileId the caller unpublishes after the commit.
  */
 export async function softDeleteInTx(
   tx: Prisma.TransactionClient,
@@ -592,9 +608,15 @@ function omitVerificationVisibility<
 export async function getMe(accountId: string) {
   const me = await prisma.account.findUnique({
     where: { id: accountId },
-    include: { student: true, tutor: true, adminUser: true },
+    include: {
+      student: true,
+      tutor: true,
+      adminUser: true,
+      avatarFile: { select: avatarSelect.avatarFile.select },
+    },
   });
   if (!me) return me;
+  const avatarUrl = await avatarUrlFor(me);
   // The admin's note reaches the student only when it was shared.
   const student = me.student && {
     ...omitVerificationVisibility(me.student),
@@ -604,7 +626,7 @@ export async function getMe(accountId: string) {
     ...me.tutor,
     location: await findOwnLocation("tutor_location", me.tutor.id),
   };
-  if (!tutor) return { ...me, student, tutor };
+  if (!tutor) return { ...me, student, tutor, avatarUrl };
 
   const [readiness] = await prisma.$queryRaw<
     { missing: string[]; verificationRequired: boolean }[]
@@ -616,6 +638,7 @@ export async function getMe(accountId: string) {
     ...me,
     student,
     tutor,
+    avatarUrl,
     applyReadiness: {
       ready: readiness.missing.length === 0,
       missing: readiness.missing,

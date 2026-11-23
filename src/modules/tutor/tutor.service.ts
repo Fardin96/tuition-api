@@ -4,6 +4,7 @@ import type {
   TutorRequirement,
   TutorVideo,
 } from "../../generated/prisma/client.js";
+import { avatarSelect, avatarUrlFor, withAvatarUrl } from "../../lib/avatar.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import { toDistrictCode } from "../../lib/districts.js";
@@ -56,6 +57,8 @@ export const tutorPublicSelect = {
   updatedAt: true,
   areas: { select: { area: { select: { id: true, name: true } } } },
   subjects: { select: { subject: { select: { id: true, name: true } } } },
+  // Only for avatarUrl: the account itself never leaves the API (see withAvatarUrl).
+  account: { select: avatarSelect },
 } as const;
 
 function serializeTutor(
@@ -371,11 +374,12 @@ export async function searchTutors(filters: {
   if (filters.area) where.areas = { some: { areaId: filters.area } };
   if (filters.subject) where.subjects = { some: { subjectId: filters.subject } };
 
-  return prisma.tutor.findMany({
+  const rows = await prisma.tutor.findMany({
     where,
     orderBy: { ratingAvg: "desc" },
     select: tutorPublicSelect,
   });
+  return Promise.all(rows.map(withAvatarUrl));
 }
 
 // Unlisted profiles are shown only to the tutor themself, to an ACTIVE admin, and to a student
@@ -420,7 +424,7 @@ export async function getPublicTutorProfile(tutorId: string, viewer?: AuthContex
     },
   });
   if (!row) return null;
-  const { accountId, ...tutor } = row;
+  const { accountId, account, ...tutor } = row;
   if (!tutor.isListed && !(await canSeeUnlistedTutor({ id: tutor.id, accountId }, viewer))) {
     return null;
   }
@@ -428,6 +432,7 @@ export async function getPublicTutorProfile(tutorId: string, viewer?: AuthContex
     isListed: tutor.isListed,
     profile: {
       ...tutor,
+      avatarUrl: await avatarUrlFor(account),
       ratingAvg: toNumber(tutor.ratingAvg),
       createdAt: tutor.createdAt.toISOString(),
       updatedAt: tutor.updatedAt.toISOString(),
@@ -448,18 +453,20 @@ export async function addNearbyCardFields<T extends { id: string }>(tutors: T[])
     select: tutorPublicSelect,
   });
   const byId = new Map(rows.map((row) => [row.id, row]));
-  return tutors.flatMap((tutor) => {
-    const row = byId.get(tutor.id);
-    if (!row) return [];
-    return [
-      {
+  const cards = await Promise.all(
+    tutors.map(async (tutor) => {
+      const row = byId.get(tutor.id);
+      if (!row) return null;
+      return {
         ...tutor,
         instituteName: row.instituteName,
+        avatarUrl: await avatarUrlFor(row.account),
         areas: row.areas.map((a) => a.area),
         subjects: row.subjects.map((s) => s.subject),
-      },
-    ];
-  });
+      };
+    }),
+  );
+  return cards.filter((card) => card !== null);
 }
 
 // One page of visible reviews students wrote about the tutor, with the rating summary. Null when there is no such tutor.
@@ -480,7 +487,11 @@ export async function getTutorReviews(tutorId: string, query: { cursor?: string;
     }),
   );
   return {
-    reviews: rows,
+    // Students may be minors, so a student author's photo is never shown on this public endpoint.
+    reviews: rows.map(({ student, ...review }) => ({
+      ...review,
+      student: { id: student.id, name: student.name, avatarUrl: null },
+    })),
     nextCursor,
     summary: await reviewSummary(base, tutor.ratingAvg, tutor.ratingCount),
   };

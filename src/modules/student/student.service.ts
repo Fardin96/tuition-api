@@ -1,4 +1,5 @@
 import { unusableAreaIds } from "../../lib/areas.js";
+import { avatarSelect, avatarUrlFor } from "../../lib/avatar.js";
 import { assertContactNumbersFree, mapContactNumberError } from "../../lib/contact-numbers.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
@@ -238,11 +239,17 @@ export async function getStudentReviews(
       where,
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take,
-      include: { tutor: { select: { id: true, name: true } } },
+      include: { tutor: { select: { id: true, name: true, account: { select: avatarSelect } } } },
     }),
   );
   return {
-    reviews: rows,
+    // The author's photo, not the account (see withAvatarUrl).
+    reviews: await Promise.all(
+      rows.map(async ({ tutor, ...review }) => ({
+        ...review,
+        tutor: { id: tutor.id, name: tutor.name, avatarUrl: await avatarUrlFor(tutor.account) },
+      })),
+    ),
     nextCursor,
     summary: await reviewSummary(base, student.ratingAvg, student.ratingCount),
   };

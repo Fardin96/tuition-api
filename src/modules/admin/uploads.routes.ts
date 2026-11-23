@@ -57,7 +57,7 @@ export async function adminUploadRoutes(app: FastifyInstance) {
           tag: "Files",
           summary: "Pause uploads for an account",
           description:
-            "Blocks video uploads, document uploads (IDs and certificates) or both, with a note. Creates the active block or updates it. The account is told, and the note shows to them only when noteVisible is true. Admin accounts cannot be blocked. Audited.",
+            "Blocks video uploads, document uploads (IDs, certificates and photos) or both, with a note. Creates the active block or updates it. The account is told, and the note shows to them only when noteVisible is true. Admin accounts cannot be blocked. Audited.",
           auth: "admin",
           errors: [404],
           rateLimit: "60/min per account",

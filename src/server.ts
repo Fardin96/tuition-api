@@ -58,6 +58,7 @@ import { reportRoutes } from "./modules/report/report.routes.js";
 import { requirementRoutes } from "./modules/requirement/requirement.route.js";
 import { reviewRoutes } from "./modules/review/review.routes.js";
 import { siteContentRoutes } from "./modules/site-content/site-content.routes.js";
+import { statsRoutes } from "./modules/stats/stats.routes.js";
 import { storyRoutes } from "./modules/story/story.routes.js";
 import { studentRoutes } from "./modules/student/student.routes.js";
 import { publicVideoRoutes, tutorRoutes } from "./modules/tutor/tutor.routes.js";
@@ -151,6 +152,7 @@ export async function buildApp() {
   await app.register(authRoutes, { prefix: "/api/v1/auth" });
   await app.register(meRoutes, { prefix: "/api/v1/me" });
   await app.register(storyRoutes, { prefix: "/api/v1/me/stories" });
+  await app.register(statsRoutes, { prefix: "/api/v1/me/stats" });
   await app.register(studentRoutes, { prefix: "/api/v1/students" });
   await app.register(tutorRoutes, { prefix: "/api/v1/tutors" });
   await app.register(zoneRoutes, { prefix: "/api/v1/tutors/me" });

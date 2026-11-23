@@ -61,7 +61,7 @@ describe("GET /tutors/:id/reviews", () => {
       rating: 1,
       comment: "c3",
       createdAt: expect.any(String),
-      student: { id: expect.any(String), name: "Student 3" },
+      student: { id: expect.any(String), name: "Student 3", avatarUrl: null },
     });
     expect(body.summary).toEqual({
       ratingAvg: 3.5,
@@ -75,6 +75,24 @@ describe("GET /tutors/:id/reviews", () => {
     });
     expect(second.json().reviews.map((r: { rating: number }) => r.rating)).toEqual([5]);
     expect(second.json().nextCursor).toBeNull();
+  });
+
+  it("never shows a student author's photo, even one the student has set", async () => {
+    const { tutor, reviews } = await seedTutorReviews([5]);
+    const studentId = reviews[0]?.studentId ?? "";
+    await prisma.account.updateMany({
+      where: { student: { id: studentId } },
+      data: { googlePictureUrl: "https://lh3.googleusercontent.com/a/student" },
+    });
+    const app = await createTestApp();
+
+    const res = await app.inject({ method: "GET", url: `/api/v1/tutors/${tutor.id}/reviews` });
+
+    expect(res.json().reviews[0].student).toEqual({
+      id: studentId,
+      name: "Student 0",
+      avatarUrl: null,
+    });
   });
 
   it("leaves out hidden reviews everywhere, including the summary", async () => {

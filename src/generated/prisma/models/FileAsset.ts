@@ -282,6 +282,7 @@ export type FileAssetWhereInput = {
   reviews?: Prisma.UploadReviewListRelationFilter
   storyImages?: Prisma.StoryListRelationFilter
   storyVideos?: Prisma.StoryListRelationFilter
+  avatarOf?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
 }
 
 export type FileAssetOrderByWithRelationInput = {
@@ -307,6 +308,7 @@ export type FileAssetOrderByWithRelationInput = {
   reviews?: Prisma.UploadReviewOrderByRelationAggregateInput
   storyImages?: Prisma.StoryOrderByRelationAggregateInput
   storyVideos?: Prisma.StoryOrderByRelationAggregateInput
+  avatarOf?: Prisma.AccountOrderByWithRelationInput
 }
 
 export type FileAssetWhereUniqueInput = Prisma.AtLeast<{
@@ -335,6 +337,7 @@ export type FileAssetWhereUniqueInput = Prisma.AtLeast<{
   reviews?: Prisma.UploadReviewListRelationFilter
   storyImages?: Prisma.StoryListRelationFilter
   storyVideos?: Prisma.StoryListRelationFilter
+  avatarOf?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
 }, "id" | "storageKey">
 
 export type FileAssetOrderByWithAggregationInput = {
@@ -397,6 +400,7 @@ export type FileAssetCreateInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateInput = {
@@ -421,6 +425,7 @@ export type FileAssetUncheckedCreateInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUpdateInput = {
@@ -445,6 +450,7 @@ export type FileAssetUpdateInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateInput = {
@@ -469,6 +475,7 @@ export type FileAssetUncheckedUpdateInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateManyInput = {
@@ -515,6 +522,11 @@ export type FileAssetUncheckedUpdateManyInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
+export type FileAssetNullableScalarRelationFilter = {
+  is?: Prisma.FileAssetWhereInput | null
+  isNot?: Prisma.FileAssetWhereInput | null
+}
+
 export type FileAssetListRelationFilter = {
   every?: Prisma.FileAssetWhereInput
   some?: Prisma.FileAssetWhereInput
@@ -523,11 +535,6 @@ export type FileAssetListRelationFilter = {
 
 export type FileAssetOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type FileAssetNullableScalarRelationFilter = {
-  is?: Prisma.FileAssetWhereInput | null
-  isNot?: Prisma.FileAssetWhereInput | null
 }
 
 export type FileAssetCountOrderByAggregateInput = {
@@ -588,6 +595,12 @@ export type FileAssetScalarRelationFilter = {
   isNot?: Prisma.FileAssetWhereInput
 }
 
+export type FileAssetCreateNestedOneWithoutAvatarOfInput = {
+  create?: Prisma.XOR<Prisma.FileAssetCreateWithoutAvatarOfInput, Prisma.FileAssetUncheckedCreateWithoutAvatarOfInput>
+  connectOrCreate?: Prisma.FileAssetCreateOrConnectWithoutAvatarOfInput
+  connect?: Prisma.FileAssetWhereUniqueInput
+}
+
 export type FileAssetCreateNestedManyWithoutOwnerInput = {
   create?: Prisma.XOR<Prisma.FileAssetCreateWithoutOwnerInput, Prisma.FileAssetUncheckedCreateWithoutOwnerInput> | Prisma.FileAssetCreateWithoutOwnerInput[] | Prisma.FileAssetUncheckedCreateWithoutOwnerInput[]
   connectOrCreate?: Prisma.FileAssetCreateOrConnectWithoutOwnerInput | Prisma.FileAssetCreateOrConnectWithoutOwnerInput[]
@@ -600,6 +613,16 @@ export type FileAssetUncheckedCreateNestedManyWithoutOwnerInput = {
   connectOrCreate?: Prisma.FileAssetCreateOrConnectWithoutOwnerInput | Prisma.FileAssetCreateOrConnectWithoutOwnerInput[]
   createMany?: Prisma.FileAssetCreateManyOwnerInputEnvelope
   connect?: Prisma.FileAssetWhereUniqueInput | Prisma.FileAssetWhereUniqueInput[]
+}
+
+export type FileAssetUpdateOneWithoutAvatarOfNestedInput = {
+  create?: Prisma.XOR<Prisma.FileAssetCreateWithoutAvatarOfInput, Prisma.FileAssetUncheckedCreateWithoutAvatarOfInput>
+  connectOrCreate?: Prisma.FileAssetCreateOrConnectWithoutAvatarOfInput
+  upsert?: Prisma.FileAssetUpsertWithoutAvatarOfInput
+  disconnect?: Prisma.FileAssetWhereInput | boolean
+  delete?: Prisma.FileAssetWhereInput | boolean
+  connect?: Prisma.FileAssetWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FileAssetUpdateToOneWithWhereWithoutAvatarOfInput, Prisma.FileAssetUpdateWithoutAvatarOfInput>, Prisma.FileAssetUncheckedUpdateWithoutAvatarOfInput>
 }
 
 export type FileAssetUpdateManyWithoutOwnerNestedInput = {
@@ -774,6 +797,59 @@ export type FileAssetUpdateOneRequiredWithoutSiteContentUsesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FileAssetUpdateToOneWithWhereWithoutSiteContentUsesInput, Prisma.FileAssetUpdateWithoutSiteContentUsesInput>, Prisma.FileAssetUncheckedUpdateWithoutSiteContentUsesInput>
 }
 
+export type FileAssetCreateWithoutAvatarOfInput = {
+  id?: string
+  purpose: $Enums.FilePurpose
+  storageKey: string
+  contentType: string
+  sizeBytes: number
+  status?: $Enums.FileStatus
+  createdAt?: Date | string
+  uploadedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
+  owner: Prisma.AccountCreateNestedOneWithoutFilesInput
+  studentVerifications?: Prisma.StudentCreateNestedManyWithoutVerificationFileInput
+  tutorVerifications?: Prisma.TutorVerificationCreateNestedManyWithoutFileInput
+  credentials?: Prisma.TutorCredentialCreateNestedManyWithoutFileInput
+  videos?: Prisma.TutorVideoCreateNestedManyWithoutFileInput
+  blogCovers?: Prisma.BlogPostCreateNestedManyWithoutCoverFileInput
+  siteContentUses?: Prisma.SiteContentFileCreateNestedManyWithoutFileInput
+  reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
+  storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
+  storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+}
+
+export type FileAssetUncheckedCreateWithoutAvatarOfInput = {
+  id?: string
+  ownerAccountId: string
+  purpose: $Enums.FilePurpose
+  storageKey: string
+  contentType: string
+  sizeBytes: number
+  status?: $Enums.FileStatus
+  createdAt?: Date | string
+  uploadedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  originalName?: string | null
+  publishedAt?: Date | string | null
+  studentVerifications?: Prisma.StudentUncheckedCreateNestedManyWithoutVerificationFileInput
+  tutorVerifications?: Prisma.TutorVerificationUncheckedCreateNestedManyWithoutFileInput
+  credentials?: Prisma.TutorCredentialUncheckedCreateNestedManyWithoutFileInput
+  videos?: Prisma.TutorVideoUncheckedCreateNestedManyWithoutFileInput
+  blogCovers?: Prisma.BlogPostUncheckedCreateNestedManyWithoutCoverFileInput
+  siteContentUses?: Prisma.SiteContentFileUncheckedCreateNestedManyWithoutFileInput
+  reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
+  storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
+  storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+}
+
+export type FileAssetCreateOrConnectWithoutAvatarOfInput = {
+  where: Prisma.FileAssetWhereUniqueInput
+  create: Prisma.XOR<Prisma.FileAssetCreateWithoutAvatarOfInput, Prisma.FileAssetUncheckedCreateWithoutAvatarOfInput>
+}
+
 export type FileAssetCreateWithoutOwnerInput = {
   id?: string
   purpose: $Enums.FilePurpose
@@ -795,6 +871,7 @@ export type FileAssetCreateWithoutOwnerInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutOwnerInput = {
@@ -818,6 +895,7 @@ export type FileAssetUncheckedCreateWithoutOwnerInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutOwnerInput = {
@@ -828,6 +906,65 @@ export type FileAssetCreateOrConnectWithoutOwnerInput = {
 export type FileAssetCreateManyOwnerInputEnvelope = {
   data: Prisma.FileAssetCreateManyOwnerInput | Prisma.FileAssetCreateManyOwnerInput[]
   skipDuplicates?: boolean
+}
+
+export type FileAssetUpsertWithoutAvatarOfInput = {
+  update: Prisma.XOR<Prisma.FileAssetUpdateWithoutAvatarOfInput, Prisma.FileAssetUncheckedUpdateWithoutAvatarOfInput>
+  create: Prisma.XOR<Prisma.FileAssetCreateWithoutAvatarOfInput, Prisma.FileAssetUncheckedCreateWithoutAvatarOfInput>
+  where?: Prisma.FileAssetWhereInput
+}
+
+export type FileAssetUpdateToOneWithWhereWithoutAvatarOfInput = {
+  where?: Prisma.FileAssetWhereInput
+  data: Prisma.XOR<Prisma.FileAssetUpdateWithoutAvatarOfInput, Prisma.FileAssetUncheckedUpdateWithoutAvatarOfInput>
+}
+
+export type FileAssetUpdateWithoutAvatarOfInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  purpose?: Prisma.EnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose
+  storageKey?: Prisma.StringFieldUpdateOperationsInput | string
+  contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeBytes?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumFileStatusFieldUpdateOperationsInput | $Enums.FileStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  owner?: Prisma.AccountUpdateOneRequiredWithoutFilesNestedInput
+  studentVerifications?: Prisma.StudentUpdateManyWithoutVerificationFileNestedInput
+  tutorVerifications?: Prisma.TutorVerificationUpdateManyWithoutFileNestedInput
+  credentials?: Prisma.TutorCredentialUpdateManyWithoutFileNestedInput
+  videos?: Prisma.TutorVideoUpdateManyWithoutFileNestedInput
+  blogCovers?: Prisma.BlogPostUpdateManyWithoutCoverFileNestedInput
+  siteContentUses?: Prisma.SiteContentFileUpdateManyWithoutFileNestedInput
+  reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
+  storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
+  storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+}
+
+export type FileAssetUncheckedUpdateWithoutAvatarOfInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
+  purpose?: Prisma.EnumFilePurposeFieldUpdateOperationsInput | $Enums.FilePurpose
+  storageKey?: Prisma.StringFieldUpdateOperationsInput | string
+  contentType?: Prisma.StringFieldUpdateOperationsInput | string
+  sizeBytes?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumFileStatusFieldUpdateOperationsInput | $Enums.FileStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentVerifications?: Prisma.StudentUncheckedUpdateManyWithoutVerificationFileNestedInput
+  tutorVerifications?: Prisma.TutorVerificationUncheckedUpdateManyWithoutFileNestedInput
+  credentials?: Prisma.TutorCredentialUncheckedUpdateManyWithoutFileNestedInput
+  videos?: Prisma.TutorVideoUncheckedUpdateManyWithoutFileNestedInput
+  blogCovers?: Prisma.BlogPostUncheckedUpdateManyWithoutCoverFileNestedInput
+  siteContentUses?: Prisma.SiteContentFileUncheckedUpdateManyWithoutFileNestedInput
+  reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
+  storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
+  storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
 }
 
 export type FileAssetUpsertWithWhereUniqueWithoutOwnerInput = {
@@ -885,6 +1022,7 @@ export type FileAssetCreateWithoutReviewsInput = {
   siteContentUses?: Prisma.SiteContentFileCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutReviewsInput = {
@@ -908,6 +1046,7 @@ export type FileAssetUncheckedCreateWithoutReviewsInput = {
   siteContentUses?: Prisma.SiteContentFileUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutReviewsInput = {
@@ -947,6 +1086,7 @@ export type FileAssetUpdateWithoutReviewsInput = {
   siteContentUses?: Prisma.SiteContentFileUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutReviewsInput = {
@@ -970,6 +1110,7 @@ export type FileAssetUncheckedUpdateWithoutReviewsInput = {
   siteContentUses?: Prisma.SiteContentFileUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateWithoutStudentVerificationsInput = {
@@ -993,6 +1134,7 @@ export type FileAssetCreateWithoutStudentVerificationsInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutStudentVerificationsInput = {
@@ -1016,6 +1158,7 @@ export type FileAssetUncheckedCreateWithoutStudentVerificationsInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutStudentVerificationsInput = {
@@ -1055,6 +1198,7 @@ export type FileAssetUpdateWithoutStudentVerificationsInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutStudentVerificationsInput = {
@@ -1078,6 +1222,7 @@ export type FileAssetUncheckedUpdateWithoutStudentVerificationsInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateWithoutTutorVerificationsInput = {
@@ -1101,6 +1246,7 @@ export type FileAssetCreateWithoutTutorVerificationsInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutTutorVerificationsInput = {
@@ -1124,6 +1270,7 @@ export type FileAssetUncheckedCreateWithoutTutorVerificationsInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutTutorVerificationsInput = {
@@ -1163,6 +1310,7 @@ export type FileAssetUpdateWithoutTutorVerificationsInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutTutorVerificationsInput = {
@@ -1186,6 +1334,7 @@ export type FileAssetUncheckedUpdateWithoutTutorVerificationsInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateWithoutCredentialsInput = {
@@ -1209,6 +1358,7 @@ export type FileAssetCreateWithoutCredentialsInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutCredentialsInput = {
@@ -1232,6 +1382,7 @@ export type FileAssetUncheckedCreateWithoutCredentialsInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutCredentialsInput = {
@@ -1271,6 +1422,7 @@ export type FileAssetUpdateWithoutCredentialsInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutCredentialsInput = {
@@ -1294,6 +1446,7 @@ export type FileAssetUncheckedUpdateWithoutCredentialsInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateWithoutVideosInput = {
@@ -1317,6 +1470,7 @@ export type FileAssetCreateWithoutVideosInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutVideosInput = {
@@ -1340,6 +1494,7 @@ export type FileAssetUncheckedCreateWithoutVideosInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutVideosInput = {
@@ -1379,6 +1534,7 @@ export type FileAssetUpdateWithoutVideosInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutVideosInput = {
@@ -1402,6 +1558,7 @@ export type FileAssetUncheckedUpdateWithoutVideosInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateWithoutBlogCoversInput = {
@@ -1425,6 +1582,7 @@ export type FileAssetCreateWithoutBlogCoversInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutBlogCoversInput = {
@@ -1448,6 +1606,7 @@ export type FileAssetUncheckedCreateWithoutBlogCoversInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutBlogCoversInput = {
@@ -1487,6 +1646,7 @@ export type FileAssetUpdateWithoutBlogCoversInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutBlogCoversInput = {
@@ -1510,6 +1670,7 @@ export type FileAssetUncheckedUpdateWithoutBlogCoversInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateWithoutStoryImagesInput = {
@@ -1533,6 +1694,7 @@ export type FileAssetCreateWithoutStoryImagesInput = {
   siteContentUses?: Prisma.SiteContentFileCreateNestedManyWithoutFileInput
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutStoryImagesInput = {
@@ -1556,6 +1718,7 @@ export type FileAssetUncheckedCreateWithoutStoryImagesInput = {
   siteContentUses?: Prisma.SiteContentFileUncheckedCreateNestedManyWithoutFileInput
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutStoryImagesInput = {
@@ -1584,6 +1747,7 @@ export type FileAssetCreateWithoutStoryVideosInput = {
   siteContentUses?: Prisma.SiteContentFileCreateNestedManyWithoutFileInput
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutStoryVideosInput = {
@@ -1607,6 +1771,7 @@ export type FileAssetUncheckedCreateWithoutStoryVideosInput = {
   siteContentUses?: Prisma.SiteContentFileUncheckedCreateNestedManyWithoutFileInput
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutStoryVideosInput = {
@@ -1646,6 +1811,7 @@ export type FileAssetUpdateWithoutStoryImagesInput = {
   siteContentUses?: Prisma.SiteContentFileUpdateManyWithoutFileNestedInput
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutStoryImagesInput = {
@@ -1669,6 +1835,7 @@ export type FileAssetUncheckedUpdateWithoutStoryImagesInput = {
   siteContentUses?: Prisma.SiteContentFileUncheckedUpdateManyWithoutFileNestedInput
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUpsertWithoutStoryVideosInput = {
@@ -1703,6 +1870,7 @@ export type FileAssetUpdateWithoutStoryVideosInput = {
   siteContentUses?: Prisma.SiteContentFileUpdateManyWithoutFileNestedInput
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutStoryVideosInput = {
@@ -1726,6 +1894,7 @@ export type FileAssetUncheckedUpdateWithoutStoryVideosInput = {
   siteContentUses?: Prisma.SiteContentFileUncheckedUpdateManyWithoutFileNestedInput
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateWithoutSiteContentUsesInput = {
@@ -1749,6 +1918,7 @@ export type FileAssetCreateWithoutSiteContentUsesInput = {
   reviews?: Prisma.UploadReviewCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetUncheckedCreateWithoutSiteContentUsesInput = {
@@ -1772,6 +1942,7 @@ export type FileAssetUncheckedCreateWithoutSiteContentUsesInput = {
   reviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutFileInput
   storyImages?: Prisma.StoryUncheckedCreateNestedManyWithoutImageInput
   storyVideos?: Prisma.StoryUncheckedCreateNestedManyWithoutVideoInput
+  avatarOf?: Prisma.AccountUncheckedCreateNestedOneWithoutAvatarFileInput
 }
 
 export type FileAssetCreateOrConnectWithoutSiteContentUsesInput = {
@@ -1811,6 +1982,7 @@ export type FileAssetUpdateWithoutSiteContentUsesInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutSiteContentUsesInput = {
@@ -1834,6 +2006,7 @@ export type FileAssetUncheckedUpdateWithoutSiteContentUsesInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetCreateManyOwnerInput = {
@@ -1871,6 +2044,7 @@ export type FileAssetUpdateWithoutOwnerInput = {
   reviews?: Prisma.UploadReviewUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateWithoutOwnerInput = {
@@ -1894,6 +2068,7 @@ export type FileAssetUncheckedUpdateWithoutOwnerInput = {
   reviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutFileNestedInput
   storyImages?: Prisma.StoryUncheckedUpdateManyWithoutImageNestedInput
   storyVideos?: Prisma.StoryUncheckedUpdateManyWithoutVideoNestedInput
+  avatarOf?: Prisma.AccountUncheckedUpdateOneWithoutAvatarFileNestedInput
 }
 
 export type FileAssetUncheckedUpdateManyWithoutOwnerInput = {
@@ -2036,6 +2211,7 @@ export type FileAssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   reviews?: boolean | Prisma.FileAsset$reviewsArgs<ExtArgs>
   storyImages?: boolean | Prisma.FileAsset$storyImagesArgs<ExtArgs>
   storyVideos?: boolean | Prisma.FileAsset$storyVideosArgs<ExtArgs>
+  avatarOf?: boolean | Prisma.FileAsset$avatarOfArgs<ExtArgs>
   _count?: boolean | Prisma.FileAssetCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fileAsset"]>
 
@@ -2098,6 +2274,7 @@ export type FileAssetInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   reviews?: boolean | Prisma.FileAsset$reviewsArgs<ExtArgs>
   storyImages?: boolean | Prisma.FileAsset$storyImagesArgs<ExtArgs>
   storyVideos?: boolean | Prisma.FileAsset$storyVideosArgs<ExtArgs>
+  avatarOf?: boolean | Prisma.FileAsset$avatarOfArgs<ExtArgs>
   _count?: boolean | Prisma.FileAssetCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FileAssetIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2120,6 +2297,7 @@ export type $FileAssetPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     reviews: Prisma.$UploadReviewPayload<ExtArgs>[]
     storyImages: Prisma.$StoryPayload<ExtArgs>[]
     storyVideos: Prisma.$StoryPayload<ExtArgs>[]
+    avatarOf: Prisma.$AccountPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2538,6 +2716,7 @@ export interface Prisma__FileAssetClient<T, Null = never, ExtArgs extends runtim
   reviews<T extends Prisma.FileAsset$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FileAsset$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UploadReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   storyImages<T extends Prisma.FileAsset$storyImagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FileAsset$storyImagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   storyVideos<T extends Prisma.FileAsset$storyVideosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FileAsset$storyVideosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  avatarOf<T extends Prisma.FileAsset$avatarOfArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FileAsset$avatarOfArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3193,6 +3372,25 @@ export type FileAsset$storyVideosArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.StoryScalarFieldEnum | Prisma.StoryScalarFieldEnum[]
+}
+
+/**
+ * FileAsset.avatarOf
+ */
+export type FileAsset$avatarOfArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Account
+   */
+  select?: Prisma.AccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Account
+   */
+  omit?: Prisma.AccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountInclude<ExtArgs> | null
+  where?: Prisma.AccountWhereInput
 }
 
 /**

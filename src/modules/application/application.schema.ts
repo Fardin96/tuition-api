@@ -29,6 +29,7 @@ export type ApplicationIdParam = z.infer<typeof applicationIdParamSchema>;
 
 export const applicationListQuerySchema = z.object({
   status: z.nativeEnum(ApplicationStatus).optional(),
+  initiatedBy: z.nativeEnum(InitiatedBy).optional(),
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
 });
@@ -40,6 +41,7 @@ export const applicationTutorSchema = z
     name: z.string(),
     gender: z.nativeEnum(Gender),
     instituteName: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
   })
@@ -53,6 +55,7 @@ export const applicationTutorProfileSchema = z
     name: z.string(),
     gender: z.nativeEnum(Gender),
     instituteName: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
     verificationStatus: z.nativeEnum(VerificationStatus),
@@ -97,6 +100,7 @@ export const applicationStudentSchema = z
     id: z.string(),
     name: z.string(),
     areaId: z.number(),
+    avatarUrl: z.string().nullable(),
   })
   .meta({ id: "ApplicationStudent" });
 

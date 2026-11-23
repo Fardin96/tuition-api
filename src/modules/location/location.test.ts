@@ -341,6 +341,7 @@ describe("location payload", () => {
       lat: 23.81,
       lng: 90.41,
       districtCode: "dhaka",
+      districtName: "Dhaka",
       placeId: "place-3",
     });
 
@@ -350,6 +351,7 @@ describe("location payload", () => {
       lng: 90.41,
       addressText: "Road 1, Dhanmondi",
       districtCode: "dhaka",
+      districtName: "Dhaka",
       placeId: "place-3",
       needsReaddress: false,
     });
@@ -380,7 +382,40 @@ describe("location payload", () => {
     expect(JSON.parse(me.body).account.student.location).toMatchObject({
       lat: 23.81,
       districtCode: "dhaka",
+      districtName: "Dhaka",
       placeId: null,
+    });
+  });
+
+  it("returns the district display name for a multi-word district code", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "STUDENT" });
+    const area = await createArea();
+    const headers = await getAuthHeaders(account);
+    const created = await app.inject({
+      method: "POST",
+      url: "/api/v1/students/me",
+      headers,
+      payload: {
+        name: "Student Name",
+        areaId: area.id,
+        address: "Student Address",
+        emergencyContact: "+8801700000001",
+        phoneNumber: "+8801700000001",
+        studentIdNumber: "STU-2",
+        location: { ...location, district: "Cox's Bazar" },
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    expect(created.json().location).toMatchObject({
+      districtCode: "coxsbazar",
+      districtName: "Cox's Bazar",
+    });
+
+    const me = await app.inject({ method: "GET", url: "/api/v1/me", headers });
+    expect(JSON.parse(me.body).account.student.location).toMatchObject({
+      districtCode: "coxsbazar",
+      districtName: "Cox's Bazar",
     });
   });
 

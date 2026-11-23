@@ -1,10 +1,12 @@
 import type { Prisma } from "../../generated/prisma/client.js";
 import type { AdminRole } from "../../generated/prisma/enums.js";
 import { writeAudit } from "../../lib/admin.js";
+import { avatarSelect, avatarUrlFor } from "../../lib/avatar.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { hardDeleteAccount, softDeleteInTx } from "../auth/auth.service.js";
+import { publishFile, unpublishFile } from "../files/files.service.js";
 import { removeAccountFromLanding } from "../site-content/site-content.service.js";
 import type {
   AccountActionReasonInput,
@@ -18,11 +20,13 @@ const summaryInclude = {
   student: { select: { name: true, phoneNumber: true, phoneVerifiedAt: true } },
   tutor: { select: { name: true, phoneNumber: true, phoneVerifiedAt: true } },
   adminUser: { select: { name: true } },
+  avatarFile: { select: avatarSelect.avatarFile.select },
 } satisfies Prisma.AccountInclude;
 
 type SummarySource = Prisma.AccountGetPayload<{ include: typeof summaryInclude }>;
 
 const detailInclude = {
+  avatarFile: { select: avatarSelect.avatarFile.select },
   student: {
     select: {
       id: true,
@@ -71,7 +75,7 @@ function phoneVerifiedAt(row: SummarySource): Date | null {
   return profile.phoneVerifiedAt;
 }
 
-function toSummary(row: SummarySource): AdminAccountSummary {
+async function toSummary(row: SummarySource): Promise<AdminAccountSummary> {
   return {
     id: row.id,
     email: row.email,
@@ -80,6 +84,7 @@ function toSummary(row: SummarySource): AdminAccountSummary {
     name: row.student?.name ?? row.tutor?.name ?? row.adminUser?.name ?? null,
     phoneNumber: contactValue(row.student?.phoneNumber ?? row.tutor?.phoneNumber),
     phoneVerifiedAt: phoneVerifiedAt(row),
+    avatarUrl: await avatarUrlFor(row),
     createdAt: row.createdAt,
     lastLoginAt: row.lastLoginAt,
     deletedAt: row.deletedAt,
@@ -134,7 +139,7 @@ export async function listAccounts(query: AccountListQuery) {
   const last = page[page.length - 1];
 
   return {
-    accounts: page.map(toSummary),
+    accounts: await Promise.all(page.map(toSummary)),
     nextCursor: hasMore && last ? encodeCursor({ createdAt: last.createdAt, id: last.id }) : null,
   };
 }
@@ -172,7 +177,7 @@ async function buildDetail(row: DetailRow): Promise<AdminAccountDetail> {
   });
 
   return {
-    ...toSummary(row),
+    ...(await toSummary(row)),
     consentVersion: row.consentVersion,
     consentAcceptedAt: row.consentAcceptedAt,
     studentId,
@@ -219,11 +224,16 @@ export async function blockAccount(
   caller: Caller,
   ip: string | undefined,
 ): Promise<AdminAccountDetail> {
-  await prisma.$transaction(async (tx) => {
+  const avatarFileId = await prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM account WHERE id = ${accountId}::uuid FOR UPDATE`;
     const account = await tx.account.findUnique({
       where: { id: accountId },
-      select: { role: true, status: true, adminUser: { select: { adminRole: true } } },
+      select: {
+        role: true,
+        status: true,
+        avatarFileId: true,
+        adminUser: { select: { adminRole: true } },
+      },
     });
     if (!account) {
       throw notFound("Account not found");
@@ -265,7 +275,10 @@ export async function blockAccount(
       after: { reason: input.reason },
       ip,
     });
+    return account.avatarFileId;
   });
+  // After the commit: a blocked account's photo leaves the public bucket too.
+  if (avatarFileId) await unpublishFile(avatarFileId);
   return getAccountDetail(accountId);
 }
 
@@ -274,7 +287,7 @@ export async function unblockAccount(
   caller: Caller,
   ip: string | undefined,
 ): Promise<AdminAccountDetail> {
-  await prisma.$transaction(async (tx) => {
+  const avatarFileId = await prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM account WHERE id = ${accountId}::uuid FOR UPDATE`;
     const account = await tx.account.findUnique({
       where: { id: accountId },
@@ -299,7 +312,7 @@ export async function unblockAccount(
     // Read back the status: a DELETED account stays DELETED after its block lifts.
     const updated = await tx.account.findUniqueOrThrow({
       where: { id: accountId },
-      select: { status: true },
+      select: { status: true, role: true, avatarFileId: true },
     });
 
     await writeAudit(tx, {
@@ -311,7 +324,11 @@ export async function unblockAccount(
       after: { status: updated.status },
       ip,
     });
+    return updated.status === "ACTIVE" && updated.role === "TUTOR" ? updated.avatarFileId : null;
   });
+  // After the commit: a tutor's photo is public again. Not for a DELETED account, whose photo stays
+  // down, and not for a student, whose photo is only ever served through signed URLs.
+  if (avatarFileId) await publishFile(avatarFileId);
   return getAccountDetail(accountId);
 }
 
@@ -361,7 +378,7 @@ export async function deactivateAccount(
   caller: Caller,
   ip: string | undefined,
 ): Promise<AdminAccountDetail> {
-  await prisma.$transaction(async (tx) => {
+  const avatarFileId = await prisma.$transaction(async (tx) => {
     const account = await lockRemovableAccount(tx, accountId, caller, {
       verb: "deactivate",
       past: "deactivated",
@@ -372,7 +389,7 @@ export async function deactivateAccount(
     if (account.status === "BLOCKED") {
       throw appError("InvalidAccountState", 409, "Unblock this account before deactivating it");
     }
-    await softDeleteInTx(tx, accountId, account, caller.accountId);
+    const deleted = await softDeleteInTx(tx, accountId, account, caller.accountId);
     await writeAudit(tx, {
       actorAccountId: caller.accountId,
       action: "account.deactivate",
@@ -382,7 +399,10 @@ export async function deactivateAccount(
       after: { status: "DELETED", reason: input.reason },
       ip,
     });
+    return deleted.avatarFileId;
   });
+  // After the commit: the photo stays on the account for a reactivation, only its public copy goes.
+  if (avatarFileId) await unpublishFile(avatarFileId);
   return getAccountDetail(accountId);
 }
 

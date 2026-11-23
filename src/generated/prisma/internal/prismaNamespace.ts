@@ -4215,7 +4215,9 @@ export const AccountScalarFieldEnum = {
   consentAcceptedAt: 'consentAcceptedAt',
   createdAt: 'createdAt',
   lastLoginAt: 'lastLoginAt',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  avatarFileId: 'avatarFileId',
+  googlePictureUrl: 'googlePictureUrl'
 } as const
 
 export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]

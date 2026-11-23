@@ -68,6 +68,45 @@ describe("POST /api/v1/reports", () => {
     expect(await prisma.report.count({ where: { reporterId: p.studentAccount.id } })).toBe(1);
   });
 
+  it("refuses a report on an application that is not answered yet", async () => {
+    const p = await setup();
+    const headers = await getAuthHeaders(p.studentAccount);
+    for (const status of ["PENDING", "WITHDRAWN", "EXPIRED"] as const) {
+      const requirement = await createRequirement({ studentId: p.student.id });
+      const application = await createApplication({
+        requirementId: requirement.id,
+        tutorId: p.tutor.id,
+        studentId: p.student.id,
+        initiatedBy: "TUTOR",
+        status,
+      });
+      const res = await p.app.inject({
+        method: "POST",
+        url: URL,
+        headers,
+        payload: { category: "NO_SHOW", details: DETAILS, applicationId: application.id },
+      });
+      expect(res.statusCode, status).toBe(409);
+      expect(res.json()).toMatchObject({
+        code: "REPORT_NOT_ALLOWED",
+        message: "You can report this person once the application has been answered.",
+      });
+    }
+    expect(await prisma.report.count()).toBe(0);
+  });
+
+  it("allows a report on a confirmed application", async () => {
+    const p = await setup();
+    const application = await applicationFor(p);
+    const res = await p.app.inject({
+      method: "POST",
+      url: URL,
+      headers: await getAuthHeaders(p.studentAccount),
+      payload: { category: "NO_SHOW", details: DETAILS, applicationId: application.id },
+    });
+    expect(res.statusCode).toBe(201);
+  });
+
   it("lets a tutor report a student without an application", async () => {
     const p = await setup();
     const res = await p.app.inject({
