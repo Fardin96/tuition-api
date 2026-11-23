@@ -419,3 +419,279 @@ describe("admin team", () => {
     });
   });
 });
+
+describe("admin invites", () => {
+  const INVITES_URL = `${LIST_URL}/invites`;
+  const inDays = (days: number) => new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+  describe("POST /api/v1/admin/admins/invites", () => {
+    it("super admin creates an invite (lowercased, trimmed) and writes an audit row", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { email: "  New.Admin@Example.com " },
+      });
+
+      expect(res.statusCode).toBe(201);
+      const body = JSON.parse(res.body);
+      expect(body).toMatchObject({
+        email: "new.admin@example.com",
+        invitedByName: "Test Super Admin",
+        expired: false,
+      });
+      expect(body.createdAt).toEqual(expect.any(String));
+      const expiresAt = new Date(body.expiresAt).getTime();
+      expect(expiresAt - Date.now()).toBeGreaterThan(13 * 24 * 60 * 60 * 1000);
+
+      const audit = await prisma.auditLog.findFirstOrThrow({
+        where: { action: "admin.invite", entityId: body.id },
+      });
+      expect(audit.entityType).toBe("admin_invite");
+      expect(audit.actorAccountId).toBe(superAdmin.id);
+      expect(audit.after).toEqual({ email: "new.admin@example.com" });
+    });
+
+    it("plain ACTIVE admin gets 403 and creates nothing", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(admin),
+        payload: { email: "nope@example.com" },
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(await prisma.adminInvite.count()).toBe(0);
+    });
+
+    it("a malformed email returns 400 VALIDATION_ERROR", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { email: "not-an-email" },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).code).toBe("VALIDATION_ERROR");
+      expect(await prisma.adminInvite.count()).toBe(0);
+    });
+
+    it("no token gets 401 and creates nothing", async () => {
+      const app = await createTestApp();
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        payload: { email: "anon@example.com" },
+      });
+
+      expect(res.statusCode).toBe(401);
+      expect(await prisma.adminInvite.count()).toBe(0);
+    });
+
+    it("an email that already has an account returns 409 ACCOUNT_EXISTS", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      await createAccount({ role: "TUTOR", email: "taken@example.com" });
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { email: "taken@example.com" },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("ACCOUNT_EXISTS");
+    });
+
+    it("a super admin email returns 409 SUPER_ADMIN_EMAIL", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      await prisma.superAdminEmail.create({ data: { slot: 2, email: "future-root@example.com" } });
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { email: "future-root@example.com" },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("SUPER_ADMIN_EMAIL");
+    });
+
+    it("a second invite for an open invite returns 409 INVITE_EXISTS", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+      await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers,
+        payload: { email: "dup@example.com" },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers,
+        payload: { email: "dup@example.com" },
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).code).toBe("INVITE_EXISTS");
+      expect(await prisma.adminInvite.count()).toBe(1);
+    });
+
+    it("an expired invite is replaced by a new one", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const oldInviter = await createAdmin({ status: "REMOVED" });
+      await prisma.adminInvite.create({
+        data: {
+          email: "again@example.com",
+          invitedById: oldInviter.id,
+          createdAt: inDays(-30),
+          expiresAt: inDays(-16),
+        },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(superAdmin),
+        payload: { email: "again@example.com" },
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(JSON.parse(res.body).expired).toBe(false);
+      const invite = await prisma.adminInvite.findUniqueOrThrow({
+        where: { email: "again@example.com" },
+      });
+      expect(invite.invitedById).toBe(superAdmin.id);
+      expect(invite.expiresAt.getTime()).toBeGreaterThan(Date.now());
+    });
+  });
+
+  describe("GET /api/v1/admin/admins/invites", () => {
+    it("lists invites newest first, with expired ones flagged", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      await prisma.adminInvite.create({
+        data: {
+          email: "old@example.com",
+          invitedById: superAdmin.id,
+          createdAt: inDays(-20),
+          expiresAt: inDays(-6),
+        },
+      });
+      await prisma.adminInvite.create({
+        data: {
+          email: "open@example.com",
+          invitedById: superAdmin.id,
+          createdAt: inDays(-1),
+          expiresAt: inDays(13),
+        },
+      });
+
+      const res = await app.inject({
+        method: "GET",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(superAdmin),
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["cache-control"]).toBe("private, no-store");
+      const { invites } = JSON.parse(res.body);
+      expect(invites.map((i: { email: string; expired: boolean }) => [i.email, i.expired])).toEqual(
+        [
+          ["open@example.com", false],
+          ["old@example.com", true],
+        ],
+      );
+    });
+
+    it("plain ACTIVE admin gets 403", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+
+      const res = await app.inject({
+        method: "GET",
+        url: INVITES_URL,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+  });
+
+  describe("DELETE /api/v1/admin/admins/invites/:id", () => {
+    it("revokes the invite (204), deletes its row and writes an audit row", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const invite = await prisma.adminInvite.create({
+        data: {
+          email: "revoke@example.com",
+          invitedById: superAdmin.id,
+          expiresAt: inDays(14),
+        },
+      });
+
+      const res = await app.inject({
+        method: "DELETE",
+        url: `${INVITES_URL}/${invite.id}`,
+        headers: await getAuthHeaders(superAdmin),
+      });
+
+      expect(res.statusCode).toBe(204);
+      expect(await prisma.adminInvite.findUnique({ where: { id: invite.id } })).toBeNull();
+      const audit = await prisma.auditLog.findFirstOrThrow({
+        where: { action: "admin.invite_revoke", entityId: invite.id },
+      });
+      expect(audit.actorAccountId).toBe(superAdmin.id);
+      expect(audit.before).toEqual({ email: "revoke@example.com" });
+    });
+
+    it("an unknown id returns 404", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+
+      const res = await app.inject({
+        method: "DELETE",
+        url: `${INVITES_URL}/${crypto.randomUUID()}`,
+        headers: await getAuthHeaders(superAdmin),
+      });
+
+      expect(res.statusCode).toBe(404);
+    });
+
+    it("plain ACTIVE admin gets 403 and the invite stays", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const admin = await createAdmin({ status: "ACTIVE" });
+      const invite = await prisma.adminInvite.create({
+        data: { email: "keep@example.com", invitedById: superAdmin.id, expiresAt: inDays(14) },
+      });
+
+      const res = await app.inject({
+        method: "DELETE",
+        url: `${INVITES_URL}/${invite.id}`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(403);
+      expect(await prisma.adminInvite.findUnique({ where: { id: invite.id } })).not.toBeNull();
+    });
+  });
+});

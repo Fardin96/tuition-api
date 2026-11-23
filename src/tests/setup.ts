@@ -51,6 +51,7 @@ beforeEach(async () => {
     TRUNCATE TABLE
       account_activity_day,
       admin_dashboard_layout,
+      admin_invite,
       session,
       admin_user,
       account_block,

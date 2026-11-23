@@ -14,7 +14,9 @@ import {
   createTutorProfile,
   createTutorRequirement,
   getAuthHeaders,
+  setStudentLocation,
 } from "../../tests/helpers.js";
+import { softDeleteAccount } from "../auth/auth.service.js";
 
 const BASE = "/api/v1/applications";
 
@@ -318,5 +320,169 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
     expect(res.status).toBe(200);
     expect(res.body.tutorProfile).toMatchObject({ id: tutor.id });
     expect(res.body.tutorSet).toMatchObject({ matchedBy: "MATCH", set: { id: set.id } });
+  });
+});
+
+describe("GET /applications/:id student location for the tutor", () => {
+  async function confirmedRequirementApp(status: "CONFIRMED" | "PENDING" = "CONFIRMED") {
+    const area = await createArea();
+    const math = await createSubject();
+    const { tutor, headers: tutorHeaders } = await createTutor([math.id], area.id);
+    const { student, headers: studentHeaders } = await createStudent();
+    const requirement = await createRequirement({
+      studentId: student.id,
+      areaId: area.id,
+      subjectIds: [math.id],
+    });
+    const application = await createApplication({
+      requirementId: requirement.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "TUTOR",
+      status,
+    });
+    return { student, application, tutorHeaders, studentHeaders };
+  }
+
+  it("gives the tutor the saved address, coordinates and place id on a CONFIRMED application", async () => {
+    const { student, application, tutorHeaders } = await confirmedRequirementApp();
+    await setStudentLocation(student.id, { lat: 23.7808, lng: 90.4193 });
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.status).toBe(200);
+    expect(res.body.studentLocation).toMatchObject({
+      address: "Student Address",
+      placeId: `place-${student.id}`,
+    });
+    expect(res.body.studentLocation.lat).toBeCloseTo(23.7808, 4);
+    expect(res.body.studentLocation.lng).toBeCloseTo(90.4193, 4);
+  });
+
+  it("gives the tutor the location on a COMPLETED application", async () => {
+    const { student, application, tutorHeaders } = await confirmedRequirementApp();
+    await prisma.application.update({
+      where: { id: application.id },
+      data: { status: "COMPLETED", endedAt: new Date() },
+    });
+    await setStudentLocation(student.id);
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.body.studentLocation).toMatchObject({ address: "Student Address" });
+  });
+
+  it("gives null on a PENDING application even when the student has a location", async () => {
+    const { student, application, tutorHeaders } = await confirmedRequirementApp("PENDING");
+    await setStudentLocation(student.id);
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.body.studentLocation).toBeNull();
+  });
+
+  it("gives null to the student, and to an admin", async () => {
+    const { student, application, studentHeaders } = await confirmedRequirementApp();
+    await setStudentLocation(student.id);
+
+    const studentRes = await getDetail(studentHeaders, application.id);
+    expect(studentRes.body.studentLocation).toBeNull();
+
+    const adminRes = await getDetail(await getAuthHeaders(await createAdmin()), application.id);
+    expect(adminRes.status).toBe(200);
+    expect(adminRes.body.studentLocation).toBeNull();
+  });
+
+  it("keeps the address and nulls the coordinates when the location has no geog (expired)", async () => {
+    const { student, application, tutorHeaders } = await confirmedRequirementApp();
+    await setStudentLocation(student.id);
+    await prisma.$executeRaw`UPDATE student_location SET geog = NULL WHERE student_id = ${student.id}`;
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.body.studentLocation).toEqual({
+      address: "Student Address",
+      lat: null,
+      lng: null,
+      placeId: `place-${student.id}`,
+    });
+  });
+
+  it("falls back to the student's profile address with null coordinates when there is no location row", async () => {
+    const { application, tutorHeaders } = await confirmedRequirementApp();
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.body.studentLocation).toEqual({
+      address: "123 Test Lane",
+      lat: null,
+      lng: null,
+      placeId: null,
+    });
+  });
+
+  it("shows the student location on a CONFIRMED package request", async () => {
+    const area = await createArea();
+    const math = await createSubject();
+    const { tutor, headers: tutorHeaders } = await createTutor([math.id], area.id);
+    const pkg = await createTuitionPackage(tutor.id, { subjectIds: [math.id], price: 18000 });
+    const { student } = await createStudent();
+    await setStudentLocation(student.id, { lat: 23.7808, lng: 90.4193 });
+    const application = await createApplication({
+      packageId: pkg.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+      status: "CONFIRMED",
+    });
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.body.target.kind).toBe("PACKAGE");
+    expect(res.body.studentLocation).toMatchObject({
+      address: "Student Address",
+      placeId: `place-${student.id}`,
+    });
+    expect(res.body.studentLocation.lat).toBeCloseTo(23.7808, 4);
+  });
+
+  it.each(["CANCELLED", "WITHDRAWN", "REJECTED", "EXPIRED"] as const)(
+    "gives null on a %s application",
+    async (status) => {
+      const { student, application, tutorHeaders } = await confirmedRequirementApp("PENDING");
+      await setStudentLocation(student.id);
+      await prisma.application.update({
+        where: { id: application.id },
+        data: status === "CANCELLED" ? { status, endedAt: new Date() } : { status },
+      });
+
+      const res = await getDetail(tutorHeaders, application.id);
+      expect(res.body.studentLocation).toBeNull();
+    },
+  );
+
+  it("returns 404 to another tutor, with no studentLocation in the body", async () => {
+    const { student, application } = await confirmedRequirementApp();
+    await setStudentLocation(student.id);
+    const area = await createArea();
+    const math = await createSubject();
+    const { headers: otherHeaders } = await createTutor([math.id], area.id);
+
+    const res = await getDetail(otherHeaders, application.id);
+    expect(res.status).toBe(404);
+    expect(res.body.studentLocation).toBeUndefined();
+  });
+
+  it("gives null once the student's account is soft-deleted", async () => {
+    const { student, application, tutorHeaders } = await confirmedRequirementApp();
+    await setStudentLocation(student.id);
+    await softDeleteAccount(student.accountId);
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.status).toBe(200);
+    expect(res.body.studentLocation).toBeNull();
+  });
+
+  it("returns the coordinates when the location needs a readdress but still has geog", async () => {
+    const { student, application, tutorHeaders } = await confirmedRequirementApp();
+    await setStudentLocation(student.id, { lat: 23.7808, lng: 90.4193, needsReaddress: true });
+
+    const res = await getDetail(tutorHeaders, application.id);
+    expect(res.body.studentLocation.lat).toBeCloseTo(23.7808, 4);
+    expect(res.body.studentLocation.lng).toBeCloseTo(90.4193, 4);
   });
 });

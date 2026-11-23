@@ -494,6 +494,7 @@ model AdminUser {
   zoneRequestsDecided   ZoneLimitRequest[]
   settingsEdits         PlatformSetting[]
   reviewedStories       Story[]             @relation("StoryReviewer")
+  invitesSent           AdminInvite[]       @relation("AdminInvites")
 
   @@unique([accountId, role])
   @@map("admin_user")
@@ -505,6 +506,19 @@ model SuperAdminEmail {
   email String @unique
 
   @@map("super_admin_email")
+}
+
+// Open invites only: accepting or revoking deletes the row (audit_log keeps the history).
+model AdminInvite {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  email       String   @unique // lowercased
+  invitedById String   @map("invited_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt   DateTime @map("expires_at") @db.Timestamptz(3)
+
+  invitedBy AdminUser @relation("AdminInvites", fields: [invitedById], references: [accountId], onDelete: Cascade)
+
+  @@map("admin_invite")
 }
 
 // A block is a super-admin action. History is kept; at most one block is active

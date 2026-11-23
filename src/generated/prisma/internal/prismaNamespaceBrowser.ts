@@ -57,6 +57,7 @@ export const ModelName = {
   AdminDashboardLayout: 'AdminDashboardLayout',
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
+  AdminInvite: 'AdminInvite',
   AccountBlock: 'AccountBlock',
   UploadReview: 'UploadReview',
   UploadBlock: 'UploadBlock',
@@ -195,6 +196,17 @@ export const SuperAdminEmailScalarFieldEnum = {
 } as const
 
 export type SuperAdminEmailScalarFieldEnum = (typeof SuperAdminEmailScalarFieldEnum)[keyof typeof SuperAdminEmailScalarFieldEnum]
+
+
+export const AdminInviteScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  invitedById: 'invitedById',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AdminInviteScalarFieldEnum = (typeof AdminInviteScalarFieldEnum)[keyof typeof AdminInviteScalarFieldEnum]
 
 
 export const AccountBlockScalarFieldEnum = {

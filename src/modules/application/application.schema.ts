@@ -158,6 +158,17 @@ export const applicationContactSchema = z
   })
   .meta({ id: "ApplicationContact" });
 
+export const applicationStudentLocationSchema = z
+  .object({
+    address: z.string(),
+    /** Null when the saved location has expired (geog cleared) or was never placed. */
+    lat: z.number().nullable(),
+    lng: z.number().nullable(),
+    placeId: z.string().nullable(),
+  })
+  .meta({ id: "ApplicationStudentLocation" });
+export type ApplicationStudentLocation = z.infer<typeof applicationStudentLocationSchema>;
+
 export const applicationFeeSchema = z
   .object({
     id: z.string(),
@@ -175,6 +186,9 @@ export const applicationDetailSchema = applicationSchema
   .extend({
     /** The other party's numbers. Only on CONFIRMED and COMPLETED; null otherwise. */
     counterpartContact: applicationContactSchema.nullable(),
+    /** The student's saved location. Only the tutor, once CONFIRMED or COMPLETED; null otherwise
+     *  and for students and admins. */
+    studentLocation: applicationStudentLocationSchema.nullable(),
     /** The placement fee. Only the tutor (and admins) see it; null for students or when none exists. */
     fee: applicationFeeSchema.nullable(),
     /** The tutor's details. Only the student (and admins); null for the tutor. */
