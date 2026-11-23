@@ -932,3 +932,7 @@ EXCEPTION WHEN OTHERS THEN
 END $$ LANGUAGE plpgsql;
 CREATE TRIGGER session_record_activity_trg AFTER INSERT ON session
   FOR EACH ROW EXECUTE FUNCTION record_account_activity();
+
+-- ───────────────────────── [admin invites] ─────────────────────────
+-- Migration 20261203000100_admin_invites. The table is created there; the lowercase rule is kept here too.
+ALTER TABLE admin_invite ADD CONSTRAINT admin_invite_email_lower CHECK (email = lower(email));

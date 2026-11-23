@@ -10,6 +10,7 @@ import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import type { AuthContext } from "../auth/auth.schema.js";
+import { findOwnLocation } from "../location/location.service.js";
 import { bestSetForPair } from "../matching/match.service.js";
 import { getMatchingConfig } from "../matching/matching-config.js";
 import {
@@ -18,6 +19,7 @@ import {
   type ApplicationListQuery,
   type ApplicationPageResponse,
   type ApplicationResponse,
+  type ApplicationStudentLocation,
   type ApplicationTutorProfile,
   type ApplicationTutorSet,
   FEE_UNPAID_AFTER_DAYS,
@@ -278,6 +280,29 @@ async function counterpartContactOf(row: AppRow, side: Side | null) {
   return other ? { phoneNumber: other.phoneNumber, whatsappNumber: other.whatsappNumber } : null;
 }
 
+// The student's saved place, for the tutor's map and navigation. Coordinates are null once the
+// location has expired (geog cleared). With no location row the student's profile address stands in.
+async function studentLocationFor(
+  row: AppRow,
+  side: Side | null,
+): Promise<ApplicationStudentLocation | null> {
+  if (side !== "TUTOR") return null;
+  if (row.status !== "CONFIRMED" && row.status !== "COMPLETED") return null;
+  if (row.student.account.status === "DELETED") return null;
+
+  const location = await findOwnLocation("student_location", row.studentId);
+  const student = location
+    ? null
+    : await prisma.student.findUnique({ where: { id: row.studentId }, select: { address: true } });
+  if (!location && !student?.address) return null;
+  return {
+    address: location ? location.addressText : (student?.address ?? ""),
+    lat: location?.lat ?? null,
+    lng: location?.lng ?? null,
+    placeId: location?.placeId ?? null,
+  };
+}
+
 const setInclude = {
   subjects: { select: { subjectId: true }, orderBy: { subjectId: "asc" } },
 } satisfies Prisma.TutorRequirementInclude;
@@ -454,13 +479,14 @@ export async function getApplicationForCaller(
   const closed = await loadClosedFor([row]);
   const base = await toApplication(row, side, isClosed(row, closed));
   const counterpartContact = adminView ? null : await counterpartContactOf(row, side);
+  const studentLocation = await studentLocationFor(row, side);
   const fee = side === "TUTOR" || adminView ? await placementFeeOf(row) : null;
   // The tutor's details and set are for the student and admins only.
   const seesTutor = side === "STUDENT" || adminView;
   const tutorProfile = seesTutor ? await tutorProfileOf(row.tutorId) : null;
   const tutorSet = seesTutor ? await tutorSetOf(row) : null;
 
-  return { ...base, counterpartContact, fee, tutorProfile, tutorSet };
+  return { ...base, counterpartContact, studentLocation, fee, tutorProfile, tutorSet };
 }
 
 export async function listMyApplications(

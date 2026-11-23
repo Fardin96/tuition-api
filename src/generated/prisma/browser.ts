@@ -48,6 +48,11 @@ export type AdminUser = Prisma.AdminUserModel
  */
 export type SuperAdminEmail = Prisma.SuperAdminEmailModel
 /**
+ * Model AdminInvite
+ * 
+ */
+export type AdminInvite = Prisma.AdminInviteModel
+/**
  * Model AccountBlock
  * 
  */

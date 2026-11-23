@@ -4,8 +4,10 @@ import { env } from "../../config/env.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import type { Role } from "../../generated/prisma/enums.js";
 import type { AccountModel } from "../../generated/prisma/models/Account.js";
+import { writeAudit } from "../../lib/admin.js";
 import { avatarSelect, avatarUrlFor, googlePictureFor } from "../../lib/avatar.js";
 import { isNumberUsedByOtherAccount } from "../../lib/contact-numbers.js";
+import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { publishFile, removeObjects, unpublishFile } from "../files/files.service.js";
 import { visibleNote } from "../files/upload-review.service.js";
@@ -267,6 +269,7 @@ export async function createOrUpdateAccount(
   payload: GoogleTokenPayload,
   role: Role | undefined,
   consentVersion?: string,
+  ip?: string,
 ): Promise<{ account: AccountModel; isNew: boolean }> {
   const existing = await prisma.account.findUnique({
     where: { googleSub: payload.sub },
@@ -301,9 +304,15 @@ export async function createOrUpdateAccount(
     return { account, isNew: false };
   }
 
-  const isSuperAdmin = await prisma.superAdminEmail.findUnique({
-    where: { email: payload.email },
-  });
+  // An unverified Google email is never an allowlisted super admin or an invitee.
+  const isSuperAdmin =
+    payload.email_verified === true
+      ? await prisma.superAdminEmail.findUnique({ where: { email: payload.email } })
+      : null;
+  if (!isSuperAdmin && (role === undefined || role === "ADMIN")) {
+    const invited = await acceptAdminInvite(payload, ip);
+    if (invited) return invited;
+  }
   // Allowlisted super admins have no sign-up step: their first sign-in creates the ACTIVE admin account.
   if (!role && !isSuperAdmin) {
     const err = new Error("No account found for this Google account. Sign up first.");
@@ -324,30 +333,117 @@ export async function createOrUpdateAccount(
         }
       : {};
 
-  const account = await prisma.account.create({
-    data: {
-      role: accountRole,
-      googleSub: payload.sub,
-      email: payload.email,
-      status: "ACTIVE",
-      lastLoginAt: new Date(),
-      googlePictureUrl: googlePictureFor(payload.picture),
-      ...consent,
-      ...(accountRole === "ADMIN"
-        ? {
-            adminUser: {
-              create: {
-                name: payload.name ?? payload.email.split("@")[0],
-                adminRole,
-                status: adminRole === "SUPER_ADMIN" ? "ACTIVE" : "PENDING",
-              },
+  const data: Prisma.AccountCreateInput = {
+    role: accountRole,
+    googleSub: payload.sub,
+    email: payload.email,
+    status: "ACTIVE",
+    lastLoginAt: new Date(),
+    googlePictureUrl: googlePictureFor(payload.picture),
+    ...consent,
+    ...(accountRole === "ADMIN"
+      ? {
+          adminUser: {
+            create: {
+              name: payload.name ?? payload.email.split("@")[0],
+              adminRole,
+              status: adminRole === "SUPER_ADMIN" ? "ACTIVE" : "PENDING",
             },
-          }
-        : {}),
-    },
+          },
+        }
+      : {}),
+  };
+  const account = await prisma.$transaction(async (tx) => {
+    const created = await tx.account.create({ data });
+    // The email now has an account, so an open invite can never be accepted. Drop it and keep a row.
+    const stale = await tx.adminInvite.findUnique({
+      where: { email: payload.email },
+      select: { id: true },
+    });
+    if (stale) {
+      await tx.adminInvite.delete({ where: { id: stale.id } });
+      await writeAudit(tx, {
+        actorAccountId: created.id,
+        action: "admin.invite_revoke",
+        entityType: "admin_invite",
+        entityId: stale.id,
+        before: { email: payload.email, reason: "account_created" },
+        ip,
+      });
+    }
+    return created;
   });
 
   return { account, isNew: true };
+}
+
+// An open invite (see admins.service.ts) makes a new Google account an ACTIVE admin. The invite row is
+// deleted in the same transaction, so it works once. A rollback (403) keeps it for the super admin to revoke.
+async function acceptAdminInvite(
+  payload: GoogleTokenPayload,
+  ip?: string,
+): Promise<{ account: AccountModel; isNew: boolean } | null> {
+  if (payload.email_verified !== true) return null;
+  const now = new Date();
+  const invite = await prisma.adminInvite.findFirst({
+    where: { email: payload.email, expiresAt: { gt: now } },
+    select: { id: true, invitedById: true },
+  });
+  if (!invite) return null;
+
+  return prisma.$transaction(async (tx) => {
+    const { count } = await tx.adminInvite.deleteMany({
+      where: { id: invite.id, expiresAt: { gt: now } },
+    });
+    if (count === 0) {
+      throw appError("InvalidAdminState", 409, "This invite was just used or revoked. Try again.");
+    }
+
+    const inviter = await tx.adminUser.findUnique({
+      where: { accountId: invite.invitedById },
+      select: { status: true, adminRole: true, account: { select: { status: true } } },
+    });
+    const inviterValid =
+      inviter?.status === "ACTIVE" &&
+      inviter.adminRole === "SUPER_ADMIN" &&
+      inviter.account.status === "ACTIVE";
+    if (!inviterValid) {
+      throw Object.assign(
+        new Error("This invite is no longer valid. Ask a super admin for a new one."),
+        { statusCode: 403 },
+      );
+    }
+
+    const account = await tx.account.create({
+      data: {
+        role: "ADMIN",
+        googleSub: payload.sub,
+        email: payload.email,
+        status: "ACTIVE",
+        lastLoginAt: now,
+        googlePictureUrl: googlePictureFor(payload.picture),
+        adminUser: {
+          create: {
+            name: payload.name ?? payload.email.split("@")[0],
+            adminRole: "ADMIN",
+            status: "ACTIVE",
+            approvedById: invite.invitedById,
+            approvedAt: now,
+          },
+        },
+      },
+    });
+
+    await writeAudit(tx, {
+      actorAccountId: account.id,
+      action: "admin.invite_accept",
+      entityType: "admin_user",
+      entityId: account.id,
+      after: { status: "ACTIVE", invitedBy: invite.invitedById },
+      ip,
+    });
+    return { account, isNew: true };
+  });
 }
 
 export async function recordConsent(accountId: string, version: string) {

@@ -70,6 +70,8 @@ export const ERROR_CODES = {
   SmsUnavailable: "SMS_UNAVAILABLE",
   InviteExists: "INVITE_EXISTS",
   InviteLimitReached: "INVITE_LIMIT_REACHED",
+  AccountExists: "ACCOUNT_EXISTS",
+  SuperAdminEmail: "SUPER_ADMIN_EMAIL",
   RequirementDuplicate: "REQUIREMENT_DUPLICATE",
   StoryLimitReached: "STORY_LIMIT_REACHED",
   StoryPending: "STORY_PENDING",

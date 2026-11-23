@@ -64,9 +64,9 @@ export async function authRoutes(app: FastifyInstance) {
           tag: "Auth",
           summary: "Sign in or sign up with Google",
           description:
-            "Verifies the Google ID token. Sign-up sends role (and optionally consentVersion); sign-in omits role. An unknown Google account with no role gets 404. A blocked account, or a deleted account signing in without a role, gets 403. Returns an access token and a refresh token.",
+            "Verifies the Google ID token. Sign-up sends role (and optionally consentVersion); sign-in omits role. An unknown Google account with no role gets 404. A blocked account, or a deleted account signing in without a role, gets 403. An unknown Google account with an open admin invite (no role, or role ADMIN) and a verified email becomes an ACTIVE admin; 403 if the inviter is no longer an active super admin; 409 if the invite was used or revoked at the same moment. Returns an access token and a refresh token.",
           auth: "public",
-          errors: [403, 404],
+          errors: [403, 404, 409],
         }),
         body: googleAuthSchema,
         response: { 200: tokenResponseSchema },
@@ -79,7 +79,12 @@ export async function authRoutes(app: FastifyInstance) {
         consentVersion?: string;
       };
       const googlePayload = await verifyGoogleIdToken(idToken);
-      const { account } = await createOrUpdateAccount(googlePayload, role, consentVersion);
+      const { account } = await createOrUpdateAccount(
+        googlePayload,
+        role,
+        consentVersion,
+        request.ip,
+      );
 
       const tokens = await buildTokenResponse(account);
       await createSession(account.id, tokens.refreshToken, {

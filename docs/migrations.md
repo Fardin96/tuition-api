@@ -40,6 +40,7 @@ Quick reference for running and recovering Prisma migrations in this repo.
 | `20261123000100_refunds` | refunds | Enums RefundStatus and RefundSource, table payment_refund, CHECKs (constraints.sql section 7d), partial unique indexes payment_refund_one_open_per_attempt and payment_refund_ref_uniq, platform_setting_value_valid replaced NOT VALID with refund_window_days. |
 | `20261123000200_refunds_validate` | refunds_validate | Runs VALIDATE CONSTRAINT on platform_setting_value_valid (refund_window_days). |
 | `20261202000100_admin_dashboard` | admin_dashboard | Tables account_activity_day and admin_dashboard_layout (CHECK on widgets, 1 to 24 ids), trigger session_record_activity_trg that writes a session's Dhaka day on every session insert. Seeds account_activity_day from session.created_at, so history reaches back only as far as the sessions still stored. No indexes on existing tables; if one is ever needed, create it out of band with `CREATE INDEX CONCURRENTLY IF NOT EXISTS`, because migrations run as one script (see the rule below). |
+| `20261203000100_admin_invites` | admin_invite | Table admin_invite (unique email, FK invited_by → admin_user ON DELETE CASCADE, CHECK admin_invite_email_lower inline and repeated in constraints.sql [admin invites]). |
 
 **Note:** v6 ran cleanly on a restored copy of the production backup before being pushed.
 

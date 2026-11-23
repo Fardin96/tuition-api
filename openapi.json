@@ -2568,6 +2568,57 @@
         ],
         "additionalProperties": false
       },
+      "AdminInvite": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "email": {
+            "type": "string"
+          },
+          "invitedByName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expired": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "invitedByName",
+          "createdAt",
+          "expiresAt",
+          "expired"
+        ],
+        "additionalProperties": false
+      },
+      "AdminInviteList": {
+        "type": "object",
+        "properties": {
+          "invites": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminInvite"
+            }
+          }
+        },
+        "required": [
+          "invites"
+        ],
+        "additionalProperties": false
+      },
       "AdminPackage": {
         "type": "object",
         "properties": {
@@ -5899,6 +5950,16 @@
               }
             ]
           },
+          "studentLocation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationStudentLocation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "fee": {
             "anyOf": [
               {
@@ -5942,6 +6003,7 @@
           "target",
           "allowedActions",
           "counterpartContact",
+          "studentLocation",
           "fee",
           "tutorProfile",
           "tutorSet"
@@ -6033,6 +6095,39 @@
           "name",
           "areaId",
           "avatarUrl"
+        ],
+        "additionalProperties": false
+      },
+      "ApplicationStudentLocation": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "lat": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "lng": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "placeId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "address",
+          "lat",
+          "lng",
+          "placeId"
         ],
         "additionalProperties": false
       },
@@ -7355,6 +7450,20 @@
           "consentAcceptedAt"
         ],
         "additionalProperties": false
+      },
+      "CreateAdminInviteInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          }
+        },
+        "required": [
+          "email"
+        ]
       },
       "CreateAreaInput": {
         "type": "object",
@@ -9047,6 +9156,8 @@
           "SMS_UNAVAILABLE",
           "INVITE_EXISTS",
           "INVITE_LIMIT_REACHED",
+          "ACCOUNT_EXISTS",
+          "SUPER_ADMIN_EMAIL",
           "REQUIREMENT_DUPLICATE",
           "STORY_LIMIT_REACHED",
           "STORY_PENDING",
@@ -17851,7 +17962,7 @@
         "tags": [
           "Auth"
         ],
-        "description": "Verifies the Google ID token. Sign-up sends role (and optionally consentVersion); sign-in omits role. An unknown Google account with no role gets 404. A blocked account, or a deleted account signing in without a role, gets 403. Returns an access token and a refresh token.\n\n**Who:** Public.\n\n**Rate limit:** global 100/min.",
+        "description": "Verifies the Google ID token. Sign-up sends role (and optionally consentVersion); sign-in omits role. An unknown Google account with no role gets 404. A blocked account, or a deleted account signing in without a role, gets 403. An unknown Google account with an open admin invite (no role, or role ADMIN) and a verified email becomes an ACTIVE admin; 403 if the inviter is no longer an active super admin; 409 if the invite was used or revoked at the same moment. Returns an access token and a refresh token.\n\n**Who:** Public.\n\n**Rate limit:** global 100/min.",
         "requestBody": {
           "required": true,
           "content": {
@@ -17897,6 +18008,16 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
             "content": {
               "application/json": {
                 "schema": {
@@ -29046,6 +29167,263 @@
           },
           "409": {
             "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/admins/invites": {
+      "get": {
+        "summary": "List admin invites",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Super admins only. Open invites, newest first, capped at 200. Expired invites stay listed with expired true until they are replaced or revoked.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminInviteList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Invite a new admin by email",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Super admins only. The invited Google account becomes an ACTIVE admin on its next sign-in (POST /auth/google, no role). Invites last 14 days. 409 ACCOUNT_EXISTS if the email already has an account, SUPER_ADMIN_EMAIL for a super admin's email, INVITE_EXISTS if an open invite exists (an expired one is replaced).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminInviteInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminInvite"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/admins/invites/{id}": {
+      "delete": {
+        "summary": "Revoke an admin invite",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Super admins only. Deletes the open invite. 404 if it does not exist.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {

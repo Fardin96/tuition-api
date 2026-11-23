@@ -403,6 +403,7 @@ export const ModelName = {
   AdminDashboardLayout: 'AdminDashboardLayout',
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
+  AdminInvite: 'AdminInvite',
   AccountBlock: 'AccountBlock',
   UploadReview: 'UploadReview',
   UploadBlock: 'UploadBlock',
@@ -464,7 +465,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "accountActivityDay" | "adminDashboardLayout" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "story" | "siteContent" | "siteContentFile" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "accountActivityDay" | "adminDashboardLayout" | "adminUser" | "superAdminEmail" | "adminInvite" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "story" | "siteContent" | "siteContentFile" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -909,6 +910,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SuperAdminEmailCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SuperAdminEmailCountAggregateOutputType> | number
+        }
+      }
+    }
+    AdminInvite: {
+      payload: Prisma.$AdminInvitePayload<ExtArgs>
+      fields: Prisma.AdminInviteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminInviteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminInviteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>
+        }
+        findFirst: {
+          args: Prisma.AdminInviteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminInviteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>
+        }
+        findMany: {
+          args: Prisma.AdminInviteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>[]
+        }
+        create: {
+          args: Prisma.AdminInviteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>
+        }
+        createMany: {
+          args: Prisma.AdminInviteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminInviteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>[]
+        }
+        delete: {
+          args: Prisma.AdminInviteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>
+        }
+        update: {
+          args: Prisma.AdminInviteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminInviteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminInviteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminInviteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminInviteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminInvitePayload>
+        }
+        aggregate: {
+          args: Prisma.AdminInviteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminInvite>
+        }
+        groupBy: {
+          args: Prisma.AdminInviteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminInviteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminInviteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminInviteCountAggregateOutputType> | number
         }
       }
     }
@@ -4431,6 +4506,17 @@ export const SuperAdminEmailScalarFieldEnum = {
 export type SuperAdminEmailScalarFieldEnum = (typeof SuperAdminEmailScalarFieldEnum)[keyof typeof SuperAdminEmailScalarFieldEnum]
 
 
+export const AdminInviteScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  invitedById: 'invitedById',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AdminInviteScalarFieldEnum = (typeof AdminInviteScalarFieldEnum)[keyof typeof AdminInviteScalarFieldEnum]
+
+
 export const AccountBlockScalarFieldEnum = {
   id: 'id',
   accountId: 'accountId',
@@ -6031,6 +6117,7 @@ export type GlobalOmitConfig = {
   adminDashboardLayout?: Prisma.AdminDashboardLayoutOmit
   adminUser?: Prisma.AdminUserOmit
   superAdminEmail?: Prisma.SuperAdminEmailOmit
+  adminInvite?: Prisma.AdminInviteOmit
   accountBlock?: Prisma.AccountBlockOmit
   uploadReview?: Prisma.UploadReviewOmit
   uploadBlock?: Prisma.UploadBlockOmit

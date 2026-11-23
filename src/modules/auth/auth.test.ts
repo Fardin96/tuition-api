@@ -14,6 +14,7 @@ import {
   createStoryRow,
   createStudentProfile,
   createSubject,
+  createSuperAdmin,
   createTestApp,
   createTuitionPackage,
   createTutorProfile,
@@ -500,7 +501,7 @@ async function superAdmin() {
 }
 
 describe("createOrUpdateAccount", () => {
-  const payload = (sub: string, email: string) => ({ sub, email });
+  const payload = (sub: string, email: string) => ({ sub, email, email_verified: true });
 
   it("creates an ACTIVE super admin on first sign-in for an allowlisted email, with no sign-up", async () => {
     await prisma.superAdminEmail.create({ data: { slot: 1, email: "owner@example.com" } });
@@ -522,6 +523,18 @@ describe("createOrUpdateAccount", () => {
     await expect(
       authService.createOrUpdateAccount(payload("google-nobody", "nobody@example.com"), undefined),
     ).rejects.toMatchObject({ statusCode: 404 });
+  });
+
+  it("an allowlisted email that Google has not verified is not a super admin", async () => {
+    await prisma.superAdminEmail.create({ data: { slot: 1, email: "owner@example.com" } });
+
+    await expect(
+      authService.createOrUpdateAccount(
+        { sub: "google-unverified-owner", email: "owner@example.com", email_verified: false },
+        undefined,
+      ),
+    ).rejects.toMatchObject({ statusCode: 404 });
+    expect(await prisma.account.findUnique({ where: { email: "owner@example.com" } })).toBeNull();
   });
 
   it("refuses sign-in for a self-deleted account; sign-up reactivates it and restores its numbers", async () => {
@@ -1087,5 +1100,339 @@ describe("account deletion takes landing cards off", () => {
     expect(await prisma.account.count({ where: { id: account.id } })).toBe(0);
     expect(await prisma.fileAsset.count({ where: { id: photo.id } })).toBe(0);
     expect(await prisma.siteContent.count({ where: { key: "testimonials" } })).toBe(0);
+  });
+});
+
+describe("admin invites at sign-in", () => {
+  const inDays = (days: number) => new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+  it("an open invite and no role make the Google account an ACTIVE admin", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    await prisma.adminInvite.create({
+      data: { email: "invited@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-invited",
+      email: "invited@example.com",
+      email_verified: true,
+      name: "Invited Person",
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+    expect(body.account.role).toBe("ADMIN");
+    const admin = await prisma.adminUser.findUniqueOrThrow({
+      where: { accountId: body.account.id },
+    });
+    expect(admin).toMatchObject({
+      name: "Invited Person",
+      adminRole: "ADMIN",
+      status: "ACTIVE",
+      approvedById: inviter.id,
+    });
+    expect(admin.approvedAt).toBeInstanceOf(Date);
+    expect(
+      await prisma.adminInvite.findUnique({ where: { email: "invited@example.com" } }),
+    ).toBeNull();
+    const audit = await prisma.auditLog.findFirstOrThrow({
+      where: { action: "admin.invite_accept", entityId: body.account.id },
+    });
+    expect(audit.actorAccountId).toBe(body.account.id);
+    expect(audit.entityType).toBe("admin_user");
+    expect(audit.after).toEqual({ status: "ACTIVE", invitedBy: inviter.id });
+    expect(audit.ip).toBe("127.0.0.1");
+  });
+
+  it("an expired invite is ignored: sign-in without a role still gets 404", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    await prisma.adminInvite.create({
+      data: { email: "late@example.com", invitedById: inviter.id, expiresAt: inDays(-1) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-late",
+      email: "late@example.com",
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(404);
+    expect(await prisma.account.findUnique({ where: { email: "late@example.com" } })).toBeNull();
+    expect(await prisma.adminInvite.count({ where: { email: "late@example.com" } })).toBe(1);
+  });
+
+  it("an invite whose inviter is no longer a super admin gives 403 and is kept", async () => {
+    const app = await createTestApp();
+    const removed = await createAdmin({ status: "REMOVED" });
+    await prisma.adminInvite.create({
+      data: { email: "orphan@example.com", invitedById: removed.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-orphan",
+      email: "orphan@example.com",
+      email_verified: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body).message).toMatch(/no longer valid/);
+    expect(await prisma.account.findUnique({ where: { email: "orphan@example.com" } })).toBeNull();
+    expect(await prisma.adminInvite.count({ where: { email: "orphan@example.com" } })).toBe(1);
+  });
+
+  it("a student sign-up gets the STUDENT account and drops the stale invite", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    const invite = await prisma.adminInvite.create({
+      data: { email: "student@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-student-invite",
+      email: "student@example.com",
+      email_verified: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token", role: "STUDENT" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).account.role).toBe("STUDENT");
+    expect(
+      await prisma.adminUser.findFirst({ where: { account: { email: "student@example.com" } } }),
+    ).toBeNull();
+    // The email now has an account, so the invite can never be accepted.
+    expect(await prisma.adminInvite.count({ where: { email: "student@example.com" } })).toBe(0);
+    const revoke = await prisma.auditLog.findFirstOrThrow({
+      where: { action: "admin.invite_revoke", entityId: invite.id },
+    });
+    expect(revoke.actorAccountId).toBe(JSON.parse(res.body).account.id);
+    expect(revoke.before).toEqual({ email: "student@example.com", reason: "account_created" });
+  });
+
+  it("role ADMIN with an unverified email becomes a PENDING admin, and the open invite is dropped with an audit row", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    const invite = await prisma.adminInvite.create({
+      data: { email: "pending-admin@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-pending-admin",
+      email: "pending-admin@example.com",
+      email_verified: false,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token", role: "ADMIN" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const accountId = JSON.parse(res.body).account.id;
+    const admin = await prisma.adminUser.findUniqueOrThrow({ where: { accountId } });
+    expect(admin).toMatchObject({ adminRole: "ADMIN", status: "PENDING" });
+    expect(await prisma.adminInvite.findUnique({ where: { id: invite.id } })).toBeNull();
+    const revoke = await prisma.auditLog.findFirstOrThrow({
+      where: { action: "admin.invite_revoke", entityId: invite.id },
+    });
+    expect(revoke.actorAccountId).toBe(accountId);
+    expect(revoke.before).toEqual({
+      email: "pending-admin@example.com",
+      reason: "account_created",
+    });
+  });
+
+  it("an unverified Google email gets 404 and the invite stays", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    await prisma.adminInvite.create({
+      data: { email: "unverified@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-unverified",
+      email: "unverified@example.com",
+      email_verified: false,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(404);
+    expect(
+      await prisma.account.findUnique({ where: { email: "unverified@example.com" } }),
+    ).toBeNull();
+    expect(await prisma.adminInvite.count({ where: { email: "unverified@example.com" } })).toBe(1);
+  });
+
+  it("role ADMIN with an open invite becomes an ACTIVE admin, not PENDING", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    await prisma.adminInvite.create({
+      data: { email: "role-admin@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-role-admin",
+      email: "role-admin@example.com",
+      email_verified: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token", role: "ADMIN" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const admin = await prisma.adminUser.findUniqueOrThrow({
+      where: { accountId: JSON.parse(res.body).account.id },
+    });
+    expect(admin).toMatchObject({ adminRole: "ADMIN", status: "ACTIVE", approvedById: inviter.id });
+  });
+
+  it("an inviter who is a plain ACTIVE admin gives 403 and the invite stays", async () => {
+    const app = await createTestApp();
+    const admin = await createAdmin({ status: "ACTIVE" });
+    await prisma.adminInvite.create({
+      data: { email: "plain@example.com", invitedById: admin.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-plain",
+      email: "plain@example.com",
+      email_verified: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body).message).toMatch(/no longer valid/);
+    expect(await prisma.account.findUnique({ where: { email: "plain@example.com" } })).toBeNull();
+    expect(await prisma.adminInvite.count({ where: { email: "plain@example.com" } })).toBe(1);
+  });
+
+  it("an inviter who is a super admin with a BLOCKED account gives 403 and the invite stays", async () => {
+    const app = await createTestApp();
+    const inviter = await createAccount({
+      role: "ADMIN",
+      email: "blocked-inviter@example.com",
+      status: "BLOCKED",
+    });
+    await prisma.superAdminEmail.create({
+      data: { slot: 1, email: "blocked-inviter@example.com" },
+    });
+    await prisma.adminUser.create({
+      data: {
+        accountId: inviter.id,
+        name: "Blocked Super Admin",
+        adminRole: "SUPER_ADMIN",
+        status: "ACTIVE",
+      },
+    });
+    await prisma.adminInvite.create({
+      data: { email: "blocked-case@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-blocked-case",
+      email: "blocked-case@example.com",
+      email_verified: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(
+      await prisma.account.findUnique({ where: { email: "blocked-case@example.com" } }),
+    ).toBeNull();
+    expect(await prisma.adminInvite.count({ where: { email: "blocked-case@example.com" } })).toBe(
+      1,
+    );
+  });
+
+  it("an email on the super admin allowlist and invited signs in as super admin, and the stale invite is dropped with an audit row", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    await prisma.superAdminEmail.create({ data: { slot: 2, email: "both@example.com" } });
+    const invite = await prisma.adminInvite.create({
+      data: { email: "both@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-both",
+      email: "both@example.com",
+      email_verified: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const admin = await prisma.adminUser.findUniqueOrThrow({
+      where: { accountId: JSON.parse(res.body).account.id },
+    });
+    expect(admin).toMatchObject({ adminRole: "SUPER_ADMIN", status: "ACTIVE" });
+    expect(admin.approvedById).toBeNull();
+    expect(await prisma.adminInvite.count({ where: { email: "both@example.com" } })).toBe(0);
+    const revoke = await prisma.auditLog.findFirstOrThrow({
+      where: { action: "admin.invite_revoke", entityId: invite.id },
+    });
+    expect(revoke.before).toEqual({ email: "both@example.com", reason: "account_created" });
+  });
+
+  it("an invite used or revoked after the lookup gives 409 INVALID_ADMIN_STATE", async () => {
+    const app = await createTestApp();
+    const inviter = await createSuperAdmin();
+    const invite = await prisma.adminInvite.create({
+      data: { email: "race@example.com", invitedById: inviter.id, expiresAt: inDays(14) },
+    });
+    await prisma.adminInvite.delete({ where: { id: invite.id } });
+    // The lookup still returns the row, as it would when a revoke lands right after it.
+    vi.spyOn(prisma.adminInvite, "findFirst").mockResolvedValueOnce(invite);
+    vi.spyOn(authService, "verifyGoogleIdToken").mockResolvedValue({
+      sub: "google-race",
+      email: "race@example.com",
+      email_verified: true,
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/google",
+      payload: { idToken: "fake-id-token" },
+    });
+
+    expect(res.statusCode).toBe(409);
+    expect(JSON.parse(res.body).code).toBe("INVALID_ADMIN_STATE");
+    expect(await prisma.account.findUnique({ where: { email: "race@example.com" } })).toBeNull();
+    vi.restoreAllMocks();
   });
 });
