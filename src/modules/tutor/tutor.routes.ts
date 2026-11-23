@@ -280,7 +280,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutors",
           summary: "Search tutors",
           description:
-            "Listed tutors only (isListed), highest rating first. Filters: area, subject, gender, rating (minimum), name (contains, case-insensitive).",
+            "Listed tutors only (isListed). Filters: area, subject, gender, rating (minimum), name (contains, case-insensitive), district (name, case-insensitive; a tutor with any area in it), recent=true (joined in the last 90 days). Order: rating, then review count, then newest, then id. Without limit every match is returned. With limit (1 to 50) one page is returned and nextCursor is a keyset cursor for the next page (null on the last page); it carries the last row's rating, review count, join time and id, and the recent cutoff. Rows that don't change are never repeated or skipped; a tutor whose rating changes mid-walk can appear twice or not at all, so dedupe by id. nextCursor is always present.",
           auth: "optional",
         }),
         querystring: tutorSearchQuerySchema,
@@ -290,15 +290,20 @@ export async function tutorRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       publicCache(request, reply, "public, max-age=60, stale-while-revalidate=300");
       const query = request.query as TutorSearchQuery;
-      const tutors = await searchTutors({
+      const { rows, nextCursor } = await searchTutors({
         area: query.area,
         subject: query.subject,
         gender: query.gender,
         rating: query.rating,
         name: query.name,
+        district: query.district,
+        recent: query.recent === "true",
+        limit: query.limit,
+        cursor: query.cursor,
       });
       return reply.send({
-        tutors: tutors.map((t) => ({
+        nextCursor,
+        tutors: rows.map((t) => ({
           id: t.id,
           name: t.name,
           instituteName: t.instituteName,

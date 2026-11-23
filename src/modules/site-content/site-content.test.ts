@@ -106,6 +106,22 @@ describe("public site content", () => {
       expect(body.seo).toEqual((defaults as Json).seo);
     });
 
+    it("serves a stored faq that still has a cta without it, and keeps the stored text", async () => {
+      const app = await createTestApp();
+      const faq = {
+        ...((defaults as Json).faq as Json),
+        title: "Stored FAQ title",
+        cta: { label: "View All", href: "/sign-in" },
+      };
+      await prisma.siteContent.create({ data: { key: "faq", value: faq as never } });
+
+      const res = await app.inject({ method: "GET", url: URL });
+
+      const body = JSON.parse(res.body) as { faq: Json };
+      expect(body.faq.title).toBe("Stored FAQ title");
+      expect(body.faq).not.toHaveProperty("cta");
+    });
+
     it("ignores rows whose key is not a landing block", async () => {
       const app = await createTestApp();
       await prisma.siteContent.create({ data: { key: "old_block", value: { anything: true } } });
