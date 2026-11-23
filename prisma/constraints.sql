@@ -913,3 +913,22 @@ ALTER TABLE story ADD CONSTRAINT story_rejection_note CHECK (
   status <> 'REJECTED' OR (moderation_note IS NOT NULL AND length(btrim(moderation_note)) > 0));
 -- At most one pending story per account. Protected: never accept a DROP INDEX for it.
 CREATE UNIQUE INDEX IF NOT EXISTS story_one_pending_per_account ON story (account_id) WHERE status = 'PENDING';
+
+-- ───────────────────────── [dashboard] activity and layouts ─────────────────────────
+-- Migration 20261202000100_admin_dashboard. Both tables are created there; these are the rules Prisma
+-- cannot express. A session insert (sign-in or refresh) records the account's Dhaka day.
+ALTER TABLE admin_dashboard_layout ADD CONSTRAINT admin_dashboard_layout_widgets_shape
+  CHECK (jsonb_typeof(widgets) = 'array' AND jsonb_array_length(widgets) BETWEEN 1 AND 24);
+-- Activity is best-effort: auth must not fail because of it, so an error is logged and the session insert goes on.
+CREATE OR REPLACE FUNCTION record_account_activity() RETURNS trigger AS $$
+BEGIN
+  INSERT INTO account_activity_day (account_id, day)
+  VALUES (NEW.account_id, (NEW.created_at AT TIME ZONE 'Asia/Dhaka')::date)
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  RAISE WARNING 'record_account_activity failed: %', SQLERRM;
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+CREATE TRIGGER session_record_activity_trg AFTER INSERT ON session
+  FOR EACH ROW EXECUTE FUNCTION record_account_activity();

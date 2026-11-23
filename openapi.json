@@ -995,6 +995,653 @@
         ],
         "additionalProperties": false
       },
+      "AdminDashboardLayout": {
+        "type": "object",
+        "properties": {
+          "catalog": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "bottleneck",
+                    "queues",
+                    "mau",
+                    "signups",
+                    "collected",
+                    "placements",
+                    "signups-trend",
+                    "revenue-trend",
+                    "fill-rate",
+                    "time-to-hire",
+                    "collection-rate",
+                    "overdue-fees",
+                    "payment-health",
+                    "trust-cases",
+                    "activity-trend"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "definition": {
+                  "type": "string"
+                },
+                "group": {
+                  "type": "string",
+                  "enum": [
+                    "pipeline",
+                    "people",
+                    "money",
+                    "operations",
+                    "trust"
+                  ]
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "kpi",
+                    "series",
+                    "funnel",
+                    "queue",
+                    "donut"
+                  ]
+                },
+                "span": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "const": 3
+                    },
+                    {
+                      "type": "number",
+                      "const": 6
+                    },
+                    {
+                      "type": "number",
+                      "const": 12
+                    }
+                  ]
+                },
+                "keywords": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "href": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "defaultOn": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "description",
+                "definition",
+                "group",
+                "kind",
+                "span",
+                "keywords",
+                "href",
+                "defaultOn"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "widgets": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "bottleneck",
+                "queues",
+                "mau",
+                "signups",
+                "collected",
+                "placements",
+                "signups-trend",
+                "revenue-trend",
+                "fill-rate",
+                "time-to-hire",
+                "collection-rate",
+                "overdue-fees",
+                "payment-health",
+                "trust-cases",
+                "activity-trend"
+              ]
+            }
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "catalog",
+          "widgets",
+          "isDefault",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "AdminDashboardWidget": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "bottleneck",
+              "queues",
+              "mau",
+              "signups",
+              "collected",
+              "placements",
+              "signups-trend",
+              "revenue-trend",
+              "fill-rate",
+              "time-to-hire",
+              "collection-rate",
+              "overdue-fees",
+              "payment-health",
+              "trust-cases",
+              "activity-trend"
+            ]
+          },
+          "range": {
+            "type": "string",
+            "enum": [
+              "7d",
+              "30d",
+              "90d",
+              "12m",
+              "all"
+            ]
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "kpi"
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "count",
+                      "money",
+                      "percent",
+                      "days"
+                    ]
+                  },
+                  "value": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "previous": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "higherIsBetter": {
+                    "type": "boolean"
+                  },
+                  "spark": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string"
+                        },
+                        "values": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "required": [
+                        "date",
+                        "values"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "breakdown": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "label": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "value"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "note": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind",
+                  "format",
+                  "value",
+                  "previous",
+                  "higherIsBetter",
+                  "spark",
+                  "breakdown",
+                  "note"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "series"
+                  },
+                  "chart": {
+                    "type": "string",
+                    "enum": [
+                      "area",
+                      "stacked-area",
+                      "bar"
+                    ]
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "count",
+                      "money",
+                      "percent",
+                      "days"
+                    ]
+                  },
+                  "series": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "color": {
+                          "type": "string",
+                          "enum": [
+                            "chart-1",
+                            "chart-2",
+                            "chart-3",
+                            "chart-4",
+                            "good",
+                            "warn",
+                            "bad"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "label",
+                        "color"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "points": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string"
+                        },
+                        "values": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "required": [
+                        "date",
+                        "values"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "totals": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  "note": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind",
+                  "chart",
+                  "format",
+                  "series",
+                  "points",
+                  "totals",
+                  "note"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "funnel"
+                  },
+                  "funnels": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "enum": [
+                            "placement",
+                            "tutors",
+                            "students"
+                          ]
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "stages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "count": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "conversion": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "medianDays": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "flagged": {
+                                "type": "boolean"
+                              },
+                              "flagReason": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "key",
+                              "label",
+                              "count",
+                              "conversion",
+                              "medianDays",
+                              "flagged",
+                              "flagReason"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "label",
+                        "stages"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "kind",
+                  "funnels"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "queue"
+                  },
+                  "rows": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "count": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "oldestHours": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "ok",
+                            "watch",
+                            "late"
+                          ]
+                        },
+                        "href": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "label",
+                        "count",
+                        "oldestHours",
+                        "status",
+                        "href"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "kind",
+                  "rows"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "donut"
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "count",
+                      "money",
+                      "percent",
+                      "days"
+                    ]
+                  },
+                  "slices": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "number"
+                        },
+                        "color": {
+                          "type": "string",
+                          "enum": [
+                            "chart-1",
+                            "chart-2",
+                            "chart-3",
+                            "chart-4",
+                            "good",
+                            "warn",
+                            "bad"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "label",
+                        "value",
+                        "color"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "center": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "count",
+                          "money",
+                          "percent",
+                          "days"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "value",
+                      "format"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "note": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind",
+                  "format",
+                  "slices",
+                  "center",
+                  "note"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "range",
+          "generatedAt",
+          "data"
+        ],
+        "additionalProperties": false
+      },
       "AdminDispute": {
         "type": "object",
         "properties": {
@@ -12479,6 +13126,39 @@
           "part"
         ],
         "additionalProperties": false
+      },
+      "SaveAdminDashboardLayoutInput": {
+        "type": "object",
+        "properties": {
+          "widgets": {
+            "minItems": 1,
+            "maxItems": 24,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "bottleneck",
+                "queues",
+                "mau",
+                "signups",
+                "collected",
+                "placements",
+                "signups-trend",
+                "revenue-trend",
+                "fill-rate",
+                "time-to-hire",
+                "collection-rate",
+                "overdue-fees",
+                "payment-health",
+                "trust-cases",
+                "activity-trend"
+              ]
+            }
+          }
+        },
+        "required": [
+          "widgets"
+        ]
       },
       "SendPhoneOtpInput": {
         "type": "object",
@@ -30844,6 +31524,330 @@
           },
           "409": {
             "description": "Conflict with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dashboard/layout": {
+      "get": {
+        "summary": "Get your dashboard layout",
+        "tags": [
+          "Admin"
+        ],
+        "description": "The widget catalog and the calling admin's widgets in order. Admins who never saved a layout get the defaults (isDefault true). Widgets no longer in the catalog are dropped.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 120/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "120/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardLayout"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Save your dashboard layout",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Replaces the calling admin's widgets with this ordered list (1 to 24 known ids, no repeats).\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAdminDashboardLayoutInput"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardLayout"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Reset your dashboard layout",
+        "tags": [
+          "Admin"
+        ],
+        "description": "Deletes the calling admin's saved layout, so the defaults show again.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 60/min per account.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "60/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardLayout"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit hit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error. In production the message is masked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dashboard/widgets/{id}": {
+      "get": {
+        "summary": "Get one dashboard widget",
+        "tags": [
+          "Admin"
+        ],
+        "description": "The data for one widget over a range (7d, 30d, 90d, 12m or all; default 30d), in Asia/Dhaka days or months. all runs from the earliest account (at least 12 months) and has no previous period. Cached for 60 seconds and shared by all admins. Unknown id: 404.\n\n**Who:** ADMIN with an ACTIVE admin_user row.\n\n**Rate limit:** 300/min per account.",
+        "parameters": [
+          {
+            "schema": {
+              "default": "30d",
+              "type": "string",
+              "enum": [
+                "7d",
+                "30d",
+                "90d",
+                "12m",
+                "all"
+              ]
+            },
+            "in": "query",
+            "name": "range",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-roles": "ADMIN with an ACTIVE admin_user row",
+        "x-rate-limit": "300/min per account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardWidget"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (VALIDATION_ERROR with `issues`) or the request breaks a business rule",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The account's role cannot call this route",
             "content": {
               "application/json": {
                 "schema": {

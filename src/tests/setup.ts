@@ -44,9 +44,13 @@ beforeEach(async () => {
   // matching_config lives in platform_setting (truncated below); drop the per-process copy too.
   const { resetMatchingConfigCache } = await import("../modules/matching/matching-config.js");
   resetMatchingConfigCache();
+  const { resetDashboardCache } = await import("../modules/admin/dashboard.service.js");
+  resetDashboardCache();
 
   await prisma.$executeRawUnsafe(`
     TRUNCATE TABLE
+      account_activity_day,
+      admin_dashboard_layout,
       session,
       admin_user,
       account_block,

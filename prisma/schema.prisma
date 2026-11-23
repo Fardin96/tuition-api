@@ -388,6 +388,8 @@ model Account {
   tutor           Tutor?
   adminUser       AdminUser?
   sessions        Session[]
+  activityDays    AccountActivityDay[]
+  dashboardLayout AdminDashboardLayout?
   files           FileAsset[]
   notifications   NotificationLog[]
   alerts          AppNotification[]
@@ -395,10 +397,10 @@ model Account {
   blocks          AccountBlock[]
   uploadReviews   UploadReview[]
   uploadBlocks    UploadBlock[]
-  reportsMade     Report[]          @relation("ReportReporter")
-  reportsAgainst  Report[]          @relation("ReportTarget")
-  disputesRaised  Dispute[]         @relation("DisputeRaisedBy")
-  disputesAgainst Dispute[]         @relation("DisputeAgainst")
+  reportsMade     Report[]              @relation("ReportReporter")
+  reportsAgainst  Report[]              @relation("ReportTarget")
+  disputesRaised  Dispute[]             @relation("DisputeRaisedBy")
+  disputesAgainst Dispute[]             @relation("DisputeAgainst")
   refundRequests  PaymentRefund[]
   phoneOtps       PhoneOtp[]
   stories         Story[]
@@ -425,6 +427,30 @@ model Session {
   @@index([accountId, revokedAt])
   @@index([expiresAt]) // cleanup job
   @@map("session")
+}
+
+// One row per account per Dhaka day it signed in or refreshed a session. Written by the
+// session_record_activity_trg trigger (constraints.sql [dashboard]); the app never writes it.
+model AccountActivityDay {
+  accountId String   @map("account_id") @db.Uuid
+  day       DateTime @db.Date
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, day])
+  @@index([day])
+  @@map("account_activity_day")
+}
+
+// An admin's dashboard widgets, in order. No row means the defaults. CHECK in constraints.sql [dashboard].
+model AdminDashboardLayout {
+  accountId String   @id @map("account_id") @db.Uuid
+  widgets   Json
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("admin_dashboard_layout")
 }
 
 // ADMIN: can moderate. SUPER_ADMIN: everything an admin can do, plus approve or

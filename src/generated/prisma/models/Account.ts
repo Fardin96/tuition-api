@@ -243,6 +243,8 @@ export type AccountWhereInput = {
   tutor?: Prisma.XOR<Prisma.TutorNullableScalarRelationFilter, Prisma.TutorWhereInput> | null
   adminUser?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
   sessions?: Prisma.SessionListRelationFilter
+  activityDays?: Prisma.AccountActivityDayListRelationFilter
+  dashboardLayout?: Prisma.XOR<Prisma.AdminDashboardLayoutNullableScalarRelationFilter, Prisma.AdminDashboardLayoutWhereInput> | null
   files?: Prisma.FileAssetListRelationFilter
   notifications?: Prisma.NotificationLogListRelationFilter
   alerts?: Prisma.AppNotificationListRelationFilter
@@ -277,6 +279,8 @@ export type AccountOrderByWithRelationInput = {
   tutor?: Prisma.TutorOrderByWithRelationInput
   adminUser?: Prisma.AdminUserOrderByWithRelationInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
+  activityDays?: Prisma.AccountActivityDayOrderByRelationAggregateInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutOrderByWithRelationInput
   files?: Prisma.FileAssetOrderByRelationAggregateInput
   notifications?: Prisma.NotificationLogOrderByRelationAggregateInput
   alerts?: Prisma.AppNotificationOrderByRelationAggregateInput
@@ -315,6 +319,8 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   tutor?: Prisma.XOR<Prisma.TutorNullableScalarRelationFilter, Prisma.TutorWhereInput> | null
   adminUser?: Prisma.XOR<Prisma.AdminUserNullableScalarRelationFilter, Prisma.AdminUserWhereInput> | null
   sessions?: Prisma.SessionListRelationFilter
+  activityDays?: Prisma.AccountActivityDayListRelationFilter
+  dashboardLayout?: Prisma.XOR<Prisma.AdminDashboardLayoutNullableScalarRelationFilter, Prisma.AdminDashboardLayoutWhereInput> | null
   files?: Prisma.FileAssetListRelationFilter
   notifications?: Prisma.NotificationLogListRelationFilter
   alerts?: Prisma.AppNotificationListRelationFilter
@@ -384,6 +390,8 @@ export type AccountCreateInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -417,6 +425,8 @@ export type AccountUncheckedCreateInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -450,6 +460,8 @@ export type AccountUpdateInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -483,6 +495,8 @@ export type AccountUncheckedUpdateInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -639,6 +653,34 @@ export type AccountUpdateOneRequiredWithoutSessionsNestedInput = {
   upsert?: Prisma.AccountUpsertWithoutSessionsInput
   connect?: Prisma.AccountWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutSessionsInput, Prisma.AccountUpdateWithoutSessionsInput>, Prisma.AccountUncheckedUpdateWithoutSessionsInput>
+}
+
+export type AccountCreateNestedOneWithoutActivityDaysInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutActivityDaysInput, Prisma.AccountUncheckedCreateWithoutActivityDaysInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutActivityDaysInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneRequiredWithoutActivityDaysNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutActivityDaysInput, Prisma.AccountUncheckedCreateWithoutActivityDaysInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutActivityDaysInput
+  upsert?: Prisma.AccountUpsertWithoutActivityDaysInput
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutActivityDaysInput, Prisma.AccountUpdateWithoutActivityDaysInput>, Prisma.AccountUncheckedUpdateWithoutActivityDaysInput>
+}
+
+export type AccountCreateNestedOneWithoutDashboardLayoutInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutDashboardLayoutInput, Prisma.AccountUncheckedCreateWithoutDashboardLayoutInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutDashboardLayoutInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneRequiredWithoutDashboardLayoutNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutDashboardLayoutInput, Prisma.AccountUncheckedCreateWithoutDashboardLayoutInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutDashboardLayoutInput
+  upsert?: Prisma.AccountUpsertWithoutDashboardLayoutInput
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutDashboardLayoutInput, Prisma.AccountUpdateWithoutDashboardLayoutInput>, Prisma.AccountUncheckedUpdateWithoutDashboardLayoutInput>
 }
 
 export type AccountCreateNestedOneWithoutAdminUserInput = {
@@ -929,6 +971,8 @@ export type AccountCreateWithoutSessionsInput = {
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -961,6 +1005,8 @@ export type AccountUncheckedCreateWithoutSessionsInput = {
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -1009,6 +1055,8 @@ export type AccountUpdateWithoutSessionsInput = {
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -1041,6 +1089,312 @@ export type AccountUncheckedUpdateWithoutSessionsInput = {
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
+  files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountCreateWithoutActivityDaysInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
+  student?: Prisma.StudentCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
+  files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
+  stories?: Prisma.StoryCreateNestedManyWithoutAccountInput
+}
+
+export type AccountUncheckedCreateWithoutActivityDaysInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
+  files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type AccountCreateOrConnectWithoutActivityDaysInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutActivityDaysInput, Prisma.AccountUncheckedCreateWithoutActivityDaysInput>
+}
+
+export type AccountUpsertWithoutActivityDaysInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutActivityDaysInput, Prisma.AccountUncheckedUpdateWithoutActivityDaysInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutActivityDaysInput, Prisma.AccountUncheckedCreateWithoutActivityDaysInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutActivityDaysInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutActivityDaysInput, Prisma.AccountUncheckedUpdateWithoutActivityDaysInput>
+}
+
+export type AccountUpdateWithoutActivityDaysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
+  student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
+  files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutActivityDaysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
+  files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUncheckedUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUncheckedUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUncheckedUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUncheckedUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUncheckedUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUncheckedUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedUpdateManyWithoutAccountNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountCreateWithoutDashboardLayoutInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  googlePictureUrl?: string | null
+  avatarFile?: Prisma.FileAssetCreateNestedOneWithoutAvatarOfInput
+  student?: Prisma.StudentCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpCreateNestedManyWithoutAccountInput
+  stories?: Prisma.StoryCreateNestedManyWithoutAccountInput
+}
+
+export type AccountUncheckedCreateWithoutDashboardLayoutInput = {
+  id?: string
+  role: $Enums.Role
+  googleSub: string
+  email: string
+  status?: $Enums.AccountStatus
+  consentVersion?: string | null
+  consentAcceptedAt?: Date | string | null
+  createdAt?: Date | string
+  lastLoginAt?: Date | string | null
+  deletedAt?: Date | string | null
+  avatarFileId?: string | null
+  googlePictureUrl?: string | null
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
+  tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
+  adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
+  notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
+  alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
+  auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  blocks?: Prisma.AccountBlockUncheckedCreateNestedManyWithoutAccountInput
+  uploadReviews?: Prisma.UploadReviewUncheckedCreateNestedManyWithoutAccountInput
+  uploadBlocks?: Prisma.UploadBlockUncheckedCreateNestedManyWithoutAccountInput
+  reportsMade?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reportsAgainst?: Prisma.ReportUncheckedCreateNestedManyWithoutTargetInput
+  disputesRaised?: Prisma.DisputeUncheckedCreateNestedManyWithoutRaisedByInput
+  disputesAgainst?: Prisma.DisputeUncheckedCreateNestedManyWithoutAgainstInput
+  refundRequests?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutRequestedByInput
+  phoneOtps?: Prisma.PhoneOtpUncheckedCreateNestedManyWithoutAccountInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type AccountCreateOrConnectWithoutDashboardLayoutInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutDashboardLayoutInput, Prisma.AccountUncheckedCreateWithoutDashboardLayoutInput>
+}
+
+export type AccountUpsertWithoutDashboardLayoutInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutDashboardLayoutInput, Prisma.AccountUncheckedUpdateWithoutDashboardLayoutInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutDashboardLayoutInput, Prisma.AccountUncheckedCreateWithoutDashboardLayoutInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutDashboardLayoutInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutDashboardLayoutInput, Prisma.AccountUncheckedUpdateWithoutDashboardLayoutInput>
+}
+
+export type AccountUpdateWithoutDashboardLayoutInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarFile?: Prisma.FileAssetUpdateOneWithoutAvatarOfNestedInput
+  student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
+  notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
+  alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
+  auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  blocks?: Prisma.AccountBlockUpdateManyWithoutAccountNestedInput
+  uploadReviews?: Prisma.UploadReviewUpdateManyWithoutAccountNestedInput
+  uploadBlocks?: Prisma.UploadBlockUpdateManyWithoutAccountNestedInput
+  reportsMade?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reportsAgainst?: Prisma.ReportUpdateManyWithoutTargetNestedInput
+  disputesRaised?: Prisma.DisputeUpdateManyWithoutRaisedByNestedInput
+  disputesAgainst?: Prisma.DisputeUpdateManyWithoutAgainstNestedInput
+  refundRequests?: Prisma.PaymentRefundUpdateManyWithoutRequestedByNestedInput
+  phoneOtps?: Prisma.PhoneOtpUpdateManyWithoutAccountNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutDashboardLayoutInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  googleSub?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  consentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  consentAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googlePictureUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
+  tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
+  adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -1073,6 +1427,8 @@ export type AccountCreateWithoutAdminUserInput = {
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -1105,6 +1461,8 @@ export type AccountUncheckedCreateWithoutAdminUserInput = {
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -1153,6 +1511,8 @@ export type AccountUpdateWithoutAdminUserInput = {
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -1185,6 +1545,8 @@ export type AccountUncheckedUpdateWithoutAdminUserInput = {
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -1218,6 +1580,8 @@ export type AccountCreateWithoutBlocksInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -1250,6 +1614,8 @@ export type AccountUncheckedCreateWithoutBlocksInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -1298,6 +1664,8 @@ export type AccountUpdateWithoutBlocksInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -1330,6 +1698,8 @@ export type AccountUncheckedUpdateWithoutBlocksInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -1362,6 +1732,8 @@ export type AccountCreateWithoutUploadReviewsInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -1394,6 +1766,8 @@ export type AccountUncheckedCreateWithoutUploadReviewsInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -1442,6 +1816,8 @@ export type AccountUpdateWithoutUploadReviewsInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -1474,6 +1850,8 @@ export type AccountUncheckedUpdateWithoutUploadReviewsInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -1506,6 +1884,8 @@ export type AccountCreateWithoutUploadBlocksInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -1538,6 +1918,8 @@ export type AccountUncheckedCreateWithoutUploadBlocksInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -1586,6 +1968,8 @@ export type AccountUpdateWithoutUploadBlocksInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -1618,6 +2002,8 @@ export type AccountUncheckedUpdateWithoutUploadBlocksInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -1650,6 +2036,8 @@ export type AccountCreateWithoutFilesInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
@@ -1682,6 +2070,8 @@ export type AccountUncheckedCreateWithoutFilesInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
@@ -1718,6 +2108,8 @@ export type AccountCreateWithoutAvatarFileInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -1750,6 +2142,8 @@ export type AccountUncheckedCreateWithoutAvatarFileInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -1799,6 +2193,8 @@ export type AccountUpdateWithoutFilesInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
@@ -1831,6 +2227,8 @@ export type AccountUncheckedUpdateWithoutFilesInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
@@ -1873,6 +2271,8 @@ export type AccountUpdateWithoutAvatarFileInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -1905,6 +2305,8 @@ export type AccountUncheckedUpdateWithoutAvatarFileInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -1937,6 +2339,8 @@ export type AccountCreateWithoutStudentInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -1969,6 +2373,8 @@ export type AccountUncheckedCreateWithoutStudentInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -2017,6 +2423,8 @@ export type AccountUpdateWithoutStudentInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -2049,6 +2457,8 @@ export type AccountUncheckedUpdateWithoutStudentInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -2081,6 +2491,8 @@ export type AccountCreateWithoutTutorInput = {
   student?: Prisma.StudentCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -2113,6 +2525,8 @@ export type AccountUncheckedCreateWithoutTutorInput = {
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -2161,6 +2575,8 @@ export type AccountUpdateWithoutTutorInput = {
   student?: Prisma.StudentUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -2193,6 +2609,8 @@ export type AccountUncheckedUpdateWithoutTutorInput = {
   student?: Prisma.StudentUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -2226,6 +2644,8 @@ export type AccountCreateWithoutReportsMadeInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -2258,6 +2678,8 @@ export type AccountUncheckedCreateWithoutReportsMadeInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -2295,6 +2717,8 @@ export type AccountCreateWithoutReportsAgainstInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -2327,6 +2751,8 @@ export type AccountUncheckedCreateWithoutReportsAgainstInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -2375,6 +2801,8 @@ export type AccountUpdateWithoutReportsMadeInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -2407,6 +2835,8 @@ export type AccountUncheckedUpdateWithoutReportsMadeInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -2450,6 +2880,8 @@ export type AccountUpdateWithoutReportsAgainstInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -2482,6 +2914,8 @@ export type AccountUncheckedUpdateWithoutReportsAgainstInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -2514,6 +2948,8 @@ export type AccountCreateWithoutDisputesRaisedInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -2546,6 +2982,8 @@ export type AccountUncheckedCreateWithoutDisputesRaisedInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -2583,6 +3021,8 @@ export type AccountCreateWithoutDisputesAgainstInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -2615,6 +3055,8 @@ export type AccountUncheckedCreateWithoutDisputesAgainstInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -2663,6 +3105,8 @@ export type AccountUpdateWithoutDisputesRaisedInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -2695,6 +3139,8 @@ export type AccountUncheckedUpdateWithoutDisputesRaisedInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -2738,6 +3184,8 @@ export type AccountUpdateWithoutDisputesAgainstInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -2770,6 +3218,8 @@ export type AccountUncheckedUpdateWithoutDisputesAgainstInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -2802,6 +3252,8 @@ export type AccountCreateWithoutRefundRequestsInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -2834,6 +3286,8 @@ export type AccountUncheckedCreateWithoutRefundRequestsInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -2882,6 +3336,8 @@ export type AccountUpdateWithoutRefundRequestsInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -2914,6 +3370,8 @@ export type AccountUncheckedUpdateWithoutRefundRequestsInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -2946,6 +3404,8 @@ export type AccountCreateWithoutPhoneOtpsInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -2978,6 +3438,8 @@ export type AccountUncheckedCreateWithoutPhoneOtpsInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -3026,6 +3488,8 @@ export type AccountUpdateWithoutPhoneOtpsInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -3058,6 +3522,8 @@ export type AccountUncheckedUpdateWithoutPhoneOtpsInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -3090,6 +3556,8 @@ export type AccountCreateWithoutNotificationsInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
@@ -3122,6 +3590,8 @@ export type AccountUncheckedCreateWithoutNotificationsInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
@@ -3170,6 +3640,8 @@ export type AccountUpdateWithoutNotificationsInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
@@ -3202,6 +3674,8 @@ export type AccountUncheckedUpdateWithoutNotificationsInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
@@ -3234,6 +3708,8 @@ export type AccountCreateWithoutAlertsInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogCreateNestedManyWithoutActorInput
@@ -3266,6 +3742,8 @@ export type AccountUncheckedCreateWithoutAlertsInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   auditEntries?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
@@ -3314,6 +3792,8 @@ export type AccountUpdateWithoutAlertsInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
@@ -3346,6 +3826,8 @@ export type AccountUncheckedUpdateWithoutAlertsInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   auditEntries?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
@@ -3378,6 +3860,8 @@ export type AccountCreateWithoutStoriesInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -3410,6 +3894,8 @@ export type AccountUncheckedCreateWithoutStoriesInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -3458,6 +3944,8 @@ export type AccountUpdateWithoutStoriesInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -3490,6 +3978,8 @@ export type AccountUncheckedUpdateWithoutStoriesInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -3522,6 +4012,8 @@ export type AccountCreateWithoutAuditEntriesInput = {
   tutor?: Prisma.TutorCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationCreateNestedManyWithoutRecipientInput
@@ -3554,6 +4046,8 @@ export type AccountUncheckedCreateWithoutAuditEntriesInput = {
   tutor?: Prisma.TutorUncheckedCreateNestedOneWithoutAccountInput
   adminUser?: Prisma.AdminUserUncheckedCreateNestedOneWithoutAccountInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAccountInput
+  activityDays?: Prisma.AccountActivityDayUncheckedCreateNestedManyWithoutAccountInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedCreateNestedOneWithoutAccountInput
   files?: Prisma.FileAssetUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutRecipientInput
   alerts?: Prisma.AppNotificationUncheckedCreateNestedManyWithoutRecipientInput
@@ -3602,6 +4096,8 @@ export type AccountUpdateWithoutAuditEntriesInput = {
   tutor?: Prisma.TutorUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUpdateManyWithoutRecipientNestedInput
@@ -3634,6 +4130,8 @@ export type AccountUncheckedUpdateWithoutAuditEntriesInput = {
   tutor?: Prisma.TutorUncheckedUpdateOneWithoutAccountNestedInput
   adminUser?: Prisma.AdminUserUncheckedUpdateOneWithoutAccountNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAccountNestedInput
+  activityDays?: Prisma.AccountActivityDayUncheckedUpdateManyWithoutAccountNestedInput
+  dashboardLayout?: Prisma.AdminDashboardLayoutUncheckedUpdateOneWithoutAccountNestedInput
   files?: Prisma.FileAssetUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationLogUncheckedUpdateManyWithoutRecipientNestedInput
   alerts?: Prisma.AppNotificationUncheckedUpdateManyWithoutRecipientNestedInput
@@ -3656,6 +4154,7 @@ export type AccountUncheckedUpdateWithoutAuditEntriesInput = {
 
 export type AccountCountOutputType = {
   sessions: number
+  activityDays: number
   files: number
   notifications: number
   alerts: number
@@ -3674,6 +4173,7 @@ export type AccountCountOutputType = {
 
 export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | AccountCountOutputTypeCountSessionsArgs
+  activityDays?: boolean | AccountCountOutputTypeCountActivityDaysArgs
   files?: boolean | AccountCountOutputTypeCountFilesArgs
   notifications?: boolean | AccountCountOutputTypeCountNotificationsArgs
   alerts?: boolean | AccountCountOutputTypeCountAlertsArgs
@@ -3705,6 +4205,13 @@ export type AccountCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type AccountCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SessionWhereInput
+}
+
+/**
+ * AccountCountOutputType without action
+ */
+export type AccountCountOutputTypeCountActivityDaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AccountActivityDayWhereInput
 }
 
 /**
@@ -3824,6 +4331,8 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tutor?: boolean | Prisma.Account$tutorArgs<ExtArgs>
   adminUser?: boolean | Prisma.Account$adminUserArgs<ExtArgs>
   sessions?: boolean | Prisma.Account$sessionsArgs<ExtArgs>
+  activityDays?: boolean | Prisma.Account$activityDaysArgs<ExtArgs>
+  dashboardLayout?: boolean | Prisma.Account$dashboardLayoutArgs<ExtArgs>
   files?: boolean | Prisma.Account$filesArgs<ExtArgs>
   notifications?: boolean | Prisma.Account$notificationsArgs<ExtArgs>
   alerts?: boolean | Prisma.Account$alertsArgs<ExtArgs>
@@ -3895,6 +4404,8 @@ export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   tutor?: boolean | Prisma.Account$tutorArgs<ExtArgs>
   adminUser?: boolean | Prisma.Account$adminUserArgs<ExtArgs>
   sessions?: boolean | Prisma.Account$sessionsArgs<ExtArgs>
+  activityDays?: boolean | Prisma.Account$activityDaysArgs<ExtArgs>
+  dashboardLayout?: boolean | Prisma.Account$dashboardLayoutArgs<ExtArgs>
   files?: boolean | Prisma.Account$filesArgs<ExtArgs>
   notifications?: boolean | Prisma.Account$notificationsArgs<ExtArgs>
   alerts?: boolean | Prisma.Account$alertsArgs<ExtArgs>
@@ -3926,6 +4437,8 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     tutor: Prisma.$TutorPayload<ExtArgs> | null
     adminUser: Prisma.$AdminUserPayload<ExtArgs> | null
     sessions: Prisma.$SessionPayload<ExtArgs>[]
+    activityDays: Prisma.$AccountActivityDayPayload<ExtArgs>[]
+    dashboardLayout: Prisma.$AdminDashboardLayoutPayload<ExtArgs> | null
     files: Prisma.$FileAssetPayload<ExtArgs>[]
     notifications: Prisma.$NotificationLogPayload<ExtArgs>[]
     alerts: Prisma.$AppNotificationPayload<ExtArgs>[]
@@ -4353,6 +4866,8 @@ export interface Prisma__AccountClient<T, Null = never, ExtArgs extends runtime.
   tutor<T extends Prisma.Account$tutorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$tutorArgs<ExtArgs>>): Prisma.Prisma__TutorClient<runtime.Types.Result.GetResult<Prisma.$TutorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   adminUser<T extends Prisma.Account$adminUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$adminUserArgs<ExtArgs>>): Prisma.Prisma__AdminUserClient<runtime.Types.Result.GetResult<Prisma.$AdminUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   sessions<T extends Prisma.Account$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activityDays<T extends Prisma.Account$activityDaysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$activityDaysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountActivityDayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dashboardLayout<T extends Prisma.Account$dashboardLayoutArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$dashboardLayoutArgs<ExtArgs>>): Prisma.Prisma__AdminDashboardLayoutClient<runtime.Types.Result.GetResult<Prisma.$AdminDashboardLayoutPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   files<T extends Prisma.Account$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FileAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Account$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   alerts<T extends Prisma.Account$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4906,6 +5421,49 @@ export type Account$sessionsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+}
+
+/**
+ * Account.activityDays
+ */
+export type Account$activityDaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AccountActivityDay
+   */
+  select?: Prisma.AccountActivityDaySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AccountActivityDay
+   */
+  omit?: Prisma.AccountActivityDayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountActivityDayInclude<ExtArgs> | null
+  where?: Prisma.AccountActivityDayWhereInput
+  orderBy?: Prisma.AccountActivityDayOrderByWithRelationInput | Prisma.AccountActivityDayOrderByWithRelationInput[]
+  cursor?: Prisma.AccountActivityDayWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AccountActivityDayScalarFieldEnum | Prisma.AccountActivityDayScalarFieldEnum[]
+}
+
+/**
+ * Account.dashboardLayout
+ */
+export type Account$dashboardLayoutArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminDashboardLayout
+   */
+  select?: Prisma.AdminDashboardLayoutSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminDashboardLayout
+   */
+  omit?: Prisma.AdminDashboardLayoutOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminDashboardLayoutInclude<ExtArgs> | null
+  where?: Prisma.AdminDashboardLayoutWhereInput
 }
 
 /**

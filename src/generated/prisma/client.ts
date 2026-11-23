@@ -52,6 +52,16 @@ export type Account = Prisma.AccountModel
  */
 export type Session = Prisma.SessionModel
 /**
+ * Model AccountActivityDay
+ * 
+ */
+export type AccountActivityDay = Prisma.AccountActivityDayModel
+/**
+ * Model AdminDashboardLayout
+ * 
+ */
+export type AdminDashboardLayout = Prisma.AdminDashboardLayoutModel
+/**
  * Model AdminUser
  * 
  */
