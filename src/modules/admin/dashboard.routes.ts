@@ -97,7 +97,7 @@ export async function adminDashboardRoutes(app: FastifyInstance) {
           tag: "Admin",
           summary: "Get one dashboard widget",
           description:
-            "The data for one widget over a range (7d, 30d, 90d or 12m; default 30d), in Asia/Dhaka days or months. Cached for 60 seconds and shared by all admins. Unknown id: 404.",
+            "The data for one widget over a range (7d, 30d, 90d, 12m or all; default 30d), in Asia/Dhaka days or months. all runs from the earliest account (at least 12 months) and has no previous period. Cached for 60 seconds and shared by all admins. Unknown id: 404.",
           auth: "admin",
           rateLimit: "300/min per account",
         }),

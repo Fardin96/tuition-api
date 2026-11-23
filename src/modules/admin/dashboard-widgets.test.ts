@@ -157,6 +157,33 @@ describe("dashboard widgets", () => {
       expect(res.points.find((p) => p.date === "2026-03-01")?.values.students).toBe(1);
       expect(res.points.find((p) => p.date === "2026-06-01")?.values.students).toBe(0);
     });
+
+    it("gives one point per month from the earliest signup's month on all", async () => {
+      await accountAt("STUDENT", new Date("2025-06-10T10:00:00Z"));
+      const since = new Date("2025-06-10T10:00:00Z");
+
+      const res = (await WIDGETS["signups-trend"]({
+        range: "all",
+        now: NOW,
+        since,
+      })) as SeriesPayload;
+
+      expect(res.points[0]?.date).toBe("2025-06-01");
+      expect(res.points.at(-1)?.date).toBe("2026-12-01");
+      expect(res.points).toHaveLength(19);
+      expect(res.points.find((p) => p.date === "2025-06-01")?.values.students).toBe(1);
+      expect(res.totals).toEqual({ students: 1, tutors: 0 });
+    });
+
+    it("range-based sign-up KPIs have no previous under all", async () => {
+      const since = new Date("2026-12-10T10:00:00Z");
+      await accountAt("STUDENT", since);
+
+      const res = (await WIDGETS.signups({ range: "all", now: NOW, since })) as KpiPayload;
+
+      expect(res.value).toBe(1);
+      expect(res.previous).toBeNull();
+    });
   });
 
   describe("fees", () => {
@@ -591,6 +618,24 @@ describe("dashboard widgets", () => {
       expect(res.spark).toHaveLength(30);
       expect(res.spark.find((p) => p.date === "2026-12-14")?.values.value).toBe(1);
       expect(res.spark.find((p) => p.date === "2026-12-13")?.values.value).toBe(0);
+      expect(res.note).toBeNull();
+    });
+
+    it("mau keeps its previous 30 days under all, which has no range-based previous", async () => {
+      const a = await accountAt("STUDENT", new Date("2025-06-01T00:00:00Z"));
+      const b = await accountAt("TUTOR", new Date("2025-06-01T00:00:00Z"));
+      await activityOn(a.id, "2026-10-17"); // first day of the previous 30 days
+      await activityOn(a.id, "2026-12-14");
+      await activityOn(b.id, "2026-11-20");
+
+      const res = (await WIDGETS.mau({
+        range: "all",
+        now: NOW,
+        since: new Date("2025-06-01T00:00:00Z"),
+      })) as KpiPayload;
+
+      expect(res.value).toBe(2);
+      expect(res.previous).toBe(1);
       expect(res.note).toBeNull();
     });
 

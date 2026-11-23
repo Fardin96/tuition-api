@@ -188,17 +188,30 @@ describe("admin dashboard", () => {
       expect(res.statusCode).toBe(404);
     });
 
-    it("rejects a range outside 7d, 30d, 90d and 12m with 400", async () => {
+    it("rejects a range outside 7d, 30d, 90d, 12m and all with 400", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
 
       const res = await app.inject({
         method: "GET",
-        url: `${WIDGET_URL}/mau?range=1y`,
+        url: `${WIDGET_URL}/mau?range=forever`,
         headers: await getAuthHeaders(admin),
       });
 
       expect(res.statusCode).toBe(400);
+    });
+
+    it("accepts range=all", async () => {
+      const app = await createTestApp();
+      const admin = await createAdmin({ status: "ACTIVE" });
+
+      const res = await app.inject({
+        method: "GET",
+        url: `${WIDGET_URL}/mau?range=all`,
+        headers: await getAuthHeaders(admin),
+      });
+
+      expect(res.statusCode).toBe(200);
     });
 
     it("rejects a student with 403", async () => {
@@ -239,6 +252,26 @@ describe("admin dashboard", () => {
 
       const rows = await prisma.accountActivityDay.findMany({ where: { accountId: account.id } });
       expect(rows.map((r) => r.day.toISOString().slice(0, 10))).toEqual(["2026-12-02"]);
+    });
+  });
+
+  describe("all time", () => {
+    it("starts at the earliest student or tutor signup and has no previous period", async () => {
+      resetDashboardCache();
+      const signup = await createAccount({ role: "TUTOR" });
+      await prisma.account.update({
+        where: { id: signup.id },
+        data: { createdAt: new Date("2025-06-10T06:00:00Z") },
+      });
+      const now = new Date();
+
+      const kpi = await getWidget("signups", "all", now);
+      expect(kpi.data).toMatchObject({ kind: "kpi", value: 1, previous: null });
+
+      const trend = await getWidget("signups-trend", "all", now);
+      expect(trend.data).toMatchObject({ kind: "series" });
+      if (trend.data.kind !== "series") throw new Error("expected a series");
+      expect(trend.data.points[0]?.date).toBe("2025-06-01");
     });
   });
 

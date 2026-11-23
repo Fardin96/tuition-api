@@ -5,7 +5,7 @@ import { WIDGET_IDS } from "./dashboard-registry.js";
 // web app needs one renderer per kind and a new metric is a backend-only change.
 // Money here is a plain number of taka (two decimals at most): charts need numbers.
 
-export const dashboardRangeSchema = z.enum(["7d", "30d", "90d", "12m"]);
+export const dashboardRangeSchema = z.enum(["7d", "30d", "90d", "12m", "all"]);
 export type DashboardRange = z.infer<typeof dashboardRangeSchema>;
 
 export const widgetIdSchema = z.enum(WIDGET_IDS);

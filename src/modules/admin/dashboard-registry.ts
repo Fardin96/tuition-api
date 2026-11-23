@@ -115,7 +115,8 @@ export const CATALOG: readonly CatalogItem[] = [
     id: "signups-trend",
     title: "Sign-ups over time",
     description: "New students and tutors per day or month.",
-    definition: "Student and tutor accounts created per Dhaka day (per month for 12 months).",
+    definition:
+      "Student and tutor accounts created per Dhaka day (per month for 12 months and all time).",
     group: "people",
     kind: "series",
     span: 6,
@@ -128,7 +129,7 @@ export const CATALOG: readonly CatalogItem[] = [
     title: "Fees over time",
     description: "Fees collected and refunded per day or month.",
     definition:
-      "Fee payments received and reversals (refunds included) per Dhaka day (per month for 12 months). Processing charges are not included.",
+      "Fee payments received and reversals (refunds included) per Dhaka day (per month for 12 months and all time). Processing charges are not included.",
     group: "money",
     kind: "series",
     span: 6,
@@ -206,7 +207,7 @@ export const CATALOG: readonly CatalogItem[] = [
     title: "Reports and disputes",
     description: "Cases opened and closed per day or month.",
     definition:
-      "Reports and disputes opened, and closed (resolved or dismissed), per Dhaka day (per month for 12 months).",
+      "Reports and disputes opened, and closed (resolved or dismissed), per Dhaka day (per month for 12 months and all time).",
     group: "trust",
     kind: "series",
     span: 6,

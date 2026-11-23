@@ -29,6 +29,10 @@ const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0);
 const money = (v: unknown): number => Math.round(num(v) * 100) / 100;
 const round1 = (v: number): number => Math.round(v * 10) / 10;
 
+/** "all" has no previous period (prevStart === prevEnd), so a range-based KPI shows no comparison. */
+const comparable = <T>(w: Windows, previous: T): T | null =>
+  w.prevStart.getTime() === w.prevEnd.getTime() ? null : previous;
+
 /** `count` consecutive Dhaka dates starting at `fromKey` (YYYY-MM-DD). */
 function addDays(key: string, days: number): string {
   return new Date(Date.parse(`${key}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
@@ -91,8 +95,8 @@ function signupRows(w: Windows, start: Date, end: Date): Promise<SignupRow[]> {
     GROUP BY k`;
 }
 
-const signups = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
-  const w = rangeWindows(range, now);
+const signups = async ({ range, now, since }: WidgetContext): Promise<KpiPayload> => {
+  const w = rangeWindows(range, now, since);
   const [cur, prev] = await Promise.all([
     signupRows(w, w.start, w.end),
     signupRows(w, w.prevStart, w.prevEnd),
@@ -101,7 +105,7 @@ const signups = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
     kind: "kpi",
     format: "count",
     value: sum(cur.map((r) => r.students + r.tutors)),
-    previous: sum(prev.map((r) => r.students + r.tutors)),
+    previous: comparable(w, sum(prev.map((r) => r.students + r.tutors))),
     higherIsBetter: true,
     spark: zeroFill(
       bucketKeys(w),
@@ -116,8 +120,8 @@ const signups = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
   };
 };
 
-const signupsTrend = async ({ range, now }: WidgetContext): Promise<SeriesPayload> => {
-  const w = rangeWindows(range, now);
+const signupsTrend = async ({ range, now, since }: WidgetContext): Promise<SeriesPayload> => {
+  const w = rangeWindows(range, now, since);
   const rows = await signupRows(w, w.start, w.end);
   return {
     kind: "series",
@@ -176,8 +180,12 @@ const mau = async ({ now }: WidgetContext): Promise<KpiPayload> => {
   };
 };
 
-const activityTrend = async ({ range, now }: WidgetContext): Promise<SeriesPayload> => {
-  const w = rangeWindows(range, now);
+const activityTrend = async ({
+  range,
+  now,
+  since: earliest,
+}: WidgetContext): Promise<SeriesPayload> => {
+  const w = rangeWindows(range, now, earliest);
   const startKey = dhakaDate(w.start);
   const keyExpr =
     w.bucket === "month"
@@ -222,8 +230,8 @@ function feeRows(w: Windows, start: Date, end: Date): Promise<FeeRow[]> {
 const netOf = (rows: FeeRow[]): number =>
   money(sum(rows.map((r) => r.collected)) - sum(rows.map((r) => r.refunded)));
 
-const collected = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
-  const w = rangeWindows(range, now);
+const collected = async ({ range, now, since }: WidgetContext): Promise<KpiPayload> => {
+  const w = rangeWindows(range, now, since);
   const [cur, prev] = await Promise.all([
     feeRows(w, w.start, w.end),
     feeRows(w, w.prevStart, w.prevEnd),
@@ -232,7 +240,7 @@ const collected = async ({ range, now }: WidgetContext): Promise<KpiPayload> => 
     kind: "kpi",
     format: "money",
     value: netOf(cur),
-    previous: netOf(prev),
+    previous: comparable(w, netOf(prev)),
     higherIsBetter: true,
     spark: zeroFill(
       bucketKeys(w),
@@ -244,8 +252,8 @@ const collected = async ({ range, now }: WidgetContext): Promise<KpiPayload> => 
   };
 };
 
-const revenueTrend = async ({ range, now }: WidgetContext): Promise<SeriesPayload> => {
-  const w = rangeWindows(range, now);
+const revenueTrend = async ({ range, now, since }: WidgetContext): Promise<SeriesPayload> => {
+  const w = rangeWindows(range, now, since);
   const rows = await feeRows(w, w.start, w.end);
   return {
     kind: "series",
@@ -270,8 +278,8 @@ const revenueTrend = async ({ range, now }: WidgetContext): Promise<SeriesPayloa
 
 // ───────────────────────── money: fees ─────────────────────────
 
-const collectionRate = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
-  const w = rangeWindows(range, now);
+const collectionRate = async ({ range, now, since }: WidgetContext): Promise<KpiPayload> => {
+  const w = rangeWindows(range, now, since);
   const [value, previous] = await Promise.all([
     collectionRateFor(w.start, w.end),
     collectionRateFor(w.prevStart, w.prevEnd),
@@ -280,7 +288,7 @@ const collectionRate = async ({ range, now }: WidgetContext): Promise<KpiPayload
     kind: "kpi",
     format: "percent",
     value,
-    previous,
+    previous: comparable(w, previous),
     higherIsBetter: true,
     spark: [],
     breakdown: [],
@@ -345,8 +353,8 @@ function placementRows(w: Windows, start: Date, end: Date): Promise<PlacementRow
     GROUP BY k`;
 }
 
-const placements = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
-  const w = rangeWindows(range, now);
+const placements = async ({ range, now, since }: WidgetContext): Promise<KpiPayload> => {
+  const w = rangeWindows(range, now, since);
   const [cur, prev] = await Promise.all([
     placementRows(w, w.start, w.end),
     placementRows(w, w.prevStart, w.prevEnd),
@@ -355,7 +363,7 @@ const placements = async ({ range, now }: WidgetContext): Promise<KpiPayload> =>
     kind: "kpi",
     format: "count",
     value: sum(cur.map((r) => num(r.total))),
-    previous: sum(prev.map((r) => num(r.total))),
+    previous: comparable(w, sum(prev.map((r) => num(r.total)))),
     higherIsBetter: true,
     spark: zeroFill(
       bucketKeys(w),
@@ -382,8 +390,8 @@ async function fillRateFor(start: Date, end: Date): Promise<number | null> {
   return total === 0 ? null : filled / total;
 }
 
-const fillRate = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
-  const w = rangeWindows(range, now);
+const fillRate = async ({ range, now, since }: WidgetContext): Promise<KpiPayload> => {
+  const w = rangeWindows(range, now, since);
   const [value, previous] = await Promise.all([
     fillRateFor(w.start, w.end),
     fillRateFor(w.prevStart, w.prevEnd),
@@ -392,7 +400,7 @@ const fillRate = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
     kind: "kpi",
     format: "percent",
     value,
-    previous,
+    previous: comparable(w, previous),
     higherIsBetter: true,
     spark: [],
     breakdown: [],
@@ -415,8 +423,8 @@ async function medianHireDays(start: Date, end: Date): Promise<number | null> {
   return median == null ? null : round1(Number(median));
 }
 
-const timeToHire = async ({ range, now }: WidgetContext): Promise<KpiPayload> => {
-  const w = rangeWindows(range, now);
+const timeToHire = async ({ range, now, since }: WidgetContext): Promise<KpiPayload> => {
+  const w = rangeWindows(range, now, since);
   const [value, previous] = await Promise.all([
     medianHireDays(w.start, w.end),
     medianHireDays(w.prevStart, w.prevEnd),
@@ -425,7 +433,7 @@ const timeToHire = async ({ range, now }: WidgetContext): Promise<KpiPayload> =>
     kind: "kpi",
     format: "days",
     value,
-    previous,
+    previous: comparable(w, previous),
     higherIsBetter: false,
     spark: [],
     breakdown: [],
@@ -435,8 +443,8 @@ const timeToHire = async ({ range, now }: WidgetContext): Promise<KpiPayload> =>
 
 // ───────────────────────── payments and cases ─────────────────────────
 
-const paymentHealth = async ({ range, now }: WidgetContext): Promise<DonutPayload> => {
-  const w = rangeWindows(range, now);
+const paymentHealth = async ({ range, now, since }: WidgetContext): Promise<DonutPayload> => {
+  const w = rangeWindows(range, now, since);
   const rows = await prisma.$queryRaw<{ status: string; n: number }[]>`
     SELECT status::text AS status, count(*)::int AS n
     FROM payment_attempt
@@ -482,8 +490,8 @@ function caseRows(w: Windows, column: "created_at" | "resolved_at", start: Date,
     GROUP BY k`;
 }
 
-const trustCases = async ({ range, now }: WidgetContext): Promise<SeriesPayload> => {
-  const w = rangeWindows(range, now);
+const trustCases = async ({ range, now, since }: WidgetContext): Promise<SeriesPayload> => {
+  const w = rangeWindows(range, now, since);
   const [opened, closed] = await Promise.all([
     caseRows(w, "created_at", w.start, w.end),
     caseRows(w, "resolved_at", w.start, w.end),

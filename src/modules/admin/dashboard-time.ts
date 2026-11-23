@@ -39,12 +39,28 @@ function dhakaMonthStart(at: Date): Date {
   return new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), 1) - DHAKA_OFFSET_MS);
 }
 
-const DAYS: Record<Exclude<DashboardRange, "12m">, number> = { "7d": 7, "30d": 30, "90d": 90 };
+const DAYS: Record<Exclude<DashboardRange, "12m" | "all">, number> = {
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+};
 
-/** Windows for a range: day ranges cover N whole Dhaka days ending today; 12m covers 12 Dhaka months ending this one. */
-export function rangeWindows(range: DashboardRange, now: Date): Windows {
-  if (range === "12m") {
-    const start = addDhakaMonths(dhakaMonthStart(now), -11);
+/**
+ * Windows for a range: day ranges cover N whole Dhaka days ending today; 12m covers 12 Dhaka months
+ * ending this one. "all" runs from the Dhaka month of `since` (the earliest account), but never starts
+ * later than the 12m start, and has no previous period (prevStart = prevEnd = start).
+ */
+export function rangeWindows(range: DashboardRange, now: Date, since?: Date): Windows {
+  if (range === "12m" || range === "all") {
+    const twelveStart = addDhakaMonths(dhakaMonthStart(now), -11);
+    if (range === "all") {
+      const start =
+        since && dhakaMonthStart(since).getTime() < twelveStart.getTime()
+          ? dhakaMonthStart(since)
+          : twelveStart;
+      return { start, end: now, prevStart: start, prevEnd: start, bucket: "month" };
+    }
+    const start = twelveStart;
     const prevStart = addDhakaMonths(start, -12);
     return {
       start,

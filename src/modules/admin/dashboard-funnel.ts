@@ -311,7 +311,7 @@ const FUNNELS: {
 ];
 
 export async function bottleneckWidget(ctx: WidgetContext): Promise<FunnelPayload> {
-  const range = rangeWindows(ctx.range, ctx.now);
+  const range = rangeWindows(ctx.range, ctx.now, ctx.since);
   const flag = flagWindows(ctx.now);
   const funnels = await Promise.all(
     FUNNELS.map(async (def) => {
