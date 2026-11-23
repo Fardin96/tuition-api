@@ -49,7 +49,7 @@
     "description": "Find the best master for your kids and boosts your results 10x!",
     "cta": {
       "label": "View All",
-      "href": "/sign-in"
+      "href": "/tutors?sort=emerging"
     }
   },
   "testimonials": {
@@ -280,11 +280,7 @@
         "answer": "Searching, comparing profiles, reading reviews and messaging tutors are all free. You only pay the tutor's fee once you start classes, and packages show the full price upfront. There are no hidden charges or subscription fees."
       }
     ],
-    "openIndex": 3,
-    "cta": {
-      "label": "View All",
-      "href": "/sign-in"
-    }
+    "openIndex": 3
   },
   "cta_banner": {
     "heading": "Find your ideal tutor and unlock your full potential today",

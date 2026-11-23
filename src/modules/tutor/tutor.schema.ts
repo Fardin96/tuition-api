@@ -80,11 +80,20 @@ export const tutorIdParamSchema = z.object({ id: z.string().uuid() });
 export type TutorIdParam = z.infer<typeof tutorIdParamSchema>;
 
 export const tutorSearchQuerySchema = z.object({
-  area: z.coerce.number().int().positive().optional(),
-  subject: z.coerce.number().int().positive().optional(),
+  // Ids are INT4 columns; a larger value would fail in Postgres instead of matching nothing.
+  area: z.coerce.number().int().positive().max(2147483647).optional(),
+  subject: z.coerce.number().int().positive().max(2147483647).optional(),
   gender: z.nativeEnum(Gender).optional(),
   rating: z.coerce.number().min(0).max(5).optional(),
   name: z.string().optional(),
+  // District name (Area.district, e.g. "Dhaka"), matched case-insensitively.
+  district: z.string().trim().min(1).max(80).optional(),
+  // "true": only tutors who joined in the last RECENT_TUTOR_DAYS days.
+  recent: z.enum(["true", "false"]).optional(),
+  // Omitted: every matching row, no paging. With limit: one page of at most 50 rows.
+  limit: z.coerce.number().int().min(1).max(50).optional(),
+  // Keyset cursor from a previous nextCursor. Ignored without limit.
+  cursor: z.string().max(200).optional(),
 });
 
 export type TutorSearchQuery = z.infer<typeof tutorSearchQuerySchema>;
@@ -181,6 +190,7 @@ export const tutorSearchResultSchema = z
 export const tutorSearchListResponseSchema = z
   .object({
     tutors: z.array(tutorSearchResultSchema),
+    nextCursor: z.string().nullable(),
   })
   .meta({ id: "TutorSearchList" });
 

@@ -217,7 +217,6 @@ export const faqBlockSchema = z
       .max(20),
     /** 0-based index of the question that starts open, or null for none. */
     openIndex: z.number().int().min(0).nullable(),
-    cta: link,
   })
   .refine((b) => b.openIndex === null || b.openIndex < b.items.length, {
     path: ["openIndex"],

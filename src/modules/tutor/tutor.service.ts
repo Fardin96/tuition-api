@@ -9,7 +9,7 @@ import { assertContactNumbersFree, mapContactNumberError } from "../../lib/conta
 import { DAYS_PER_WEEK_MESSAGE, daysPerWeekFits } from "../../lib/days.js";
 import { toDistrictCode } from "../../lib/districts.js";
 import { validateTutorCoverage } from "../../lib/education.js";
-import { appError } from "../../lib/errors.js";
+import { appError, validationIssuesError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import type { AuthContext } from "../auth/auth.schema.js";
 import { MAX_TUTOR_CREDENTIALS, MAX_TUTOR_VIDEOS } from "../files/file-policy.js";
@@ -359,27 +359,163 @@ export async function getTutorVerifications(accountId: string) {
   }));
 }
 
+// Tutors who joined within this many days are the "Emerging masters" on the landing page.
+export const RECENT_TUTOR_DAYS = 90;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// The same order on every page. The keyset cursor walks this order, so rows that don't change are
+// never repeated or skipped; a tutor whose rating changes mid-walk can repeat or be missed.
+const TUTOR_SEARCH_ORDER: Prisma.TutorOrderByWithRelationInput[] = [
+  { ratingAvg: "desc" },
+  { ratingCount: "desc" },
+  { createdAt: "desc" },
+  { id: "asc" },
+];
+
+// The last row of the previous page, in TUTOR_SEARCH_ORDER. `s` is the recent cutoff that the
+// first page used, so one walk keeps one 90-day window.
+type TutorCursor = {
+  r: string; // ratingAvg, fixed 2dp
+  c: number; // ratingCount
+  t: string; // createdAt, ISO
+  i: string; // id
+  s?: string; // recent cutoff, ISO; only when recent
+};
+
+const RATING_CURSOR_PATTERN = /^\d(\.\d{1,2})?$/;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const INT4_MAX = 2147483647;
+
+function encodeTutorCursor(cursor: TutorCursor): string {
+  return Buffer.from(JSON.stringify(cursor)).toString("base64url");
+}
+
+function invalidCursor() {
+  return validationIssuesError("Invalid cursor", [{ path: "cursor", message: "Invalid cursor" }]);
+}
+
+function isIsoDate(value: unknown): value is string {
+  return typeof value === "string" && !Number.isNaN(Date.parse(value));
+}
+
+function decodeTutorCursor(raw: string): TutorCursor {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(Buffer.from(raw, "base64url").toString("utf8"));
+  } catch {
+    throw invalidCursor();
+  }
+  if (typeof parsed !== "object" || parsed === null) throw invalidCursor();
+  const c = parsed as Record<string, unknown>;
+  // The id must be a uuid: an invalid one would reach the uuid column and fail as a 500.
+  const valid =
+    typeof c.r === "string" &&
+    RATING_CURSOR_PATTERN.test(c.r) &&
+    Number(c.r) <= 5 &&
+    Number.isInteger(c.c) &&
+    (c.c as number) >= 0 &&
+    (c.c as number) <= INT4_MAX &&
+    isIsoDate(c.t) &&
+    (c.s === undefined || isIsoDate(c.s)) &&
+    typeof c.i === "string" &&
+    UUID_PATTERN.test(c.i);
+  if (!valid) throw invalidCursor();
+  return {
+    r: c.r as string,
+    c: c.c as number,
+    t: c.t as string,
+    i: c.i as string,
+    s: c.s as string | undefined,
+  };
+}
+
 export async function searchTutors(filters: {
   area?: number;
   subject?: number;
   gender?: "MALE" | "FEMALE" | "OTHER";
   rating?: number;
   name?: string;
+  district?: string;
+  recent?: boolean;
+  limit?: number;
+  cursor?: string;
 }) {
-  const where: Record<string, unknown> = { isListed: true };
+  // area and district both constrain the same tutor_area row, so they share one areas.some.
+  const areaWhere: Prisma.TutorAreaWhereInput = {};
+  if (filters.area) areaWhere.areaId = filters.area;
+  if (filters.district) {
+    // Prisma sends an insensitive equals as ILIKE, so % and _ would act as wildcards.
+    const district = filters.district.replace(/[\\%_]/g, "\\$&");
+    areaWhere.area = { district: { equals: district, mode: "insensitive" } };
+  }
 
+  const where: Prisma.TutorWhereInput = { isListed: true };
   if (filters.gender) where.gender = filters.gender;
   if (filters.rating !== undefined) where.ratingAvg = { gte: filters.rating };
   if (filters.name) where.name = { contains: filters.name, mode: "insensitive" };
-  if (filters.area) where.areas = { some: { areaId: filters.area } };
+  if (Object.keys(areaWhere).length > 0) where.areas = { some: areaWhere };
   if (filters.subject) where.subjects = { some: { subjectId: filters.subject } };
 
+  const { limit } = filters;
+  if (limit === undefined) {
+    if (filters.recent) {
+      where.createdAt = { gte: new Date(Date.now() - RECENT_TUTOR_DAYS * DAY_MS) };
+    }
+    const rows = await prisma.tutor.findMany({
+      where,
+      orderBy: TUTOR_SEARCH_ORDER,
+      select: tutorPublicSelect,
+    });
+    return { rows: await Promise.all(rows.map(withAvatarUrl)), nextCursor: null };
+  }
+
+  const cursor = filters.cursor !== undefined ? decodeTutorCursor(filters.cursor) : undefined;
+  // The first page sets the recent cutoff and the cursor carries it, so one walk keeps one window.
+  const cutoff = filters.recent
+    ? cursor?.s
+      ? new Date(cursor.s)
+      : new Date(Date.now() - RECENT_TUTOR_DAYS * DAY_MS)
+    : undefined;
+  if (cutoff) where.createdAt = { gte: cutoff };
+  if (cursor) {
+    // Prisma reads a decimal string as the exact value; the fixed 2dp form matches the column.
+    const r = cursor.r;
+    const t = new Date(cursor.t);
+    where.AND = [
+      {
+        OR: [
+          { ratingAvg: { lt: r } },
+          { ratingAvg: r, ratingCount: { lt: cursor.c } },
+          { ratingAvg: r, ratingCount: cursor.c, createdAt: { lt: t } },
+          { ratingAvg: r, ratingCount: cursor.c, createdAt: t, id: { gt: cursor.i } },
+        ],
+      },
+    ];
+  }
+
+  // One extra row tells us whether another page exists.
   const rows = await prisma.tutor.findMany({
     where,
-    orderBy: { ratingAvg: "desc" },
+    orderBy: TUTOR_SEARCH_ORDER,
     select: tutorPublicSelect,
+    take: limit + 1,
   });
-  return Promise.all(rows.map(withAvatarUrl));
+  const page = rows.slice(0, limit);
+  const last = page[page.length - 1];
+  return {
+    rows: await Promise.all(page.map(withAvatarUrl)),
+    nextCursor:
+      rows.length > limit && last
+        ? encodeTutorCursor({
+            r: last.ratingAvg.toFixed(2),
+            c: last.ratingCount,
+            t: last.createdAt.toISOString(),
+            i: last.id,
+            s: cutoff?.toISOString(),
+          })
+        : null,
+  };
 }
 
 // Unlisted profiles are shown only to the tutor themself, to an ACTIVE admin, and to a student

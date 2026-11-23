@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mapContactNumberError } from "../../lib/contact-numbers.js";
 import { prisma } from "../../lib/prisma.js";
 import { setStorageForTests } from "../../lib/storage.js";
@@ -1080,6 +1080,303 @@ describe("tutor routes", () => {
 
       expect(res.statusCode).toBe(200);
       expect(JSON.parse(res.body).tutors).toHaveLength(1);
+    });
+  });
+
+  describe("GET /api/v1/tutors: district, recent and paging", () => {
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    const daysAgo = (n: number) => new Date(Date.now() - n * DAY_MS);
+
+    // Ratings come from review rows: a trigger keeps ratingAvg and ratingCount in step with them,
+    // and the rating columns cannot be written directly.
+    async function rateTutor(tutorId: string, ratings: number[]) {
+      const area = await createArea();
+      for (const rating of ratings) {
+        const account = await createAccount({ role: "STUDENT" });
+        const student = await createStudentProfile(account.id, area.id);
+        const requirement = await createRequirement({ studentId: student.id, areaId: area.id });
+        await createApplication({
+          requirementId: requirement.id,
+          tutorId,
+          studentId: student.id,
+          initiatedBy: "TUTOR",
+          status: "CONFIRMED",
+        });
+        await prisma.review.create({
+          data: { tutorId, studentId: student.id, direction: "STUDENT_TO_TUTOR", rating },
+        });
+      }
+    }
+
+    async function tutorWith(
+      name: string,
+      opts: { areaIds?: number[]; isListed?: boolean; ratings?: number[]; createdAt?: Date } = {},
+    ) {
+      const account = await createAccount({ role: "TUTOR" });
+      const tutor = await createTutorProfile(account.id, {
+        name,
+        isListed: opts.isListed ?? true,
+      });
+      for (const areaId of opts.areaIds ?? []) {
+        await prisma.tutorArea.create({ data: { tutorId: tutor.id, areaId } });
+      }
+      if (opts.ratings) await rateTutor(tutor.id, opts.ratings);
+      if (opts.createdAt) {
+        await prisma.tutor.update({ where: { id: tutor.id }, data: { createdAt: opts.createdAt } });
+      }
+      return tutor;
+    }
+
+    async function search(app: TestApp, query: string) {
+      const res = await app.inject({ method: "GET", url: `/api/v1/tutors${query}` });
+      expect(res.statusCode).toBe(200);
+      return JSON.parse(res.body) as {
+        tutors: { id: string; name: string }[];
+        nextCursor: string | null;
+      };
+    }
+
+    it("recent=true keeps tutors who joined in the last 90 days only", async () => {
+      const app = await createTestApp();
+      await tutorWith("Joined 91 Days Ago", { createdAt: daysAgo(91) });
+      await tutorWith("Joined 89 Days Ago", { createdAt: daysAgo(89) });
+
+      const recent = await search(app, "?recent=true");
+      expect(recent.tutors.map((t) => t.name)).toEqual(["Joined 89 Days Ago"]);
+
+      const all = await search(app, "?recent=false");
+      expect(all.tutors).toHaveLength(2);
+    });
+
+    it("district matches any area in that district, case-insensitively", async () => {
+      const app = await createTestApp();
+      const dhaka = await createArea({ district: "Testshire" });
+      const elsewhere = await createArea({ district: "Otherton" });
+      await tutorWith("In Testshire", { areaIds: [dhaka.id] });
+      await tutorWith("In Otherton", { areaIds: [elsewhere.id] });
+
+      const body = await search(app, "?district=TESTSHIRE");
+
+      expect(body.tutors.map((t) => t.name)).toEqual(["In Testshire"]);
+    });
+
+    it("district and area must both hold on the same area row", async () => {
+      const app = await createTestApp();
+      const areaA = await createArea({ district: "Testshire" });
+      const areaB = await createArea({ district: "Otherton" });
+      await tutorWith("Only areaA", { areaIds: [areaA.id] });
+      await tutorWith("Only areaB", { areaIds: [areaB.id] });
+      await tutorWith("Both", { areaIds: [areaA.id, areaB.id] });
+
+      // Same tutor_area row must match both: areaA is in Testshire, so Otherton finds nothing.
+      const crossed = await search(app, `?area=${areaA.id}&district=Otherton`);
+      expect(crossed.tutors).toEqual([]);
+
+      const inTestshire = await search(app, `?area=${areaA.id}&district=Testshire`);
+      expect(inTestshire.tutors.map((t) => t.name).sort()).toEqual(["Both", "Only areaA"]);
+
+      const inOtherton = await search(app, `?area=${areaB.id}&district=Otherton`);
+      expect(inOtherton.tutors.map((t) => t.name).sort()).toEqual(["Both", "Only areaB"]);
+    });
+
+    it("breaks a rating tie by review count, then newest", async () => {
+      const app = await createTestApp();
+      await tutorWith("Fewer Reviews", { ratings: [4, 4] });
+      await tutorWith("More Reviews", { ratings: [4, 4, 4] });
+      await tutorWith("Higher Rating", { ratings: [5] });
+
+      const body = await search(app, "");
+
+      expect(body.tutors.map((t) => t.name)).toEqual([
+        "Higher Rating",
+        "More Reviews",
+        "Fewer Reviews",
+      ]);
+    });
+
+    it("walks every page with limit=1 once, in the same order as no limit", async () => {
+      const app = await createTestApp();
+      await tutorWith("Top", { ratings: [5, 5] });
+      await tutorWith("Tie A", { ratings: [4, 4] });
+      await tutorWith("Tie B", { ratings: [4, 4], createdAt: daysAgo(10) });
+      await tutorWith("Low", { ratings: [3] });
+
+      const full = await search(app, "");
+      const seen: string[] = [];
+      let cursor: string | null = null;
+      let last: Awaited<ReturnType<typeof search>> | null = null;
+      for (let page = 0; page < 10; page++) {
+        last = await search(app, `?limit=1${cursor ? `&cursor=${cursor}` : ""}`);
+        expect(last.tutors).toHaveLength(1);
+        seen.push(last.tutors[0].name);
+        cursor = last.nextCursor;
+        if (cursor === null) break;
+      }
+
+      expect(seen).toEqual(["Top", "Tie A", "Tie B", "Low"]);
+      expect(seen).toEqual(full.tutors.map((t) => t.name));
+      expect(new Set(seen).size).toBe(seen.length);
+      expect(last?.nextCursor).toBeNull();
+    });
+
+    it("keeps page 2 right after page 1 when a higher-rated tutor joins between pages", async () => {
+      const app = await createTestApp();
+      await tutorWith("Original Top", { ratings: [5, 5] });
+      await tutorWith("Second", { ratings: [4, 4] });
+      await tutorWith("Third", { ratings: [3] });
+
+      const first = await search(app, "?limit=1");
+      expect(first.tutors.map((t) => t.name)).toEqual(["Original Top"]);
+
+      // Ranks above every row already walked. An offset cursor would repeat "Original Top" here.
+      await tutorWith("Newcomer", { ratings: [5, 5, 5] });
+
+      const second = await search(app, `?limit=1&cursor=${first.nextCursor ?? ""}`);
+      expect(second.tutors.map((t) => t.name)).toEqual(["Second"]);
+
+      const third = await search(app, `?limit=1&cursor=${second.nextCursor ?? ""}`);
+      expect(third.tutors.map((t) => t.name)).toEqual(["Third"]);
+      expect(third.nextCursor).toBeNull();
+    });
+
+    it("keeps the recent cutoff of the first page for the whole walk", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      try {
+        const start = new Date();
+        vi.setSystemTime(start);
+        const app = await createTestApp();
+        await tutorWith("Top", { ratings: [5, 5], createdAt: daysAgo(1) });
+        await tutorWith("Edge", {
+          ratings: [4, 4],
+          createdAt: new Date(start.getTime() - 89.5 * DAY_MS),
+        });
+        await tutorWith("Outside", { ratings: [3], createdAt: daysAgo(120) });
+
+        const first = await search(app, "?recent=true&limit=1");
+        expect(first.tutors.map((t) => t.name)).toEqual(["Top"]);
+
+        // A day later a fresh 90-day window would drop Edge. The cutoff in the cursor keeps it.
+        vi.setSystemTime(new Date(start.getTime() + DAY_MS));
+        const second = await search(app, `?recent=true&limit=1&cursor=${first.nextCursor ?? ""}`);
+        expect(second.tutors.map((t) => t.name)).toEqual(["Edge"]);
+        expect(second.nextCursor).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("combines district and recent on both the list and the paged search", async () => {
+      const app = await createTestApp();
+      const area = await createArea({ district: "Testshire" });
+      const other = await createArea({ district: "Otherton" });
+      await tutorWith("Recent Testshire", { areaIds: [area.id], createdAt: daysAgo(5) });
+      await tutorWith("Old Testshire", { areaIds: [area.id], createdAt: daysAgo(200) });
+      await tutorWith("Recent Otherton", { areaIds: [other.id], createdAt: daysAgo(5) });
+
+      const all = await search(app, "?district=Testshire&recent=true");
+      expect(all.tutors.map((t) => t.name)).toEqual(["Recent Testshire"]);
+
+      const paged = await search(app, "?district=Testshire&recent=true&limit=10");
+      expect(paged.tutors.map((t) => t.name)).toEqual(["Recent Testshire"]);
+    });
+
+    it("matches district names literally: % and _ are not wildcards", async () => {
+      const app = await createTestApp();
+      const area = await createArea({ district: "Testshire" });
+      await tutorWith("In Testshire", { areaIds: [area.id] });
+
+      for (const query of [
+        "?district=%25",
+        "?district=Test_hire",
+        "?district=_",
+        "?district=Test%25",
+      ]) {
+        const body = await search(app, query);
+        expect(body.tutors).toEqual([]);
+      }
+
+      const real = await search(app, "?district=testshire");
+      expect(real.tutors.map((t) => t.name)).toEqual(["In Testshire"]);
+    });
+
+    it("refuses area and subject ids above the INT4 range with 400", async () => {
+      const app = await createTestApp();
+
+      for (const query of ["?area=99999999999", "?subject=99999999999"]) {
+        const res = await app.inject({ method: "GET", url: `/api/v1/tutors${query}` });
+        expect(res.statusCode).toBe(400);
+      }
+    });
+
+    it("rejects a garbage or tampered cursor with 400", async () => {
+      const app = await createTestApp();
+      await tutorWith("Someone", { ratings: [4] });
+
+      const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");
+      const good = {
+        r: "4.00",
+        c: 1,
+        t: new Date().toISOString(),
+        i: crypto.randomUUID(),
+      };
+      const tampered = [
+        "not-a-cursor",
+        Buffer.from("{nope").toString("base64url"),
+        encode(5),
+        encode({ ...good, r: "abc" }),
+        encode({ ...good, r: "4.123" }),
+        encode({ ...good, r: "5.01" }),
+        encode({ ...good, c: -1 }),
+        encode({ ...good, c: 1.5 }),
+        encode({ ...good, c: 2147483648 }),
+        encode({ ...good, t: "not-a-date" }),
+        encode({ ...good, s: "not-a-date" }),
+        encode({ ...good, i: "" }),
+        encode({ ...good, i: "not-a-uuid" }),
+      ];
+      for (const cursor of tampered) {
+        const res = await app.inject({
+          method: "GET",
+          url: `/api/v1/tutors?limit=1&cursor=${cursor}`,
+        });
+        expect(res.statusCode).toBe(400);
+      }
+
+      // A cursor without limit is ignored, so a tampered one changes nothing there.
+      const ignored = await app.inject({
+        method: "GET",
+        url: `/api/v1/tutors?cursor=${tampered[0]}`,
+      });
+      expect(ignored.statusCode).toBe(200);
+    });
+
+    it("never returns unlisted tutors, with or without paging", async () => {
+      const app = await createTestApp();
+      const area = await createArea({ district: "Testshire" });
+      await tutorWith("Listed", { areaIds: [area.id], createdAt: daysAgo(1) });
+      await tutorWith("Unlisted", { areaIds: [area.id], isListed: false, createdAt: daysAgo(1) });
+
+      const filtered = await search(app, "?district=Testshire&recent=true");
+      expect(filtered.tutors.map((t) => t.name)).toEqual(["Listed"]);
+
+      const paged = await search(app, "?limit=10&district=Testshire");
+      expect(paged.tutors.map((t) => t.name)).toEqual(["Listed"]);
+    });
+
+    it("returns every row with a null nextCursor when limit is not set", async () => {
+      const app = await createTestApp();
+      await tutorWith("One");
+      await tutorWith("Two");
+      await tutorWith("Three");
+
+      const body = await search(app, "");
+      expect(body.tutors).toHaveLength(3);
+      expect(body.nextCursor).toBeNull();
+
+      // A cursor without limit is ignored, even a garbage one.
+      const ignored = await search(app, "?cursor=not-a-cursor");
+      expect(ignored.tutors).toHaveLength(3);
+      expect(ignored.nextCursor).toBeNull();
     });
   });
 
