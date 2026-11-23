@@ -76,6 +76,11 @@ async function trackingSince(): Promise<string | null> {
   return rows[0]?.d ?? null;
 }
 
+/** The bucket key that contains the first tracked day: the day itself, or the 1st of its month. */
+function trackedBucket(since: string, w: Windows): string {
+  return w.bucket === "month" ? `${since.slice(0, 7)}-01` : since;
+}
+
 /** The caveat shown when activity history starts after the window does. */
 function trackingNote(since: string | null, windowStart: string): string | null {
   return since && since > windowStart ? `Tracking since ${formatDay(since)}` : null;
@@ -206,7 +211,12 @@ const activityTrend = async ({
     chart: "area",
     format: "count",
     series: [{ key: "active", label: "Active users", color: "chart-1" }],
-    points: zeroFill(bucketKeys(w), rows, ["active"]),
+    // Buckets before tracking began have no data, not zero users, so the chart starts there.
+    points: zeroFill(
+      bucketKeys(w).filter((key) => !since || key >= trackedBucket(since, w)),
+      rows,
+      ["active"],
+    ),
     totals: { active: windowTotal },
     note: trackingNote(since, startKey),
   };

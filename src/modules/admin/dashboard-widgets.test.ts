@@ -671,6 +671,17 @@ describe("dashboard widgets", () => {
       expect(res.series).toEqual([{ key: "active", label: "Active users", color: "chart-1" }]);
       expect(res.note).toBe("Tracking since 5 Jan 2026");
     });
+
+    it("activity-trend starts at the first tracked day, not at zeros before it", async () => {
+      const a = await accountAt("STUDENT", new Date("2026-01-01T00:00:00Z"));
+      await activityOn(a.id, "2026-12-10");
+
+      const res = (await WIDGETS["activity-trend"](ctx("30d"))) as SeriesPayload;
+
+      expect(res.points[0]?.date).toBe("2026-12-10");
+      expect(res.points.at(-1)?.date).toBe("2026-12-15");
+      expect(res.note).toBe("Tracking since 10 Dec 2026");
+    });
   });
 
   describe("needs attention", () => {
