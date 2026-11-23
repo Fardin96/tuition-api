@@ -10,6 +10,8 @@
  */
 export type * from './models/Account.js'
 export type * from './models/Session.js'
+export type * from './models/AccountActivityDay.js'
+export type * from './models/AdminDashboardLayout.js'
 export type * from './models/AdminUser.js'
 export type * from './models/SuperAdminEmail.js'
 export type * from './models/AccountBlock.js'

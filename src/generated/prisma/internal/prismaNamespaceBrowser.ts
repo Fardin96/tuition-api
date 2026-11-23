@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Account: 'Account',
   Session: 'Session',
+  AccountActivityDay: 'AccountActivityDay',
+  AdminDashboardLayout: 'AdminDashboardLayout',
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
   AccountBlock: 'AccountBlock',
@@ -150,6 +152,23 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const AccountActivityDayScalarFieldEnum = {
+  accountId: 'accountId',
+  day: 'day'
+} as const
+
+export type AccountActivityDayScalarFieldEnum = (typeof AccountActivityDayScalarFieldEnum)[keyof typeof AccountActivityDayScalarFieldEnum]
+
+
+export const AdminDashboardLayoutScalarFieldEnum = {
+  accountId: 'accountId',
+  widgets: 'widgets',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdminDashboardLayoutScalarFieldEnum = (typeof AdminDashboardLayoutScalarFieldEnum)[keyof typeof AdminDashboardLayoutScalarFieldEnum]
 
 
 export const AdminUserScalarFieldEnum = {
@@ -925,19 +944,19 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
-export const JsonNullValueInput = {
-  JsonNull: JsonNull
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

@@ -399,6 +399,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Account: 'Account',
   Session: 'Session',
+  AccountActivityDay: 'AccountActivityDay',
+  AdminDashboardLayout: 'AdminDashboardLayout',
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
   AccountBlock: 'AccountBlock',
@@ -462,7 +464,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "story" | "siteContent" | "siteContentFile" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "accountActivityDay" | "adminDashboardLayout" | "adminUser" | "superAdminEmail" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "story" | "siteContent" | "siteContentFile" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -611,6 +613,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SessionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccountActivityDay: {
+      payload: Prisma.$AccountActivityDayPayload<ExtArgs>
+      fields: Prisma.AccountActivityDayFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccountActivityDayFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccountActivityDayFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>
+        }
+        findFirst: {
+          args: Prisma.AccountActivityDayFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccountActivityDayFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>
+        }
+        findMany: {
+          args: Prisma.AccountActivityDayFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>[]
+        }
+        create: {
+          args: Prisma.AccountActivityDayCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>
+        }
+        createMany: {
+          args: Prisma.AccountActivityDayCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccountActivityDayCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>[]
+        }
+        delete: {
+          args: Prisma.AccountActivityDayDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>
+        }
+        update: {
+          args: Prisma.AccountActivityDayUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccountActivityDayDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccountActivityDayUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccountActivityDayUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccountActivityDayUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountActivityDayPayload>
+        }
+        aggregate: {
+          args: Prisma.AccountActivityDayAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccountActivityDay>
+        }
+        groupBy: {
+          args: Prisma.AccountActivityDayGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountActivityDayGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccountActivityDayCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountActivityDayCountAggregateOutputType> | number
+        }
+      }
+    }
+    AdminDashboardLayout: {
+      payload: Prisma.$AdminDashboardLayoutPayload<ExtArgs>
+      fields: Prisma.AdminDashboardLayoutFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminDashboardLayoutFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminDashboardLayoutFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminDashboardLayoutFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminDashboardLayoutFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>
+        }
+        findMany: {
+          args: Prisma.AdminDashboardLayoutFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>[]
+        }
+        create: {
+          args: Prisma.AdminDashboardLayoutCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>
+        }
+        createMany: {
+          args: Prisma.AdminDashboardLayoutCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminDashboardLayoutCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>[]
+        }
+        delete: {
+          args: Prisma.AdminDashboardLayoutDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>
+        }
+        update: {
+          args: Prisma.AdminDashboardLayoutUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminDashboardLayoutDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminDashboardLayoutUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminDashboardLayoutUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminDashboardLayoutUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminDashboardLayoutPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminDashboardLayoutAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminDashboardLayout>
+        }
+        groupBy: {
+          args: Prisma.AdminDashboardLayoutGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminDashboardLayoutGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminDashboardLayoutCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminDashboardLayoutCountAggregateOutputType> | number
         }
       }
     }
@@ -4238,6 +4388,23 @@ export const SessionScalarFieldEnum = {
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
+export const AccountActivityDayScalarFieldEnum = {
+  accountId: 'accountId',
+  day: 'day'
+} as const
+
+export type AccountActivityDayScalarFieldEnum = (typeof AccountActivityDayScalarFieldEnum)[keyof typeof AccountActivityDayScalarFieldEnum]
+
+
+export const AdminDashboardLayoutScalarFieldEnum = {
+  accountId: 'accountId',
+  widgets: 'widgets',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdminDashboardLayoutScalarFieldEnum = (typeof AdminDashboardLayoutScalarFieldEnum)[keyof typeof AdminDashboardLayoutScalarFieldEnum]
+
+
 export const AdminUserScalarFieldEnum = {
   accountId: 'accountId',
   role: 'role',
@@ -5011,19 +5178,19 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
-export const JsonNullValueInput = {
-  JsonNull: JsonNull
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -5110,6 +5277,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -5257,20 +5438,6 @@ export type EnumGeogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'GeogSource[]'
  */
 export type ListEnumGeogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GeogSource[]'>
-    
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -5860,6 +6027,8 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   session?: Prisma.SessionOmit
+  accountActivityDay?: Prisma.AccountActivityDayOmit
+  adminDashboardLayout?: Prisma.AdminDashboardLayoutOmit
   adminUser?: Prisma.AdminUserOmit
   superAdminEmail?: Prisma.SuperAdminEmailOmit
   accountBlock?: Prisma.AccountBlockOmit
