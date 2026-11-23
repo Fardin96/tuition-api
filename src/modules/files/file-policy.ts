@@ -27,6 +27,8 @@ export const FILE_POLICY: Record<FilePurpose, FilePolicy> = {
   SITE_VIDEO: { roles: ["ADMIN"], contentTypes: WEB_VIDEO_TYPES, maxBytes: 25 * MB },
   STORY_IMAGE: { roles: ["STUDENT", "TUTOR"], contentTypes: IMAGE_TYPES, maxBytes: 5 * MB },
   STORY_VIDEO: { roles: ["STUDENT"], contentTypes: WEB_VIDEO_TYPES, maxBytes: 25 * MB },
+  // Tutor photos are published (public cards); student photos are served through signed URLs.
+  AVATAR: { roles: ["STUDENT", "TUTOR"], contentTypes: IMAGE_TYPES, maxBytes: 2 * MB },
 };
 
 /** Signed upload URLs live this long (seconds). */

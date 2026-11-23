@@ -1,4 +1,5 @@
 import { Prisma } from "../../generated/prisma/client.js";
+import { DISTRICTS } from "../../lib/districts.js";
 import { prisma } from "../../lib/prisma.js";
 
 export type SaveLocationInput = {
@@ -14,6 +15,8 @@ export type OwnLocation = {
   lng: number | null;
   addressText: string;
   districtCode: string;
+  /** Display name of districtCode (DISTRICTS), null for an unknown code. */
+  districtName: string | null;
   placeId: string | null;
   needsReaddress: boolean;
 };
@@ -64,13 +67,14 @@ export async function findOwnLocation(
   ownerId: string,
 ): Promise<OwnLocation | null> {
   const { table, owner } = LOCATION_TABLES[kind];
-  const [row] = await prisma.$queryRaw<OwnLocation[]>`
+  const [row] = await prisma.$queryRaw<Omit<OwnLocation, "districtName">[]>`
     SELECT ST_Y(geog::geometry) AS lat, ST_X(geog::geometry) AS lng,
            address_text AS "addressText", district_code AS "districtCode",
            place_id AS "placeId", needs_readdress AS "needsReaddress"
     FROM ${table} WHERE ${owner} = ${ownerId}
   `;
-  return row ?? null;
+  if (!row) return null;
+  return { ...row, districtName: DISTRICTS[row.districtCode]?.name ?? null };
 }
 
 export async function getTutorNeedsReaddress(tutorId: string): Promise<boolean> {

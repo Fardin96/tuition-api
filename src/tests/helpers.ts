@@ -321,7 +321,8 @@ export async function createFileAsset(
     | "SITE_IMAGE"
     | "SITE_VIDEO"
     | "STORY_IMAGE"
-    | "STORY_VIDEO",
+    | "STORY_VIDEO"
+    | "AVATAR",
   overrides: {
     status?: "PENDING_UPLOAD" | "UPLOADED" | "DELETED";
     contentType?: string;

@@ -202,7 +202,7 @@ export async function getDownloadUrl(
 
 /** True when any record points at the file. Keep in step with the FileAsset relations. */
 export async function fileInUse(db: Db, fileId: string): Promise<boolean> {
-  const [student, verification, credential, video, post, site, story] = [
+  const [student, verification, credential, video, post, site, story, avatar] = [
     await db.student.count({ where: { verificationFileId: fileId } }),
     await db.tutorVerification.count({ where: { fileId } }),
     await db.tutorCredential.count({ where: { fileId } }),
@@ -210,8 +210,9 @@ export async function fileInUse(db: Db, fileId: string): Promise<boolean> {
     await db.blogPost.count({ where: { coverFileId: fileId } }),
     await db.siteContentFile.count({ where: { fileId } }),
     await db.story.count({ where: { OR: [{ imageFileId: fileId }, { videoFileId: fileId }] } }),
+    await db.account.count({ where: { avatarFileId: fileId } }),
   ];
-  return student + verification + credential + video + post + site + story > 0;
+  return student + verification + credential + video + post + site + story + avatar > 0;
 }
 
 /** Prisma filter for files no record points at. Keep in step with fileInUse. */
@@ -224,6 +225,7 @@ export const unattachedFileWhere = {
   siteContentUses: { none: {} },
   storyImages: { none: {} },
   storyVideos: { none: {} },
+  avatarOf: { is: null },
 } satisfies Prisma.FileAssetWhereInput;
 
 /**
@@ -362,7 +364,18 @@ export async function publishFile(fileId: string): Promise<void> {
   if (!storage.publicUrl(row.storageKey)) return;
   try {
     await storage.copyToPublic(row.storageKey);
-    await prisma.fileAsset.update({ where: { id: fileId }, data: { publishedAt: new Date() } });
+    // A file discarded while the copy ran must not keep its public object.
+    const { count } = await prisma.fileAsset.updateMany({
+      where: { id: fileId, status: "UPLOADED" },
+      data: { publishedAt: new Date() },
+    });
+    if (count === 0) {
+      try {
+        await storage.delete(row.storageKey, "public");
+      } catch (err) {
+        console.warn(`publish: could not remove public copy ${row.storageKey}: ${String(err)}`);
+      }
+    }
   } catch (err) {
     console.warn(`publish: could not copy ${row.storageKey}: ${String(err)}`);
   }

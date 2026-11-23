@@ -1,16 +1,20 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { appError, notFound } from "../../lib/errors.js";
+import { accountRateLimit } from "../../lib/rate-limit.js";
 import { routeDocs } from "../../openapi/docs.js";
 import { requireAuth, requireRole } from "../../plugins/auth.js";
 import {
+  avatarResponseSchema,
   consentResultSchema,
   consentSchema,
   googleAuthSchema,
   logoutSchema,
   meSchema,
   refreshSchema,
+  type SetAvatarInput,
   sessionListSchema,
+  setAvatarSchema,
   tokenResponseSchema,
 } from "./auth.schema.js";
 import {
@@ -29,6 +33,7 @@ import {
   softDeleteAccount,
   verifyGoogleIdToken,
 } from "./auth.service.js";
+import { clearAvatar, setAvatar } from "./avatar.service.js";
 
 const paramsSchema = z.object({ id: z.string().uuid() });
 
@@ -326,6 +331,56 @@ export async function meRoutes(app: FastifyInstance) {
       const account = requireAuth(request);
       await hardDeleteAccount(account.accountId);
       return reply.status(204).send();
+    },
+  );
+
+  app.put(
+    "/avatar",
+    {
+      config: accountRateLimit(10, "1 hour", "Too many photo changes. Try again later."),
+      schema: {
+        ...routeDocs({
+          tag: "Account",
+          summary: "Set my profile photo",
+          description:
+            "Uses an uploaded AVATAR file (JPEG, PNG or WebP, 2 MB) as the profile photo. The previous photo is deleted. Students and tutors only.",
+          auth: ["STUDENT", "TUTOR"],
+          errors: [400, 403, 409],
+          rateLimit: "10/hour per account",
+        }),
+        body: setAvatarSchema,
+        response: { 200: avatarResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      requireRole(request, "STUDENT", "TUTOR");
+      const account = requireAuth(request);
+      const { fileId } = request.body as SetAvatarInput;
+      return reply.send(await setAvatar(account.accountId, fileId));
+    },
+  );
+
+  app.delete(
+    "/avatar",
+    {
+      config: accountRateLimit(30, "1 hour", "Too many photo changes. Try again later."),
+      schema: {
+        ...routeDocs({
+          tag: "Account",
+          summary: "Remove my profile photo",
+          description:
+            "Deletes the uploaded profile photo. The Google picture from the last sign-in shows again, if there is one. Students and tutors only.",
+          auth: ["STUDENT", "TUTOR"],
+          errors: [403],
+          rateLimit: "30/hour per account",
+        }),
+        response: { 200: avatarResponseSchema },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      requireRole(request, "STUDENT", "TUTOR");
+      const account = requireAuth(request);
+      return reply.send(await clearAvatar(account.accountId));
     },
   );
 }

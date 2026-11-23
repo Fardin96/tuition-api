@@ -1,4 +1,5 @@
 import { Prisma } from "../../generated/prisma/client.js";
+import type { ApplicationStatus } from "../../generated/prisma/enums.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
@@ -13,6 +14,8 @@ import type {
 const ACCOUNT_NOT_FOUND = "Account not found";
 const APPLICATION_NOT_FOUND = "Application not found";
 const ALREADY_OPEN = "You already have an open report about this account.";
+const UNANSWERED_MESSAGE = "You can report this person once the application has been answered.";
+const UNANSWERED_STATUSES: ApplicationStatus[] = ["PENDING", "WITHDRAWN", "EXPIRED"];
 // The one-open-report-per-pair index. Any unique violation on insert can only come from it.
 const ONE_OPEN_INDEX = "report_one_open_per_pair";
 
@@ -67,13 +70,21 @@ export async function createReport(
   if (input.applicationId) {
     const application = await prisma.application.findUnique({
       where: { id: input.applicationId },
-      select: { tutor: { select: { accountId: true } }, student: { select: { accountId: true } } },
+      select: {
+        status: true,
+        tutor: { select: { accountId: true } },
+        student: { select: { accountId: true } },
+      },
     });
     const parties = application ? [application.tutor.accountId, application.student.accountId] : [];
     if (!parties.includes(caller.accountId)) throw notFound(APPLICATION_NOT_FOUND);
     targetAccountId ??= parties.find((id) => id !== caller.accountId);
     if (!targetAccountId || !parties.includes(targetAccountId)) {
       throw notFound(APPLICATION_NOT_FOUND);
+    }
+    // Reports wait until the application is answered; earlier reports stay valid.
+    if (application && UNANSWERED_STATUSES.includes(application.status)) {
+      throw appError("ReportNotAllowed", 409, UNANSWERED_MESSAGE);
     }
   }
   if (!targetAccountId) throw appError("ValidationError", 400, "Pick who you're reporting.");

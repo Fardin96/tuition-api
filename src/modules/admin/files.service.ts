@@ -17,6 +17,7 @@ import type {
 // Relation counts mirror fileInUse in files/files.service.ts. Keep the two in step.
 const adminFileInclude = {
   owner: { select: { email: true } },
+  avatarOf: { select: { id: true } },
   _count: {
     select: {
       studentVerifications: true,
@@ -48,6 +49,7 @@ function toAdminFile(row: AdminFileRow): AdminFileResponse {
     ownerEmail: row.owner.email,
     published: row.publishedAt !== null,
     inUse:
+      row.avatarOf !== null ||
       c.studentVerifications +
         c.tutorVerifications +
         c.credentials +
@@ -56,7 +58,7 @@ function toAdminFile(row: AdminFileRow): AdminFileResponse {
         c.siteContentUses +
         c.storyImages +
         c.storyVideos >
-      0,
+        0,
   };
 }
 
@@ -265,6 +267,12 @@ export async function removeFile(
       await tx.tutorCredential.deleteMany({ where: { fileId: row.id } });
     } else if (row.purpose === "TUTOR_VIDEO") {
       await tx.tutorVideo.deleteMany({ where: { fileId: row.id } });
+    } else if (row.purpose === "AVATAR") {
+      // The owner shows the Google picture again, or no picture.
+      await tx.account.updateMany({
+        where: { avatarFileId: row.id },
+        data: { avatarFileId: null },
+      });
     } else if (row.purpose === "STORY_IMAGE" || row.purpose === "STORY_VIDEO") {
       const story = await tx.story.findFirst({
         where: { OR: [{ imageFileId: row.id }, { videoFileId: row.id }] },

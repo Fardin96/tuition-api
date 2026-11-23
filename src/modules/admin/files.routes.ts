@@ -74,7 +74,7 @@ export async function adminFileRoutes(app: FastifyInstance) {
           tag: "Files",
           summary: "Remove an uploaded file and tell its owner",
           description:
-            "Takes a file down with a note for the owner (required). What changes depends on the file. An ID (tutor or student) that is pending is rejected; an approved ID is rejected only when unverify is true. Only a tutor's latest submission changes. A credential or video that uses the file is deleted. Files no record uses are just removed. The stored copies are deleted. noteVisible false keeps the note between admins: the owner sees a generic message. Each removal is audited, kept in the upload history and sent to the owner as an alert. Blog covers are removed from their post instead (400). 404 when the file is missing or already removed. Replies with the file.",
+            "Takes a file down with a note for the owner (required). What changes depends on the file. An ID (tutor or student) that is pending is rejected; an approved ID is rejected only when unverify is true. Only a tutor's latest submission changes. A credential or video that uses the file is deleted. A profile photo is cleared from the account (the Google picture shows again). Files no record uses are just removed. The stored copies are deleted. noteVisible false keeps the note between admins: the owner sees a generic message. Each removal is audited, kept in the upload history and sent to the owner as an alert. Blog covers are removed from their post instead (400). 404 when the file is missing or already removed. Replies with the file.",
           auth: "admin",
           errors: [400, 404],
           rateLimit: "60/min per account",

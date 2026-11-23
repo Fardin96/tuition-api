@@ -236,7 +236,8 @@ export const FilePurpose = {
   SITE_IMAGE: 'SITE_IMAGE',
   SITE_VIDEO: 'SITE_VIDEO',
   STORY_IMAGE: 'STORY_IMAGE',
-  STORY_VIDEO: 'STORY_VIDEO'
+  STORY_VIDEO: 'STORY_VIDEO',
+  AVATAR: 'AVATAR'
 } as const
 
 export type FilePurpose = (typeof FilePurpose)[keyof typeof FilePurpose]

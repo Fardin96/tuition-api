@@ -56,7 +56,7 @@ export async function assertUploadsAllowed(
   if (!block) return;
   const blocked = category === "VIDEOS" ? block.blocksVideos : block.blocksDocuments;
   if (!blocked) return;
-  const what = category === "VIDEOS" ? "video uploads" : "ID and certificate uploads";
+  const what = category === "VIDEOS" ? "video uploads" : "ID, certificate and photo uploads";
   throw appError("UploadsBlocked", 403, `An admin has paused your ${what}.`, {
     category,
     note: visibleNote(block.note, block.noteVisible),

@@ -46,6 +46,7 @@ export const packageSchema = z
       gender: z.nativeEnum(Gender),
       ratingAvg: z.number(),
       ratingCount: z.number(),
+      avatarUrl: z.string().nullable(),
     }),
     title: z.string(),
     /** What the package covers. */

@@ -19,9 +19,9 @@ const adminInclude = {
 
 type AdminRow = Prisma.TuitionPackageGetPayload<{ include: typeof adminInclude }>;
 
-function toAdminPackage(row: AdminRow): AdminPackageResponse {
+async function toAdminPackage(row: AdminRow): Promise<AdminPackageResponse> {
   // closed is always false here: the moderation view does not show application state.
-  const pkg = toPackageResponse(row, false, null);
+  const pkg = await toPackageResponse(row, false, null);
   return {
     ...pkg,
     moderationNote: row.moderationNote,
@@ -69,7 +69,7 @@ export async function listAdminPackages(
   const last = page[page.length - 1];
 
   return {
-    packages: page.map(toAdminPackage),
+    packages: await Promise.all(page.map(toAdminPackage)),
     nextCursor: hasMore && last ? encodeCursor({ createdAt: last.createdAt, id: last.id }) : null,
   };
 }
@@ -77,7 +77,7 @@ export async function listAdminPackages(
 export async function getAdminPackage(id: string): Promise<AdminPackageResponse> {
   const row = await prisma.tuitionPackage.findUnique({ where: { id }, include: adminInclude });
   if (!row) throw notFound("Package not found");
-  return toAdminPackage(row);
+  return await toAdminPackage(row);
 }
 
 export async function moderatePackage(
@@ -115,6 +115,6 @@ export async function moderatePackage(
       after: { moderationStatus, note },
       ip,
     });
-    return toAdminPackage(row);
+    return await toAdminPackage(row);
   });
 }

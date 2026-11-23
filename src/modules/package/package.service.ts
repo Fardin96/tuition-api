@@ -4,6 +4,7 @@ import {
   type AppNotificationKind,
   type ListingStatus,
 } from "../../generated/prisma/enums.js";
+import { avatarSelect, avatarUrlFor } from "../../lib/avatar.js";
 import { type Cursor, decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound, validationIssuesError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
@@ -34,6 +35,8 @@ const tutorCardSelect = {
   ratingCount: true,
   // Read for the student visibility check only; never serialized.
   isListed: true,
+  // Only for avatarUrl: the account itself never leaves the API.
+  account: { select: avatarSelect },
 } as const;
 
 // Zones are read for the count and for the tutor's own list. Students only ever see zoneCount.
@@ -51,11 +54,11 @@ const dayOf = (d: Date) => d.toISOString().slice(0, 10);
 const toClock = (hhmm: string) => new Date(`1970-01-01T${hhmm}:00Z`);
 const toDay = (ymd: string) => new Date(`${ymd}T00:00:00Z`);
 
-export function toPackageResponse(
+export async function toPackageResponse(
   pkg: PackageRow,
   closed: boolean,
   myApplication: { id: string; status: ApplicationStatus } | null,
-): PackageResponse {
+): Promise<PackageResponse> {
   return {
     id: pkg.id,
     tutor: {
@@ -64,6 +67,7 @@ export function toPackageResponse(
       gender: pkg.tutor.gender,
       ratingAvg: Number(pkg.tutor.ratingAvg),
       ratingCount: pkg.tutor.ratingCount,
+      avatarUrl: await avatarUrlFor(pkg.tutor.account),
     },
     title: pkg.title,
     description: pkg.description,
@@ -201,7 +205,9 @@ export async function browsePackages(
   for (const row of page) {
     const pkg = packageById.get(row.id);
     if (!pkg) continue;
-    result.push(toPackageResponse(pkg, closedIds.has(pkg.id), myByPackage.get(pkg.id) ?? null));
+    result.push(
+      await toPackageResponse(pkg, closedIds.has(pkg.id), myByPackage.get(pkg.id) ?? null),
+    );
   }
 
   return {
@@ -417,17 +423,19 @@ export async function listMyPackages(account: AuthContext): Promise<MyPackageLis
   }
 
   return {
-    packages: packages.map((pkg) => {
-      const t = tally.get(pkg.id);
-      return {
-        ...toPackageResponse(pkg, t?.closed ?? false, null),
-        zoneIds: pkg.zones.map((row) => row.zoneId),
-        moderationNote: pkg.moderationNote,
-        updatedAt: pkg.updatedAt,
-        pendingRequestCount: t?.pendingRequestCount ?? 0,
-        requestCount: t?.requestCount ?? 0,
-      };
-    }),
+    packages: await Promise.all(
+      packages.map(async (pkg) => {
+        const t = tally.get(pkg.id);
+        return {
+          ...(await toPackageResponse(pkg, t?.closed ?? false, null)),
+          zoneIds: pkg.zones.map((row) => row.zoneId),
+          moderationNote: pkg.moderationNote,
+          updatedAt: pkg.updatedAt,
+          pendingRequestCount: t?.pendingRequestCount ?? 0,
+          requestCount: t?.requestCount ?? 0,
+        };
+      }),
+    ),
   };
 }
 

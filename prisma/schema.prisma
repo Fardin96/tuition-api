@@ -217,6 +217,7 @@ enum FilePurpose {
   SITE_VIDEO
   STORY_IMAGE
   STORY_VIDEO
+  AVATAR
 }
 
 enum FileStatus {
@@ -377,6 +378,11 @@ model Account {
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   lastLoginAt       DateTime?     @map("last_login_at") @db.Timestamptz(3)
   deletedAt         DateTime?     @map("deleted_at") @db.Timestamptz(3)
+  // The profile picture the account uploaded (purpose AVATAR). Wins over googlePictureUrl when set.
+  avatarFileId      String?       @unique @map("avatar_file_id") @db.Uuid
+  avatarFile        FileAsset?    @relation("AccountAvatar", fields: [avatarFileId], references: [id], onDelete: SetNull)
+  // The picture Google sent at the last sign-in: https only, null when Google sent none.
+  googlePictureUrl  String?       @map("google_picture_url")
 
   student         Student?
   tutor           Tutor?
@@ -603,6 +609,7 @@ model FileAsset {
   reviews              UploadReview[]
   storyImages          Story[]             @relation("StoryImage")
   storyVideos          Story[]             @relation("StoryVideo")
+  avatarOf             Account?            @relation("AccountAvatar")
 
   @@index([ownerAccountId])
   @@index([status, createdAt])

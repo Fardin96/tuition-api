@@ -26,6 +26,7 @@ export const ownLocationResponseSchema = z
     lng: z.number().nullable(),
     addressText: z.string(),
     districtCode: z.string(),
+    districtName: z.string().nullable(),
     placeId: z.string().nullable(),
     needsReaddress: z.boolean(),
   })

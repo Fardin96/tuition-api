@@ -303,6 +303,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           name: t.name,
           instituteName: t.instituteName,
           gender: t.gender,
+          avatarUrl: t.avatarUrl,
           ratingAvg: Number(t.ratingAvg),
           ratingCount: t.ratingCount,
           areas: t.areas.map((a) => a.area),
@@ -353,7 +354,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutors",
           summary: "List a tutor's reviews",
           description:
-            "Visible reviews written by students, newest first, cursor-paginated (limit 1 to 100, default 25). summary has the average, the count and the 1 to 5 star breakdown. 404 when the tutor does not exist.",
+            "Visible reviews written by students, newest first, cursor-paginated (limit 1 to 100, default 25). summary has the average, the count and the 1 to 5 star breakdown. Student authors' avatarUrl is always null (students may be minors). 404 when the tutor does not exist.",
           auth: "optional",
           errors: [404],
         }),

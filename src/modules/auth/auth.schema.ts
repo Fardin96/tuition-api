@@ -60,6 +60,22 @@ export const consentResultSchema = z
   })
   .meta({ id: "ConsentResult" });
 
+// The profile picture. fileId is an UPLOADED AVATAR file the caller owns.
+export const setAvatarSchema = z
+  .object({
+    fileId: z.string().uuid(),
+  })
+  .strict()
+  .meta({ id: "SetAvatar" });
+
+export type SetAvatarInput = z.infer<typeof setAvatarSchema>;
+
+export const avatarResponseSchema = z
+  .object({
+    avatarUrl: z.string().nullable(),
+  })
+  .meta({ id: "Avatar" });
+
 export const sessionSchema = z
   .object({
     id: z.string().uuid(),
@@ -90,6 +106,7 @@ const ownLocationSchema = z
     lng: z.number().nullable(),
     addressText: z.string(),
     districtCode: z.string(),
+    districtName: z.string().nullable(),
     placeId: z.string().nullable(),
     needsReaddress: z.boolean(),
   })
@@ -184,6 +201,8 @@ const meAccountSchema = z
     createdAt: z.date(),
     lastLoginAt: z.date().nullable(),
     deletedAt: z.date().nullable(),
+    // The uploaded photo, else the Google picture, else null. Only the URL leaves the API.
+    avatarUrl: z.string().nullable(),
     adminUser: meAdminUserSchema.nullable(),
     student: meStudentSchema.optional(),
     tutor: meTutorSchema.optional(),

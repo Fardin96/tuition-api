@@ -860,6 +860,117 @@ describe("reads", () => {
     expect(JSON.parse(pending.body).applications).toEqual([]);
   });
 
+  it("GET /applications filters by initiatedBy alone and with status, for tutor and student", async () => {
+    const app = await createTestApp();
+    const { student, actor: studentActor } = await createStudent();
+    const { tutor, actor: tutorActor } = await createPlainTutor();
+    const sentRequirement = await createRequirement({ studentId: student.id });
+    const sent = await createApplication({
+      requirementId: sentRequirement.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "TUTOR",
+      status: "CONFIRMED",
+    });
+    const receivedRequirement = await createRequirement({ studentId: student.id });
+    const received = await createApplication({
+      requirementId: receivedRequirement.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+    });
+
+    const idsFor = async (headers: Actor["headers"], query: string) => {
+      const res = await app.inject({ method: "GET", url: `${BASE}/applications${query}`, headers });
+      expect(res.statusCode).toBe(200);
+      return JSON.parse(res.body).applications.map((a: { id: string }) => a.id);
+    };
+
+    for (const headers of [tutorActor.headers, studentActor.headers]) {
+      expect(await idsFor(headers, "")).toHaveLength(2);
+      expect(await idsFor(headers, "?initiatedBy=TUTOR")).toEqual([sent.id]);
+      expect(await idsFor(headers, "?initiatedBy=STUDENT")).toEqual([received.id]);
+      expect(await idsFor(headers, "?initiatedBy=TUTOR&status=CONFIRMED")).toEqual([sent.id]);
+      expect(await idsFor(headers, "?initiatedBy=TUTOR&status=PENDING")).toEqual([]);
+      expect(await idsFor(headers, "?initiatedBy=STUDENT&status=PENDING")).toEqual([received.id]);
+      expect(await idsFor(headers, "?initiatedBy=STUDENT&status=CONFIRMED")).toEqual([]);
+    }
+  });
+
+  it("GET /applications rejects an unknown initiatedBy with 400", async () => {
+    const app = await createTestApp();
+    const { actor: tutorActor } = await createPlainTutor();
+    const res = await app.inject({
+      method: "GET",
+      url: `${BASE}/applications?initiatedBy=ADMIN`,
+      headers: tutorActor.headers,
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("initiatedBy=TUTOR list length equals the dashboard counts for a tutor and a student", async () => {
+    const app = await createTestApp();
+    const { student, actor: studentActor } = await createStudent();
+    const { tutor, actor: tutorActor } = await createPlainTutor();
+    const { tutor: other } = await createPlainTutor();
+    const rows = [
+      { tutorId: tutor.id, initiatedBy: "TUTOR", status: "PENDING" },
+      { tutorId: tutor.id, initiatedBy: "TUTOR", status: "CONFIRMED" },
+      { tutorId: tutor.id, initiatedBy: "TUTOR", status: "WITHDRAWN" },
+      { tutorId: tutor.id, initiatedBy: "STUDENT", status: "PENDING" },
+      { tutorId: other.id, initiatedBy: "TUTOR", status: "PENDING" },
+    ] as const;
+    for (const row of rows) {
+      const requirement = await createRequirement({ studentId: student.id });
+      await createApplication({
+        requirementId: requirement.id,
+        tutorId: row.tutorId,
+        studentId: student.id,
+        initiatedBy: row.initiatedBy,
+        status: row.status,
+      });
+    }
+
+    // A student's package request is STUDENT-initiated and sits on a package, not a requirement:
+    // neither the tutor's sent count nor the student's received count may include it.
+    const pkg = await createTuitionPackage(tutor.id);
+    await createApplication({
+      packageId: pkg.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+    });
+
+    const tutorStats = await app.inject({
+      method: "GET",
+      url: `${BASE}/me/stats`,
+      headers: tutorActor.headers,
+    });
+    const tutorSent = JSON.parse(tutorStats.body).applicationsSent;
+    const tutorList = await app.inject({
+      method: "GET",
+      url: `${BASE}/applications?initiatedBy=TUTOR&limit=100`,
+      headers: tutorActor.headers,
+    });
+    expect(tutorSent).toBe(3);
+    expect(JSON.parse(tutorList.body).applications).toHaveLength(tutorSent);
+
+    // The student's received count includes the other tutor's application, since it is on the student's requirement.
+    const studentStats = await app.inject({
+      method: "GET",
+      url: `${BASE}/me/stats`,
+      headers: studentActor.headers,
+    });
+    const studentReceived = JSON.parse(studentStats.body).applicationsReceived;
+    const studentList = await app.inject({
+      method: "GET",
+      url: `${BASE}/applications?initiatedBy=TUTOR&limit=100`,
+      headers: studentActor.headers,
+    });
+    expect(studentReceived).toBe(4);
+    expect(JSON.parse(studentList.body).applications).toHaveLength(studentReceived);
+  });
+
   it("GET /applications/:id hides the counterpart contact until CONFIRMED, then shows it", async () => {
     const app = await createTestApp();
     const { student, actor: studentActor } = await createStudent();
@@ -1045,5 +1156,32 @@ describe("reads", () => {
       headers: otherTutor.headers,
     });
     expect(stranger.statusCode).toBe(404);
+  });
+
+  it("GET /packages/:id/applications filters by initiatedBy", async () => {
+    const app = await createTestApp();
+    const { tutor, actor: tutorActor } = await createPlainTutor();
+    await prisma.tutor.update({ where: { id: tutor.id }, data: { isListed: true } });
+    const pkg = await createTuitionPackage(tutor.id);
+    const { actor: studentActor } = await createStudent();
+    await app.inject({
+      method: "POST",
+      url: `${BASE}/packages/${pkg.id}/applications`,
+      headers: studentActor.headers,
+    });
+
+    const list = async (query: string) => {
+      const res = await app.inject({
+        method: "GET",
+        url: `${BASE}/packages/${pkg.id}/applications${query}`,
+        headers: tutorActor.headers,
+      });
+      expect(res.statusCode).toBe(200);
+      return JSON.parse(res.body).applications as { initiatedBy: string }[];
+    };
+
+    expect((await list("")).map((a) => a.initiatedBy)).toEqual(["STUDENT"]);
+    expect((await list("?initiatedBy=STUDENT")).map((a) => a.initiatedBy)).toEqual(["STUDENT"]);
+    expect(await list("?initiatedBy=TUTOR")).toEqual([]);
   });
 });

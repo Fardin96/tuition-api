@@ -135,7 +135,8 @@ export async function applicationRoutes(app: FastifyInstance) {
         ...routeDocs({
           tag: "Applications",
           summary: "List my applications",
-          description: "Newest first, cursor-paginated. Filter by status.",
+          description:
+            "Newest first, cursor-paginated. Filter by status and by initiatedBy (TUTOR: applications the tutor sent; STUDENT: requests the student sent). initiatedBy=TUTOR lists the rows behind the dashboard's applications sent and applications received counts.",
           auth: ["TUTOR", "STUDENT"],
           rateLimit: "300/min per account",
         }),

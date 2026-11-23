@@ -5,6 +5,7 @@ import type {
   ListingStatus,
   ModerationStatus,
 } from "../../generated/prisma/enums.js";
+import { avatarSelect, avatarUrlFor } from "../../lib/avatar.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
@@ -41,10 +42,11 @@ const applicationInclude = {
       instituteName: true,
       ratingAvg: true,
       ratingCount: true,
+      account: { select: avatarSelect },
     },
   },
   student: {
-    select: { id: true, name: true, areaId: true },
+    select: { id: true, name: true, areaId: true, account: { select: avatarSelect } },
   },
   requirement: {
     select: {
@@ -198,7 +200,11 @@ function toTargetAndState(
   throw new Error(`Application ${row.id} has neither a requirement nor a package`);
 }
 
-function toApplication(row: AppRow, side: Side | null, closed: boolean): ApplicationResponse {
+async function toApplication(
+  row: AppRow,
+  side: Side | null,
+  closed: boolean,
+): Promise<ApplicationResponse> {
   const { target, state } = toTargetAndState(row, closed);
   return {
     id: row.id,
@@ -214,11 +220,13 @@ function toApplication(row: AppRow, side: Side | null, closed: boolean): Applica
       instituteName: row.tutor.instituteName,
       ratingAvg: Number(row.tutor.ratingAvg),
       ratingCount: row.tutor.ratingCount,
+      avatarUrl: await avatarUrlFor(row.tutor.account),
     },
     student: {
       id: row.student.id,
       name: row.student.name,
       areaId: row.student.areaId,
+      avatarUrl: await avatarUrlFor(row.student.account),
     },
     target,
     allowedActions: computeAllowedActions(row, side, state),
@@ -340,6 +348,7 @@ async function tutorProfileOf(tutorId: string): Promise<ApplicationTutorProfile 
         orderBy: { subjectId: "asc" },
       },
       credentials: { select: { id: true, examLabel: true, result: true }, orderBy: { id: "asc" } },
+      account: { select: avatarSelect },
     },
   });
   if (!tutor) return null;
@@ -348,6 +357,7 @@ async function tutorProfileOf(tutorId: string): Promise<ApplicationTutorProfile 
     name: tutor.name,
     gender: tutor.gender,
     instituteName: tutor.instituteName,
+    avatarUrl: await avatarUrlFor(tutor.account),
     ratingAvg: Number(tutor.ratingAvg),
     ratingCount: tutor.ratingCount,
     verificationStatus: tutor.verificationStatus,
@@ -400,6 +410,7 @@ async function fetchPage(
       AND: [
         scope,
         query.status ? { status: query.status } : {},
+        query.initiatedBy ? { initiatedBy: query.initiatedBy } : {},
         cursor
           ? {
               OR: [
@@ -421,7 +432,9 @@ async function fetchPage(
   const closed = await loadClosedFor(page);
 
   return {
-    applications: page.map((row) => toApplication(row, side, isClosed(row, closed))),
+    applications: await Promise.all(
+      page.map((row) => toApplication(row, side, isClosed(row, closed))),
+    ),
     nextCursor: hasMore && last ? encodeCursor({ createdAt: last.appliedAt, id: last.id }) : null,
   };
 }
@@ -439,7 +452,7 @@ export async function getApplicationForCaller(
   if (side === null && !adminView) throw notFound("Application not found");
 
   const closed = await loadClosedFor([row]);
-  const base = toApplication(row, side, isClosed(row, closed));
+  const base = await toApplication(row, side, isClosed(row, closed));
   const counterpartContact = adminView ? null : await counterpartContactOf(row, side);
   const fee = side === "TUTOR" || adminView ? await placementFeeOf(row) : null;
   // The tutor's details and set are for the student and admins only.
