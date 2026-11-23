@@ -359,60 +359,80 @@ export async function softDeleteAccount(accountId: string) {
   if (account.status === "BLOCKED") {
     throw Object.assign(new Error("Account is blocked"), { statusCode: 403 });
   }
-  const now = new Date();
+  return prisma.$transaction((tx) => softDeleteInTx(tx, accountId, account, accountId));
+}
 
-  return prisma.$transaction(async (tx) => {
-    // Tombstones keep the unique phone/WhatsApp columns free for the real numbers.
-    if (account.student) {
-      await tx.student.update({
-        where: { id: account.student.id },
-        data: {
-          phoneNumber: tombstone(accountId, account.student.phoneNumber),
-          whatsappNumber:
-            account.student.whatsappNumber && tombstone(accountId, account.student.whatsappNumber),
-        },
-      });
-      await tx.tuitionRequirement.updateMany({
-        where: { studentId: account.student.id, status: "OPEN" },
-        data: { status: "CLOSED" },
-      });
-      await tx.application.updateMany({
-        where: { studentId: account.student.id, status: "PENDING" },
-        data: { status: "WITHDRAWN" },
-      });
-    }
-    if (account.tutor) {
-      await tx.tutor.update({
-        where: { id: account.tutor.id },
-        data: {
-          phoneNumber: tombstone(accountId, account.tutor.phoneNumber),
-          whatsappNumber:
-            account.tutor.whatsappNumber && tombstone(accountId, account.tutor.whatsappNumber),
-        },
-      });
-      await tx.tuitionPackage.updateMany({
-        where: { tutorId: account.tutor.id, status: "OPEN" },
-        data: { status: "CLOSED" },
-      });
-      await tx.application.updateMany({
-        where: { tutorId: account.tutor.id, status: "PENDING" },
-        data: { status: "WITHDRAWN" },
-      });
-    }
-    await tx.session.updateMany({
-      where: { accountId, revokedAt: null },
-      data: { revokedAt: now },
+type ContactNumbers = { id: string; phoneNumber: string; whatsappNumber: string | null };
+
+/**
+ * The soft delete itself, inside the caller's transaction: tombstones the numbers, closes open
+ * listings, withdraws pending applications, revokes sessions and takes landing cards down.
+ * `actorId` is recorded on the landing removal (the account itself, or the admin deactivating it).
+ */
+export async function softDeleteInTx(
+  tx: Prisma.TransactionClient,
+  accountId: string,
+  account: { student: ContactNumbers | null; tutor: ContactNumbers | null },
+  actorId: string,
+) {
+  const now = new Date();
+  // Tombstones keep the unique phone/WhatsApp columns free for the real numbers.
+  if (account.student) {
+    await tx.student.update({
+      where: { id: account.student.id },
+      data: {
+        phoneNumber: tombstone(accountId, account.student.phoneNumber),
+        whatsappNumber:
+          account.student.whatsappNumber && tombstone(accountId, account.student.whatsappNumber),
+      },
     });
-    // Stories and videos on the landing page come down with the account.
-    await removeAccountFromLanding(tx, accountId, accountId);
-    return tx.account.update({
-      where: { id: accountId },
-      data: { deletedAt: now, status: "DELETED" },
+    await tx.tuitionRequirement.updateMany({
+      where: { studentId: account.student.id, status: "OPEN" },
+      data: { status: "CLOSED" },
     });
+    await tx.application.updateMany({
+      where: { studentId: account.student.id, status: "PENDING" },
+      data: { status: "WITHDRAWN" },
+    });
+  }
+  if (account.tutor) {
+    await tx.tutor.update({
+      where: { id: account.tutor.id },
+      data: {
+        phoneNumber: tombstone(accountId, account.tutor.phoneNumber),
+        whatsappNumber:
+          account.tutor.whatsappNumber && tombstone(accountId, account.tutor.whatsappNumber),
+      },
+    });
+    await tx.tuitionPackage.updateMany({
+      where: { tutorId: account.tutor.id, status: "OPEN" },
+      data: { status: "CLOSED" },
+    });
+    await tx.application.updateMany({
+      where: { tutorId: account.tutor.id, status: "PENDING" },
+      data: { status: "WITHDRAWN" },
+    });
+  }
+  await tx.session.updateMany({
+    where: { accountId, revokedAt: null },
+    data: { revokedAt: now },
+  });
+  // Stories and videos on the landing page come down with the account.
+  await removeAccountFromLanding(tx, accountId, actorId);
+  return tx.account.update({
+    where: { id: accountId },
+    data: { deletedAt: now, status: "DELETED" },
   });
 }
 
-export async function hardDeleteAccount(accountId: string) {
+/**
+ * `beforeDelete` runs first inside the same transaction (the admin path locks and checks the
+ * account and writes its audit row there), so a refused or failed delete leaves nothing behind.
+ */
+export async function hardDeleteAccount(
+  accountId: string,
+  options: { beforeDelete?: (tx: Prisma.TransactionClient) => Promise<void> } = {},
+) {
   // Keys are read first: the rows are gone after the transaction, and the objects go after it commits.
   const files = await prisma.fileAsset.findMany({
     where: { ownerAccountId: accountId },
@@ -420,6 +440,8 @@ export async function hardDeleteAccount(accountId: string) {
   });
 
   await prisma.$transaction(async (tx) => {
+    await options.beforeDelete?.(tx);
+
     // First: the landing page uses these files, and a file in use cannot be deleted.
     await removeAccountFromLanding(tx, accountId, null);
 

@@ -495,16 +495,27 @@ ALTER TABLE account_block
 -- At most one active block per account.
 CREATE UNIQUE INDEX account_block_one_active ON account_block (account_id) WHERE unblocked_at IS NULL;
 
+-- [admin blocks] any active admin may block and unblock a student or tutor; an admin account only an
+-- active super admin (migration 20261130000100_admin_blocks).
 CREATE OR REPLACE FUNCTION account_block_guard() RETURNS trigger AS $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM admin_user s WHERE s.account_id = NEW.blocked_by AND s.admin_role = 'SUPER_ADMIN' AND s.status = 'ACTIVE') THEN
-    RAISE EXCEPTION 'only an active super admin can block';
+  IF NOT EXISTS (SELECT 1 FROM admin_user s WHERE s.account_id = NEW.blocked_by AND s.status = 'ACTIVE') THEN
+    RAISE EXCEPTION 'only an active admin can block';
   END IF;
-  IF NEW.unblocked_by IS NOT NULL AND NOT EXISTS (SELECT 1 FROM admin_user s WHERE s.account_id = NEW.unblocked_by AND s.admin_role = 'SUPER_ADMIN' AND s.status = 'ACTIVE') THEN
-    RAISE EXCEPTION 'only an active super admin can unblock';
+  IF NEW.unblocked_by IS NOT NULL AND NOT EXISTS (SELECT 1 FROM admin_user s WHERE s.account_id = NEW.unblocked_by AND s.status = 'ACTIVE') THEN
+    RAISE EXCEPTION 'only an active admin can unblock';
   END IF;
   IF EXISTS (SELECT 1 FROM admin_user u WHERE u.account_id = NEW.account_id AND u.admin_role = 'SUPER_ADMIN') THEN
     RAISE EXCEPTION 'a super admin cannot be blocked';
+  END IF;
+  IF EXISTS (SELECT 1 FROM admin_user u WHERE u.account_id = NEW.account_id) THEN
+    -- Checked when the block is made, so it can still be lifted after its author leaves.
+    IF TG_OP = 'INSERT' AND NOT EXISTS (SELECT 1 FROM admin_user s WHERE s.account_id = NEW.blocked_by AND s.admin_role = 'SUPER_ADMIN' AND s.status = 'ACTIVE') THEN
+      RAISE EXCEPTION 'only an active super admin can block an admin';
+    END IF;
+    IF NEW.unblocked_by IS NOT NULL AND NOT EXISTS (SELECT 1 FROM admin_user s WHERE s.account_id = NEW.unblocked_by AND s.admin_role = 'SUPER_ADMIN' AND s.status = 'ACTIVE') THEN
+      RAISE EXCEPTION 'only an active super admin can unblock an admin';
+    END IF;
   END IF;
   RETURN NEW;
 END $$ LANGUAGE plpgsql;

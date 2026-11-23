@@ -1,10 +1,13 @@
 import type { Prisma } from "../../generated/prisma/client.js";
+import type { AdminRole } from "../../generated/prisma/enums.js";
 import { writeAudit } from "../../lib/admin.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { hardDeleteAccount, softDeleteInTx } from "../auth/auth.service.js";
 import { removeAccountFromLanding } from "../site-content/site-content.service.js";
 import type {
+  AccountActionReasonInput,
   AccountListQuery,
   AdminAccountDetail,
   AdminAccountSummary,
@@ -200,17 +203,27 @@ async function buildDetail(row: DetailRow): Promise<AdminAccountDetail> {
   };
 }
 
+/** The admin acting: any ACTIVE admin (requireAdmin). */
+type Caller = { accountId: string; adminRole: AdminRole };
+
+/** Admin accounts are for super admins only: a plain admin may act on students and tutors. */
+function assertMayActOnAdmin(target: { role: string }, caller: Caller, verb: string) {
+  if (target.role === "ADMIN" && caller.adminRole !== "SUPER_ADMIN") {
+    throw appError("Forbidden", 403, `Only a super admin can ${verb} an admin account`);
+  }
+}
+
 export async function blockAccount(
   accountId: string,
   input: BlockAccountInput,
-  caller: { accountId: string },
+  caller: Caller,
   ip: string | undefined,
 ): Promise<AdminAccountDetail> {
   await prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM account WHERE id = ${accountId}::uuid FOR UPDATE`;
     const account = await tx.account.findUnique({
       where: { id: accountId },
-      select: { status: true, adminUser: { select: { adminRole: true } } },
+      select: { role: true, status: true, adminUser: { select: { adminRole: true } } },
     });
     if (!account) {
       throw notFound("Account not found");
@@ -221,6 +234,7 @@ export async function blockAccount(
     if (account.adminUser?.adminRole === "SUPER_ADMIN") {
       throw appError("InvalidAccountState", 409, "A super admin cannot be blocked");
     }
+    assertMayActOnAdmin(account, caller, "block");
     if (account.status === "DELETED") {
       throw appError("InvalidAccountState", 409, "Deleted accounts cannot be blocked");
     }
@@ -257,18 +271,19 @@ export async function blockAccount(
 
 export async function unblockAccount(
   accountId: string,
-  caller: { accountId: string },
+  caller: Caller,
   ip: string | undefined,
 ): Promise<AdminAccountDetail> {
   await prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM account WHERE id = ${accountId}::uuid FOR UPDATE`;
     const account = await tx.account.findUnique({
       where: { id: accountId },
-      select: { status: true },
+      select: { role: true, status: true },
     });
     if (!account) {
       throw notFound("Account not found");
     }
+    assertMayActOnAdmin(account, caller, "unblock");
     const openBlock = await tx.accountBlock.findFirst({
       where: { accountId, unblockedAt: null },
       select: { id: true },
@@ -298,4 +313,125 @@ export async function unblockAccount(
     });
   });
   return getAccountDetail(accountId);
+}
+
+const contactSelect = { id: true, phoneNumber: true, whatsappNumber: true } as const;
+
+/**
+ * Locks the account row and refuses the caller themselves and every super admin; an admin account
+ * only a super admin may touch. Used by deactivate and permanent delete.
+ */
+async function lockRemovableAccount(
+  tx: Prisma.TransactionClient,
+  accountId: string,
+  caller: Caller,
+  action: { verb: string; past: string },
+) {
+  await tx.$queryRaw`SELECT id FROM account WHERE id = ${accountId}::uuid FOR UPDATE`;
+  const account = await tx.account.findUnique({
+    where: { id: accountId },
+    select: {
+      role: true,
+      status: true,
+      adminUser: { select: { adminRole: true } },
+      student: { select: contactSelect },
+      tutor: { select: contactSelect },
+    },
+  });
+  if (!account) {
+    throw notFound("Account not found");
+  }
+  if (accountId === caller.accountId) {
+    throw appError("InvalidAccountState", 409, `You cannot ${action.verb} yourself`);
+  }
+  if (account.adminUser?.adminRole === "SUPER_ADMIN") {
+    throw appError("InvalidAccountState", 409, `A super admin cannot be ${action.past}`);
+  }
+  assertMayActOnAdmin(account, caller, action.verb);
+  return account;
+}
+
+/**
+ * The soft delete, done by an admin ("Deactivate" in the admin panel). A blocked account must
+ * be unblocked first: the database keeps BLOCKED in step with account_block and refuses to change it.
+ */
+export async function deactivateAccount(
+  accountId: string,
+  input: AccountActionReasonInput,
+  caller: Caller,
+  ip: string | undefined,
+): Promise<AdminAccountDetail> {
+  await prisma.$transaction(async (tx) => {
+    const account = await lockRemovableAccount(tx, accountId, caller, {
+      verb: "deactivate",
+      past: "deactivated",
+    });
+    if (account.status === "DELETED") {
+      throw appError("InvalidAccountState", 409, "This account is already deactivated");
+    }
+    if (account.status === "BLOCKED") {
+      throw appError("InvalidAccountState", 409, "Unblock this account before deactivating it");
+    }
+    await softDeleteInTx(tx, accountId, account, caller.accountId);
+    await writeAudit(tx, {
+      actorAccountId: caller.accountId,
+      action: "account.deactivate",
+      entityType: "account",
+      entityId: accountId,
+      before: { status: account.status },
+      after: { status: "DELETED", reason: input.reason },
+      ip,
+    });
+  });
+  return getAccountDetail(accountId);
+}
+
+// Postgres refuses the delete when kept records still point at the account (RESTRICT keys).
+function isForeignKeyViolation(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const { code, message } = err as { code?: unknown; message?: unknown };
+  if (code === "P2003" || code === "23503") return true;
+  return typeof message === "string" && /foreign key constraint/i.test(message);
+}
+
+/**
+ * Permanently deletes an account (the same delete as DELETE /me/hard-delete) for an admin.
+ * The audit row is written in the same transaction, without the account's email or name. Payment
+ * records and an admin's audit history are kept, so such an account answers 409: block or
+ * deactivate it.
+ */
+export async function hardDeleteAccountAsAdmin(
+  accountId: string,
+  input: AccountActionReasonInput,
+  caller: Caller,
+  ip: string | undefined,
+): Promise<void> {
+  try {
+    await hardDeleteAccount(accountId, {
+      beforeDelete: async (tx) => {
+        const account = await lockRemovableAccount(tx, accountId, caller, {
+          verb: "delete",
+          past: "deleted",
+        });
+        await writeAudit(tx, {
+          actorAccountId: caller.accountId,
+          action: "account.delete",
+          entityType: "account",
+          entityId: accountId,
+          before: { role: account.role, status: account.status },
+          after: { reason: input.reason },
+          ip,
+        });
+      },
+    });
+  } catch (err) {
+    if (isForeignKeyViolation(err)) {
+      throw appError(
+        "InvalidAccountState",
+        409,
+        "This account has payment or admin records that must be kept, so it can't be deleted. Block or deactivate it instead.",
+      );
+    }
+    throw err;
+  }
 }
