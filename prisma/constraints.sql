@@ -746,6 +746,8 @@ ALTER TABLE application ADD CONSTRAINT app_match_score_range
 -- (validated by 20261121000200_payment_attempts_validate).
 -- [phone OTP] require_phone_verification split into require_tutor_phone_verification and
 -- require_student_phone_verification (migration 20261127000100_phone_otp, validated by 20261127000200_phone_otp_validate).
+-- [daily limits] three number keys added by migrations 20261206000100_daily_limits and 20261206000200_daily_limits_validate;
+-- the daily_action table (same migrations) is listed further down with the late tables.
 ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
   CASE key
     WHEN 'require_tutor_verification' THEN jsonb_typeof(value) = 'boolean'
@@ -760,6 +762,19 @@ ALTER TABLE platform_setting ADD CONSTRAINT platform_setting_value_valid CHECK (
     WHEN 'refund_window_days' THEN
       CASE WHEN jsonb_typeof(value) = 'number'
         THEN (value #>> '{}')::numeric BETWEEN 0 AND 90 AND (value #>> '{}')::numeric = trunc((value #>> '{}')::numeric)
+        ELSE false END
+    -- [daily limits] whole counts, 1..1000 (migration 20261206000100_daily_limits)
+    WHEN 'daily_application_limit' THEN
+      CASE WHEN jsonb_typeof(value) = 'number'
+        THEN (value #>> '{}')::numeric BETWEEN 1 AND 1000 AND (value #>> '{}')::numeric = trunc((value #>> '{}')::numeric)
+        ELSE false END
+    WHEN 'daily_package_request_limit' THEN
+      CASE WHEN jsonb_typeof(value) = 'number'
+        THEN (value #>> '{}')::numeric BETWEEN 1 AND 1000 AND (value #>> '{}')::numeric = trunc((value #>> '{}')::numeric)
+        ELSE false END
+    WHEN 'daily_accept_limit' THEN
+      CASE WHEN jsonb_typeof(value) = 'number'
+        THEN (value #>> '{}')::numeric BETWEEN 1 AND 1000 AND (value #>> '{}')::numeric = trunc((value #>> '{}')::numeric)
         ELSE false END
     -- [matching] a JSON object validated by the API (migration 20261128000100_matching)
     WHEN 'matching_config' THEN jsonb_typeof(value) = 'object'
@@ -936,3 +951,54 @@ CREATE TRIGGER session_record_activity_trg AFTER INSERT ON session
 -- ───────────────────────── [admin invites] ─────────────────────────
 -- Migration 20261203000100_admin_invites. The table is created there; the lowercase rule is kept here too.
 ALTER TABLE admin_invite ADD CONSTRAINT admin_invite_email_lower CHECK (email = lower(email));
+
+-- [daily limits] daily_action rows (migrations 20261206000100_daily_limits, validated by 20261206000200_daily_limits_validate).
+-- The table is created there; its kind CHECK is mirrored here.
+ALTER TABLE daily_action ADD CONSTRAINT daily_action_kind_valid CHECK (kind IN ('application', 'package_request', 'accept'));
+
+-- ───────────────────────── [institutions] ─────────────────────────
+-- Migration 20261205000100_institutions. The table and the seed rows are there; these are the rules
+-- Prisma cannot express. Search keys are written only by the trigger.
+ALTER TABLE institution ADD CONSTRAINT institution_name_length CHECK (char_length(btrim("name")) BETWEEN 2 AND 150);
+ALTER TABLE institution ADD CONSTRAINT institution_aliases_count CHECK (cardinality("aliases") <= 20);
+
+-- Lowercase ASCII words, with common Bangla-romanisation variants folded together on both sides.
+CREATE OR REPLACE FUNCTION institution_norm(p text) RETURNS text
+LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE AS $$
+DECLARE
+  s text := lower(coalesce(p, ''));
+BEGIN
+  s := replace(s, '&', ' and ');
+  s := regexp_replace(s, '[^a-z0-9]+', ' ', 'g');
+  s := regexp_replace(s, '\m(government)\M', 'govt', 'g');
+  s := regexp_replace(s, '\m(and|of|the)\M', ' ', 'g');
+  s := replace(replace(replace(replace(replace(s, 'ph', 'f'), 'sh', 's'), 'kh', 'k'), 'gh', 'g'), 'th', 't');
+  s := replace(replace(replace(replace(replace(s, 'dh', 'd'), 'bh', 'b'), 'ch', 'c'), 'jh', 'j'), 'ee', 'i');
+  s := replace(s, 'oo', 'u');
+  s := translate(s, 'qzwvy', 'kjbbi');
+  s := regexp_replace(s, '([a-z])\1+', '\1', 'g');
+  RETURN btrim(regexp_replace(s, '\s+', ' ', 'g'));
+END $$;
+
+CREATE OR REPLACE FUNCTION institution_keys() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.name_key := institution_norm(NEW.name);
+  NEW.alias_keys := ARRAY(
+    SELECT DISTINCT k FROM (SELECT institution_norm(a) AS k FROM unnest(NEW.aliases) AS a) s WHERE k <> '');
+  NEW.search_text := btrim(NEW.name_key || ' ' || array_to_string(NEW.alias_keys, ' '));
+  NEW.initials_key := coalesce((
+    SELECT string_agg(left(w, 1), '' ORDER BY n)
+    FROM unnest(string_to_array(NEW.name_key, ' ')) WITH ORDINALITY AS t(w, n)
+    WHERE w ~ '^[a-z]'), '');
+  RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS institution_keys_trg ON institution;
+CREATE TRIGGER institution_keys_trg BEFORE INSERT OR UPDATE OF "name", "aliases" ON "institution"
+  FOR EACH ROW EXECUTE FUNCTION institution_keys();
+
+CREATE UNIQUE INDEX IF NOT EXISTS institution_eiin_key ON institution (eiin);
+-- One row per name in one area (BANBEIS repeats names across thanas). Unique violation = INSTITUTION_EXISTS.
+CREATE UNIQUE INDEX IF NOT EXISTS institution_name_area_key ON institution (name_key, (coalesce(lower(area), '')));
+CREATE INDEX IF NOT EXISTS institution_search_trgm ON institution USING gin (search_text gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS institution_alias_keys_gin ON institution USING gin (alias_keys);

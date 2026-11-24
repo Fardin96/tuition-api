@@ -127,6 +127,7 @@ describe("GET /applications/:id tutor details for the student (#4 of the follow-
       ratingAvg: 0,
       ratingCount: 0,
       verificationStatus: "NOT_SUBMITTED",
+      verifiedBadge: false,
       avatarUrl: null,
       areas: [{ id: area.id, name: area.name }],
       subjects: [{ id: math.id, name: math.name }],

@@ -25,6 +25,7 @@ import { adminDashboardRoutes } from "./modules/admin/dashboard.routes.js";
 import { adminDisputeRoutes } from "./modules/admin/disputes.routes.js";
 import { adminFeeRoutes } from "./modules/admin/fees.routes.js";
 import { adminFileRoutes } from "./modules/admin/files.routes.js";
+import { adminInstitutionRoutes } from "./modules/admin/institutions.routes.js";
 import { adminMatchingRoutes } from "./modules/admin/matching.routes.js";
 import { adminPackageRoutes } from "./modules/admin/packages.routes.js";
 import { adminPaymentRoutes } from "./modules/admin/payments.routes.js";
@@ -48,6 +49,7 @@ import { disputeRoutes } from "./modules/dispute/dispute.routes.js";
 import { feeRoutes } from "./modules/fees/fee.routes.js";
 import { fileRoutes } from "./modules/files/files.routes.js";
 import { areaRoutes } from "./modules/lookups/areas.routes.js";
+import { institutionRoutes } from "./modules/lookups/institutions.routes.js";
 import { lookupRoutes } from "./modules/lookups/lookups.routes.js";
 import { subjectRoutes } from "./modules/lookups/subjects.routes.js";
 import { notificationRoutes } from "./modules/notification/notification.routes.js";
@@ -178,6 +180,7 @@ export async function buildApp() {
   await app.register(lookupRoutes, { prefix: "/api/v1/lookups" });
   await app.register(areaRoutes, { prefix: "/api/v1/areas" });
   await app.register(subjectRoutes, { prefix: "/api/v1/subjects" });
+  await app.register(institutionRoutes, { prefix: "/api/v1/institutions" });
   await app.register(adminZoneRequestRoutes, { prefix: "/api/v1/admin/zone-limit-requests" });
   await app.register(adminTeamRoutes, { prefix: "/api/v1/admin/admins" });
   await app.register(adminAccountRoutes, { prefix: "/api/v1/admin/accounts" });
@@ -192,6 +195,7 @@ export async function buildApp() {
   await app.register(adminPackageRoutes, { prefix: "/api/v1/admin/packages" });
   await app.register(adminSubjectRoutes, { prefix: "/api/v1/admin/subjects" });
   await app.register(adminAreaRoutes, { prefix: "/api/v1/admin/areas" });
+  await app.register(adminInstitutionRoutes, { prefix: "/api/v1/admin/institutions" });
   await app.register(adminSettingRoutes, { prefix: "/api/v1/admin/settings" });
   // Full paths: /admin/matching/* and /admin/cities/*.
   await app.register(adminMatchingRoutes, { prefix: "/api/v1/admin" });

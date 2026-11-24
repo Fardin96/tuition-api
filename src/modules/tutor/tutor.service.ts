@@ -11,6 +11,7 @@ import { toDistrictCode } from "../../lib/districts.js";
 import { validateTutorCoverage } from "../../lib/education.js";
 import { appError, validationIssuesError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { tutorBadges } from "../../lib/profile-strength.js";
 import type { AuthContext } from "../auth/auth.schema.js";
 import { MAX_TUTOR_CREDENTIALS, MAX_TUTOR_VIDEOS } from "../files/file-policy.js";
 import { claimFile, discardFile, fileUrl, removeObjects } from "../files/files.service.js";
@@ -22,6 +23,7 @@ import {
   type SaveLocationInput,
   upsertLocation,
 } from "../location/location.service.js";
+import { instituteFields } from "../lookups/institutions.service.js";
 import {
   assertPhoneVerifiedForSignup,
   consumeOtp,
@@ -100,6 +102,7 @@ export async function createTutorProfile(
   data: {
     name: string;
     instituteName?: string;
+    institutionId?: number | null;
     address: string;
     emergencyContact: string;
     phoneNumber: string;
@@ -117,11 +120,17 @@ export async function createTutorProfile(
   await assertContactNumbersFree(accountId, numbers);
   const otp = await assertPhoneVerifiedForSignup(prisma, "TUTOR", accountId, data.phoneNumber);
 
-  const { location, ...profileData } = data;
+  const { location, instituteName, institutionId, ...profileData } = data;
   const tutor = await prisma.$transaction(async (tx) => {
+    const institute = await instituteFields(tx, { institutionId, instituteName }, null);
     const created = await tx.tutor
       .create({
-        data: { accountId, ...profileData, phoneVerifiedAt: otp?.verifiedAt ?? null },
+        data: {
+          accountId,
+          ...profileData,
+          ...institute,
+          phoneVerifiedAt: otp?.verifiedAt ?? null,
+        },
       })
       .catch((e: unknown) => mapContactNumberError(e, accountId, numbers));
     if (otp) await consumeOtp(tx, otp.id);
@@ -140,6 +149,7 @@ export async function updateTutorProfile(
   data: Partial<{
     name: string;
     instituteName: string;
+    institutionId: number | null;
     address: string;
     emergencyContact: string;
     phoneNumber: string;
@@ -156,7 +166,7 @@ export async function updateTutorProfile(
   const numbers = { phoneNumber: data.phoneNumber, whatsappNumber: data.whatsappNumber };
   await assertContactNumbersFree(accountId, numbers);
 
-  const { location, ...profileData } = data;
+  const { location, instituteName, institutionId, ...profileData } = data;
   const whatsappChanged =
     data.whatsappNumber !== undefined && data.whatsappNumber !== existing.whatsappNumber;
   const newPhone = data.phoneNumber !== existing.phoneNumber ? data.phoneNumber : undefined;
@@ -166,11 +176,17 @@ export async function updateTutorProfile(
     if (newPhone !== undefined && !otp && (await isPhoneVerificationRequired("TUTOR", tx))) {
       throw appError("PhoneVerificationRequired", 403, "Verify the new number before saving it.");
     }
+    const institute = await instituteFields(
+      tx,
+      { institutionId, instituteName },
+      existing.institutionId,
+    );
     const updated = await tx.tutor
       .update({
         where: { accountId },
         data: {
           ...profileData,
+          ...institute,
           ...(whatsappChanged ? { whatsappVerifiedAt: null } : {}),
           ...(otp ? { phoneVerifiedAt: otp.verifiedAt } : {}),
         },
@@ -430,6 +446,17 @@ function decodeTutorCursor(raw: string): TutorCursor {
   };
 }
 
+export const UNPAGED_SEARCH_MAX = 500;
+
+// One badge query per page, not per row.
+async function withBadges<T extends { id: string }>(rows: T[]) {
+  const badges = await tutorBadges(
+    prisma,
+    rows.map((r) => r.id),
+  );
+  return rows.map((r) => ({ ...r, verifiedBadge: badges.get(r.id) ?? false }));
+}
+
 export async function searchTutors(filters: {
   area?: number;
   subject?: number;
@@ -466,8 +493,10 @@ export async function searchTutors(filters: {
       where,
       orderBy: TUTOR_SEARCH_ORDER,
       select: tutorPublicSelect,
+      // Without a page size the list was unbounded, and every row now costs a badge lookup.
+      take: UNPAGED_SEARCH_MAX,
     });
-    return { rows: await Promise.all(rows.map(withAvatarUrl)), nextCursor: null };
+    return { rows: await withBadges(await Promise.all(rows.map(withAvatarUrl))), nextCursor: null };
   }
 
   const cursor = filters.cursor !== undefined ? decodeTutorCursor(filters.cursor) : undefined;
@@ -504,7 +533,7 @@ export async function searchTutors(filters: {
   const page = rows.slice(0, limit);
   const last = page[page.length - 1];
   return {
-    rows: await Promise.all(page.map(withAvatarUrl)),
+    rows: await withBadges(await Promise.all(page.map(withAvatarUrl))),
     nextCursor:
       rows.length > limit && last
         ? encodeTutorCursor({
@@ -564,18 +593,25 @@ export async function getPublicTutorProfile(tutorId: string, viewer?: AuthContex
   if (!tutor.isListed && !(await canSeeUnlistedTutor({ id: tutor.id, accountId }, viewer))) {
     return null;
   }
+  const [avatarUrl, needsReaddress, badges, videos] = await Promise.all([
+    avatarUrlFor(account),
+    getTutorNeedsReaddress(tutor.id),
+    tutorBadges(prisma, [tutor.id]),
+    Promise.all(tutor.videos.map(publicVideoFields)),
+  ]);
   return {
     isListed: tutor.isListed,
     profile: {
       ...tutor,
-      avatarUrl: await avatarUrlFor(account),
+      avatarUrl,
       ratingAvg: toNumber(tutor.ratingAvg),
       createdAt: tutor.createdAt.toISOString(),
       updatedAt: tutor.updatedAt.toISOString(),
-      needsReaddress: await getTutorNeedsReaddress(tutor.id),
+      needsReaddress,
+      verifiedBadge: badges.get(tutor.id) ?? false,
       areas: tutor.areas.map((a) => a.area),
       subjects: tutor.subjects.map((s) => s.subject),
-      videos: await Promise.all(tutor.videos.map(publicVideoFields)),
+      videos,
     },
   };
 }
@@ -602,7 +638,7 @@ export async function addNearbyCardFields<T extends { id: string }>(tutors: T[])
       };
     }),
   );
-  return cards.filter((card) => card !== null);
+  return withBadges(cards.filter((card) => card !== null));
 }
 
 // One page of visible reviews students wrote about the tutor, with the rating summary. Null when there is no such tutor.

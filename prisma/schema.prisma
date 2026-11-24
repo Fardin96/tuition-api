@@ -508,6 +508,18 @@ model SuperAdminEmail {
   @@map("super_admin_email")
 }
 
+// One row per send or accept inside the rolling 24-hour daily limits (application/daily-limits.ts).
+// The check prunes rows older than 24 hours. CHECK kind in migration 20261206000100_daily_limits.
+model DailyAction {
+  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  partyId String   @map("party_id") @db.Uuid
+  kind    String
+  at      DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([partyId, kind, at], map: "daily_action_party_kind_at_idx")
+  @@map("daily_action")
+}
+
 // Open invites only: accepting or revoking deletes the row (audit_log keeps the history).
 model AdminInvite {
   id          String   @id @default(uuid(7)) @db.Uuid
@@ -656,6 +668,40 @@ model FileAsset {
   @@map("file_asset")
 }
 
+// ───────────────────────── institutions ─────────────────────────
+
+enum InstitutionKind {
+  SCHOOL
+  COLLEGE
+  SCHOOL_AND_COLLEGE
+  UNIVERSITY
+}
+
+// Schools, colleges and universities to pick from (migration 20261205000100_institutions seeds the
+// defaults; super admins edit them). name_key, alias_keys and search_text are written only by the
+// institution_keys trigger (institution_norm()). Search indexes live in the migration and constraints.sql.
+model Institution {
+  id           Int                  @id @default(autoincrement())
+  name         String
+  kind         InstitutionKind
+  district     String?
+  area         String?
+  eiin         String?              @unique
+  aliases      String[]             @default([])
+  popularity   Int                  @default(0) @db.SmallInt
+  isActive     Boolean              @default(true) @map("is_active")
+  nameKey      String               @default("") @map("name_key")
+  aliasKeys    String[]             @default([]) @map("alias_keys")
+  searchText   String               @default("") @map("search_text")
+  initialsKey  String               @default("") @map("initials_key")
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime             @updatedAt @map("updated_at") @db.Timestamptz(3)
+  tutors       Tutor[]
+  requirements TuitionRequirement[]
+
+  @@map("institution")
+}
+
 // ───────────────────────── profiles ─────────────────────────
 
 model Student {
@@ -716,7 +762,8 @@ model Tutor {
   studentIdNumber    String?            @map("student_id_number") // required only when submitting verification (#32)
   gender             Gender
   parentsInfo        String?            @map("parents_info")
-  instituteName      String?            @map("institute_name") // university or college; 1-120 chars (API)
+  instituteName      String?            @map("institute_name") // university or college; 1-150 chars (API); the text shown
+  institutionId      Int?               @map("institution_id") // the picked institution, null for free text
   zoneLimit          Int                @default(5) @map("zone_limit") @db.SmallInt
   // Denormalised current state, kept in step by trigger from tutor_verification (latest row).
   verificationStatus VerificationStatus @default(NOT_SUBMITTED) @map("verification_status")
@@ -739,6 +786,7 @@ model Tutor {
   fees          PlatformFee[]
   reviews       Review[]            @relation("ReviewTutor")
   location      TutorLocation?
+  institution   Institution?        @relation(fields: [institutionId], references: [id], onDelete: SetNull)
 
   requirements      TutorRequirement[]
   zones             TutorZone[]
@@ -751,6 +799,7 @@ model Tutor {
   @@unique([accountId, role])
   @@index([isListed, ratingAvg(sort: Desc)])
   @@index([isListed, gender])
+  @@index([institutionId])
   @@map("tutor")
 }
 
@@ -1007,6 +1056,7 @@ model TuitionRequirement {
   hireByDate       DateTime?         @map("hire_by_date") @db.Date
   tutorGenderPref  GenderPref        @default(ANY) @map("tutor_gender_pref")
   instituteName    String?           @map("institute_name")
+  institutionId    Int?              @map("institution_id") // the picked institution, null for free text
   tuitionType      String?           @map("tuition_type") @db.VarChar(30)
   status           ListingStatus     @default(OPEN)
   createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -1014,6 +1064,7 @@ model TuitionRequirement {
 
   student      Student              @relation(fields: [studentId], references: [id])
   area         Area?                @relation(fields: [areaId], references: [id], onDelete: Restrict)
+  institution  Institution?         @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   subjects     RequirementSubject[]
   applications Application[]
   invites      RequirementInvite[]
@@ -1021,6 +1072,7 @@ model TuitionRequirement {
 
   @@index([studentId, createdAt(sort: Desc)])
   @@index([status, curriculum, levelCode, areaId, createdAt(sort: Desc)])
+  @@index([institutionId])
   @@map("tuition_requirement")
 }
 

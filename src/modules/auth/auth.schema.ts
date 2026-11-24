@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Role } from "../../generated/prisma/enums.js";
+import { PROFILE_ITEM_KEYS } from "../../lib/profile-strength.js";
 
 export const roleSchema = z.enum(["STUDENT", "TUTOR", "ADMIN"] as const);
 
@@ -153,6 +154,7 @@ const meTutorSchema = z
     role: roleSchema,
     name: z.string(),
     instituteName: z.string().nullable(),
+    institutionId: z.number().nullable(),
     address: z.string(),
     emergencyContact: z.string().nullable(),
     whatsappNumber: z.string().nullable(),
@@ -190,6 +192,19 @@ const meAdminUserSchema = z
   })
   .meta({ id: "MeAdminUser" });
 
+export const profileStrengthSchema = z
+  .object({
+    percent: z.number(),
+    complete: z.boolean(),
+    completeAt: z.number(),
+    verifiedBadge: z.boolean(),
+    badgeAt: z.number(),
+    items: z.array(
+      z.object({ key: z.enum(PROFILE_ITEM_KEYS), weight: z.number(), done: z.boolean() }),
+    ),
+  })
+  .meta({ id: "ProfileStrength" });
+
 const meAccountSchema = z
   .object({
     id: z.string().uuid(),
@@ -207,6 +222,7 @@ const meAccountSchema = z
     student: meStudentSchema.optional(),
     tutor: meTutorSchema.optional(),
     applyReadiness: applyReadinessSchema.optional(),
+    profileStrength: profileStrengthSchema.optional(),
   })
   .meta({ id: "MeAccount" });
 

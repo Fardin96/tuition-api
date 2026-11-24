@@ -182,11 +182,11 @@ describe("tutor routes", () => {
         method: "POST",
         url: "/api/v1/tutors/me",
         headers: await getAuthHeaders(account),
-        payload: tutorPayload({ instituteName: "x".repeat(120) }),
+        payload: tutorPayload({ instituteName: "x".repeat(150) }),
       });
 
       expect(res.statusCode).toBe(201);
-      expect(JSON.parse(res.body).instituteName).toHaveLength(120);
+      expect(JSON.parse(res.body).instituteName).toHaveLength(150);
     });
 
     it("keeps the profile valid without an institute name (older web builds)", async () => {
@@ -204,7 +204,7 @@ describe("tutor routes", () => {
       expect(JSON.parse(res.body).instituteName).toBeNull();
     });
 
-    it("rejects an institute name over 120 characters (400)", async () => {
+    it("rejects an institute name over 150 characters (400)", async () => {
       const app = await createTestApp();
       const account = await createAccount({ role: "TUTOR" });
 
@@ -212,7 +212,7 @@ describe("tutor routes", () => {
         method: "POST",
         url: "/api/v1/tutors/me",
         headers: await getAuthHeaders(account),
-        payload: tutorPayload({ instituteName: "x".repeat(121) }),
+        payload: tutorPayload({ instituteName: "x".repeat(151) }),
       });
 
       expect(res.statusCode).toBe(400);
@@ -321,7 +321,7 @@ describe("tutor routes", () => {
         method: "PATCH",
         url: "/api/v1/tutors/me",
         headers,
-        payload: { instituteName: "x".repeat(121) },
+        payload: { instituteName: "x".repeat(151) },
       });
 
       expect(blank.statusCode).toBe(400);
@@ -977,6 +977,7 @@ describe("tutor routes", () => {
       );
       expect(card.subjects).toEqual([{ id: subject.id, name: "Physics" }]);
       expect(card.distanceMeters).toBeLessThan(2000);
+      expect(card.verifiedBadge).toBe(false);
     });
 
     it("keeps distance order and gives each tutor only its own areas and subjects", async () => {
@@ -3928,5 +3929,199 @@ describe("home page consent for my videos", () => {
 
     expect(res.statusCode).toBe(204);
     expect(await prisma.siteContent.count({ where: { key: "showcase" } })).toBe(0);
+  });
+});
+
+describe("tutor institution pick (institutionId)", () => {
+  it("stores the canonical name of a picked institution, ignoring the typed text", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: tutorPayload({ instituteName: "Dhaka Uni", institutionId: 1 }),
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(JSON.parse(res.body)).toMatchObject({
+      institutionId: 1,
+      instituteName: "University of Dhaka",
+    });
+  });
+
+  it("saves typed text unlinked when only the text is sent", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(account.id, { instituteName: "University of Dhaka" });
+    await prisma.tutor.update({
+      where: { accountId: account.id },
+      data: { institutionId: 1 },
+    });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { instituteName: "My own college" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      institutionId: null,
+      instituteName: "My own college",
+    });
+  });
+
+  it("unlinks on institutionId null and keeps the text it sends", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(account.id, { instituteName: "University of Dhaka" });
+    await prisma.tutor.update({ where: { accountId: account.id }, data: { institutionId: 1 } });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { institutionId: null, instituteName: "Dhaka University" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      institutionId: null,
+      instituteName: "Dhaka University",
+    });
+  });
+
+  it("leaves the link unchanged when neither field is sent", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(account.id, { instituteName: "University of Dhaka" });
+    await prisma.tutor.update({ where: { accountId: account.id }, data: { institutionId: 1 } });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { address: "New Address 1" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({ institutionId: 1 });
+  });
+
+  it("answers 400 on institutionId for an unknown or inactive id", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const inactive = await prisma.institution.create({
+      data: { name: `Retired ${crypto.randomUUID()}`, kind: "SCHOOL", isActive: false },
+    });
+
+    for (const institutionId of [999999, inactive.id]) {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/tutors/me",
+        headers: await getAuthHeaders(account),
+        payload: tutorPayload({ institutionId }),
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).issues).toEqual([
+        { path: ["institutionId"], message: "Pick a school or university from the list." },
+      ]);
+    }
+    expect(await prisma.tutor.count({ where: { accountId: account.id } })).toBe(0);
+  });
+});
+
+describe("tutor institution link rules", () => {
+  it("keeps the link to a since-hidden institution when the same id is sent again", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const hidden = await prisma.institution.create({
+      data: { name: `Hidden ${crypto.randomUUID()}`, kind: "COLLEGE", isActive: false },
+    });
+    await createTutorProfile(account.id, { instituteName: hidden.name });
+    await prisma.tutor.update({
+      where: { accountId: account.id },
+      data: { institutionId: hidden.id },
+    });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { institutionId: hidden.id, address: "Another Road 2" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      institutionId: hidden.id,
+      instituteName: hidden.name,
+    });
+  });
+
+  it("links typed text that exactly names one active institution", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: tutorPayload({ instituteName: "University of Dhaka" }),
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(JSON.parse(res.body)).toMatchObject({
+      institutionId: 1,
+      instituteName: "University of Dhaka",
+    });
+  });
+
+  it("the web's shape, institutionId null with exact typed text, links the institution", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    await createTutorProfile(account.id, { instituteName: "Old text" });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { institutionId: null, instituteName: "BRAC University" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      institutionId: 79,
+      instituteName: "BRAC University",
+    });
+  });
+
+  it("the web's hidden-link shape, same institutionId with its name, still saves", async () => {
+    const app = await createTestApp();
+    const account = await createAccount({ role: "TUTOR" });
+    const hidden = await prisma.institution.create({
+      data: { name: `Hidden ${crypto.randomUUID()}`, kind: "COLLEGE", isActive: false },
+    });
+    await createTutorProfile(account.id, { instituteName: hidden.name });
+    await prisma.tutor.update({
+      where: { accountId: account.id },
+      data: { institutionId: hidden.id },
+    });
+
+    const res = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/tutors/me",
+      headers: await getAuthHeaders(account),
+      payload: { institutionId: hidden.id, instituteName: hidden.name, address: "Web Road 3" },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toMatchObject({
+      institutionId: hidden.id,
+      instituteName: hidden.name,
+    });
   });
 });

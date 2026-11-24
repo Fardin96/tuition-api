@@ -59,7 +59,7 @@ describe("admin platform settings", () => {
       expect(res.statusCode).toBe(403);
     });
 
-    it("lists the seven known settings in order, with defaults for missing rows", async () => {
+    it("lists the ten known settings in order, with defaults for missing rows", async () => {
       const app = await createTestApp();
       const admin = await createAdmin({ status: "ACTIVE" });
 
@@ -76,6 +76,9 @@ describe("admin platform settings", () => {
         "gateway_charge_percent",
         "online_payments_enabled",
         "refund_window_days",
+        "daily_application_limit",
+        "daily_package_request_limit",
+        "daily_accept_limit",
         "require_tutor_verification",
         "require_tutor_phone_verification",
         "require_student_phone_verification",
@@ -87,7 +90,17 @@ describe("admin platform settings", () => {
         updatedAt: null,
         updatedByName: null,
       });
-      expect(body.settings.slice(1).map((s) => s.value)).toEqual([0, true, 7, false, false, false]);
+      expect(body.settings.slice(1).map((s) => s.value)).toEqual([
+        0,
+        true,
+        7,
+        50,
+        20,
+        20,
+        false,
+        false,
+        false,
+      ]);
     });
 
     it("sends Cache-Control private, no-store", async () => {
@@ -159,6 +172,15 @@ describe("admin platform settings", () => {
       ["refund_window_days", 91],
       ["refund_window_days", -1],
       ["refund_window_days", "7"],
+      ["daily_application_limit", 0],
+      ["daily_application_limit", 1001],
+      ["daily_application_limit", 1.5],
+      ["daily_package_request_limit", 0],
+      ["daily_package_request_limit", 1001],
+      ["daily_package_request_limit", 1.5],
+      ["daily_accept_limit", 0],
+      ["daily_accept_limit", 1001],
+      ["daily_accept_limit", 1.5],
       ["online_payments_enabled", 1],
       ["online_payments_enabled", "true"],
       ["require_tutor_verification", 1],
@@ -324,8 +346,30 @@ describe("admin platform settings", () => {
       const body = JSON.parse(res.body);
       expect(body.message).toBe("Invalid setting value");
       expect(body.issues).toEqual([
-        { path: ["value"], message: "refund_window_days must be a whole number of days" },
+        { path: ["value"], message: "refund_window_days must be a whole number" },
       ]);
+    });
+
+    it("accepts the daily limits as whole counts from 1 to 1000", async () => {
+      const app = await createTestApp();
+      const superAdmin = await createSuperAdmin();
+      const headers = await getAuthHeaders(superAdmin);
+
+      for (const key of [
+        "daily_application_limit",
+        "daily_package_request_limit",
+        "daily_accept_limit",
+      ]) {
+        for (const value of [1, 30, 1000]) {
+          const res = await app.inject({
+            method: "PUT",
+            url: `${URL}/${key}`,
+            headers,
+            payload: { value },
+          });
+          expect(res.statusCode, `${key} ${value}`).toBe(200);
+        }
+      }
     });
 
     it("saves refund_window_days and lists it back between the switches", async () => {
@@ -403,7 +447,7 @@ describe("admin platform settings", () => {
 
       const list = await app.inject({ method: "GET", url: URL, headers });
       const settings = JSON.parse(list.body).settings as Setting[];
-      expect(settings.slice(4).map((s) => [s.key, s.value])).toEqual([
+      expect(settings.slice(7).map((s) => [s.key, s.value])).toEqual([
         ["require_tutor_verification", false],
         ["require_tutor_phone_verification", true],
         ["require_student_phone_verification", false],

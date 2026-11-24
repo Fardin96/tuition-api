@@ -76,6 +76,8 @@ export const ERROR_CODES = {
   StoryLimitReached: "STORY_LIMIT_REACHED",
   StoryPending: "STORY_PENDING",
   StoryAlreadyModerated: "STORY_ALREADY_MODERATED",
+  DailyLimitReached: "DAILY_LIMIT_REACHED",
+  InstitutionExists: "INSTITUTION_EXISTS",
 } as const;
 
 export type ErrorName = keyof typeof ERROR_CODES;

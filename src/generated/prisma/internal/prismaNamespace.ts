@@ -403,6 +403,7 @@ export const ModelName = {
   AdminDashboardLayout: 'AdminDashboardLayout',
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
+  DailyAction: 'DailyAction',
   AdminInvite: 'AdminInvite',
   AccountBlock: 'AccountBlock',
   UploadReview: 'UploadReview',
@@ -410,6 +411,7 @@ export const ModelName = {
   Area: 'Area',
   Subject: 'Subject',
   FileAsset: 'FileAsset',
+  Institution: 'Institution',
   Student: 'Student',
   Tutor: 'Tutor',
   TutorLocation: 'TutorLocation',
@@ -465,7 +467,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "accountActivityDay" | "adminDashboardLayout" | "adminUser" | "superAdminEmail" | "adminInvite" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "story" | "siteContent" | "siteContentFile" | "platformSetting" | "auditLog"
+    modelProps: "account" | "session" | "accountActivityDay" | "adminDashboardLayout" | "adminUser" | "superAdminEmail" | "dailyAction" | "adminInvite" | "accountBlock" | "uploadReview" | "uploadBlock" | "area" | "subject" | "fileAsset" | "institution" | "student" | "tutor" | "tutorLocation" | "studentLocation" | "tutorArea" | "tutorSubject" | "tutorVerification" | "tutorCredential" | "tutorVideo" | "tutorRequirement" | "tutorRequirementSubject" | "tutorZone" | "tutorRequirementZone" | "zoneLimitRequest" | "tuitionRequirement" | "requirementSubject" | "requirementInvite" | "city" | "tuitionPackage" | "packageSubject" | "packageZone" | "application" | "review" | "report" | "dispute" | "platformFee" | "feePayment" | "paymentAttempt" | "paymentRefund" | "phoneOtp" | "promoCode" | "promoRedemption" | "notificationLog" | "appNotification" | "blogPost" | "story" | "siteContent" | "siteContentFile" | "platformSetting" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -910,6 +912,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SuperAdminEmailCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SuperAdminEmailCountAggregateOutputType> | number
+        }
+      }
+    }
+    DailyAction: {
+      payload: Prisma.$DailyActionPayload<ExtArgs>
+      fields: Prisma.DailyActionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DailyActionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DailyActionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>
+        }
+        findFirst: {
+          args: Prisma.DailyActionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DailyActionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>
+        }
+        findMany: {
+          args: Prisma.DailyActionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>[]
+        }
+        create: {
+          args: Prisma.DailyActionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>
+        }
+        createMany: {
+          args: Prisma.DailyActionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DailyActionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>[]
+        }
+        delete: {
+          args: Prisma.DailyActionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>
+        }
+        update: {
+          args: Prisma.DailyActionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>
+        }
+        deleteMany: {
+          args: Prisma.DailyActionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DailyActionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DailyActionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>[]
+        }
+        upsert: {
+          args: Prisma.DailyActionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyActionPayload>
+        }
+        aggregate: {
+          args: Prisma.DailyActionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDailyAction>
+        }
+        groupBy: {
+          args: Prisma.DailyActionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyActionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DailyActionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyActionCountAggregateOutputType> | number
         }
       }
     }
@@ -1428,6 +1504,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.FileAssetCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.FileAssetCountAggregateOutputType> | number
+        }
+      }
+    }
+    Institution: {
+      payload: Prisma.$InstitutionPayload<ExtArgs>
+      fields: Prisma.InstitutionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InstitutionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InstitutionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>
+        }
+        findFirst: {
+          args: Prisma.InstitutionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InstitutionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>
+        }
+        findMany: {
+          args: Prisma.InstitutionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>[]
+        }
+        create: {
+          args: Prisma.InstitutionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>
+        }
+        createMany: {
+          args: Prisma.InstitutionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InstitutionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>[]
+        }
+        delete: {
+          args: Prisma.InstitutionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>
+        }
+        update: {
+          args: Prisma.InstitutionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>
+        }
+        deleteMany: {
+          args: Prisma.InstitutionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InstitutionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InstitutionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>[]
+        }
+        upsert: {
+          args: Prisma.InstitutionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstitutionPayload>
+        }
+        aggregate: {
+          args: Prisma.InstitutionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInstitution>
+        }
+        groupBy: {
+          args: Prisma.InstitutionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InstitutionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InstitutionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InstitutionCountAggregateOutputType> | number
         }
       }
     }
@@ -4506,6 +4656,16 @@ export const SuperAdminEmailScalarFieldEnum = {
 export type SuperAdminEmailScalarFieldEnum = (typeof SuperAdminEmailScalarFieldEnum)[keyof typeof SuperAdminEmailScalarFieldEnum]
 
 
+export const DailyActionScalarFieldEnum = {
+  id: 'id',
+  partyId: 'partyId',
+  kind: 'kind',
+  at: 'at'
+} as const
+
+export type DailyActionScalarFieldEnum = (typeof DailyActionScalarFieldEnum)[keyof typeof DailyActionScalarFieldEnum]
+
+
 export const AdminInviteScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -4604,6 +4764,27 @@ export const FileAssetScalarFieldEnum = {
 export type FileAssetScalarFieldEnum = (typeof FileAssetScalarFieldEnum)[keyof typeof FileAssetScalarFieldEnum]
 
 
+export const InstitutionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  kind: 'kind',
+  district: 'district',
+  area: 'area',
+  eiin: 'eiin',
+  aliases: 'aliases',
+  popularity: 'popularity',
+  isActive: 'isActive',
+  nameKey: 'nameKey',
+  aliasKeys: 'aliasKeys',
+  searchText: 'searchText',
+  initialsKey: 'initialsKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InstitutionScalarFieldEnum = (typeof InstitutionScalarFieldEnum)[keyof typeof InstitutionScalarFieldEnum]
+
+
 export const StudentScalarFieldEnum = {
   id: 'id',
   accountId: 'accountId',
@@ -4648,6 +4829,7 @@ export const TutorScalarFieldEnum = {
   gender: 'gender',
   parentsInfo: 'parentsInfo',
   instituteName: 'instituteName',
+  institutionId: 'institutionId',
   zoneLimit: 'zoneLimit',
   verificationStatus: 'verificationStatus',
   isListed: 'isListed',
@@ -4843,6 +5025,7 @@ export const TuitionRequirementScalarFieldEnum = {
   hireByDate: 'hireByDate',
   tutorGenderPref: 'tutorGenderPref',
   instituteName: 'instituteName',
+  institutionId: 'institutionId',
   tuitionType: 'tuitionType',
   status: 'status',
   createdAt: 'createdAt',
@@ -5468,6 +5651,20 @@ export type EnumFileStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'FileStatus[]'
  */
 export type ListEnumFileStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FileStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'InstitutionKind'
+ */
+export type EnumInstitutionKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InstitutionKind'>
+    
+
+
+/**
+ * Reference to a field of type 'InstitutionKind[]'
+ */
+export type ListEnumInstitutionKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InstitutionKind[]'>
     
 
 
@@ -6117,6 +6314,7 @@ export type GlobalOmitConfig = {
   adminDashboardLayout?: Prisma.AdminDashboardLayoutOmit
   adminUser?: Prisma.AdminUserOmit
   superAdminEmail?: Prisma.SuperAdminEmailOmit
+  dailyAction?: Prisma.DailyActionOmit
   adminInvite?: Prisma.AdminInviteOmit
   accountBlock?: Prisma.AccountBlockOmit
   uploadReview?: Prisma.UploadReviewOmit
@@ -6124,6 +6322,7 @@ export type GlobalOmitConfig = {
   area?: Prisma.AreaOmit
   subject?: Prisma.SubjectOmit
   fileAsset?: Prisma.FileAssetOmit
+  institution?: Prisma.InstitutionOmit
   student?: Prisma.StudentOmit
   tutor?: Prisma.TutorOmit
   tutorLocation?: Prisma.TutorLocationOmit

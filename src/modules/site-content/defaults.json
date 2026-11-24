@@ -41,7 +41,7 @@
     ],
     "cta": {
       "label": "Register Now",
-      "href": "/sign-in"
+      "href": "/sign-up"
     }
   },
   "categories": {
@@ -287,7 +287,7 @@
     "text": "Discover trusted, subject-specialist mentors tailored to your syllabus, learning pace, and academic goals.",
     "cta": {
       "label": "Get Started",
-      "href": "/sign-in"
+      "href": "/sign-up?role=student"
     }
   },
   "footer": {
