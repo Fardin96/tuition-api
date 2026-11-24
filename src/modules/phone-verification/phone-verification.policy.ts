@@ -77,6 +77,22 @@ export async function consumeOtp(db: Db, id: string): Promise<void> {
   }
 }
 
+// Listing and placement gate: the profile must have a verified phone when the admin switch is on.
+export async function assertPhoneVerified(
+  db: Db,
+  role: "STUDENT" | "TUTOR",
+  profileId: string,
+  message: string,
+): Promise<void> {
+  if (!(await isPhoneVerificationRequired(role, db))) return;
+  const profile =
+    role === "STUDENT"
+      ? await db.student.findUnique({ where: { id: profileId }, select: { phoneVerifiedAt: true } })
+      : await db.tutor.findUnique({ where: { id: profileId }, select: { phoneVerifiedAt: true } });
+  if (profile?.phoneVerifiedAt) return;
+  throw appError("PhoneVerificationRequired", 403, message);
+}
+
 // Sign-up gate. Returns the verified code to spend, or null when none is needed.
 export async function assertPhoneVerifiedForSignup(
   db: Db,

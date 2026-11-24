@@ -343,23 +343,29 @@ async function alertStudents(
   });
 }
 
+// Readiness comes from SQL tutor_missing_requirements(); never duplicate those checks here.
+// A package carries its own subjects and zones, so the default requirement set does not count.
+async function assertPackageReadiness(
+  db: Prisma.TransactionClient | typeof prisma,
+  tutorId: string,
+  message: string,
+) {
+  const [readiness] = await db.$queryRaw<{ missing: string[] }[]>`
+    SELECT tutor_missing_requirements(${tutorId}::uuid) AS missing
+  `;
+  const missing = (readiness?.missing ?? []).filter((key) => key !== "default_requirement");
+  if (missing.length > 0) {
+    throw appError("ProfileIncomplete", 403, message, { missing });
+  }
+}
+
 export async function createPackage(
   account: AuthContext,
   input: CreatePackageInput,
 ): Promise<PackageResponse> {
   const tutorId = await findTutorId(account.accountId);
 
-  // Readiness comes from SQL tutor_missing_requirements(); never duplicate those checks here.
-  // A package carries its own subjects and zones, so the default requirement set does not count.
-  const [readiness] = await prisma.$queryRaw<{ missing: string[] }[]>`
-    SELECT tutor_missing_requirements(${tutorId}::uuid) AS missing
-  `;
-  const missing = (readiness?.missing ?? []).filter((key) => key !== "default_requirement");
-  if (missing.length > 0) {
-    throw appError("ProfileIncomplete", 403, "Complete your profile before creating a package", {
-      missing,
-    });
-  }
+  await assertPackageReadiness(prisma, tutorId, "Complete your profile before creating a package");
 
   const { subjectIds, zoneIds, syncProfileSubjects, timeFrom, timeTo, availableFrom, ...values } =
     input;
@@ -477,6 +483,15 @@ export async function updatePackage(
     };
     const issues = packageRuleIssues(merged);
     if (issues.length > 0) throw validationIssuesError("Invalid package", issues);
+
+    // Editing a rejected package resubmits it, so it needs the same readiness as a new one.
+    if (existing.moderationStatus === "REJECTED") {
+      await assertPackageReadiness(
+        tx,
+        tutorId,
+        "Complete your profile before resubmitting a package",
+      );
+    }
 
     if (subjectIds !== undefined) {
       await prepareSetSubjects(tx, tutorId, subjectIds, syncProfileSubjects === true);

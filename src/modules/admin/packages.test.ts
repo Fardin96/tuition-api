@@ -425,6 +425,10 @@ describe("admin package moderation", () => {
     it("editing a REJECTED package resubmits it as PENDING and clears the note", async () => {
       const app = await createTestApp();
       const { tutor, account } = await setupTutor();
+      // A resubmit passes the same profile gate as creating a package.
+      await setTutorLocation(tutor.id);
+      const area = await createArea();
+      await prisma.tutorArea.create({ data: { tutorId: tutor.id, areaId: area.id } });
       const pkg = await createTuitionPackage(tutor.id, {
         moderationStatus: "REJECTED",
         moderationNote: "x",

@@ -1185,3 +1185,262 @@ describe("reads", () => {
     expect(await list("?initiatedBy=TUTOR")).toEqual([]);
   });
 });
+
+describe("phone verification gate on placement actions", () => {
+  const MESSAGE_BY_ACTION = {
+    request: "Verify your phone number before requesting a package.",
+    accept: "Verify your phone number before accepting.",
+    resend: "Verify your phone number before sending this again.",
+  };
+
+  async function listedPackage() {
+    const { tutor, actor } = await createPlainTutor();
+    await prisma.tutor.update({ where: { id: tutor.id }, data: { isListed: true } });
+    const pkg = await createTuitionPackage(tutor.id);
+    return { tutor, actor, pkg };
+  }
+
+  async function verify(id: string, role: "tutor" | "student") {
+    if (role === "tutor") {
+      await prisma.tutor.update({ where: { id }, data: { phoneVerifiedAt: new Date() } });
+    } else {
+      await prisma.student.update({ where: { id }, data: { phoneVerifiedAt: new Date() } });
+    }
+  }
+
+  async function dailyRows(partyId: string) {
+    return prisma.dailyAction.count({ where: { partyId } });
+  }
+
+  // Whole-table counts; each test starts from an empty database.
+  async function notificationTotals() {
+    return {
+      outbox: await prisma.notificationLog.count(),
+      inApp: await prisma.appNotification.count(),
+    };
+  }
+
+  it("requesting a package needs a verified student phone when the switch is on", async () => {
+    const app = await createTestApp();
+    const { pkg } = await listedPackage();
+    const { student, actor } = await createStudent();
+    await setPlatformSetting("require_student_phone_verification", true);
+    const url = `${BASE}/packages/${pkg.id}/applications`;
+    const before = await notificationTotals();
+
+    const blocked = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(blocked.statusCode).toBe(403);
+    expect(JSON.parse(blocked.body)).toMatchObject({
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: MESSAGE_BY_ACTION.request,
+    });
+    expect(await prisma.application.count({ where: { studentId: student.id } })).toBe(0);
+    expect(await dailyRows(student.id)).toBe(0);
+    expect(await notificationTotals()).toEqual(before);
+
+    await verify(student.id, "student");
+    const passed = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(passed.statusCode).toBe(201);
+  });
+
+  it("requesting a package works with the student switch off and the phone unverified", async () => {
+    const app = await createTestApp();
+    const { pkg } = await listedPackage();
+    const { actor } = await createStudent();
+    await setPlatformSetting("require_student_phone_verification", false);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/packages/${pkg.id}/applications`,
+      headers: actor.headers,
+    });
+    expect(res.statusCode).toBe(201);
+  });
+
+  it("a tutor confirming a package request needs a verified tutor phone when the switch is on", async () => {
+    const app = await createTestApp();
+    const { tutor, actor, pkg } = await listedPackage();
+    const { student } = await createStudent();
+    const application = await createApplication({
+      packageId: pkg.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+    });
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    const url = `${BASE}/applications/${application.id}/confirm`;
+    const before = await notificationTotals();
+
+    const blocked = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(blocked.statusCode).toBe(403);
+    expect(JSON.parse(blocked.body)).toMatchObject({
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: MESSAGE_BY_ACTION.accept,
+    });
+    expect((await statusOf(application.id)).status).toBe("PENDING");
+    expect(await dailyRows(tutor.id)).toBe(0);
+    expect(await notificationTotals()).toEqual(before);
+
+    await verify(tutor.id, "tutor");
+    const passed = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(passed.statusCode).toBe(200);
+    expect((await statusOf(application.id)).status).toBe("CONFIRMED");
+  });
+
+  it("a tutor confirming works with the tutor switch off and the phone unverified", async () => {
+    const app = await createTestApp();
+    const { tutor, actor, pkg } = await listedPackage();
+    const { student } = await createStudent();
+    const application = await createApplication({
+      packageId: pkg.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+    });
+    await setPlatformSetting("require_tutor_phone_verification", false);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/applications/${application.id}/confirm`,
+      headers: actor.headers,
+    });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it("a student confirming a tutor's application needs a verified student phone when the switch is on", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    const requirement = await createRequirement({ studentId: student.id });
+    const { tutor } = await createPlainTutor();
+    const application = await createApplication({
+      requirementId: requirement.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "TUTOR",
+    });
+    await setPlatformSetting("require_student_phone_verification", true);
+    const url = `${BASE}/applications/${application.id}/confirm`;
+    const before = await notificationTotals();
+
+    const blocked = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(blocked.statusCode).toBe(403);
+    expect(JSON.parse(blocked.body)).toMatchObject({
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: MESSAGE_BY_ACTION.accept,
+    });
+    expect((await statusOf(application.id)).status).toBe("PENDING");
+    expect(await dailyRows(student.id)).toBe(0);
+    expect(await notificationTotals()).toEqual(before);
+
+    await verify(student.id, "student");
+    const passed = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(passed.statusCode).toBe(200);
+    expect((await statusOf(application.id)).status).toBe("CONFIRMED");
+  });
+
+  it("a student confirming works with the student switch off and the phone unverified", async () => {
+    const app = await createTestApp();
+    const { student, actor } = await createStudent();
+    const requirement = await createRequirement({ studentId: student.id });
+    const { tutor } = await createPlainTutor();
+    const application = await createApplication({
+      requirementId: requirement.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "TUTOR",
+    });
+    await setPlatformSetting("require_student_phone_verification", false);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/applications/${application.id}/confirm`,
+      headers: actor.headers,
+    });
+    expect(res.statusCode).toBe(200);
+    expect((await statusOf(application.id)).status).toBe("CONFIRMED");
+  });
+
+  it("a student reopening their own package request needs a verified student phone when the switch is on", async () => {
+    const app = await createTestApp();
+    const { tutor, pkg } = await listedPackage();
+    const { student, actor } = await createStudent();
+    const application = await createApplication({
+      packageId: pkg.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+      status: "WITHDRAWN",
+    });
+    await setPlatformSetting("require_student_phone_verification", true);
+    const url = `${BASE}/applications/${application.id}/reopen`;
+    const before = await statusOf(application.id);
+    const totals = await notificationTotals();
+
+    const blocked = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(blocked.statusCode).toBe(403);
+    expect(JSON.parse(blocked.body)).toMatchObject({
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: MESSAGE_BY_ACTION.resend,
+    });
+    const unchanged = await statusOf(application.id);
+    expect(unchanged.status).toBe("WITHDRAWN");
+    expect(unchanged.appliedAt).toEqual(before.appliedAt);
+    expect(await dailyRows(student.id)).toBe(0);
+    expect(await notificationTotals()).toEqual(totals);
+
+    await verify(student.id, "student");
+    const passed = await app.inject({ method: "POST", url, headers: actor.headers });
+    expect(passed.statusCode).toBe(200);
+    expect((await statusOf(application.id)).status).toBe("PENDING");
+  });
+
+  it("a student reopening works with the student switch off and the phone unverified", async () => {
+    const app = await createTestApp();
+    const { tutor, pkg } = await listedPackage();
+    const { student, actor } = await createStudent();
+    const application = await createApplication({
+      packageId: pkg.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "STUDENT",
+      status: "WITHDRAWN",
+    });
+    await setPlatformSetting("require_student_phone_verification", false);
+
+    const res = await app.inject({
+      method: "POST",
+      url: `${BASE}/applications/${application.id}/reopen`,
+      headers: actor.headers,
+    });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it("a tutor reopening their own application returns PROFILE_INCOMPLETE with phone_verification, and writes nothing", async () => {
+    const app = await createTestApp();
+    const { student } = await createStudent();
+    const requirement = await createRequirement({ studentId: student.id });
+    const { tutor, actor } = await createReadyTutor();
+    const application = await createApplication({
+      requirementId: requirement.id,
+      tutorId: tutor.id,
+      studentId: student.id,
+      initiatedBy: "TUTOR",
+      status: "WITHDRAWN",
+    });
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    const totals = await notificationTotals();
+
+    const blocked = await app.inject({
+      method: "POST",
+      url: `${BASE}/applications/${application.id}/reopen`,
+      headers: actor.headers,
+    });
+    expect(blocked.statusCode).toBe(403);
+    const error = JSON.parse(blocked.body);
+    expect(error.code).toBe("PROFILE_INCOMPLETE");
+    expect(error.details.missing).toContain("phone_verification");
+    expect((await statusOf(application.id)).status).toBe("WITHDRAWN");
+    expect(await dailyRows(tutor.id)).toBe(0);
+    expect(await notificationTotals()).toEqual(totals);
+  });
+});

@@ -12,6 +12,7 @@ import {
   createTutorRequirement,
   createTutorZone,
   getAuthHeaders,
+  setPlatformSetting,
   setStudentLocation,
   setTutorLocation,
 } from "../../tests/helpers.js";
@@ -378,5 +379,51 @@ describe("POST /requirements/:id/invites (student invites a tutor)", () => {
       code: "INVITE_LIMIT_REACHED",
       message: "You can invite up to 20 tutors to one requirement",
     });
+  });
+});
+
+describe("phone verification gate on inviting tutors", () => {
+  it("refuses an invite with the student switch on and the phone unverified, and writes nothing", async () => {
+    await setPlatformSetting("require_student_phone_verification", true);
+    const { student, headers } = await createStudentAt();
+    const math = await createSubject();
+    const req = await createRequirement({ studentId: student.id, subjectIds: [math.id] });
+    const { tutor } = await createTutor();
+
+    const res = await invite(headers, req.id, tutor.id);
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: "Verify your phone number before inviting tutors.",
+    });
+    expect(await prisma.requirementInvite.count({ where: { requirementId: req.id } })).toBe(0);
+    expect(await prisma.appNotification.count({ where: { recipientId: tutor.accountId } })).toBe(0);
+  });
+
+  it("sends the invite once the student phone is verified", async () => {
+    await setPlatformSetting("require_student_phone_verification", true);
+    const { student, headers } = await createStudentAt();
+    await prisma.student.update({
+      where: { id: student.id },
+      data: { phoneVerifiedAt: new Date() },
+    });
+    const math = await createSubject();
+    const req = await createRequirement({ studentId: student.id, subjectIds: [math.id] });
+    const { tutor } = await createTutor();
+
+    const res = await invite(headers, req.id, tutor.id);
+    expect(res.status).toBe(201);
+    expect(await prisma.requirementInvite.count({ where: { requirementId: req.id } })).toBe(1);
+  });
+
+  it("sends the invite with the student switch off and the phone unverified", async () => {
+    await setPlatformSetting("require_student_phone_verification", false);
+    const { student, headers } = await createStudentAt();
+    const math = await createSubject();
+    const req = await createRequirement({ studentId: student.id, subjectIds: [math.id] });
+    const { tutor } = await createTutor();
+
+    const res = await invite(headers, req.id, tutor.id);
+    expect(res.status).toBe(201);
   });
 });

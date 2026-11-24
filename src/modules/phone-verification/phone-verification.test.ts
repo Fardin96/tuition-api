@@ -11,6 +11,7 @@ import {
   getAuthHeaders,
   setPlatformSetting,
 } from "../../tests/helpers.js";
+import { assertPhoneVerified } from "./phone-verification.policy.js";
 import { sendPhoneOtp, verifyPhoneOtp } from "./phone-verification.service.js";
 
 type InjectOptions = {
@@ -622,5 +623,43 @@ describe("blocked accounts", () => {
     });
     expect(sent).toHaveLength(0);
     expect(await prisma.phoneOtp.count({ where: { accountId: account.id } })).toBe(0);
+  });
+});
+
+describe("assertPhoneVerified", () => {
+  const MESSAGE = "Verify your phone number before accepting.";
+
+  it("passes with the switch off, and for a verified profile", async () => {
+    const tutor = await tutorWithProfile();
+    await expect(
+      assertPhoneVerified(prisma, "TUTOR", tutor.profile.id, MESSAGE),
+    ).resolves.toBeUndefined();
+
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    await prisma.tutor.update({
+      where: { id: tutor.profile.id },
+      data: { phoneVerifiedAt: new Date() },
+    });
+    await expect(
+      assertPhoneVerified(prisma, "TUTOR", tutor.profile.id, MESSAGE),
+    ).resolves.toBeUndefined();
+  });
+
+  it("throws PhoneVerificationRequired with the given message when the switch is on and unverified", async () => {
+    await setPlatformSetting("require_student_phone_verification", true);
+    const student = await studentWithProfile();
+
+    await expect(
+      assertPhoneVerified(prisma, "STUDENT", student.profile.id, MESSAGE),
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: MESSAGE,
+    });
+    // The switch is per role: a tutor with the same setting off is not checked.
+    const tutor = await tutorWithProfile();
+    await expect(
+      assertPhoneVerified(prisma, "TUTOR", tutor.profile.id, MESSAGE),
+    ).resolves.toBeUndefined();
   });
 });
