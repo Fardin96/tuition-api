@@ -419,3 +419,13 @@ export const AdmissionTarget = {
 } as const
 
 export type AdmissionTarget = (typeof AdmissionTarget)[keyof typeof AdmissionTarget]
+
+
+export const InstitutionKind = {
+  SCHOOL: 'SCHOOL',
+  COLLEGE: 'COLLEGE',
+  SCHOOL_AND_COLLEGE: 'SCHOOL_AND_COLLEGE',
+  UNIVERSITY: 'UNIVERSITY'
+} as const
+
+export type InstitutionKind = (typeof InstitutionKind)[keyof typeof InstitutionKind]

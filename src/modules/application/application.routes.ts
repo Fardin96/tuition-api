@@ -33,7 +33,7 @@ const TRANSITIONS: {
     action: "confirm",
     summary: "Confirm an application",
     description:
-      "#63. The counterparty accepts. Other pending applications on the same listing are rejected, and a placement fee is created at commission_percent (40% unless an admin sets another rate; an explicit 0 creates none).",
+      "#63. The counterparty accepts. Other pending applications on the same listing are rejected, and a placement fee is created at commission_percent (40% unless an admin sets another rate; an explicit 0 creates none). 429 DAILY_LIMIT_REACHED once the account has confirmed the daily accept limit in 24 hours.",
     errors: [404, 409],
   },
   {
@@ -52,7 +52,7 @@ const TRANSITIONS: {
     action: "reopen",
     summary: "Reopen an application",
     description:
-      "#66. The initiator sends a withdrawn, rejected or expired application again. The listing must still be open and not closed. A tutor reopening re-checks profile completeness (403 PROFILE_INCOMPLETE).",
+      "#66. The initiator sends a withdrawn, rejected or expired application again. The listing must still be open and not closed. A tutor reopening re-checks profile completeness (403 PROFILE_INCOMPLETE). 429 DAILY_LIMIT_REACHED once the initiator has used its daily limit in 24 hours; a reopen counts as another send.",
     errors: [403, 404, 409],
   },
   {
@@ -80,7 +80,7 @@ export async function applicationRoutes(app: FastifyInstance) {
           tag: "Applications",
           summary: "Apply to a requirement",
           description:
-            "#57. A tutor applies to an open requirement. Fails with 403 PROFILE_INCOMPLETE until the profile passes the apply gate, 409 ALREADY_APPLIED for a repeat, and 409 APPLICATION_CLOSED once the tuition has a confirmed application.",
+            "#57. A tutor applies to an open requirement. Fails with 403 PROFILE_INCOMPLETE until the profile passes the apply gate, 409 ALREADY_APPLIED for a repeat, and 409 APPLICATION_CLOSED once the tuition has a confirmed application, and 429 DAILY_LIMIT_REACHED once the tutor has used the daily application limit (rolling 24 hours, withdrawn ones included).",
           auth: ["TUTOR"],
           errors: [403, 404, 409],
           rateLimit: "60/min per account",
@@ -108,7 +108,7 @@ export async function applicationRoutes(app: FastifyInstance) {
           tag: "Applications",
           summary: "Request a package",
           description:
-            "#58. A student asks to take an approved, open package from a listed tutor. Fails with 409 ALREADY_APPLIED for a repeat and 409 APPLICATION_CLOSED once the package has a confirmed application.",
+            "#58. A student asks to take an approved, open package from a listed tutor. Fails with 409 ALREADY_APPLIED for a repeat, 409 APPLICATION_CLOSED once the package has a confirmed application, and 429 DAILY_LIMIT_REACHED once the student has used the daily request limit (rolling 24 hours).",
           auth: ["STUDENT"],
           errors: [404, 409],
           rateLimit: "60/min per account",

@@ -57,6 +57,7 @@ export const ModelName = {
   AdminDashboardLayout: 'AdminDashboardLayout',
   AdminUser: 'AdminUser',
   SuperAdminEmail: 'SuperAdminEmail',
+  DailyAction: 'DailyAction',
   AdminInvite: 'AdminInvite',
   AccountBlock: 'AccountBlock',
   UploadReview: 'UploadReview',
@@ -64,6 +65,7 @@ export const ModelName = {
   Area: 'Area',
   Subject: 'Subject',
   FileAsset: 'FileAsset',
+  Institution: 'Institution',
   Student: 'Student',
   Tutor: 'Tutor',
   TutorLocation: 'TutorLocation',
@@ -198,6 +200,16 @@ export const SuperAdminEmailScalarFieldEnum = {
 export type SuperAdminEmailScalarFieldEnum = (typeof SuperAdminEmailScalarFieldEnum)[keyof typeof SuperAdminEmailScalarFieldEnum]
 
 
+export const DailyActionScalarFieldEnum = {
+  id: 'id',
+  partyId: 'partyId',
+  kind: 'kind',
+  at: 'at'
+} as const
+
+export type DailyActionScalarFieldEnum = (typeof DailyActionScalarFieldEnum)[keyof typeof DailyActionScalarFieldEnum]
+
+
 export const AdminInviteScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -296,6 +308,27 @@ export const FileAssetScalarFieldEnum = {
 export type FileAssetScalarFieldEnum = (typeof FileAssetScalarFieldEnum)[keyof typeof FileAssetScalarFieldEnum]
 
 
+export const InstitutionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  kind: 'kind',
+  district: 'district',
+  area: 'area',
+  eiin: 'eiin',
+  aliases: 'aliases',
+  popularity: 'popularity',
+  isActive: 'isActive',
+  nameKey: 'nameKey',
+  aliasKeys: 'aliasKeys',
+  searchText: 'searchText',
+  initialsKey: 'initialsKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InstitutionScalarFieldEnum = (typeof InstitutionScalarFieldEnum)[keyof typeof InstitutionScalarFieldEnum]
+
+
 export const StudentScalarFieldEnum = {
   id: 'id',
   accountId: 'accountId',
@@ -340,6 +373,7 @@ export const TutorScalarFieldEnum = {
   gender: 'gender',
   parentsInfo: 'parentsInfo',
   instituteName: 'instituteName',
+  institutionId: 'institutionId',
   zoneLimit: 'zoneLimit',
   verificationStatus: 'verificationStatus',
   isListed: 'isListed',
@@ -535,6 +569,7 @@ export const TuitionRequirementScalarFieldEnum = {
   hireByDate: 'hireByDate',
   tutorGenderPref: 'tutorGenderPref',
   instituteName: 'instituteName',
+  institutionId: 'institutionId',
   tuitionType: 'tuitionType',
   status: 'status',
   createdAt: 'createdAt',

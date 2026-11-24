@@ -12,11 +12,14 @@ import {
 export const COMMISSION_DEFAULT_PERCENT = 40;
 
 // Used when a key has no platform_setting row yet.
-const DEFAULTS: Record<SettingKey, SettingValue> = {
+export const DEFAULTS: Record<SettingKey, SettingValue> = {
   commission_percent: COMMISSION_DEFAULT_PERCENT,
   gateway_charge_percent: 0,
   online_payments_enabled: true,
   refund_window_days: 7,
+  daily_application_limit: 50,
+  daily_package_request_limit: 20,
+  daily_accept_limit: 20,
   require_tutor_verification: false,
   require_tutor_phone_verification: false,
   require_student_phone_verification: false,
@@ -27,10 +30,18 @@ const NUMBER_RANGES: Partial<Record<SettingKey, { min: number; max: number }>> =
   commission_percent: { min: 0, max: 100 },
   gateway_charge_percent: { min: 0, max: 10 },
   refund_window_days: { min: 0, max: 90 },
+  daily_application_limit: { min: 1, max: 1000 },
+  daily_package_request_limit: { min: 1, max: 1000 },
+  daily_accept_limit: { min: 1, max: 1000 },
 };
 
 // Number settings that count whole units (days), so a fraction is refused.
-const WHOLE_NUMBER_KEYS: SettingKey[] = ["refund_window_days"];
+const WHOLE_NUMBER_KEYS: SettingKey[] = [
+  "refund_window_days",
+  "daily_application_limit",
+  "daily_package_request_limit",
+  "daily_accept_limit",
+];
 
 function readValue(key: SettingKey, raw: unknown): SettingValue {
   if (typeof raw === "number" || typeof raw === "boolean") return raw;
@@ -47,7 +58,7 @@ function validateValue(key: SettingKey, value: SettingValue) {
     }
     if (WHOLE_NUMBER_KEYS.includes(key) && !Number.isInteger(value)) {
       throw validationIssuesError("Invalid setting value", [
-        { path: "value", message: `${key} must be a whole number of days` },
+        { path: "value", message: `${key} must be a whole number` },
       ]);
     }
     // The tolerance absorbs float error in value * 100.

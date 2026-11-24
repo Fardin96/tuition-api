@@ -51,6 +51,7 @@ beforeEach(async () => {
     TRUNCATE TABLE
       account_activity_day,
       admin_dashboard_layout,
+      daily_action,
       admin_invite,
       session,
       admin_user,
@@ -109,6 +110,9 @@ beforeEach(async () => {
       ('require_student_phone_verification', 'false'::jsonb, now())
     ON CONFLICT (key) DO NOTHING;
   `);
+  // institution is seeded by migration (ids up to 100000) and never truncated: drop rows a test added.
+  // Tests must not edit seeded rows; create their own instead.
+  await prisma.$executeRawUnsafe(`DELETE FROM institution WHERE id > 100000`);
   // city is seeded by migration (Dhaka) and never truncated: drop cities a test added, keep Dhaka on.
   await prisma.$executeRawUnsafe(`DELETE FROM city WHERE slug <> 'dhaka'`);
   await prisma.$executeRawUnsafe(

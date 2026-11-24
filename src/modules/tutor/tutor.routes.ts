@@ -280,7 +280,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           tag: "Tutors",
           summary: "Search tutors",
           description:
-            "Listed tutors only (isListed). Filters: area, subject, gender, rating (minimum), name (contains, case-insensitive), district (name, case-insensitive; a tutor with any area in it), recent=true (joined in the last 90 days). Order: rating, then review count, then newest, then id. Without limit every match is returned. With limit (1 to 50) one page is returned and nextCursor is a keyset cursor for the next page (null on the last page); it carries the last row's rating, review count, join time and id, and the recent cutoff. Rows that don't change are never repeated or skipped; a tutor whose rating changes mid-walk can appear twice or not at all, so dedupe by id. nextCursor is always present.",
+            "Listed tutors only (isListed). Filters: area, subject, gender, rating (minimum), name (contains, case-insensitive), district (name, case-insensitive; a tutor with any area in it), recent=true (joined in the last 90 days). Order: rating, then review count, then newest, then id. Without limit the first 500 matches are returned (nextCursor null). With limit (1 to 50) one page is returned and nextCursor is a keyset cursor for the next page (null on the last page); it carries the last row's rating, review count, join time and id, and the recent cutoff. Rows that don't change are never repeated or skipped; a tutor whose rating changes mid-walk can appear twice or not at all, so dedupe by id. nextCursor is always present.",
           auth: "optional",
         }),
         querystring: tutorSearchQuerySchema,
@@ -311,6 +311,7 @@ export async function tutorRoutes(app: FastifyInstance) {
           avatarUrl: t.avatarUrl,
           ratingAvg: Number(t.ratingAvg),
           ratingCount: t.ratingCount,
+          verifiedBadge: t.verifiedBadge,
           areas: t.areas.map((a) => a.area),
           subjects: t.subjects.map((s) => s.subject),
         })),

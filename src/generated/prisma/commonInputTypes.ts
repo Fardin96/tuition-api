@@ -443,6 +443,23 @@ export type EnumFileStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumFileStatusFilter<$PrismaModel>
 }
 
+export type EnumInstitutionKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.InstitutionKind | Prisma.EnumInstitutionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInstitutionKindFilter<$PrismaModel> | $Enums.InstitutionKind
+}
+
+export type EnumInstitutionKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.InstitutionKind | Prisma.EnumInstitutionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInstitutionKindWithAggregatesFilter<$PrismaModel> | $Enums.InstitutionKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumInstitutionKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumInstitutionKindFilter<$PrismaModel>
+}
+
 export type EnumVerificationStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.VerificationStatus | Prisma.EnumVerificationStatusFieldRefInput<$PrismaModel>
   in?: $Enums.VerificationStatus[] | Prisma.ListEnumVerificationStatusFieldRefInput<$PrismaModel>
@@ -1524,6 +1541,23 @@ export type NestedEnumFileStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFileStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFileStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumInstitutionKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.InstitutionKind | Prisma.EnumInstitutionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInstitutionKindFilter<$PrismaModel> | $Enums.InstitutionKind
+}
+
+export type NestedEnumInstitutionKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.InstitutionKind | Prisma.EnumInstitutionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InstitutionKind[] | Prisma.ListEnumInstitutionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInstitutionKindWithAggregatesFilter<$PrismaModel> | $Enums.InstitutionKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumInstitutionKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumInstitutionKindFilter<$PrismaModel>
 }
 
 export type NestedEnumVerificationStatusFilter<$PrismaModel = never> = {

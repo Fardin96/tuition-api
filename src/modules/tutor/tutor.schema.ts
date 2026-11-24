@@ -16,14 +16,16 @@ import {
 } from "../../lib/education.js";
 import { fileIdSchema } from "../files/files.schema.js";
 import { locationSchema, ownLocationResponseSchema } from "../location/location.schema.js";
+import { institutionIdSchema } from "../lookups/institutions.schema.js";
 import { reviewSummarySchema } from "../review/review.schema.js";
 
-const instituteNameSchema = z.string().trim().min(1).max(120);
+const instituteNameSchema = z.string().trim().min(1).max(150);
 
 export const tutorProfileSchema = z
   .object({
     name: z.string().min(1).max(200),
     instituteName: instituteNameSchema.optional(),
+    institutionId: institutionIdSchema,
     address: z.string().min(1).max(500),
     emergencyContact: z.string().min(1).max(50),
     phoneNumber: z
@@ -104,6 +106,7 @@ export const tutorResponseSchema = z
     accountId: z.string(),
     name: z.string(),
     instituteName: z.string().nullable(),
+    institutionId: z.number().nullable(),
     address: z.string(),
     emergencyContact: z.string().nullable(),
     phoneNumber: z.string(),
@@ -161,6 +164,7 @@ export const tutorNearbyResultSchema = z
     ratingAvg: z.number(),
     ratingCount: z.number(),
     distanceMeters: z.number(),
+    verifiedBadge: z.boolean(),
     avatarUrl: z.string().nullable(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),
     subjects: z.array(z.object({ id: z.number(), name: z.string() })),
@@ -182,6 +186,7 @@ export const tutorSearchResultSchema = z
     avatarUrl: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
+    verifiedBadge: z.boolean(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),
     subjects: z.array(z.object({ id: z.number(), name: z.string() })),
   })
@@ -286,6 +291,7 @@ export const tutorPublicProfileSchema = z
     verificationStatus: z.nativeEnum(VerificationStatus),
     isListed: z.boolean(),
     needsReaddress: z.boolean(),
+    verifiedBadge: z.boolean(),
     createdAt: z.string(),
     updatedAt: z.string(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),

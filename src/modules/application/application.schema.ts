@@ -44,6 +44,7 @@ export const applicationTutorSchema = z
     avatarUrl: z.string().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number(),
+    verifiedBadge: z.boolean(),
   })
   .meta({ id: "ApplicationTutor" });
 
@@ -59,6 +60,7 @@ export const applicationTutorProfileSchema = z
     ratingAvg: z.number(),
     ratingCount: z.number(),
     verificationStatus: z.nativeEnum(VerificationStatus),
+    verifiedBadge: z.boolean(),
     areas: z.array(z.object({ id: z.number(), name: z.string() })),
     subjects: z.array(z.object({ id: z.number(), name: z.string() })),
     credentials: z.array(z.object({ id: z.string(), examLabel: z.string(), result: z.string() })),
@@ -101,6 +103,7 @@ export const applicationStudentSchema = z
     name: z.string(),
     areaId: z.number(),
     avatarUrl: z.string().nullable(),
+    verifiedBadge: z.boolean(),
   })
   .meta({ id: "ApplicationStudent" });
 

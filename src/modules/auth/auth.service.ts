@@ -9,6 +9,7 @@ import { avatarSelect, avatarUrlFor, googlePictureFor } from "../../lib/avatar.j
 import { isNumberUsedByOtherAccount } from "../../lib/contact-numbers.js";
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { loadProfileItems, summarizeStrength } from "../../lib/profile-strength.js";
 import { publishFile, removeObjects, unpublishFile } from "../files/files.service.js";
 import { visibleNote } from "../files/upload-review.service.js";
 import { findOwnLocation } from "../location/location.service.js";
@@ -712,33 +713,44 @@ export async function getMe(accountId: string) {
     },
   });
   if (!me) return me;
-  const avatarUrl = await avatarUrlFor(me);
-  // The admin's note reaches the student only when it was shared.
-  const student = me.student && {
-    ...omitVerificationVisibility(me.student),
-    location: await findOwnLocation("student_location", me.student.id),
-  };
-  const tutor = me.tutor && {
-    ...me.tutor,
-    location: await findOwnLocation("tutor_location", me.tutor.id),
-  };
-  if (!tutor) return { ...me, student, tutor, avatarUrl };
-
-  const [readiness] = await prisma.$queryRaw<
-    { missing: string[]; verificationRequired: boolean }[]
-  >`
-    SELECT tutor_missing_requirements(${tutor.id}::uuid) AS missing,
-           COALESCE((SELECT (value #>> '{}')::boolean FROM platform_setting
-                     WHERE key = 'require_tutor_verification'), false) AS "verificationRequired"`;
-  return {
-    ...me,
-    student,
-    tutor,
-    avatarUrl,
-    applyReadiness: {
-      ready: readiness.missing.length === 0,
-      missing: readiness.missing,
-      verificationRequired: readiness.verificationRequired,
-    },
-  };
+  // Independent reads run together; no transaction is needed for them.
+  if (me.role === "STUDENT" && me.student) {
+    const [avatarUrl, location, items] = await Promise.all([
+      avatarUrlFor(me),
+      findOwnLocation("student_location", me.student.id),
+      loadProfileItems(prisma, "STUDENT", me.student.id),
+    ]);
+    return {
+      ...me,
+      avatarUrl,
+      // The admin's note reaches the student only when it was shared.
+      student: { ...omitVerificationVisibility(me.student), location },
+      tutor: null,
+      profileStrength: summarizeStrength("STUDENT", items),
+    };
+  }
+  if (me.role === "TUTOR" && me.tutor) {
+    const [avatarUrl, location, items, [readiness]] = await Promise.all([
+      avatarUrlFor(me),
+      findOwnLocation("tutor_location", me.tutor.id),
+      loadProfileItems(prisma, "TUTOR", me.tutor.id),
+      prisma.$queryRaw<{ missing: string[]; verificationRequired: boolean }[]>`
+        SELECT tutor_missing_requirements(${me.tutor.id}::uuid) AS missing,
+               COALESCE((SELECT (value #>> '{}')::boolean FROM platform_setting
+                         WHERE key = 'require_tutor_verification'), false) AS "verificationRequired"`,
+    ]);
+    return {
+      ...me,
+      avatarUrl,
+      student: null,
+      tutor: { ...me.tutor, location },
+      profileStrength: summarizeStrength("TUTOR", items),
+      applyReadiness: {
+        ready: readiness.missing.length === 0,
+        missing: readiness.missing,
+        verificationRequired: readiness.verificationRequired,
+      },
+    };
+  }
+  return { ...me, student: null, tutor: null, avatarUrl: await avatarUrlFor(me) };
 }

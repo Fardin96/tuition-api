@@ -9,6 +9,7 @@ import {
 } from "../../lib/education.js";
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { instituteFields } from "../lookups/institutions.service.js";
 import { isPhoneVerificationRequired } from "../phone-verification/phone-verification.policy.js";
 import type { CreateRequirementInput, UpdateRequirementInput } from "./requirement.schema.js";
 
@@ -159,7 +160,7 @@ export async function createRequirement(accountId: string, data: CreateRequireme
     throw err;
   }
 
-  const { subjectIds, ...requirementData } = data;
+  const { subjectIds, instituteName, institutionId, ...requirementData } = data;
 
   if (data.status !== "DRAFT") {
     await assertPhoneVerifiedToPost(studentId);
@@ -187,9 +188,11 @@ export async function createRequirement(accountId: string, data: CreateRequireme
         });
       }
 
+      const institute = await instituteFields(tx, { institutionId, instituteName }, null);
       return tx.tuitionRequirement.create({
         data: {
           ...requirementData,
+          ...institute,
           studentId,
           timeOfDay: timeOfDayDate,
           hireByDate,
@@ -251,7 +254,7 @@ export async function updateRequirement(
   const studentId = await getStudentId(accountId);
   if (!studentId) return null;
 
-  const { subjectIds, ...requirementData } = data;
+  const { subjectIds, instituteName, institutionId, ...requirementData } = data;
 
   try {
     const updated = await prisma.$transaction(async (tx) => {
@@ -385,10 +388,16 @@ export async function updateRequirement(
         }
       }
 
+      const institute = await instituteFields(
+        tx,
+        { institutionId, instituteName },
+        existing.institutionId,
+      );
       return tx.tuitionRequirement.update({
         where: { id },
         data: {
           ...requirementData,
+          ...institute,
           timeOfDay: data.timeOfDay ? new Date(`1970-01-01T${data.timeOfDay}:00Z`) : undefined,
           hireByDate: data.hireByDate ? new Date(data.hireByDate) : undefined,
         },

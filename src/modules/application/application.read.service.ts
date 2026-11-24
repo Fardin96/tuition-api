@@ -9,6 +9,7 @@ import { avatarSelect, avatarUrlFor } from "../../lib/avatar.js";
 import { decodeCursor, encodeCursor } from "../../lib/cursor.js";
 import { notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { studentBadges, tutorBadges } from "../../lib/profile-strength.js";
 import type { AuthContext } from "../auth/auth.schema.js";
 import { findOwnLocation } from "../location/location.service.js";
 import { bestSetForPair } from "../matching/match.service.js";
@@ -202,10 +203,22 @@ function toTargetAndState(
   throw new Error(`Application ${row.id} has neither a requirement nor a package`);
 }
 
+type Badges = { tutors: Map<string, boolean>; students: Map<string, boolean> };
+
+// One badge query per side for every application in the list.
+async function badgesFor(rows: AppRow[]): Promise<Badges> {
+  const [tutors, students] = await Promise.all([
+    tutorBadges(prisma, [...new Set(rows.map((r) => r.tutor.id))]),
+    studentBadges(prisma, [...new Set(rows.map((r) => r.student.id))]),
+  ]);
+  return { tutors, students };
+}
+
 async function toApplication(
   row: AppRow,
   side: Side | null,
   closed: boolean,
+  badges: Badges,
 ): Promise<ApplicationResponse> {
   const { target, state } = toTargetAndState(row, closed);
   return {
@@ -223,12 +236,14 @@ async function toApplication(
       ratingAvg: Number(row.tutor.ratingAvg),
       ratingCount: row.tutor.ratingCount,
       avatarUrl: await avatarUrlFor(row.tutor.account),
+      verifiedBadge: badges.tutors.get(row.tutor.id) ?? false,
     },
     student: {
       id: row.student.id,
       name: row.student.name,
       areaId: row.student.areaId,
       avatarUrl: await avatarUrlFor(row.student.account),
+      verifiedBadge: badges.students.get(row.student.id) ?? false,
     },
     target,
     allowedActions: computeAllowedActions(row, side, state),
@@ -356,7 +371,10 @@ async function tutorSetOf(row: AppRow): Promise<ApplicationTutorSet | null> {
 }
 
 // The tutor's details for the student. Credentials carry only id, exam label and result.
-async function tutorProfileOf(tutorId: string): Promise<ApplicationTutorProfile | null> {
+async function tutorProfileOf(
+  tutorId: string,
+  verifiedBadge: boolean,
+): Promise<ApplicationTutorProfile | null> {
   const tutor = await prisma.tutor.findUnique({
     where: { id: tutorId },
     select: {
@@ -386,6 +404,7 @@ async function tutorProfileOf(tutorId: string): Promise<ApplicationTutorProfile 
     ratingAvg: Number(tutor.ratingAvg),
     ratingCount: tutor.ratingCount,
     verificationStatus: tutor.verificationStatus,
+    verifiedBadge,
     areas: tutor.areas.map((a) => a.area),
     subjects: tutor.subjects.map((s) => s.subject),
     credentials: tutor.credentials,
@@ -455,10 +474,11 @@ async function fetchPage(
   const page = hasMore ? rows.slice(0, limit) : rows;
   const last = page[page.length - 1];
   const closed = await loadClosedFor(page);
+  const badges = await badgesFor(page);
 
   return {
     applications: await Promise.all(
-      page.map((row) => toApplication(row, side, isClosed(row, closed))),
+      page.map((row) => toApplication(row, side, isClosed(row, closed), badges)),
     ),
     nextCursor: hasMore && last ? encodeCursor({ createdAt: last.appliedAt, id: last.id }) : null,
   };
@@ -477,14 +497,17 @@ export async function getApplicationForCaller(
   if (side === null && !adminView) throw notFound("Application not found");
 
   const closed = await loadClosedFor([row]);
-  const base = await toApplication(row, side, isClosed(row, closed));
-  const counterpartContact = adminView ? null : await counterpartContactOf(row, side);
-  const studentLocation = await studentLocationFor(row, side);
-  const fee = side === "TUTOR" || adminView ? await placementFeeOf(row) : null;
+  const badges = await badgesFor([row]);
+  const base = await toApplication(row, side, isClosed(row, closed), badges);
   // The tutor's details and set are for the student and admins only.
   const seesTutor = side === "STUDENT" || adminView;
-  const tutorProfile = seesTutor ? await tutorProfileOf(row.tutorId) : null;
-  const tutorSet = seesTutor ? await tutorSetOf(row) : null;
+  const [counterpartContact, studentLocation, fee, tutorProfile, tutorSet] = await Promise.all([
+    adminView ? null : counterpartContactOf(row, side),
+    studentLocationFor(row, side),
+    side === "TUTOR" || adminView ? placementFeeOf(row) : null,
+    seesTutor ? tutorProfileOf(row.tutorId, badges.tutors.get(row.tutorId) ?? false) : null,
+    seesTutor ? tutorSetOf(row) : null,
+  ]);
 
   return { ...base, counterpartContact, studentLocation, fee, tutorProfile, tutorSet };
 }

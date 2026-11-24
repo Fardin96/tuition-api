@@ -16,6 +16,7 @@ import { partsOf } from "../matching/match-sql.js";
 import { getMatchingConfig } from "../matching/matching-config.js";
 import { computeAllowedActions, type Side, type TargetState } from "./application.read.service.js";
 import { type ApplicationAction, FEE_DUE_IN_DAYS } from "./application.schema.js";
+import { recordDailyAction } from "./daily-limits.js";
 
 type Db = Prisma.TransactionClient;
 
@@ -253,6 +254,7 @@ export async function applyToRequirement(
         select: { id: true },
       });
       if (existing) throw alreadyApplied(existing.id);
+      await recordDailyAction(tx, "application", { tutorId: tutor.id });
 
       const created = await tx.application.create({
         data: {
@@ -342,6 +344,7 @@ export async function requestPackage(account: AuthContext, packageId: string): P
         select: { id: true },
       });
       if (existing) throw alreadyApplied(existing.id);
+      await recordDailyAction(tx, "package_request", { studentId: student.id });
 
       const created = await tx.application.create({
         data: {
@@ -412,6 +415,19 @@ export async function transitionApplication(
     if (action === "confirm") assertListingOpen(targetState);
     if (action === "reopen" && app.initiatedBy === "TUTOR") {
       await assertProfileComplete(tx, app.tutorId);
+    }
+    // Listing and application rows are locked before the advisory lock; after it, confirm only touches rows of the already-locked listing.
+    if (action === "reopen" || action === "confirm") {
+      const [kind, party] =
+        action === "confirm"
+          ? ([
+              "accept",
+              side === "TUTOR" ? { tutorId: app.tutorId } : { studentId: app.studentId },
+            ] as const)
+          : app.initiatedBy === "TUTOR"
+            ? (["application", { tutorId: app.tutorId }] as const)
+            : (["package_request", { studentId: app.studentId }] as const);
+      await recordDailyAction(tx, kind, party);
     }
 
     switch (action) {

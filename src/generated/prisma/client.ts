@@ -72,6 +72,11 @@ export type AdminUser = Prisma.AdminUserModel
  */
 export type SuperAdminEmail = Prisma.SuperAdminEmailModel
 /**
+ * Model DailyAction
+ * 
+ */
+export type DailyAction = Prisma.DailyActionModel
+/**
  * Model AdminInvite
  * 
  */
@@ -106,6 +111,11 @@ export type Subject = Prisma.SubjectModel
  * 
  */
 export type FileAsset = Prisma.FileAssetModel
+/**
+ * Model Institution
+ * 
+ */
+export type Institution = Prisma.InstitutionModel
 /**
  * Model Student
  * 

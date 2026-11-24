@@ -11,6 +11,7 @@ import {
   normalizeLevelNote,
   validateStudentEducation,
 } from "../../lib/education.js";
+import { institutionIdSchema } from "../lookups/institutions.schema.js";
 
 export const requirementIdParamSchema = z.object({ id: z.string().uuid() });
 export type RequirementIdParam = z.infer<typeof requirementIdParamSchema>;
@@ -62,7 +63,8 @@ const baseRequirementSchema = z.object({
   studentCount: z.coerce.number().int().min(1),
   hireByDate: z.string().date(),
   tutorGenderPref: tutorGenderPrefSchema,
-  instituteName: z.string().max(200).optional(),
+  instituteName: z.string().max(200).nullable().optional(),
+  institutionId: institutionIdSchema,
   tuitionType: tuitionTypeSchema,
 });
 
@@ -164,6 +166,7 @@ export const requirementResponseSchema = z
     hireByDate: z.string().nullable(),
     tutorGenderPref: tutorGenderPrefSchema,
     instituteName: z.string().nullable(),
+    institutionId: z.number().nullable(),
     tuitionType: tuitionTypeSchema.nullable(),
     status: z.enum(ListingStatus),
     createdAt: z.string(),

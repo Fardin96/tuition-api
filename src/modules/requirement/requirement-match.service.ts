@@ -2,6 +2,7 @@ import { Prisma } from "../../generated/prisma/client.js";
 import { avatarSelect, avatarUrlFor } from "../../lib/avatar.js";
 import { appError, notFound } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
+import { tutorBadges } from "../../lib/profile-strength.js";
 import { MATCH_LIST_CAP, recommendTutors, studentSuggestions } from "../matching/match.service.js";
 import { reasonsFor } from "../matching/match-reasons.js";
 import { getMatchingConfig } from "../matching/matching-config.js";
@@ -51,7 +52,7 @@ export async function listRecommendedTutors(
   const { rows, total } = await recommendTutors(cfg, requirementId, offset, PAGE_SIZE);
   const tutorIds = rows.map((row) => row.tutorId);
 
-  const [tutors, invites, applications] = await Promise.all([
+  const [tutors, invites, applications, badges] = await Promise.all([
     tutorIds.length
       ? prisma.tutor.findMany({
           where: { id: { in: tutorIds } },
@@ -87,6 +88,7 @@ export async function listRecommendedTutors(
           select: { id: true, tutorId: true, status: true },
         })
       : Promise.resolve([]),
+    tutorBadges(prisma, tutorIds),
   ]);
 
   const tutorById = new Map(tutors.map((t) => [t.id, t]));
@@ -112,6 +114,7 @@ export async function listRecommendedTutors(
           ratingAvg: Number(tutor.ratingAvg),
           ratingCount: tutor.ratingCount,
           verificationStatus: tutor.verificationStatus,
+          verifiedBadge: badges.get(tutor.id) ?? false,
           avatarUrl: avatarById.get(tutor.id) ?? null,
           areas: tutor.areas.map((a) => a.area),
           subjects: tutor.subjects.map((s) => s.subject),
