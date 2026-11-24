@@ -4125,3 +4125,144 @@ describe("tutor institution link rules", () => {
     });
   });
 });
+
+describe("phone verification gate on adding a tutor requirement set", () => {
+  const base = "/api/v1/tutors/me/requirements";
+
+  async function tutorOnSubject() {
+    const account = await createAccount({ role: "TUTOR" });
+    const tutor = await createTutorProfile(account.id);
+    const subject = await createSubject();
+    await prisma.tutorSubject.create({ data: { tutorId: tutor.id, subjectId: subject.id } });
+    return { tutor, subject, headers: await getAuthHeaders(account) };
+  }
+
+  const setPayload = (subjectId: number) => ({
+    name: "Evening Math",
+    levelMin: 6,
+    levelMax: 10,
+    curricula: ["BANGLA_MEDIUM"],
+    academicGroups: [],
+    admissionTargets: [],
+    timeFrom: "10:00",
+    timeTo: "12:00",
+    availableDays: 127,
+    minSalary: 5000,
+    maxStudents: 2,
+    availableFrom: "2024-01-01",
+    teachesOnline: true,
+    subjectIds: [subjectId],
+    zoneIds: [],
+  });
+
+  it("refuses a new set with the tutor switch on and the phone unverified, and writes nothing", async () => {
+    const app = await createTestApp();
+    const { tutor, subject, headers } = await tutorOnSubject();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+
+    const res = await app.inject({
+      method: "POST",
+      url: base,
+      headers,
+      payload: setPayload(subject.id),
+    });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body)).toMatchObject({
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: "Verify your phone number before adding a requirement set.",
+    });
+    expect(await prisma.tutorRequirement.count({ where: { tutorId: tutor.id } })).toBe(0);
+  });
+
+  it("adds a set once the tutor phone is verified", async () => {
+    const app = await createTestApp();
+    const { tutor, subject, headers } = await tutorOnSubject();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    await prisma.tutor.update({ where: { id: tutor.id }, data: { phoneVerifiedAt: new Date() } });
+
+    const res = await app.inject({
+      method: "POST",
+      url: base,
+      headers,
+      payload: setPayload(subject.id),
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(await prisma.tutorRequirement.count({ where: { tutorId: tutor.id } })).toBe(1);
+  });
+
+  it("adds a set with the tutor switch off and the phone unverified", async () => {
+    const app = await createTestApp();
+    const { tutor, subject, headers } = await tutorOnSubject();
+    await setPlatformSetting("require_tutor_phone_verification", false);
+
+    const res = await app.inject({
+      method: "POST",
+      url: base,
+      headers,
+      payload: setPayload(subject.id),
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(await prisma.tutorRequirement.count({ where: { tutorId: tutor.id } })).toBe(1);
+  });
+});
+
+describe("phone verification gate on restoring a tutor requirement set", () => {
+  const base = "/api/v1/tutors/me/requirements";
+
+  async function archivedSet() {
+    const account = await createAccount({ role: "TUTOR" });
+    const tutor = await createTutorProfile(account.id);
+    const subject = await createSubject();
+    await prisma.tutorSubject.create({ data: { tutorId: tutor.id, subjectId: subject.id } });
+    const set = await createTutorRequirement(tutor.id, {
+      isActive: false,
+      subjectIds: [subject.id],
+    });
+    return { tutor, set, headers: await getAuthHeaders(account) };
+  }
+
+  it("refuses to restore with the tutor switch on and the phone unverified, and the set stays archived", async () => {
+    const app = await createTestApp();
+    const { tutor, set, headers } = await archivedSet();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+
+    const res = await app.inject({ method: "POST", url: `${base}/${set.id}/restore`, headers });
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body)).toMatchObject({
+      code: "PHONE_VERIFICATION_REQUIRED",
+      message: "Verify your phone number before restoring a requirement set.",
+    });
+    const row = await prisma.tutorRequirement.findUniqueOrThrow({ where: { id: set.id } });
+    expect(row.isActive).toBe(false);
+    expect(
+      await prisma.tutorRequirement.count({ where: { tutorId: tutor.id, isActive: true } }),
+    ).toBe(0);
+  });
+
+  it("restores once the tutor phone is verified", async () => {
+    const app = await createTestApp();
+    const { tutor, set, headers } = await archivedSet();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    await prisma.tutor.update({ where: { id: tutor.id }, data: { phoneVerifiedAt: new Date() } });
+
+    const res = await app.inject({ method: "POST", url: `${base}/${set.id}/restore`, headers });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).isActive).toBe(true);
+  });
+
+  it("restores with the tutor switch off and the phone unverified", async () => {
+    const app = await createTestApp();
+    const { set, headers } = await archivedSet();
+    await setPlatformSetting("require_tutor_phone_verification", false);
+
+    const res = await app.inject({ method: "POST", url: `${base}/${set.id}/restore`, headers });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).isActive).toBe(true);
+  });
+});

@@ -25,6 +25,7 @@ import {
 } from "../location/location.service.js";
 import { instituteFields } from "../lookups/institutions.service.js";
 import {
+  assertPhoneVerified,
   assertPhoneVerifiedForSignup,
   consumeOtp,
   findVerifiedOtp,
@@ -1054,6 +1055,12 @@ export async function createTutorRequirement(
   try {
     const id = await prisma.$transaction(async (tx) => {
       await lockTutor(tx, tutor.id);
+      await assertPhoneVerified(
+        tx,
+        "TUTOR",
+        tutor.id,
+        "Verify your phone number before adding a requirement set.",
+      );
       await prepareSetSubjects(tx, tutor.id, subjectIds, syncProfileSubjects === true);
       const activeCount = await tx.tutorRequirement.count({
         where: { tutorId: tutor.id, isActive: true },
@@ -1269,6 +1276,12 @@ export async function restoreTutorRequirement(accountId: string, id: string) {
       where: { tutorId: tutor.id, isActive: true },
     });
     if (activeCount >= MAX_ACTIVE_REQUIREMENTS) throw limitError();
+    await assertPhoneVerified(
+      tx,
+      "TUTOR",
+      tutor.id,
+      "Verify your phone number before restoring a requirement set.",
+    );
     await tx.tutorRequirement.update({ where: { id }, data: { isActive: true } });
     return true;
   });

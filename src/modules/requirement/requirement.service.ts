@@ -10,7 +10,7 @@ import {
 import { appError } from "../../lib/errors.js";
 import { prisma } from "../../lib/prisma.js";
 import { instituteFields } from "../lookups/institutions.service.js";
-import { isPhoneVerificationRequired } from "../phone-verification/phone-verification.policy.js";
+import { assertPhoneVerified } from "../phone-verification/phone-verification.policy.js";
 import type { CreateRequirementInput, UpdateRequirementInput } from "./requirement.schema.js";
 
 // A hire is a CONFIRMED or COMPLETED application. FILLED is derived from it, never stored.
@@ -65,14 +65,8 @@ async function assertAreaUsable(areaId: number, db: Prisma.TransactionClient = p
 }
 
 // Posting (status OPEN) needs a verified phone when the student switch is on. Drafts never do.
-async function assertPhoneVerifiedToPost(studentId: string, db: Prisma.TransactionClient = prisma) {
-  if (!(await isPhoneVerificationRequired("STUDENT", db))) return;
-  const student = await db.student.findUnique({
-    where: { id: studentId },
-    select: { phoneVerifiedAt: true },
-  });
-  if (student?.phoneVerifiedAt) return;
-  throw appError("PhoneVerificationRequired", 403, "Verify your phone number before posting.");
+function assertPhoneVerifiedToPost(studentId: string, db: Prisma.TransactionClient = prisma) {
+  return assertPhoneVerified(db, "STUDENT", studentId, "Verify your phone number before posting.");
 }
 
 function cannotModify() {

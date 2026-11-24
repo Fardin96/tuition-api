@@ -6,6 +6,7 @@ import { tutorBadges } from "../../lib/profile-strength.js";
 import { MATCH_LIST_CAP, recommendTutors, studentSuggestions } from "../matching/match.service.js";
 import { reasonsFor } from "../matching/match-reasons.js";
 import { getMatchingConfig } from "../matching/matching-config.js";
+import { assertPhoneVerified } from "../phone-verification/phone-verification.policy.js";
 import type {
   RecommendedTutorPageResponse,
   RequirementInviteResponse,
@@ -206,6 +207,13 @@ export async function inviteTutor(
         `You can invite up to ${INVITE_LIMIT} tutors to one requirement`,
       );
     }
+
+    await assertPhoneVerified(
+      tx,
+      "STUDENT",
+      student.id,
+      "Verify your phone number before inviting tutors.",
+    );
 
     let invite: { id: string; requirementId: string; tutorId: string; createdAt: Date };
     try {

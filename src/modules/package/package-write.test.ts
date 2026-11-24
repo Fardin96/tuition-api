@@ -12,6 +12,7 @@ import {
   createTutorRequirement,
   createTutorZone,
   getAuthHeaders,
+  setPlatformSetting,
   setTutorLocation,
 } from "../../tests/helpers.js";
 
@@ -815,5 +816,92 @@ describe("POST /packages/:id/close (#56)", () => {
     expect(res.status).toBe(409);
     expect(res.body.code).toBe("LISTING_NOT_OPEN");
     expect(await prisma.application.count({ where: { packageId: pkg.id } })).toBe(0);
+  });
+});
+
+describe("phone verification in package readiness", () => {
+  it("refuses a new package with the tutor switch on and the phone unverified", async () => {
+    const tutor = await createReadyTutor();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+
+    const res = await send("POST", `${BASE}`, tutor.actor.headers, packageBody(tutor.subjectId));
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe("PROFILE_INCOMPLETE");
+    expect(res.body.details.missing).toContain("phone_verification");
+    expect(await prisma.tuitionPackage.count({ where: { tutorId: tutor.tutor.id } })).toBe(0);
+  });
+});
+
+describe("resubmitting a rejected package", () => {
+  async function rejectedPackage() {
+    const tutor = await createReadyTutor();
+    const pkg = await createTuitionPackage(tutor.tutor.id, {
+      subjectIds: [tutor.subjectId],
+      moderationStatus: "REJECTED",
+      moderationNote: "Price is unclear",
+    });
+    return { tutor, pkg };
+  }
+
+  it("refuses a resubmit with the tutor switch on and the phone unverified, and leaves the package rejected", async () => {
+    const { tutor, pkg } = await rejectedPackage();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+
+    const res = await send("PATCH", `${BASE}/${pkg.id}`, tutor.actor.headers, {
+      title: "Weekend Physics",
+    });
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe("PROFILE_INCOMPLETE");
+    expect(res.body.details.missing).toContain("phone_verification");
+    const row = await prisma.tuitionPackage.findUniqueOrThrow({ where: { id: pkg.id } });
+    expect(row.moderationStatus).toBe("REJECTED");
+    expect(row.moderationNote).toBe("Price is unclear");
+    expect(row.title).toBe("SSC Math Booster");
+  });
+
+  it("resubmits once the tutor phone is verified", async () => {
+    const { tutor, pkg } = await rejectedPackage();
+    await setPlatformSetting("require_tutor_phone_verification", true);
+    await prisma.tutor.update({
+      where: { id: tutor.tutor.id },
+      data: { phoneVerifiedAt: new Date() },
+    });
+
+    const res = await send("PATCH", `${BASE}/${pkg.id}`, tutor.actor.headers, {
+      title: "Weekend Physics",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.moderationStatus).toBe("PENDING");
+  });
+
+  it("resubmits with the tutor switch off and the phone unverified", async () => {
+    const { tutor, pkg } = await rejectedPackage();
+    await setPlatformSetting("require_tutor_phone_verification", false);
+
+    const res = await send("PATCH", `${BASE}/${pkg.id}`, tutor.actor.headers, {
+      title: "Weekend Physics",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.moderationStatus).toBe("PENDING");
+  });
+
+  it("edits an approved package while the phone is unverified, since only resubmits are gated", async () => {
+    const tutor = await createReadyTutor();
+    const pkg = await createTuitionPackage(tutor.tutor.id, {
+      subjectIds: [tutor.subjectId],
+      moderationStatus: "APPROVED",
+    });
+    await setPlatformSetting("require_tutor_phone_verification", true);
+
+    const res = await send("PATCH", `${BASE}/${pkg.id}`, tutor.actor.headers, {
+      title: "Weekend Physics",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.moderationStatus).toBe("APPROVED");
   });
 });

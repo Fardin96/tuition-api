@@ -14,6 +14,7 @@ import type { AuthContext } from "../auth/auth.schema.js";
 import { bestSetForPair } from "../matching/match.service.js";
 import { partsOf } from "../matching/match-sql.js";
 import { getMatchingConfig } from "../matching/matching-config.js";
+import { assertPhoneVerified } from "../phone-verification/phone-verification.policy.js";
 import { computeAllowedActions, type Side, type TargetState } from "./application.read.service.js";
 import { type ApplicationAction, FEE_DUE_IN_DAYS } from "./application.schema.js";
 import { recordDailyAction } from "./daily-limits.js";
@@ -344,6 +345,12 @@ export async function requestPackage(account: AuthContext, packageId: string): P
         select: { id: true },
       });
       if (existing) throw alreadyApplied(existing.id);
+      await assertPhoneVerified(
+        tx,
+        "STUDENT",
+        student.id,
+        "Verify your phone number before requesting a package.",
+      );
       await recordDailyAction(tx, "package_request", { studentId: student.id });
 
       const created = await tx.application.create({
@@ -412,9 +419,25 @@ export async function transitionApplication(
       }
       throw invalidState(action);
     }
-    if (action === "confirm") assertListingOpen(targetState);
+    if (action === "confirm") {
+      assertListingOpen(targetState);
+      await assertPhoneVerified(
+        tx,
+        side,
+        side === "TUTOR" ? app.tutorId : app.studentId,
+        "Verify your phone number before accepting.",
+      );
+    }
     if (action === "reopen" && app.initiatedBy === "TUTOR") {
       await assertProfileComplete(tx, app.tutorId);
+    }
+    if (action === "reopen" && app.initiatedBy === "STUDENT") {
+      await assertPhoneVerified(
+        tx,
+        "STUDENT",
+        app.studentId,
+        "Verify your phone number before sending this again.",
+      );
     }
     // Listing and application rows are locked before the advisory lock; after it, confirm only touches rows of the already-locked listing.
     if (action === "reopen" || action === "confirm") {
